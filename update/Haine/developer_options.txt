@@ -1,0 +1,9 @@
+.gitignore,nonar,noupdate
+.gitattributes,nonar,noupdate
+.git/,nonar,noupdate
+ghost/master/satori_savedata.txt,nonar,noupdate
+ghost/master/satori_savebackup.txt,nonar,noupdate
+ghost/master/satorite.dat,nonar,noupdate
+ghost/master/satorite.exe,nonar,noupdate
+ghost/master/profile/,nonar,noupdate
+ghost/shell/profile/,nonar,noupdate

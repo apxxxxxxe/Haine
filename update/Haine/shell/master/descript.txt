@@ -1,0 +1,12 @@
+charset,Shift_JIS
+name,master
+type,shell
+id,master
+craftmanw,apxxxxxxe
+craftmanurl,https://apxxxxxxe.github.io/
+
+seriko.use_self_alpha,1
+sakura.balloon.offsetx,0
+sakura.balloon.offsety,170
+kero.balloon.offsetx,0
+kero.balloon.offsety,340
