@@ -1,8 +1,8 @@
 file,developer_options.txtcd175bfbb9cd87cc5a32a96ce205089asize=337
 file,ghost/master/descript.txtd6f9f5d79fbb26cc665cebd880b9aef0size=330
 file,ghost/master/dic_advanced.txt318bdfe5a4ccd517254623f8fee194d7size=1966
-file,ghost/master/dic_base.txt6cc99da9b138dcb6f7bfa698f40800edsize=5258
-file,ghost/master/dic_menu.txtfdad140eec14267f3fd89a7517e7e9d6size=5644
+file,ghost/master/dic_base.txt1e8640dae7b3e7c39820c0b031bc9220size=5346
+file,ghost/master/dic_menu.txt70cb5630dc2d8888158fa0010d173354size=5335
 file,ghost/master/dic_mouse.txt1315b544a960f0789116d6e733ca0b75size=2308
 file,ghost/master/dic_network.txtb617ec0b78f580caa2330f3f5ba915e9size=353
 file,ghost/master/dic_resource.txtd8f70fc4d54beea0dd5e0cfec21084d1size=838
