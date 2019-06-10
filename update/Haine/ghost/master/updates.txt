@@ -1,10 +1,10 @@
 file,delete.txtda5213388f34248efb5618a0258594dbsize=27
-file,developer_options.txt45d31f711d56f8b66fa160fc649cbdedsize=417
+file,developer_options.txta3894a552dba616fe09da650647ab7c4size=453
 file,ghost/master/descript.txt96b12b208c79afa33b3dfc11d0fbf073size=745
 file,ghost/master/dic_advanced.txt6d01d48d0a77d66a9b99b45a35f1ccebsize=3817
 file,ghost/master/dic_change.txt8621b7f846de0c87a6630e7390d03cedsize=5473
 file,ghost/master/dic_com.txt6022cd75ec21688e790ae6ac57607842size=8562
-file,ghost/master/dic_menu.txt4e38c873f5bfdab96d602ed392745b2dsize=8593
+file,ghost/master/dic_menu.txt5bb9f995d5af153608e0b839205897c7size=8599
 file,ghost/master/dic_mouse.txtbea82fc941409012fa0026972eb0c2f4size=7559
 file,ghost/master/dic_network.txt3311775d70fd22bb0df30fbab8b9cb1bsize=2386
 file,ghost/master/dic_resource.txtc9c36707eacfd88e5ff7331a7c333c68size=1541
