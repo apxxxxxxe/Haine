@@ -1,15 +1,31 @@
 charset,Shift_JIS
-
-craftmanw,apxxxxxxe
-craftmanurl,https://apxxxxxxe.github.io/
-
 name,郊外通りのハイネ
 type,ghost
-
+craftmanw,aphanite
+craftmanurl,https://apxxxxxxe.github.io/
+homeurl,https://raw.githubusercontent.com/apxxxxxxe/Haine/master/update/Haine/
+readme,readme.txt
 sakura.name,ハイネ
 kero.name,なし
-
-shiori,satori.dll
 sakura.seriko.defaultsurface,11111
 kero.seriko.defaultsurface,10000
-homeurl,https://raw.githubusercontent.com/apxxxxxxe/Haine/master/update/Haine/
+balloon.defaultsurface,0
+seriko.alignmenttodesktop,bottom
+sakura.seriko.alignmenttodesktop,bottom
+kero.seriko.alignmenttodesktop,bottom
+sstp.allowunspecifiedsend,1
+sstp.allowcommunicate,1
+sstp.alwaystranslate,0
+name.allowoverrid,1
+shiori.cache,1
+shiori.encoding,0
+don't need onmousemove,0
+don't need bind,0
+don't need seriko talk,0
+balloon,Teatime_In_The_Fog
+balloon.dontmove,False
+shiori,satori.dll
+
+
+
+

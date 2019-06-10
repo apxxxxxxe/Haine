@@ -1,0 +1,5 @@
+charset,Shift_JIS
+name,–¶‚ÌxŠO‚É‚Ä
+type,balloon
+directory,Teatime_In_The_Fog
+

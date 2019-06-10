@@ -1,4 +1,6 @@
-Charset,UTF-8
+charset,Shift_JIS
+name,xŠO’Ê‚è‚ÌƒnƒCƒl
 type,ghost
-name,éƒŠå¤–é€šã‚Šã®ãƒã‚¤ãƒ
 directory,Haine
+refresh,0
+balloon.directory,Teatime_In_The_Fog
