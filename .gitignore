@@ -1,3 +1,20 @@
-profile/
-yaya_variable.cfg
+desktop.ini
+thumbs.db
+folder.htt
+mscreate.dir
+.DS_Store
+_CATALOG.VIX
 
+profile/
+var/
+__MACOSX/
+XtraStuf.mac/
+
+
+/developer_options.txt
+/md5buildignore.txt
+
+*.log
+
+yaya_variable.cfg
+sagyou/
