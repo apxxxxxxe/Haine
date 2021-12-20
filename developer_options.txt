@@ -3,4 +3,4 @@
 .git/,nonar,noupdate
 ghost/master/profile/,nonar,noupdate
 shell/master/profile/,nonar,noupdate
-shell/sugatami/,nonar,noupdate
+shell/master/sagyou/,nonar,noupdate
