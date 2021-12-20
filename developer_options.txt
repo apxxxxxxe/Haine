@@ -1,3 +1,6 @@
 .gitignore,nonar,noupdate
 .gitattributes,nonar,noupdate
 .git/,nonar,noupdate
+ghost/master/profile/,nonar,noupdate
+shell/master/profile/,nonar,noupdate
+shell/sugatami/,nonar,noupdate
