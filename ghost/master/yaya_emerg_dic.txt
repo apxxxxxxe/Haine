@@ -1,0 +1,65 @@
+//******************************************************************************
+// YAYA　ゴーストテンプレート
+// 緊急時辞書
+// 最低限のエラー対策
+//
+// ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+// ！！！！！辞書エラーの原因になるような記述はしないこと！！！！！
+// ！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！
+//
+//******************************************************************************
+
+OnBoot
+{
+  "\0\s[324109]\1\s[-1]\0致命的エラー発生:\n"
+  --
+  ErrorList.Gene
+  ErrorList
+}
+
+OnFirstBoot
+{
+  OnBoot
+}
+
+OnKeyPress
+{
+  case reference[0] {
+    when "r" {
+      "リロードします\![change,ghost,郊外通りのハイネ]"
+    }
+  }
+}
+
+//form https://github.com/Taromati2
+//free to copy/edit/use
+//E:\ssp\ghost\Taromati2\ghost\master\dic\system\ERRORLOG.dic(17) : error E0041 : 'for'のループ式が異常です.
+ErrorList.SPLIT{
+  _L=SPLIT(RE_REPLACEEX(_argv[0],'\((\d+|-)\) : ',',$1,'),',',3)
+  //("E:\ssp\ghost\Taromati2\ghost\master\dic\system\ERRORLOG.dic","17","error E0041 : 'for'のループ式が異常です.")
+  _L[2]=SPLIT(RE_REPLACEEX(_L[2],' *([WEN])(\d+|-)( *: |：)',',$1,$2,'),',',4)
+  //("E:\ssp\ghost\Taromati2\ghost\master\dic\system\ERRORLOG.dic","17","error","E","0041","'for'のループ式が異常です.")
+  _L
+}
+ErrorList.Gene{
+  ErrorList.filename=IARRAY
+  ErrorList.linenum=IARRAY
+  ErrorList.type=IARRAY
+  ErrorList.typecode=IARRAY
+  ErrorList.code=IARRAY
+  ErrorList.Info=IARRAY
+
+  _l=GETERRORLOG
+  foreach _l;_i{
+    _t=ErrorList.SPLIT(_i)
+    ErrorList.filename,=_t[0]
+    ErrorList.linenum,=TOINT(_t[1])
+    ErrorList.type,=_t[2]
+    ErrorList.typecode,=_t[3]
+    ErrorList.code,=TOINT(_t[4])
+    ErrorList.Info,=_t[5]
+  }
+}
+ClearErrorListVar{
+  ERASEALLVARBEGINAS('ErrorList.')
+}

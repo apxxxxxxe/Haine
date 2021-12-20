@@ -1,0 +1,16 @@
+charset,UTF-8
+
+name,郊外通りのハイネ
+type,ghost
+
+sakura.name,ハイネ
+kero.name,
+
+balloon,霧の郊外にて
+
+sstp.allowunspecifiedsend,1
+
+icon,icon.ico
+icon.minimize,icon_minimize.ico
+
+shiori,yaya.dll

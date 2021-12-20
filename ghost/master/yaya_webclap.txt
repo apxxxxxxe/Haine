@@ -1,0 +1,38 @@
+//Web拍手------------------------------------------------------------------
+
+OnWebClap{
+  "\![open,inputbox,WebClapMessage,,--limit=1000]/
+    \_q拍手メッセージが作者に送信されますφ。\n/
+    バグ報告や要望φ、感想はこちらにお願いしますφ。"
+}
+
+WebClapMessageを入力した{
+  "\![execute,http-post,http://clap.webclap.com/clap.php?id=apxxxxxxe,--param=message_body='Haine:%(InputMessage)',--async=webclap]"
+}
+
+WebClapMessageを空打ちされた{
+  '\_q送信を中止しました'
+}
+
+拍手送信完了{
+  "\_q拍手メッセージを送信しました。"
+    WebClapMessage = ''
+}
+
+拍手送信失敗{
+  "\_q送信に失敗しました。\n%(reference[4])"
+    WebClapMessage = ''
+}
+
+OnExecuteHTTPComplete{
+  if (reference[1] == 'webclap') {
+    拍手送信完了
+  }
+}
+
+OnExecuteHTTPFailure{
+  if (reference[1] == 'webclap') {
+    拍手送信失敗
+  }
+}
+

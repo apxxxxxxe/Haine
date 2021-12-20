@@ -1,0 +1,168 @@
+//******************************************************************************
+// YAYA　ゴーストテンプレート
+// マウス入力関連辞書
+//******************************************************************************
+
+
+//******************************************************************************
+//マウス処理部
+//
+//以下、実際のトークを記述します。関数名は以下の規則になっています。
+//[種別] + [スコープ] + [部位]
+//種別は、MouseMove, MouseDoubleClick, MouseWheelUp, MouseWheelDown のどれかです。
+//スコープは、\0,\1,といったスコープ番号です。
+//部位は、当たり判定のどの部位かを表します。当たり判定の無い場所でのイベントの場合
+//部位はありません。
+//******************************************************************************
+
+
+//******************************************************************************
+//撫で反応
+//******************************************************************************
+
+MouseMove0head : nonoverlap
+{
+  "h111209ん……ありがとう。\nh111205あなたも無理しないでね。"
+  "h111209あたたかいのね、あなたの手。"
+  "h111209……誰かになでられる機会なんて、\nどんどんなくなってしまうものよね。\n…………h111205うん、ありがとう。\nh114204さ、いらっしゃい。あなたの頭もなでてあげるわh114207。"
+}
+
+MouseMove0face : nonoverlap
+{
+  "h111205やさしく触れてくれるのね。\nh111209嬉しいわ、ありがとう。"
+  "h111207くすぐったいわよ。"
+}
+
+MouseMove0bust : nonoverlap
+{
+  "h322104…ちょ、ちょっと……\nh322209ふざけすぎよ、ユーザ。"
+  "h124206……気が済んだらやめてね。"
+  "h324209……なんというか……困ってしまうわ。"
+}
+
+//******************************************************************************
+//つつかれ反応
+//******************************************************************************
+
+MouseDoubleClick0
+{
+  OnOpenMenu
+}
+
+// MouseDoubleClick0bust : nonoverlap
+// {
+//   "h111109……h111101痛くしないで。"
+//   "h111101……h111104さすがに怒るわよ。触るにしても、叩くのは……。"
+// }
+
+//******************************************************************************
+// 引き寄せ反応（下ホイール）
+//******************************************************************************
+
+MouseWheelDown0shoulder
+{
+  "h114209ん。\nh114205……。\nh114201………h114204ふふ。"
+}
+
+MouseWheelDown0hand
+{
+  "h114202うん？\n……h114205手を引いて、h114204それからどうするの？"
+  "h114204……どこかへ連れて行ってくれるの？"
+}
+
+//******************************************************************************
+// 見つめ反応（静止時）
+//******************************************************************************
+
+OnMouseLookAtbust : nonoverlap
+{
+  'h112204……視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。'
+  'h111104……h212109見すぎよ。'
+}
+
+OnMouseLookAtface : nonoverlap
+{
+  'h111101……顔に何かついてる？'
+  'h121201……h121207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？'
+}
+
+OnMouseLookAtfaceBefore : nonoverlap
+{
+
+}
+
+//******************************************************************************
+//マウス処理部コア
+//AYATEMPLATE.MouseMoveWheelFuncの2番目の数字が「感度」です。
+//1番目の数字（0か1）は、MoveかWheelかを判別するためのもので、
+//変更の必要はありません。
+//******************************************************************************
+
+// 触り反応時の共通処理
+CommonEventMouse {
+  lastresponce = systemuptime
+}
+
+OnMouseMove
+{
+  _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
+  if _result != '' {
+    TalkStatus = 1
+    CommonEventMouse
+    "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
+  }
+}
+
+OnMouseWheel
+{
+  _result = ''
+  if TOINT(reference[2]) > 0 {
+    _result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelUp')
+  }
+  else {
+    _result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelDown')
+  }
+  
+  if _result == '' {
+    _result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheel')
+  }
+  
+  if _result != '' {
+    TalkStatus = 1
+    CommonEventMouse
+    "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
+  }
+}
+
+OnMouseDoubleClick
+{
+  _result = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
+  if _result != '' {
+    TalkStatus = 1
+    CommonEventMouse
+    "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
+  }
+}
+
+OnMouseClickEx
+{
+  if reference[5] == 'middle' {
+    _result = AYATEMPLATE.MouseEventExec('MouseWheelClick')
+    if _result != '' {
+      if TalkStatus != 2 {TalkStatus = 1}
+      CommonEventMouse
+      "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
+    }
+  }
+}
+
+OnMouseHover
+{
+  "\C\![timerraise,2000,1,OnMouseLookAt%(reference[4])]"
+}
+
+OnMouseLeave
+{
+  "\C\![timerraise,0,1,OnMouseLookAt%(reference[4])]"
+}
+

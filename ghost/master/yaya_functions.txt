@@ -1,0 +1,157 @@
+//******************************************************************************
+//関数辞書
+//******************************************************************************
+
+//初期化処理
+InitializeVariable
+{
+  MakeKeroBalloownFollow
+  --
+  lastresponce = systemuptime
+  uwanosora_minute = 5
+}
+
+//\1バルーンを\0サーフェスに追従させる
+MakeKeroBalloownFollow
+{
+  '\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]'
+}
+
+//------------------------------------------------------------------------------
+//朝/昼/夜などをおおざっぱに調べる関数
+//------------------------------------------------------------------------------
+GetTimeSlot
+{
+  case hour{
+  when 22,23,0,1,2,3 {'深夜'}
+  when 4,5,6,7,8,9,10,11 {'朝'}
+  when 12,13 {'昼'}
+  when 14,15,16,17 {'日中'}
+  when 18,19,20,21 {'夜'}
+  }
+}
+
+OnNotifySelfInfo
+{
+  sakura_name = reference[1]
+  sakura_name = '郊外通りのハイネ'
+}
+
+OnGetBalloonInfo
+{
+  balloon.name = reference[0]
+  balloon.lines = reference[1]
+}
+
+OnBalloonChange
+{
+  "\![get,property,OnGetBalloonInfo,,currentghost.balloon.name,currentghost.balloon.scope(0).lines]"
+}
+
+
+OnSurfaceChange
+{
+  current_surface = reference[0]
+}
+
+OnSurfaceComplete
+{
+  _delay = 100
+
+  _kocchi = "1, 4"
+  _shita = "2, 5"
+  _acchi = "3, 6"
+  _mesen = (_kocchi, _shita, _acchi) // 目線判定用の２次元配列を作る
+
+  //_dest_surface = TOINT(_argv[0])
+  _dest_surface = TOINT(reference[0]) // 頬・眉・腕・口・目
+  _dest_eyes = _dest_surface % 10 // 目
+  _dest_remain = _dest_surface - _dest_eyes // 頬・眉・腕・口
+  _from_surface = current_surface
+  _from_eyes = _from_surface % 10
+  _from_remain = _from_surface - _from_eyes
+
+  _middle_surface = _dest_surface
+  if (_from_eyes == 7 || _from_eyes == 9) && (_dest_eyes >= 1 && _dest_eyes <= 3) {
+    //直前が目閉じかつ目標が全目の場合
+    "\s[%(_dest_surface + 3)]"
+  }
+  elseif (_dest_eyes == 7 || _dest_eyes == 9) && (_from_eyes >= 1 && _from_eyes <= 3) {
+    // 直前が全目かつ目標が目閉じの場合
+    "\s[%(_dest_remain + _from_eyes + 3)]"
+  }
+  elseif (_dest_eyes >= 1 && _dest_eyes <= 3) && (_from_eyes >= 1 && _from_eyes <= 3) && (_from_eyes != _dest_eyes) {
+    // 直前が全目かつ目標が全目の場合（ただし直前と目標が同じ場合を除く）
+    "\s[%(_from_surface + 3)]\_w[%(_delay)]\s[%(_dest_remain + 9)]\_w[%(_delay)]\s[%(_dest_surface + 3)]"
+  }
+  elseif (_dest_eyes >= 4 && _dest_eyes <= 6) && (_from_eyes >= 1 && _from_eyes <= 3) {
+    // 直前が全目かつ目標が全目の場合（ただし直前と目標が同じ場合を除く）
+    "\s[%(_from_surface + 3)]\_w[%(_delay)]\s[%(_dest_remain + 9)]"
+  }
+  else {
+    "\s[%(_dest_surface)]"
+  }
+  //--
+  //"\_q_s:%(_dest_surface)\n_dest_eyes:%(_dest_eyes)\n_dest_remain:%(_dest_remain)\n_from_eyes:%(_from_eyes)\n_middle:%(_middle_surface)\_q\n"
+  --
+  "\_w[%(_delay)]\s[%(_dest_surface)]"
+}
+
+SETBALLOONSURFACE
+{
+  '\1\s[10000]\0\b[6]'
+}
+
+OnGetSurfaceInfo
+{
+  CurrentSurface = reference[0]
+}
+
+//現在のサーフェス番号を桁で分解して配列として返す
+//10000の位:顔色 1000の位:眉 100の位:腕 10の位:口 1の位:目
+GetSurfaceElements
+{
+  _e = CurrentSurface / POW(10, 5 - _argv[0]) % 10
+  _e
+}
+
+ICON
+{
+  _fontsize = 12
+  if (TOINT(_argv[1]) != 0) {_fontsize = _argv[1]}
+  "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
+  --
+  case _argv[0] {
+    when 'stopwatch' {
+      'e900'
+    }
+    when 'undo' {
+      'e901'
+    }
+    when 'cog' {
+      'e902'
+    }
+    when 'cross' {
+      'e903'
+    }
+    when 'arrow-right' {
+      'e904'
+    }
+    when 'arrow-left' {
+      'e905'
+    }
+  }
+  --
+  ']\f[default]'
+}
+
+//******************************************************************************
+//最小化からの復帰 OnWindowStateRestore
+//******************************************************************************
+
+OnWindowStateRestore
+{
+  'h100000h114109\_w[500]h114101'
+  'h100000h111109\_w[500]h111103'
+  'h100000h111105\_w[500]h111101'
+}

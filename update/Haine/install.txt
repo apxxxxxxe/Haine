@@ -1,6 +1,0 @@
-charset,Shift_JIS
-name,郊外通りのハイネ
-type,ghost
-directory,Haine
-refresh,0
-balloon.directory,Teatime_In_The_Fog

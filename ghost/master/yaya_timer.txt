@@ -1,0 +1,110 @@
+
+/*--------------------------------------------------
+  ポモドーロタイマー
+--------------------------------------------------*/
+UpdatePomodoroTimer
+{
+  if PomodoroStatus > 0 // ポモドーロタイマーが作動中なら
+  {
+    TimerSec = systemuptime - base_time // タイマー開始からの秒数
+    TimerMin = TimerSec / 60 // タイマー開始からの分数
+    if TimerSec >= (currentpomodoro * 60)
+    {
+      if TalkStatus == 2
+      {
+        WillResetPomodoro = 1
+      }
+      else
+      {
+        ResetPomodoroTimer(currentpomodoro) // 時間になったらタイムアップ時の処理
+      }
+    }
+  }
+}
+
+OnPomodoroSet
+{
+  pomodoro = (reference[0], reference[1])
+  ResetPomodoroTimer(-1)
+}
+
+ResetPomodoroTimer
+{
+  /*
+    _argv[0]: -1;開始 pomodoro[0];休憩開始 pomodoro[1];作業再開
+  */
+  _ret = "\_v[sound/柱時計の鐘.mp3]"
+  if _argv[0] == -1 // 開始時
+  {
+    PomodoroStatus = 1
+    PomodoroCount = 0
+    currentpomodoro = pomodoro[0]
+    _ret += "h111204ポモドーロタイマーを開始するわ。\nh114209まずは%(currentpomodoro)分ね。"
+  }
+  elseif (_argv[0] == pomodoro[0]) // 作業時間が終わったとき
+  {
+    currentpomodoro = pomodoro[1]
+    _ret += "h111207お疲れ様。%(_argv[0])分が経過したわ。\nh111204これから%(currentpomodoro)分の休憩ね。"
+  }
+  elseif (_argv[0] == pomodoro[1]) // 休憩時間が終わったとき
+  {
+    currentpomodoro = pomodoro[0]
+    PomodoroCount += 1
+    _ret += "h111207%(_argv[0])分が経過したわ。\nh111204続けて%(currentpomodoro)分の作業、開始するわね。"
+    _ret += "\nちなみに現在%(PomodoroCount)セット（%(EVAL((pomodoro[0]+pomodoro[1])*PomodoroCount))分）よ。"
+  }
+
+  base_time = systemuptime // 経過時間の基準点を再設定
+  _ret
+}
+
+OnPomodoroStop
+{
+  if (PomodoroCount == 0) {
+    "h114209はい、中断したわ。"
+  }else {
+    "h111207お疲れさま。\n今回は" + PomodoroCount + "セット（" + (pomodoro[0]+pomodoro[1])*PomodoroCount + "分）ね。"
+  }
+  PomodoroStatus = 0
+  AllPomodoroCount += PomodoroCount
+}
+
+/*--------------------------------------------------
+  ループタイマー
+--------------------------------------------------*/
+OnLoopSet
+{
+  PomodoroStatus = 2
+  CurrentLoop = reference[0]
+  "\![raise,OnLoopTimerOver,100]"
+}
+
+OnLoopTimerOver
+{
+  /*
+   reference[0]:
+  */
+  TimerMin = 0
+    _loop = CurrentLoop * 1000 * 60
+    "\![timerraise,%(_loop),1,OnLoopTimerOver,0]\_v[sound/柱時計の鐘.mp3]"
+    --
+
+    if (reference[0] == 100) {
+      "%(CurrentLoop)分のループタイマーを開始するわ。"
+        LoopCount = 0
+    } else {
+      "%(CurrentLoop)分が経過したわ。次は%(CurrentLoop)分後ね。"
+        LoopCount += 1
+    }
+}
+
+OnTimerStop
+{
+  if (reference[0] == 0) {
+    "h114209はい、中断したわ。"
+  }else {
+    "h111207お疲れさま。\n今回は" + CurrentLoop + "セット（" + CurrentLoop*LoopCount + "分）ね。"
+  }
+  PomodoroStatus = 0
+}
+

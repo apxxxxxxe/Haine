@@ -1,0 +1,11 @@
+charset.dic, UTF-8
+charset.output, UTF-8
+charset.file, UTF-8
+charset.save, UTF-8
+charset.save.old, UTF-8
+charset.extension, UTF-8
+
+include, system_config.txt
+
+dic, yaya_emerg_dic.txt
+dic, yaya_homeurl.txt
