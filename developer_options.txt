@@ -3,4 +3,5 @@
 .git/,nonar,noupdate
 ghost/master/profile/,nonar,noupdate
 shell/master/profile/,nonar,noupdate
+ghost/master/sagyou/,nonar,noupdate
 shell/master/sagyou/,nonar,noupdate
