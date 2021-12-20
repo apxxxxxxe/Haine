@@ -54,6 +54,7 @@ OnSurfaceChange
   current_surface = reference[0]
 }
 
+// サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
 OnSurfaceComplete
 {
   _delay = 100
@@ -81,15 +82,20 @@ OnSurfaceComplete
     "\s[%(_dest_remain + _from_eyes + 3)]"
   }
   elseif (_dest_eyes >= 1 && _dest_eyes <= 3) && (_from_eyes >= 1 && _from_eyes <= 3) && (_from_eyes != _dest_eyes) {
-    // 直前が全目かつ目標が全目の場合（ただし直前と目標が同じ場合を除く）
+    // 直前が全目かつ目標が全目の場合（直前と目標が同じ場合を除く）
     "\s[%(_from_surface + 3)]\_w[%(_delay)]\s[%(_dest_remain + 9)]\_w[%(_delay)]\s[%(_dest_surface + 3)]"
   }
-  elseif (_dest_eyes >= 4 && _dest_eyes <= 6) && (_from_eyes >= 1 && _from_eyes <= 3) {
-    // 直前が全目かつ目標が全目の場合（ただし直前と目標が同じ場合を除く）
+  elseif (_dest_eyes >= 4 && _dest_eyes <= 6) && (_from_eyes >= 1 && _from_eyes <= 3) && ((_from_eyes + 3) != _dest_eyes) {
+    // 直前が全目かつ目標が半目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
     "\s[%(_from_surface + 3)]\_w[%(_delay)]\s[%(_dest_remain + 9)]"
+  }
+  elseif (_dest_eyes >= 1 && _dest_eyes <= 3) && (_from_eyes >= 4 && _from_eyes <= 6) && ((_from_eyes - 3) != _dest_eyes) {
+    // 直前が半目かつ目標が全目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
+    "\s[%(_dest_remain + 9)]\_w[%(_delay)]\s[%(_dest_surface + 3)]"
   }
   else {
     "\s[%(_dest_surface)]"
+    return
   }
   //--
   //"\_q_s:%(_dest_surface)\n_dest_eyes:%(_dest_eyes)\n_dest_remain:%(_dest_remain)\n_from_eyes:%(_from_eyes)\n_middle:%(_middle_surface)\_q\n"
