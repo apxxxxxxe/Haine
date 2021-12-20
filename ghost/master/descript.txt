@@ -6,6 +6,8 @@ type,ghost
 sakura.name,ハイネ
 kero.name,
 
+homeurl,https://raw.githubusercontent.com/apxxxxxxe/Haine/develop/
+
 balloon,霧の郊外にて
 
 sstp.allowunspecifiedsend,1
