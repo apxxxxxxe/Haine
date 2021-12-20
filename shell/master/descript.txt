@@ -1,4 +1,4 @@
-charset,Shift_JIS
+charset,UTF-8
 name,master
 type,shell
 id,master
@@ -15,142 +15,142 @@ sakura.balloon.offsety,170
 kero.balloon.offsetx,184
 kero.balloon.offsety,380
 
-sakura.bindoption.group,“ª,multiple
-sakura.bindgroup507001.name,“ª,–XqA
-sakura.bindgroup507005.name,“ª,–XqB
-sakura.bindgroup507006.name,“ª,–XqC
-sakura.bindgroup507000.name,“ª,–XqD
+sakura.bindoption.group,é ­,multiple
+sakura.bindgroup507001.name,é ­,å¸½å­A
+sakura.bindgroup507005.name,é ­,å¸½å­B
+sakura.bindgroup507006.name,é ­,å¸½å­C
+sakura.bindgroup507000.name,é ­,å¸½å­D
 sakura.bindgroup507000.addid,500050
-sakura.bindgroup507007.name,“ª,–XqE
+sakura.bindgroup507007.name,é ­,å¸½å­E
 sakura.bindgroup507007.addid,500050
-sakura.bindgroup507002.name,“ª,ƒJƒ`ƒ…[ƒVƒƒ
-sakura.bindgroup507003.name,“ª,ƒsƒAƒXA
-sakura.bindgroup507004.name,“ª,ƒsƒAƒXB
-sakura.bindgroup506508.name,“ª,ƒ‚ƒmƒNƒ‹
-sakura.bindgroup506509.name,“ª,ƒ‚ƒmƒNƒ‹
-sakura.bindgroup506510.name,“ª,ƒ‚ƒmƒNƒ‹
-sakura.bindgroup506511.name,“ª,ƒ‚ƒmƒNƒ‹
+sakura.bindgroup507002.name,é ­,ã‚«ãƒãƒ¥ãƒ¼ã‚·ãƒ£
+sakura.bindgroup507003.name,é ­,ãƒ”ã‚¢ã‚¹A
+sakura.bindgroup507004.name,é ­,ãƒ”ã‚¢ã‚¹B
+sakura.bindgroup506508.name,é ­,ãƒ¢ãƒã‚¯ãƒ«
+sakura.bindgroup506509.name,é ­,ãƒ¢ãƒã‚¯ãƒ«
+sakura.bindgroup506510.name,é ­,ãƒ¢ãƒã‚¯ãƒ«
+sakura.bindgroup506511.name,é ­,ãƒ¢ãƒã‚¯ãƒ«
 
-sakura.bindoption.group,Œã”¯,mustselect
-sakura.bindgroup500100.name,Œã”¯,ƒfƒtƒHƒ‹ƒg
-sakura.bindgroup500102.name,Œã”¯,A
-sakura.bindgroup500107.name,Œã”¯,B
-sakura.bindgroup500109.name,Œã”¯,C
-sakura.bindgroup500101.name,Œã”¯,D
-sakura.bindgroup500103.name,Œã”¯,E
-sakura.bindgroup500110.name,Œã”¯,F
-sakura.bindgroup500106.name,Œã”¯,G
+sakura.bindoption.group,å¾Œé«ª,mustselect
+sakura.bindgroup500100.name,å¾Œé«ª,ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
+sakura.bindgroup500102.name,å¾Œé«ª,A
+sakura.bindgroup500107.name,å¾Œé«ª,B
+sakura.bindgroup500109.name,å¾Œé«ª,C
+sakura.bindgroup500101.name,å¾Œé«ª,D
+sakura.bindgroup500103.name,å¾Œé«ª,E
+sakura.bindgroup500110.name,å¾Œé«ª,F
+sakura.bindgroup500106.name,å¾Œé«ª,G
 sakura.bindgroup500100.default,1
 
-sakura.bindoption.group,‘O”¯,mustselect
-sakura.bindgroup506701.name,‘O”¯,ƒfƒtƒHƒ‹ƒg
-sakura.bindgroup506706.name,‘O”¯,A
-sakura.bindgroup506700.name,‘O”¯,B
-sakura.bindgroup506702.name,‘O”¯,C
-sakura.bindgroup506703.name,‘O”¯,D
-sakura.bindgroup506704.name,‘O”¯,E
-sakura.bindgroup506705.name,‘O”¯,F
-sakura.bindgroup506707.name,‘O”¯,G
-sakura.bindgroup506708.name,‘O”¯,H
-sakura.bindgroup506709.name,‘O”¯,I
-sakura.bindgroup506710.name,‘O”¯,J
+sakura.bindoption.group,å‰é«ª,mustselect
+sakura.bindgroup506701.name,å‰é«ª,ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ
+sakura.bindgroup506706.name,å‰é«ª,A
+sakura.bindgroup506700.name,å‰é«ª,B
+sakura.bindgroup506702.name,å‰é«ª,C
+sakura.bindgroup506703.name,å‰é«ª,D
+sakura.bindgroup506704.name,å‰é«ª,E
+sakura.bindgroup506705.name,å‰é«ª,F
+sakura.bindgroup506707.name,å‰é«ª,G
+sakura.bindgroup506708.name,å‰é«ª,H
+sakura.bindgroup506709.name,å‰é«ª,I
+sakura.bindgroup506710.name,å‰é«ª,J
 sakura.bindgroup506701.default,1
 
-sakura.bindoption.group,‘O”¯B,multiple
-sakura.bindgroup506799.name,‘O”¯B,A‘O
-sakura.bindgroup506699.name,‘O”¯B,AŒã
-sakura.bindgroup506798.name,‘O”¯B,B‘O
-sakura.bindgroup506698.name,‘O”¯B,BŒã
+sakura.bindoption.group,å‰é«ªB,multiple
+sakura.bindgroup506799.name,å‰é«ªB,Aå‰
+sakura.bindgroup506699.name,å‰é«ªB,Aå¾Œ
+sakura.bindgroup506798.name,å‰é«ªB,Bå‰
+sakura.bindgroup506698.name,å‰é«ªB,Bå¾Œ
 sakura.bindgroup506799.default,1
 
-sakura.bindoption.group,”¯+,multiple
-sakura.bindgroup506150.name,”¯+,ƒAƒz–Ñ
-sakura.bindgroup506790.name,”¯+,‰¡”¯A
-sakura.bindgroup506791.name,”¯+,‰¡”¯B
+sakura.bindoption.group,é«ª+,multiple
+sakura.bindgroup506150.name,é«ª+,ã‚¢ãƒ›æ¯›
+sakura.bindgroup506790.name,é«ª+,æ¨ªé«ªA
+sakura.bindgroup506791.name,é«ª+,æ¨ªé«ªB
 sakura.bindgroup506150.default,1
 sakura.bindgroup506790.default,1
 
-sakura.bindoption.group,ƒgƒbƒvƒX
-sakura.bindgroup502362.name,ƒgƒbƒvƒX,ƒƒ“ƒs[ƒX”’
-sakura.bindgroup502363.name,ƒgƒbƒvƒX,ƒƒ“ƒs[ƒX•
-sakura.bindgroup502360.name,ƒgƒbƒvƒX,ƒuƒ‰ƒEƒX”’A
-sakura.bindgroup502364.name,ƒgƒbƒvƒX,ƒuƒ‰ƒEƒX”’B
-sakura.bindgroup502361.name,ƒgƒbƒvƒX,ƒuƒ‰ƒEƒX•A
-sakura.bindgroup502366.name,ƒgƒbƒvƒX,ƒuƒ‰ƒEƒX•B
-sakura.bindgroup502367.name,ƒgƒbƒvƒX,xx
-sakura.bindgroup502368.name,ƒgƒbƒvƒX,ƒpƒtƒƒ“ƒs[ƒX•
-sakura.bindgroup502369.name,ƒgƒbƒvƒX,ƒpƒtƒƒ“ƒs[ƒX”’
+sakura.bindoption.group,ãƒˆãƒƒãƒ—ã‚¹
+sakura.bindgroup502362.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ¯ãƒ³ãƒ”ãƒ¼ã‚¹ç™½
+sakura.bindgroup502363.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ¯ãƒ³ãƒ”ãƒ¼ã‚¹é»’
+sakura.bindgroup502360.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ–ãƒ©ã‚¦ã‚¹ç™½A
+sakura.bindgroup502364.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ–ãƒ©ã‚¦ã‚¹ç™½B
+sakura.bindgroup502361.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ–ãƒ©ã‚¦ã‚¹é»’A
+sakura.bindgroup502366.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ–ãƒ©ã‚¦ã‚¹é»’B
+sakura.bindgroup502367.name,ãƒˆãƒƒãƒ—ã‚¹,xx
+sakura.bindgroup502368.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ‘ãƒ•ãƒ¯ãƒ³ãƒ”ãƒ¼ã‚¹é»’
+sakura.bindgroup502369.name,ãƒˆãƒƒãƒ—ã‚¹,ãƒ‘ãƒ•ãƒ¯ãƒ³ãƒ”ãƒ¼ã‚¹ç™½
 sakura.bindgroup502363.default,1
 
-sakura.bindoption.group,ƒgƒbƒvƒX+,multiple
-sakura.bindgroup506300.name,ƒgƒbƒvƒX+,‹İA
-sakura.bindgroup506301.name,ƒgƒbƒvƒX+,‹İB
-sakura.bindgroup506303.name,ƒgƒbƒvƒX+,‹İC
-sakura.bindgroup506304.name,ƒgƒbƒvƒX+,ƒŠƒ{ƒ“•
-sakura.bindgroup506305.name,ƒgƒbƒvƒX+,ƒŠƒ{ƒ“Ô
-sakura.bindgroup506306.name,ƒgƒbƒvƒX+,ƒuƒ[ƒ`
-sakura.bindgroup506307.name,ƒgƒbƒvƒX+,ƒXƒJ[ƒt
-sakura.bindgroup506308.name,ƒgƒbƒvƒX+,ƒ`ƒ‡[ƒJ[
-sakura.bindgroup506309.name,ƒgƒbƒvƒX+,ƒlƒNƒ^ƒC
-sakura.bindgroup504510.name,ƒgƒbƒvƒX+,ƒRƒ‹ƒZƒbƒgA
-sakura.bindgroup504511.name,ƒgƒbƒvƒX+,ƒRƒ‹ƒZƒbƒgB
-sakura.bindgroup506312.name,ƒgƒbƒvƒX+,ƒŠƒ{ƒ“‘å•
-sakura.bindgroup506313.name,ƒgƒbƒvƒX+,ƒŠƒ{ƒ“‘å”’
-sakura.bindgroup506314.name,ƒgƒbƒvƒX+,ƒŠƒ{ƒ“‘åÔ
-sakura.bindgroup506298.name,ƒgƒbƒvƒX+,ƒtƒŠƒ‹‘³
-sakura.bindgroup506299.name,ƒgƒbƒvƒX+,“û
+sakura.bindoption.group,ãƒˆãƒƒãƒ—ã‚¹+,multiple
+sakura.bindgroup506300.name,ãƒˆãƒƒãƒ—ã‚¹+,è¥ŸA
+sakura.bindgroup506301.name,ãƒˆãƒƒãƒ—ã‚¹+,è¥ŸB
+sakura.bindgroup506303.name,ãƒˆãƒƒãƒ—ã‚¹+,è¥ŸC
+sakura.bindgroup506304.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒªãƒœãƒ³é»’
+sakura.bindgroup506305.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒªãƒœãƒ³èµ¤
+sakura.bindgroup506306.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒ–ãƒ­ãƒ¼ãƒ
+sakura.bindgroup506307.name,ãƒˆãƒƒãƒ—ã‚¹+,ã‚¹ã‚«ãƒ¼ãƒ•
+sakura.bindgroup506308.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒãƒ§ãƒ¼ã‚«ãƒ¼
+sakura.bindgroup506309.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒã‚¯ã‚¿ã‚¤
+sakura.bindgroup504510.name,ãƒˆãƒƒãƒ—ã‚¹+,ã‚³ãƒ«ã‚»ãƒƒãƒˆA
+sakura.bindgroup504511.name,ãƒˆãƒƒãƒ—ã‚¹+,ã‚³ãƒ«ã‚»ãƒƒãƒˆB
+sakura.bindgroup506312.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒªãƒœãƒ³å¤§é»’
+sakura.bindgroup506313.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒªãƒœãƒ³å¤§ç™½
+sakura.bindgroup506314.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒªãƒœãƒ³å¤§èµ¤
+sakura.bindgroup506298.name,ãƒˆãƒƒãƒ—ã‚¹+,ãƒ•ãƒªãƒ«è¢–
+sakura.bindgroup506299.name,ãƒˆãƒƒãƒ—ã‚¹+,ä¹³
 sakura.bindgroup506304.default,1
 
-sakura.bindoption.group,‘³
-sakura.bindgroup505310.name,‘³,‘³”’
-sakura.bindgroup505311.name,‘³,‘³•
-sakura.bindgroup505312.name,‘³,ƒtƒŠƒ‹‘³”’
-sakura.bindgroup505313.name,‘³,ƒtƒŠƒ‹‘³•
-sakura.bindgroup505314.name,‘³,ƒn[ƒt”’
-sakura.bindgroup505315.name,‘³,ƒn[ƒt•
-sakura.bindgroup505316.name,‘³,ƒpƒt”’
-sakura.bindgroup505318.name,‘³,’·”’
-sakura.bindgroup505319.name,‘³,’·•
+sakura.bindoption.group,è¢–
+sakura.bindgroup505310.name,è¢–,è¢–ç™½
+sakura.bindgroup505311.name,è¢–,è¢–é»’
+sakura.bindgroup505312.name,è¢–,ãƒ•ãƒªãƒ«è¢–ç™½
+sakura.bindgroup505313.name,è¢–,ãƒ•ãƒªãƒ«è¢–é»’
+sakura.bindgroup505314.name,è¢–,ãƒãƒ¼ãƒ•ç™½
+sakura.bindgroup505315.name,è¢–,ãƒãƒ¼ãƒ•é»’
+sakura.bindgroup505316.name,è¢–,ãƒ‘ãƒ•ç™½
+sakura.bindgroup505318.name,è¢–,é•·ç™½
+sakura.bindgroup505319.name,è¢–,é•·é»’
 sakura.bindgroup505318.default,1
 
-sakura.bindoption.group,ƒ{ƒgƒ€ƒX
-sakura.bindgroup504370.name,ƒ{ƒgƒ€ƒX,ƒtƒŒƒA•
-sakura.bindgroup504371.name,ƒ{ƒgƒ€ƒX,ƒtƒŒƒA”’
-sakura.bindgroup504372.name,ƒ{ƒgƒ€ƒX,ƒtƒŠƒ‹•
-sakura.bindgroup504373.name,ƒ{ƒgƒ€ƒX,ƒtƒŒƒA”’
-sakura.bindgroup504374.name,ƒ{ƒgƒ€ƒX,ƒVƒ‡[ƒgƒpƒ“ƒc
-sakura.bindgroup504375.name,ƒ{ƒgƒ€ƒX,ƒXƒ‰ƒbƒNƒX
+sakura.bindoption.group,ãƒœãƒˆãƒ ã‚¹
+sakura.bindgroup504370.name,ãƒœãƒˆãƒ ã‚¹,ãƒ•ãƒ¬ã‚¢é»’
+sakura.bindgroup504371.name,ãƒœãƒˆãƒ ã‚¹,ãƒ•ãƒ¬ã‚¢ç™½
+sakura.bindgroup504372.name,ãƒœãƒˆãƒ ã‚¹,ãƒ•ãƒªãƒ«é»’
+sakura.bindgroup504373.name,ãƒœãƒˆãƒ ã‚¹,ãƒ•ãƒ¬ã‚¢ç™½
+sakura.bindgroup504374.name,ãƒœãƒˆãƒ ã‚¹,ã‚·ãƒ§ãƒ¼ãƒˆãƒ‘ãƒ³ãƒ„
+sakura.bindgroup504375.name,ãƒœãƒˆãƒ ã‚¹,ã‚¹ãƒ©ãƒƒã‚¯ã‚¹
 
-sakura.bindoption.group,ŒC‰º
-sakura.bindgroup501380.name,ŒC‰º,ƒnƒCƒ\”’
-sakura.bindgroup501381.name,ŒC‰º,ƒnƒCƒ\•
-sakura.bindgroup501384.name,ŒC‰º,ƒj[ƒ\”’A
-sakura.bindgroup501382.name,ŒC‰º,ƒj[ƒ\”’B
-sakura.bindgroup501385.name,ŒC‰º,ƒj[ƒ\•A
-sakura.bindgroup501383.name,ŒC‰º,ƒj[ƒ\•B
-sakura.bindgroup501386.name,ŒC‰º,ƒ\ƒbƒNƒX”’
-sakura.bindgroup501387.name,ŒC‰º,ƒ\ƒbƒNƒX•
+sakura.bindoption.group,é´ä¸‹
+sakura.bindgroup501380.name,é´ä¸‹,ãƒã‚¤ã‚½ç™½
+sakura.bindgroup501381.name,é´ä¸‹,ãƒã‚¤ã‚½é»’
+sakura.bindgroup501384.name,é´ä¸‹,ãƒ‹ãƒ¼ã‚½ç™½A
+sakura.bindgroup501382.name,é´ä¸‹,ãƒ‹ãƒ¼ã‚½ç™½B
+sakura.bindgroup501385.name,é´ä¸‹,ãƒ‹ãƒ¼ã‚½é»’A
+sakura.bindgroup501383.name,é´ä¸‹,ãƒ‹ãƒ¼ã‚½é»’B
+sakura.bindgroup501386.name,é´ä¸‹,ã‚½ãƒƒã‚¯ã‚¹ç™½
+sakura.bindgroup501387.name,é´ä¸‹,ã‚½ãƒƒã‚¯ã‚¹é»’
 sakura.bindgroup501380.default,1
 
-sakura.bindoption.group,ŒC‰º+
-sakura.bindgroup501401.name,ŒC‰º+,ƒ\ƒbƒNƒXƒK[ƒ^[•
-sakura.bindgroup501400.name,ŒC‰º+,ƒ\ƒbƒNƒXƒK[ƒ^[”’
-sakura.bindgroup501402.name,ŒC‰º+,‘«ñƒtƒŠƒ‹
-sakura.bindgroup501403.name,ŒC‰º+,ƒK[ƒ^[ƒxƒ‹ƒg”’
-sakura.bindgroup501404.name,ŒC‰º+,ƒK[ƒ^[ƒxƒ‹ƒg•
+sakura.bindoption.group,é´ä¸‹+
+sakura.bindgroup501401.name,é´ä¸‹+,ã‚½ãƒƒã‚¯ã‚¹ã‚¬ãƒ¼ã‚¿ãƒ¼é»’
+sakura.bindgroup501400.name,é´ä¸‹+,ã‚½ãƒƒã‚¯ã‚¹ã‚¬ãƒ¼ã‚¿ãƒ¼ç™½
+sakura.bindgroup501402.name,é´ä¸‹+,è¶³é¦–ãƒ•ãƒªãƒ«
+sakura.bindgroup501403.name,é´ä¸‹+,ã‚¬ãƒ¼ã‚¿ãƒ¼ãƒ™ãƒ«ãƒˆç™½
+sakura.bindgroup501404.name,é´ä¸‹+,ã‚¬ãƒ¼ã‚¿ãƒ¼ãƒ™ãƒ«ãƒˆé»’
 sakura.bindgroup501401.default,1
 
-sakura.bindoption.group,ŒC
-sakura.bindgroup508351.name,ŒC,‚¨‚Å‚±ŒC•
-sakura.bindgroup508352.name,ŒC,‚¨‚Å‚±ŒC”’
-sakura.bindgroup508353.name,ŒC,‚¨‚Å‚±ŒCÔ
-sakura.bindgroup508354.name,ŒC,•
-sakura.bindgroup508356.name,ŒC,”’
-sakura.bindgroup508357.name,ŒC,ƒ[ƒtƒ@[
-sakura.bindgroup508360.name,ŒC,ƒu[ƒc•
-sakura.bindgroup508361.name,ŒC,ƒu[ƒc’ƒ
-sakura.bindgroup508358.name,ŒC,ƒTƒ“ƒ_ƒ‹•
-sakura.bindgroup508359.name,ŒC,ƒTƒ“ƒ_ƒ‹”’
+sakura.bindoption.group,é´
+sakura.bindgroup508351.name,é´,ãŠã§ã“é´é»’
+sakura.bindgroup508352.name,é´,ãŠã§ã“é´ç™½
+sakura.bindgroup508353.name,é´,ãŠã§ã“é´èµ¤
+sakura.bindgroup508354.name,é´,é»’
+sakura.bindgroup508356.name,é´,ç™½
+sakura.bindgroup508357.name,é´,ãƒ­ãƒ¼ãƒ•ã‚¡ãƒ¼
+sakura.bindgroup508360.name,é´,ãƒ–ãƒ¼ãƒ„é»’
+sakura.bindgroup508361.name,é´,ãƒ–ãƒ¼ãƒ„èŒ¶
+sakura.bindgroup508358.name,é´,ã‚µãƒ³ãƒ€ãƒ«é»’
+sakura.bindgroup508359.name,é´,ã‚µãƒ³ãƒ€ãƒ«ç™½
 sakura.bindgroup508351.default,1
 
 sakura.menu,auto
