@@ -225,7 +225,7 @@ surface111101,111201,111301,112101,112201,112301,113101,113201,113301,114101,114
 	//‚±‚Á‚¿–Ú
 	animation500300.interval,runonce+rarely
 	animation500300.pattern0,overlay,202,0,0,0
-	animation500300.pattern1,overlay,208,2000,0,0
+	animation500300.pattern1,overlay,208,4000,0,0
 	animation500300.pattern2,overlay,212,100,0,0
 	animation500300.pattern3,overlay,208,100,0,0
 	animation500300.pattern4,overlay,202,100,0,0
@@ -236,7 +236,7 @@ surface111102,111202,111302,112102,112202,112302,113102,113202,113302,114102,114
 	//ã‚Ì‹ó–Ú
 	animation500300.interval,runonce+rarely
 	animation500300.pattern0,overlay,207,0,0,0
-	animation500300.pattern1,overlay,211,2000,0,0
+	animation500300.pattern1,overlay,211,4000,0,0
 	animation500300.pattern2,overlay,212,100,0,0
 	animation500300.pattern3,overlay,211,100,0,0
 	animation500300.pattern4,overlay,207,100,0,0
@@ -247,7 +247,7 @@ surface111103,111203,111303,112103,112203,112303,113103,113203,113303,114103,114
 	//‚ ‚Á‚¿–Ú
 	animation500300.interval,runonce+rarely
 	animation500300.pattern0,overlay,205,0,0,0
-	animation500300.pattern1,overlay,210,2000,0,0
+	animation500300.pattern1,overlay,210,4000,0,0
 	animation500300.pattern2,overlay,212,100,0,0
 	animation500300.pattern3,overlay,210,100,0,0
 	animation500300.pattern4,overlay,205,100,0,0
