@@ -3,24 +3,6 @@
 // メニュー処理辞書
 //******************************************************************************
 
-//******************************************************************************
-//メインメニューの展開
-//
-//AYATEMPLATE.MenuItemの使い方
-//1つめの文字列＝選択肢に表示する文字列
-//2つめの文字列＝選んだときに実行される関数名
-//3つめの文字列＝改行する量　50%刻み　省略すると100%（＝\n）
-//******************************************************************************
-
-On_balloon_tooltip {
-  if ISFUNC( "BalloonTooltip_%(reference[1])" ) {
-    EVAL( "BalloonTooltip_%(reference[1])" )
-  }
-}
-
-// 「BalloonTooltip_[選択肢ID]」にツールチップで表示させるテキストを記述
-BalloonTooltip_OnPomodoroSet { "（作業時間）-(休憩時間)-（大休憩時間）" }
-
 //------------------------------------------------------------------------------
 //メインメニュー展開
 //------------------------------------------------------------------------------
@@ -32,14 +14,8 @@ OnOpenMenu
     _quickdialogue = '\_q'
     '\C\c'
   }
-
   --
-  //if PomodoroStatus > 0
-  //{
-  //  "\![timerraise,1000,0,OnReloadTimer,1]" // 10秒ごとに更新
-  //}
 
-  --
   if (メニュー台詞 == '')
   {
     メニュー台詞 = メニュー一言
@@ -55,46 +31,13 @@ OnOpenMenu
   "%(メインメニュー)%(_quickdialogue)%(メニュー台詞)"
 }
 
-OnReloadTimer
-{
-  if PomodoroStatus > 0
-  {
-    '\C\1\c\_q\f[align,center]'
-    --
-    if WillResetPomodoro == 1
-    {
-      WillResetPomodoro = 0
-      ResetPomodoroTimer(currentpomodoro)
-    }
-    else
-    {
-      OnShowTimer
-    }
-  }
-}
-
-OnShowTimer
-{
-  _timerv = ''
-  if (PomodoroStatus == 1) {
-      _timerv = "\__q[OnPomodoroStop]%(ICON('stopwatch'))\f[height,12] %(PomodoroCount+1)セット目 %(TimerMin)/%(currentpomodoro)分\__q"
-  } elseif (PomodoroStatus == 2) {
-      _timerv = "\__q[OnTimerStop,%(LoopCount),%(_totalmin)]%(ICON('stopwatch'))\f[height,12] %(TimerMin)/%(CurrentLoop)分\__q"
-  }
-  if (PomodoroStatus > 0) {
-    "\_l[0,13.3em]\0\f[align,right]\f[cursorstyle,none]\f[color,175,175,165]%(_timerv)\f[default]"
-  } else {
-    "\0\_l[@0.7em,]\__q[OnTimerMenuSelected]%(ICON('stopwatch'))\__q"
-  }
-}
-
 メインメニュー
 {
   "\![set,autoscroll,disable]\_q\*\0/
   //\_l[0,1.2em]------------------------------------/
   \_l[0,1.2em]/
-  \_l[0.8em,@2.0em]\![*]\q[話して,Menu_AITALK]/
-  \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LASTTALK]/
+  \_l[0.8em,@2.0em]\![*]\q[話して,Menu_RandomTalk]/
+  \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LastTalk]/
   \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]/
   \_l[0.7em,13.25em]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
@@ -163,11 +106,6 @@ OnJihouSelected
   設定メニュー
 }
 
-
-ポーズ保持表情
-{
-}
-
 OnTalkIntervalSet
 {
   aitalkinterval = reference[0]
@@ -206,7 +144,6 @@ OnChoiceTimeout
 {
 }
 
-
 //******************************************************************************
 //各項目の処理内容
 //******************************************************************************
@@ -219,27 +156,8 @@ OnMenuClose
 }
 //アンカー　ツールチップ
 
-OnTimerMenuSelected
-{
-  "\C\c/
-    \_q\_l[0.5em,2em]◆ポモドーロタイマー/
-    \_l[1.5em,@1.7em]\![*]\q[2-1,OnPomodoroSet,2,1]/
-    \_l[1.5em,@1.7em]\![*]\q[10-2,OnPomodoroSet,10,2]/
-    \_l[1.5em,@1.2em]\![*]\q[15-3,OnPomodoroSet,15,3]/
-    \_l[1.5em,@1.2em]\![*]\q[25-5,OnPomodoroSet,20,4]/
-    \_l[1.5em,@1.2em]\![*]\q[25-5,OnPomodoroSet,25,5]/
-    /
-    \_l[11.5em,2em]◆ループタイマー/
-    \_l[12.5em,@1.7em]\![*]\q[1,OnLoopSet,1]/
-    \_l[12.5em,@1.2em]\![*]\q[10,OnLoopSet,10]/
-    \_l[12.5em,@1.2em]\![*]\q[15,OnLoopSet,15]/
-    \_l[0.7em,13.25em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
-    "
-}
-
-
 //---- 何か話して
-Menu_AITALK
+Menu_RandomTalk
 {
   TalkStatus = 1
   "h114201いいわよ。h114205……そうね、\n\c"
@@ -251,24 +169,11 @@ Menu_AITALK
 }
 
 //---- さっきの話は
-Menu_LASTTALK
+Menu_LastTalk
 {
   lastanchor = ""
-    "h111209さっきの話ね\_q\n\n\_l[0,@%(balloon.lines+1)em]　\_l[0,@-%(balloon.lines+1)em]\_q"//\w6\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
-    --
-    lasttalk
-    //AYATEMPLATE.LastTalk
-}
-
-//---- 他のゴーストと話す
-Menu_GHOSTCOMSTART
-{
-  StartCommunicate
-}
-
-//---- ヘッドライン
-Menu_HEADLINECANCEL
-{
-  //---- キャンセルされた
+  "h111209さっきの話ね\_q\n\n\_l[0,@%(balloon.lines+1)em]　\_l[0,@-%(balloon.lines+1)em]\_q"//\w6\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
+  --
+  lasttalk
 }
 

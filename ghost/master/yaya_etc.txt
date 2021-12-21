@@ -516,3 +516,14 @@ OnScreenSaverStart
 OnScreenSaverEnd
 {
 }
+
+//------------------------------------------------------------------------------
+// バルーンのツールチップ定義
+//------------------------------------------------------------------------------
+
+On_balloon_tooltip {
+  if ISFUNC( "BalloonTooltip_%(reference[1])" ) {
+    EVAL( "BalloonTooltip_%(reference[1])" )
+  }
+}
+
