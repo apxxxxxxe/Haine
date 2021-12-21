@@ -572,6 +572,8 @@ surface.append111101-999909
 	animation506313.pattern0,overlay,1813,0,0,0
 	animation506314.interval,bind
 	animation506314.pattern0,overlay,1814,0,0,0	
+	animation506316.interval,bind
+	animation506316.pattern0,overlay,1817,0,0,0	
 	animation506298.interval,bind
 	animation506298.pattern0,overlay,1815,0,0,0	
 	
