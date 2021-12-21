@@ -9,7 +9,7 @@
 OnOpenMenu
 {
   _quickdialogue = ''
-  if TalkStatus == 2
+  if TalkStatus == 'menu'
   {
     _quickdialogue = '\_q'
     '\C\c'
@@ -26,7 +26,7 @@ OnOpenMenu
     メニュー台詞 = _argv[0]
   }
 
-  TalkStatus = 2
+  TalkStatus = 'menu'
   --
   "%(メインメニュー)%(_quickdialogue)%(メニュー台詞)"
 }
@@ -67,7 +67,7 @@ OnOpenMenu
 
 OnConfigMenu
 {
-  TalkStatus = 2
+  TalkStatus = 'menu'
   '\C\c'
   --
   "%(設定メニュー)\e"
@@ -151,7 +151,7 @@ OnChoiceTimeout
 OnMenuClose
 {
   メニュー台詞 = ''
-  TalkStatus = 0
+  TalkStatus = 'none'
   if ISFUNC(OnReloadTimer) {"\![timerraise,0,0,OnReloadTimer]"} // 予約を削除
 }
 //アンカー　ツールチップ
@@ -159,7 +159,7 @@ OnMenuClose
 //---- 何か話して
 Menu_RandomTalk
 {
-  TalkStatus = 1
+  TalkStatus = 'talking'
   "h114201いいわよ。h114205……そうね、\n\c"
   "h113309なんの話がいいかしら……h113205そうね、\n\c"
   --

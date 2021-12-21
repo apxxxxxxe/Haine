@@ -179,7 +179,7 @@ OnSurfaceRestore
 
 OnBalloonBreak
 {
-  TalkStatus = 0
+  TalkStatus = 'none'
 }
 
 OnBalloonClose

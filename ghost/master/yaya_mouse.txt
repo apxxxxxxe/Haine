@@ -107,7 +107,7 @@ OnMouseMove
 {
   _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
   if _result != '' {
-    TalkStatus = 1
+    TalkStatus = 'talking'
     CommonEventMouse
     "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
   }
@@ -128,7 +128,7 @@ OnMouseWheel
   }
   
   if _result != '' {
-    TalkStatus = 1
+    TalkStatus = 'talking'
     CommonEventMouse
     "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
   }
@@ -138,7 +138,7 @@ OnMouseDoubleClick
 {
   _result = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
   if _result != '' {
-    TalkStatus = 1
+    TalkStatus = 'talking'
     CommonEventMouse
     "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
   }
@@ -149,7 +149,7 @@ OnMouseClickEx
   if reference[5] == 'middle' {
     _result = AYATEMPLATE.MouseEventExec('MouseWheelClick')
     if _result != '' {
-      if TalkStatus != 2 {TalkStatus = 1}
+      if TalkStatus != 'menu' {TalkStatus = 'talking'}
       CommonEventMouse
       "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
     }

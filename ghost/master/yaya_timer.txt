@@ -11,7 +11,7 @@ UpdatePomodoroTimer
     TimerMin = TimerSec / 60 // タイマー開始からの分数
     if TimerSec >= (currentpomodoro * 60)
     {
-      if TalkStatus == 2
+      if TalkStatus == 'menu'
       {
         WillResetPomodoro = 1
       }
