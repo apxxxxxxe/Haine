@@ -25,7 +25,7 @@ dic, yaya_mouse.txt           // マウス入力関連辞書
 dic, yaya_menu.txt            // メニュー処理辞書
 dic, yaya_etc.txt             // 種々のイベント辞書
 dic, yaya_functions.txt       // 関数辞書
-dic, yaya_timer.txt           // タイマー機能辞書
+//dic, yaya_timer.txt           // タイマー機能辞書
 dic, yaya_input.txt           // ユーザー入力機能辞書
 dic, yaya_webclap.txt         // Web拍手機能辞書
 

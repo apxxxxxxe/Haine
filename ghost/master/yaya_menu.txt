@@ -42,7 +42,7 @@ OnOpenMenu
   \_l[0.7em,13.25em]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
-  OnShowTimer
+  if ISFUNC(OnShowTimer) {OnShowTimer}
   --
   "\0\_l[0,0]\_q"
 }
@@ -152,7 +152,7 @@ OnMenuClose
 {
   メニュー台詞 = ''
   TalkStatus = 0
-  "\![timerraise,0,0,OnReloadTimer]" // 予約を削除
+  if ISFUNC(OnReloadTimer) {"\![timerraise,0,0,OnReloadTimer]"} // 予約を削除
 }
 //アンカー　ツールチップ
 
