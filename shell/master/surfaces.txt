@@ -450,20 +450,15 @@ surface.append111101-999909,!111101-111109,!111201-111209,!111301-111309,!121101
 	animation502364.interval,bind
 	animation502364.pattern0,overlay,1204,0,0,0
 
-	animation506299.interval,bind
-	animation506299.pattern0,overlay,1205,0,0,0
-
 	animation502366.interval,bind
 	animation502366.pattern0,overlay,1206,0,0,0
-	
+
 	animation502367.interval,bind
 	animation502367.pattern0,overlay,1207,0,0,0
 
 	animation502368.interval,bind
 	animation502368.pattern0,overlay,1208,0,0,0
 
-	animation502369.interval,bind
-	animation502369.pattern0,overlay,1209,0,0,0
 }
 
 surface.append111101-999909
