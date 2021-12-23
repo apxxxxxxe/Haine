@@ -35,7 +35,9 @@ MouseMove0face : nonoverlap
 
 MouseMove0bust : nonoverlap
 {
-  "h322104ちょ、ちょっと……\nh322209ふざけすぎよ、ユーザ。"
+  if touch_count == 1 {
+    "h322104ちょ、ちょっと……\nh322209ふざけすぎよ、ユーザ。"
+  }
   "h124206……気が済んだらやめてね。"
   "h324209……なんというか……困ってしまうわ。"
 }
@@ -103,12 +105,23 @@ CommonEventMouse {
   lastresponce = systemuptime
 }
 
+TouchCount {
+  // _argv[0]: 触り反応の部位
+  if last_touch_part == _argv[0] {
+    touch_count = touch_count + 1
+  } else {
+    touch_count = 1
+  }
+  last_touch_part = _argv[0]
+}
+
 OnMouseMove
 {
   _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
   if _result != '' {
     TalkStatus = 'talking'
     CommonEventMouse
+    TouchCount(reference[4])
     "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
   }
 }
@@ -130,6 +143,7 @@ OnMouseWheel
   if _result != '' {
     TalkStatus = 'talking'
     CommonEventMouse
+    TouchCount(reference[4])
     "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
   }
 }
@@ -140,6 +154,7 @@ OnMouseDoubleClick
   if _result != '' {
     TalkStatus = 'talking'
     CommonEventMouse
+    TouchCount(reference[4])
     "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
   }
 }
@@ -151,6 +166,7 @@ OnMouseClickEx
     if _result != '' {
       if TalkStatus != 'menu' {TalkStatus = 'talking'}
       CommonEventMouse
+      TouchCount(reference[4])
       "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result
     }
   }
