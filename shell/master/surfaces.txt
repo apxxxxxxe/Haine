@@ -368,18 +368,6 @@ surface111101-111109,111201-111209,111301-111309,121101-121209,131101-131109,131
 	animation502364.pattern8,insert,505319
 	animation502364.pattern9,overlay,1204,0,0,0
 
-	animation506299.interval,bind
-	animation506299.pattern0,insert,505310
-	animation506299.pattern1,insert,505311
-	animation506299.pattern2,insert,505312
-	animation506299.pattern3,insert,505313
-	animation506299.pattern4,insert,505314
-	animation506299.pattern5,insert,505315
-	animation506299.pattern6,insert,505316
-	animation506299.pattern7,insert,505318
-	animation506299.pattern8,insert,505319
-	animation506299.pattern9,overlay,1205,0,0,0
-
 	animation502366.interval,bind
 	animation502366.pattern0,insert,505310
 	animation502366.pattern1,insert,505311
@@ -415,18 +403,6 @@ surface111101-111109,111201-111209,111301-111309,121101-121209,131101-131109,131
 	animation502368.pattern7,insert,505318
 	animation502368.pattern8,insert,505319
 	animation502368.pattern9,overlay,1208,0,0,0
-
-	animation502369.interval,bind
-	animation502369.pattern0,insert,505310
-	animation502369.pattern1,insert,505311
-	animation502369.pattern2,insert,505312
-	animation502369.pattern3,insert,505313
-	animation502369.pattern4,insert,505314
-	animation502369.pattern5,insert,505315
-	animation502369.pattern6,insert,505316
-	animation502369.pattern7,insert,505318
-	animation502369.pattern8,insert,505319
-	animation502369.pattern9,overlay,1209,0,0,0
 
 }
 
