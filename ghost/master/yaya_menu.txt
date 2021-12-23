@@ -160,8 +160,8 @@ OnMenuClose
 Menu_RandomTalk
 {
   TalkStatus = 'talking'
-  "h114201いいわよ。h114205……そうね、\n\c"
-  "h113309なんの話がいいかしら……h113205そうね、\n\c"
+  "h114201いいわよ。h114205……そうね、\c"
+  "h113309なんの話がいいかしら……h113205そうね、\c"
   --
   RandomTalk
   --
@@ -172,7 +172,7 @@ Menu_RandomTalk
 Menu_LastTalk
 {
   lastanchor = ""
-  "h111209さっきの話ね\_q\n\n\_l[0,@%(balloon.lines+1)em]　\_l[0,@-%(balloon.lines+1)em]\_q"//\w6\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
+  "h111209さっきの話ね。\c"
   --
   lasttalk
 }
