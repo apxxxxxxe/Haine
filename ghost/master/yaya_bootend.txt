@@ -37,15 +37,9 @@ OnFirstBoot
 //******************************************************************************
 OnBoot
 {
-  "\![notify,OnNotifySelfInfo]"
-  --
   InitializeVariable
   --
-  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines]"
-  --
   "h111201ちょうどあなたが来るんじゃないかと\n思っていたところだったのよ。\nh111207いらっしゃい。h111204すぐにお茶の準備をするわね。"
-  --
-  "\e"
 }
 
 //******************************************************************************

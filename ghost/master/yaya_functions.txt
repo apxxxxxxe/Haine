@@ -5,6 +5,10 @@
 //初期化処理
 InitializeVariable
 {
+  "\![notify,OnNotifySelfInfo]"
+  --
+  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines]"
+  --
   MakeKeroBalloownFollow
   --
   lastresponce = systemuptime
