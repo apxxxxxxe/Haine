@@ -586,10 +586,6 @@ surface.append111101-999909
 	
 	//‘³ 507000
 	
-	//–¢–Sl”¯•\
-	//animation509900.interval,bind
-	//animation509900.pattern0,overlay,1105,0,0,0
-
 	//”¯+
 	animation506150.interval,bind
 	animation506150.pattern0,overlay,1150,0,0,0
