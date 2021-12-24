@@ -66,12 +66,6 @@ OnSurfaceComplete
 {
   _delay = 100
 
-  _kocchi = "1, 4"
-  _shita = "2, 5"
-  _acchi = "3, 6"
-  _mesen = (_kocchi, _shita, _acchi) // 目線判定用の２次元配列を作る
-
-  //_dest_surface = TOINT(_argv[0])
   _dest_surface = TOINT(reference[0]) // 頬・眉・腕・口・目
   _dest_eyes = _dest_surface % 10 // 目
   _dest_remain = _dest_surface - _dest_eyes // 頬・眉・腕・口
