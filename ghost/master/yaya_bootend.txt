@@ -12,6 +12,8 @@ OnFirstBoot
   //---- 変数の初期化
   username         = "ユーザーさん"
   teachusername    = 0  // ユーザー名覚え用
+  IsJihouActive = '有効'
+  circadian_rhythm = '設定しない'
   InitializeVariable
   --
 
