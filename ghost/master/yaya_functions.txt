@@ -15,6 +15,7 @@ InitializeVariable
   uwanosora_minute = 5
   touch_count = 0
   last_touch_part = ''
+  first_touch = 0
 }
 
 //\1バルーンを\0サーフェスに追従させる
