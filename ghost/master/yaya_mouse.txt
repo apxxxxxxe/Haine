@@ -73,19 +73,24 @@ MouseWheelDown0hand
 
 OnMouseLookAtbust : nonoverlap
 {
-  'h112204……視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。'
-  'h111104……h212109見すぎよ。'
+  '……h112204視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。'
+  '……h212109見すぎよ。'
+}
+
+OnMouseLookAtBeforebust : nonoverlap
+{
+  "h112104"
 }
 
 OnMouseLookAtface : nonoverlap
 {
-  'h111101……顔に何かついてる？'
-  'h121201……h121207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？'
+  '……h324207顔に何かついてる？'
+  'h321201……h321207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？'
 }
 
-OnMouseLookAtfaceBefore : nonoverlap
+OnMouseLookAtBeforeface : nonoverlap
 {
-
+  "h324201"
 }
 
 //******************************************************************************
@@ -121,7 +126,7 @@ OnMouseMove
     TalkStatus = 'talking'
     CommonEventMousePre
     TouchCount(reference[4])
-    "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result + "\![raise,CommonEventMousePost]"
+    CanselLookAt + _result + "\![raise,CommonEventMousePost]"
   }
 }
 
@@ -143,7 +148,7 @@ OnMouseWheel
     TalkStatus = 'talking'
     CommonEventMousePre
     TouchCount(reference[4])
-    "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result + "\![raise,CommonEventMousePost]"
+    CanselLookAt + _result + "\![raise,CommonEventMousePost]"
   }
 }
 
@@ -154,7 +159,7 @@ OnMouseDoubleClick
     TalkStatus = 'talking'
     CommonEventMousePre
     TouchCount(reference[4])
-    "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result + "\![raise,CommonEventMousePost]"
+    CanselLookAt + _result + "\![raise,CommonEventMousePost]"
   }
 }
 
@@ -166,18 +171,28 @@ OnMouseClickEx
       if TalkStatus != 'menu' {TalkStatus = 'talking'}
       CommonEventMousePre
       TouchCount(reference[4])
-      "\![timerraise,0,1,OnMouseLookAt%(reference[4])]" + _result + "\![raise,CommonEventMousePost]"
+      CanselLookAt + _result + "\![raise,CommonEventMousePost]"
     }
   }
 }
 
 OnMouseHover
 {
-  "\C\![timerraise,2000,1,OnMouseLookAt%(reference[4])]"
+  "\C\![timerraise,1500,1,OnMouseLookAtBefore,%(reference[4])]"
+  --
+  "\C\![timerraise,2500,1,OnMouseLookAt%(reference[4])]"
 }
 
 OnMouseLeave
 {
-  "\C\![timerraise,0,1,OnMouseLookAt%(reference[4])]"
+  "\C" + CanselLookAt(reference[4])
+}
+
+CanselLookAt {
+  "\![timerraise,0,1,OnMouseLookAtBefore%(_argv[0])]\![timerraise,0,1,OnMouseLookAt%(_argv[0])]"
+}
+
+OnMouseLookAtBefore {
+  "\C\![raise,OnMouseLookAtBefore%(reference[0])]"
 }
 
