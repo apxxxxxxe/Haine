@@ -13,6 +13,8 @@ InitializeVariable
   --
   lastresponce = systemuptime
   uwanosora_minute = 5
+  touch_count = 0
+  last_touch_part = ''
 }
 
 //\1バルーンを\0サーフェスに追従させる
