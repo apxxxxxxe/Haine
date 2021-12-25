@@ -178,7 +178,7 @@ OnMouseClickEx
 
 OnMouseHover
 {
-  "\C\![timerraise,1500,1,OnMouseLookAtBefore,%(reference[4])]"
+  "\C\![timerraise,500,1,OnMouseLookAtBefore,%(reference[4])]"
   --
   "\C\![timerraise,2500,1,OnMouseLookAt%(reference[4])]"
 }
