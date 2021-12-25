@@ -1,0 +1,4 @@
+.gitignore,nonar,noupdate
+.gitattributes,nonar,noupdate
+.git/,nonar,noupdate
+profile/,nonar,noupdate
