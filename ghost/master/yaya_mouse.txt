@@ -178,7 +178,9 @@ OnMouseClickEx
 
 OnMouseHover
 {
-  "\C\![timerraise,1000,1,OnMouseLookAtBefore,%(reference[4])]\![timerraise,2000,1,OnMouseLookAt%(reference[4])]"
+  "\C\![timerraise,1000,1,OnMouseLookAtBefore,%(reference[4])]"
+  --
+  "\![timerraise,2000,1,OnMouseLookAt%(reference[4])]"
 }
 
 OnMouseLeave
@@ -187,7 +189,9 @@ OnMouseLeave
 }
 
 CanselLookAt {
-  "\![timerraise,0,1,OnMouseLookAtBefore%(_argv[0])]\![timerraise,0,1,OnMouseLookAt%(_argv[0])]"
+  "\![timerraise,0,1,OnMouseLookAtBefore%(_argv[0])]"
+  --
+  "\![timerraise,0,1,OnMouseLookAt%(_argv[0])]"
 }
 
 OnMouseLookAtBefore {
