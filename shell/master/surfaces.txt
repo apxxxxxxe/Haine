@@ -549,17 +549,22 @@ surface.append111101-999909
 	animation506313.interval,bind
 	animation506313.pattern0,overlay,1813,0,0,0
 	animation506314.interval,bind
-	animation506314.pattern0,overlay,1814,0,0,0	
+	animation506314.pattern0,overlay,1814,0,0,0
 	animation506316.interval,bind
-	animation506316.pattern0,overlay,1817,0,0,0	
+	animation506316.pattern0,overlay,1817,0,0,0
 	animation506298.interval,bind
-	animation506298.pattern0,overlay,1815,0,0,0	
+	animation506298.pattern0,overlay,1815,0,0,0
 	
 	//コルセットのみ腕より下に
 	animation504510.interval,bind
 	animation504510.pattern0,overlay,1810,0,0,0
 	animation504511.interval,bind
 	animation504511.pattern0,overlay,1811,0,0,0
+
+    animation504417.interval,bind
+    animation504417.pattern0,overlay,1900,0,0,0
+    animation504418.interval,bind
+    animation504418.pattern0,overlay,1901,0,0,0
 	
 	//手back4000
 

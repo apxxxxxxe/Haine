@@ -91,7 +91,10 @@ sakura.bindgroup504510.name,トップス+,コルセットA
 sakura.bindgroup504511.name,トップス+,コルセットB
 sakura.bindgroup506312.name,トップス+,リボン大黒
 sakura.bindgroup506313.name,トップス+,リボン大白
-sakura.bindgroup506314.name,トップス+,リボン大赤
+sakura.bindgroup504417.name,トップス+,スカート装飾黒
+sakura.bindgroup504418.name,トップス+,スカート装飾白
+
+
 sakura.bindgroup506304.default,1
 
 sakura.bindoption.group,袖
