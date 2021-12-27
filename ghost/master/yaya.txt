@@ -28,6 +28,7 @@ dic, yaya_functions.txt       // 関数辞書
 //dic, yaya_timer.txt           // タイマー機能辞書
 dic, yaya_input.txt           // ユーザー入力機能辞書
 dic, yaya_webclap.txt         // Web拍手機能辞書
+dic, yaya_events.txt          // 進行イベント辞書
 
 
 //------------------------------------------------------------------------------
