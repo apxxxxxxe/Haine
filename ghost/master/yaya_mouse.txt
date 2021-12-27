@@ -103,10 +103,15 @@ OnMouseLookAtBeforeface : nonoverlap
 // 触り反応時の共通処理
 CommonEventMousePre {
   lastresponce = systemuptime
+  TalkStatus = 'talking'
+  first_touch = 1
+}
+
+OnMouseEvent {
+  touch_count + CanselLookAt + NextTouchTalk
 }
 
 CommonEventMousePost {
-  first_touch = 1
 }
 
 TouchCount {
@@ -121,57 +126,53 @@ TouchCount {
 
 OnMouseMove
 {
-  _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
-  if _result != '' {
-    TalkStatus = 'talking'
-    CommonEventMousePre
+  NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
+  if NextTouchTalk != '' {
     TouchCount(reference[4])
-    CanselLookAt + _result + "\![raise,CommonEventMousePost]"
+    CommonEventMousePre
+    '\![raise,OnMouseEvent]'
   }
 }
 
 OnMouseWheel
 {
-  _result = ''
+  NextTouchTalk = ''
   if TOINT(reference[2]) > 0 {
-    _result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelUp')
+    NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelUp')
   }
   else {
-    _result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelDown')
+    NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelDown')
   }
   
-  if _result == '' {
-    _result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheel')
+  if NextTouchTalk == '' {
+    NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheel')
   }
   
-  if _result != '' {
-    TalkStatus = 'talking'
-    CommonEventMousePre
+  if NextTouchTalk != '' {
     TouchCount(reference[4])
-    CanselLookAt + _result + "\![raise,CommonEventMousePost]"
+    CommonEventMousePre
+    '\![raise,OnMouseEvent]'
   }
 }
 
 OnMouseDoubleClick
 {
-  _result = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
-  if _result != '' {
-    TalkStatus = 'talking'
-    CommonEventMousePre
+  NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
+  if NextTouchTalk != '' {
     TouchCount(reference[4])
-    CanselLookAt + _result + "\![raise,CommonEventMousePost]"
+    CommonEventMousePre
+    '\![raise,OnMouseEvent]'
   }
 }
 
 OnMouseClickEx
 {
   if reference[5] == 'middle' {
-    _result = AYATEMPLATE.MouseEventExec('MouseWheelClick')
-    if _result != '' {
-      if TalkStatus != 'menu' {TalkStatus = 'talking'}
-      CommonEventMousePre
+    NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseWheelClick')
+    if NextTouchTalk != '' {
       TouchCount(reference[4])
-      CanselLookAt + _result + "\![raise,CommonEventMousePost]"
+      CommonEventMousePre
+      '\![raise,OnMouseEvent]'
     }
   }
 }
