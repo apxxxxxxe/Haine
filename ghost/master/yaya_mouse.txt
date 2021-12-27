@@ -177,18 +177,6 @@ OnMouseClickEx
   }
 }
 
-OnMouseHover
-{
-  "\C\![timerraise,1000,1,OnMouseLookAtBefore,%(reference[4])]"
-  --
-  "\![timerraise,2000,1,OnMouseLookAt%(reference[4])]"
-}
-
-OnMouseLeave
-{
-  "\C" + CanselLookAt(reference[4])
-}
-
 CanselLookAt {
   "\![timerraise,0,1,OnMouseLookAtBefore%(_argv[0])]"
   --
