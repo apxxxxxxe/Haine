@@ -30,11 +30,11 @@ MakeKeroBalloownFollow
 GetTimeSlot
 {
   case hour{
-  when 22,23,0,1,2,3 {'深夜'}
-  when 4,5,6,7,8,9,10,11 {'朝'}
-  when 12,13 {'昼'}
-  when 14,15,16,17 {'日中'}
-  when 18,19,20,21 {'夜'}
+    when 22,23,0,1,2,3 {'深夜'}
+    when 4,5,6,7,8,9,10,11 {'朝'}
+    when 12,13 {'昼'}
+    when 14,15,16,17 {'日中'}
+    when 18,19,20,21 {'夜'}
   }
 }
 
@@ -106,7 +106,7 @@ OnSurfaceComplete
 
 SETBALLOONSURFACE
 {
-  '\1\s[10000]\0\b[6]'
+  '\1\s[100000]\0\b[6]'
 }
 
 OnGetSurfaceInfo
