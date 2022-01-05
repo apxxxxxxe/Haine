@@ -24,6 +24,9 @@ RandomTalk
   lastanchor = ""
   lastresponce = systemuptime
   lasttalk = TOSTR(EVAL(CHR(0x22)+talks(RAND(100))+CHR(0x22)))
+
+  SETBALLOONSURFACE
+  --
   lasttalk
 }
 
@@ -32,6 +35,8 @@ talks : nonoverlap_pool
 {
   if _argv[0] < 30
   {
+    '\0\b[4]'
+    --
     'h124205気持ち悪いと思うかしら。死や、終わりに惹かれていること。\nこういうことを考えるとき、人はもっとも優しくなれると、\nそう思っているの。……h124207静かで、穏やかで、楽なのよ。'
     'h111209カエルの足に電流を流す実験。\n生体電気の発見に繋がったといわれるあの現象は、\nh121207\_a[見世物]死者の蘇りを謳う見世物\_aに利用されたことがあったの。'
     'h111103棺を使わない土葬の場合、\n地中の遺体が朽ちるとそこに空洞ができるわ。\nh121206「死体に足を引っ張られる」という伝承は、\nこれを踏み抜いてしまっただけかもしれないわね。\nh111209あなたも墓地を歩くときは気をつけて……って、\nh111204あなたの住む場所にそんなところは少ないかしら。'
@@ -214,7 +219,6 @@ OnTranslate
   _text = RE_REPLACEEX(_text, "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]") //h111101のようにしてサーフェス表示&まばたき補完関数を埋め込む
 
   //バルーンのサーフェスを規定
-  _text = SETBALLOONSURFACE + _text
 
   if RE_SEARCH(_text,'\\C') {
     // \Cが含まれている場合適用されるように加工
