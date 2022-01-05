@@ -147,6 +147,9 @@ ICON
     when 'arrow-left' {
       'e905'
     }
+    when 'bubble' {
+      'e906'
+    }
   }
   --
   ']\f[default]'
