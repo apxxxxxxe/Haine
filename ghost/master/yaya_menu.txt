@@ -77,12 +77,6 @@ OnConfigMenu
 
 全般設定メニュー
 {
-  _talkintervalmin = aitalkinterval / 60
-    _talkintervalmessage = "なし"
-    if _talkintervalmin != 0 {
-      _talkintervalmessage = "%(_talkintervalmin)分"
-    }
-
   "\b[4]\_q/
     \_l[0.5em,1.8em]◆時報\_l[@0.5em,]【現在\_l[@0.3em,]%(IsJihouActive)】/
     \_l[2em,@1.5em]\q[有効,OnJihouSelected,有効]\_l[@0.5em,]\q[無効,OnJihouSelected,無効]/
@@ -134,7 +128,7 @@ OnTalkIntervalSet
        */
     "\C\c"
     --
-    OnConfigMenu
+    OnTalkSettingMenu
 }
 
 OnShowTalkSetting
@@ -152,6 +146,12 @@ OnTalkSettingMenu
 
 喋り設定メニュー
 {
+  _talkintervalmin = aitalkinterval / 60
+    _talkintervalmessage = "なし"
+    if _talkintervalmin != 0 {
+      _talkintervalmessage = "%(_talkintervalmin)分"
+    }
+
   "\b[0]\_q/
     \_l[0.5em,1.8em]◆喋り頻度\_l[@0.5em,]【現在\_l[@0.3em,]%(_talkintervalmessage)】/
     \_l[2em,@1.5em]\q[1,OnTalkIntervalSet,60]\_l[@0.5em,]\q[3,OnTalkIntervalSet,180]\_l[@0.5em,]\q[5,OnTalkIntervalSet,300]\_l[@0.5em,]\q[10,OnTalkIntervalSet,600]\_l[@0.5em,]\q[なし,OnTalkIntervalSet,0]/
