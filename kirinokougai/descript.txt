@@ -12,7 +12,7 @@ origin.y,14
 wordwrappoint.x,-20
 
 font.height,14
-font.name,UD デジタル 教科書体 NK-R
+font.name,Honoka-Shin-Maru-Gothic_R.otf
 font.color.r,250
 font.color.g,250
 font.color.b,230
