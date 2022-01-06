@@ -1,6 +1,5 @@
-charset, UTF-8
+charset,UTF-8
 type,ghost
 name,郊外通りのハイネ
 directory,Haine
-balloon,directory,kirinokougai
-
+balloon.directory,kirinokougai
