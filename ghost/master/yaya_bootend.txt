@@ -16,12 +16,14 @@ OnFirstBoot
   circadian_rhythm = '設定しない'
   InitializeVariable
   --
+  SETBALLOONSURFACE
+  --
 
   //---- Vanishカウントを見て、真の初回か否かを判定する
   if reference[0] == 0
   {
     //---- ほんとうに初めての起動
-    ""
+    "初回起動"
   }
   else
   {
@@ -39,6 +41,8 @@ OnFirstBoot
 OnBoot
 {
   InitializeVariable
+  --
+  SETBALLOONSURFACE
   --
   _timeslot = GetTimeSlot
   if _timeslot == "朝"
@@ -65,6 +69,8 @@ OnBoot
 
 OnClose
 {
+  SETBALLOONSURFACE
+  --
   _timeslot = GetTimeSlot
   if _timeslot == "朝"
   {

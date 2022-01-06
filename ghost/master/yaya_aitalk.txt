@@ -218,12 +218,11 @@ OnTranslate
   //入力の簡単化
   _text = RE_REPLACEEX(_text, "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]") //h111101のようにしてサーフェス表示&まばたき補完関数を埋め込む
 
-  //バルーンのサーフェスを規定
-
   if RE_SEARCH(_text,'\\C') {
     // \Cが含まれている場合適用されるように加工
     _text = '\C' + _text
   }
+
   _text
 }
 
