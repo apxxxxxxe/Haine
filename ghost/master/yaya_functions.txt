@@ -124,32 +124,22 @@ GetSurfaceElements
 
 ICON
 {
-  _fontsize = 12
-  if (TOINT(_argv[1]) != 0) {_fontsize = _argv[1]}
+  if (TOINT(_argv[1]) != 0) {
+    _fontsize = _argv[1]
+  } else{
+    _fontsize = 12
+  }
+
   "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
   --
   case _argv[0] {
-    when 'stopwatch' {
-      'e900'
-    }
-    when 'undo' {
-      'e901'
-    }
-    when 'cog' {
-      'e902'
-    }
-    when 'cross' {
-      'e903'
-    }
-    when 'arrow-right' {
-      'e904'
-    }
-    when 'arrow-left' {
-      'e905'
-    }
-    when 'bubble' {
-      'e906'
-    }
+    when 'stopwatch'   { 'e900' }
+    when 'undo'        { 'e901' }
+    when 'cog'         { 'e902' }
+    when 'cross'       { 'e903' }
+    when 'arrow-right' { 'e904' }
+    when 'arrow-left'  { 'e905' }
+    when 'bubble'      { 'e906' }
   }
   --
   ']\f[default]'
