@@ -215,14 +215,65 @@ OnTranslate
 {
   _text = reference[0]
 
-  //入力の簡単化
-  _text = RE_REPLACEEX(_text, "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]") //h111101のようにしてサーフェス表示&まばたき補完関数を埋め込む
+   _text = TextOnlyTranslator(_text,'TextOnlyTranslatorFunc')
 
-  if RE_SEARCH(_text,'\\C') {
-    // \Cが含まれている場合適用されるように加工
-    _text = '\C' + _text
+  _text
+}
+
+// TextOnlyTranslator, TextOnlyTranslatorFunc: 以下より
+// http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
+TextOnlyTranslator
+{
+        _string = RE_SPLIT(_argv[0],'\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])')
+        _n = ARRAYSIZE(_string)
+        _tag = RE_GETSTR()
+        _tr = ''
+        _qs = 0
+        
+        for _i = 0 ; _i < _n ; _i++ {
+                _tr += EVAL("%(_argv[1])(_string[_i],_qs)")
+                _tr += _tag[_i]
+                if '\_q' _in_ _tag[_i] {
+                        _qs = ! _qs
+                }
+        }
+        
+        _tr
+}
+
+TextOnlyTranslatorFunc
+{
+  //_argv[0] = 置換対象テキスト
+  //_argv[1] = クイックセクション内か否か
+
+  _text = _argv[0]
+  if ! _argv[1] {
+
+
+    // ウェイトの挿入や表記の置換
+    _words = (/
+        "…\n"     ,   "\![quicksection,1]…\![quicksection,0]\n\_w[1000]", /
+        "…"       ,   "\![quicksection,1]…\_w[500]\![quicksection,0]",    /
+        "。"      ,   "　\_w[1200]",                                      /
+        "、"      ,   "、\_w[600]",                                       /
+        "！"      ,   "！\_w[900]",                                       /
+        "かしら？",   "かしら　\_w[1200]",                                /
+        "？"      ,   "？\_w[1200]",                                      /
+        "\n\n"    ,   "\n\_w[1000]\n"                                     /
+        )
+    for _i = 0; _i < ARRAYSIZE(_words); _i+=2 {
+      _text = REPLACE(_text,_words[_i],_words[_i + 1])
+      //φでエスケープできる（里々と同じ記法）
+      _text = REPLACE(_text,"φ"+_words[_i + 1],_words[_i])
+    }
+
+    //サーフェス入力の簡単化と関数埋め込み: h111101のようにしてサーフェス表示&まばたき補完関数を埋め込む
+    _text = RE_REPLACEEX(_text, "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]")
+
+    // \Cが文頭以外に含まれている場合、適用されるように加工
+    if STRSTR(_text, '\C', 0) > 0 { _text = '\C' + _text }
+
   }
-
   _text
 }
 
@@ -230,26 +281,12 @@ OnTranslate
 //OnTranslateInternalイベント
 //------------------------------------------------------------------------------
 
+/*
 OnTranslateInternal
 {
   _text = _argv[0]
 
-  _words = (/
-      "…\n"     ,   "\![quicksection,1]…\![quicksection,0]\n\_w[1000]", /
-      "…"       ,   "\![quicksection,1]…\_w[500]\![quicksection,0]",    /
-      "。"      ,   "　\_w[1200]",                                      /
-      "、"      ,   "、\_w[600]",                                       /
-      "！"      ,   "！\_w[900]",                                       /
-      "かしら？",   "かしら　\_w[1200]",                                /
-      "？"      ,   "？\_w[1200]",                                      /
-      "\n\n"    ,   "\n\_w[1000]\n"                                     /
-      )
-
-  for _i = 0; _i < ARRAYSIZE(_words); _i+=2 {
-    _text = REPLACE(_text,_words[_i],_words[_i + 1])
-    _text = REPLACE(_text,"φ"+_words[_i + 1],_words[_i]) //φでエスケープできる（里々と同じ記法）
-  }
-  --
   _text
 }
+*/
 
