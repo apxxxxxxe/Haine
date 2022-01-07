@@ -154,6 +154,59 @@ GETMIN
   _min
 }
 
+//自動改行(特定の文字列の直後に改行するようにする)
+AutoCRLF {
+  _text = _argv[0]
+  if STRLEN(_text) > 0 {
+    _kugirimoji = (/
+        "、", /
+        "。", /
+        "から", /
+        "でも", /
+        "や", /
+        "で", /
+        )
+    _itigyou = 24
+    _tmp = ''
+    _idx = 0
+    _crlf = -1
+    _kugiri = -1
+    _kugirilen = 0
+    _cx = -1
+    _n = 100
+    for _j=0; _j<_n; _j++ { // _n回で強制終了
+      _crlf = STRSTR(_text, '\n', _idx)
+      if _crlf != -1 && _crlf < _itigyou {
+        _idx = _idx + _crlf + 1
+        _tmp += SUBSTR(_text, _idx, _crlf+1)
+        continue
+      }
+      for _i=0; _i<ARRAYSIZE(_kugirimoji); _i++ {
+        _kugiri = STRSTR(_text, _kugirimoji[_i], _idx)
+        _kugirilen = STRLEN(_kugirimoji[_i]) - 1
+        //タグ等があるから_itigyouは無意味かも...
+        if _kugiri != -1 && _kugiri > (_itigyou / 2) && _kugiri < _itigyou { break }
+      }
+      if _crlf != -1 && _kugiri != -1 {
+        _cx = GETMIN(_crlf, _kugiri + _kugirilen)
+      } elseif _crlf != -1 && _kugiri == -1 {
+        _cx = _crlf
+      } elseif _crlf == -1 && _kugiri != -1 {
+        _cx = _kugiri + _kugirilen
+      } else { // _crlf == -1 && _kugiri == -1
+        if _kugiri == -1 {
+          break
+        }
+        _tmp += SUBSTR(_text, _idx, _cx+1) + '\n'
+        _idx += _cx + 1
+      }
+
+      _tmp
+      return
+    }
+  }
+}
+
 //******************************************************************************
 //最小化からの復帰 OnWindowStateRestore
 //******************************************************************************
