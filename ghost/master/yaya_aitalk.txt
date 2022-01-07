@@ -12,7 +12,6 @@
   - OnSecondChange
 - トランスレータ
   - OnTranslate
-  - OnTranslateInternal
 */
 
 //******************************************************************************
@@ -135,8 +134,7 @@ OnKeyPress
       RandomTalk
     }
     when "r" {
-      "リロードします%(sakura_name)\![change,ghost,%(sakura_name)]"
-      //'\![reload,shiori](RELOAD SHIORI)\w9\n' + OnBoot
+      "リロードします\![change,ghost,%(sakura_name)]"
     }
     when "m" {
       '\![raise,OnMouseDoubleClick,0,0,0,0,__SYSTEM_KEYDOWN_COL,0,mouse]'
@@ -144,6 +142,7 @@ OnKeyPress
     when "q" {
       '\![raise,OnEvent1]'
     }
+    when "k" {
   }
 }
 
@@ -157,8 +156,6 @@ OnKeyPress
 
 OnMinuteChange
 {
-  //---- 時間の分を見て 0 であれば時報。それ以外のときは重なり処理を行う
-
   if minute == 0 && IsJihouActive == '有効'
   {
     "\1%(hour)時だ"
@@ -229,7 +226,7 @@ TextOnlyTranslator
         _tag = RE_GETSTR()
         _tr = ''
         _qs = 0
-        
+
         for _i = 0 ; _i < _n ; _i++ {
                 _tr += EVAL("%(_argv[1])(_string[_i],_qs)")
                 _tr += _tag[_i]
@@ -237,7 +234,7 @@ TextOnlyTranslator
                         _qs = ! _qs
                 }
         }
-        
+
         _tr
 }
 
@@ -322,17 +319,4 @@ TextOnlyTranslatorFunc
   }
   _text
 }
-
-//------------------------------------------------------------------------------
-//OnTranslateInternalイベント
-//------------------------------------------------------------------------------
-
-/*
-OnTranslateInternal
-{
-  _text = _argv[0]
-
-  _text
-}
-*/
 
