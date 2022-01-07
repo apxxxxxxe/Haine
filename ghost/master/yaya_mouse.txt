@@ -143,11 +143,11 @@ OnMouseWheel
   else {
     NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelDown')
   }
-  
+
   if NextTouchTalk == '' {
     NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheel')
   }
-  
+
   if NextTouchTalk != '' {
     TouchCount(reference[4])
     CommonEventMousePre

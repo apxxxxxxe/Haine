@@ -2,8 +2,8 @@
 
 OnWebClap{
   "\![open,inputbox,WebClapMessage,,--limit=1000]/
-    \_q拍手メッセージが作者に送信されますφ。\n/
-    バグ報告や要望φ、感想はこちらにお願いしますφ。"
+  \_q拍手メッセージが作者に送信されますφ。\n/
+  バグ報告や要望φ、感想はこちらにお願いしますφ。"
 }
 
 WebClapMessageを入力した{
@@ -16,12 +16,12 @@ WebClapMessageを空打ちされた{
 
 拍手送信完了{
   "\_q拍手メッセージを送信しました。"
-    WebClapMessage = ''
+  WebClapMessage = ''
 }
 
 拍手送信失敗{
   "\_q送信に失敗しました。\n%(reference[4])"
-    WebClapMessage = ''
+  WebClapMessage = ''
 }
 
 OnExecuteHTTPComplete{

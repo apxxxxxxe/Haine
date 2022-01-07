@@ -42,7 +42,7 @@ OnInstallBegin
 OnInstallComplete
 {
   _ref0 = SPLIT(reference[0],' with',2)[0] //hogehoge with hemohemo
-  
+
   "\0\s[5]"
   --
   if _ref0 == "shell" {
@@ -71,7 +71,7 @@ OnInstallComplete
     elseif _ref0 == "balloon" {
       _id = 'balloon'
     }
-    
+
     if _id != '' {
       "切り替えますか？"
       --
@@ -236,7 +236,7 @@ OnUpdateComplete
     //---- 更新すべきファイルが無かった
     "\1\s[10]あいや、盛り上がってるとこ水を差すようだが、対象ファイルが無いぞ。\w5\0\s[0]ぬあー。\e"
     "\0\s[4]‥\w5‥\w5きょ、きょうはだめでも‥\w5‥\w5\w9\nあしたはでっかい太陽が‥\w5‥\w5\w8\1パクんな。\e"
-  "\0\s[4]ぷー。\w8\1‥\w5‥\w5まあ、そんな時もあるさ。\e"
+    "\0\s[4]ぷー。\w8\1‥\w5‥\w5まあ、そんな時もあるさ。\e"
   }
   else
   {

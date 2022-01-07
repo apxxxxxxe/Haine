@@ -3,8 +3,8 @@
 OnUserInput
 {
   InputMessage = reference[1]
-    --
-    EVAL("%(reference[0])を入力した")
+  --
+  EVAL("%(reference[0])を入力した")
 }
 
 OnUserInputCancel

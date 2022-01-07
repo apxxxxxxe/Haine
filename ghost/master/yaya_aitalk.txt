@@ -1,18 +1,18 @@
 /*
-ここにあるもの
-- ランダムトーク
-  - RandomTalk
-  - talks
-- アンカートーク
-  - (省略)
-- キーが押された
-  - OnKeyPress
-- 時報
-  - OnMinuteChange
-  - OnSecondChange
-- トランスレータ
-  - OnTranslate
-*/
+   ここにあるもの
+   - ランダムトーク
+   - RandomTalk
+   - talks
+   - アンカートーク
+   - (省略)
+   - キーが押された
+   - OnKeyPress
+   - 時報
+   - OnMinuteChange
+   - OnSecondChange
+   - トランスレータ
+   - OnTranslate
+   */
 
 //******************************************************************************
 // ランダムトーク
@@ -221,7 +221,7 @@ OnTranslate
 {
   _text = reference[0]
 
-   _text = TextOnlyTranslator(_text,'TextOnlyTranslatorFunc')
+  _text = TextOnlyTranslator(_text,'TextOnlyTranslatorFunc')
 
   _text
 }
@@ -230,21 +230,21 @@ OnTranslate
 // http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
 TextOnlyTranslator
 {
-        _string = RE_SPLIT(_argv[0],'\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])')
-        _n = ARRAYSIZE(_string)
-        _tag = RE_GETSTR()
-        _tr = ''
-        _qs = 0
+  _string = RE_SPLIT(_argv[0],'\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])')
+  _n = ARRAYSIZE(_string)
+  _tag = RE_GETSTR()
+  _tr = ''
+  _qs = 0
 
-        for _i = 0 ; _i < _n ; _i++ {
-                _tr += EVAL("%(_argv[1])(_string[_i],_qs)")
-                _tr += _tag[_i]
-                if '\_q' _in_ _tag[_i] {
-                        _qs = ! _qs
-                }
-        }
+  for _i = 0 ; _i < _n ; _i++ {
+    _tr += EVAL("%(_argv[1])(_string[_i],_qs)")
+    _tr += _tag[_i]
+    if '\_q' _in_ _tag[_i] {
+      _qs = ! _qs
+    }
+  }
 
-        _tr
+  _tr
 }
 
 TextOnlyTranslatorFunc
