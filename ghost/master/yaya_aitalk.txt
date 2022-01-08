@@ -261,6 +261,9 @@ TextOnlyTranslatorFunc
   _text = _argv[0]
   if ! _argv[1] {
 
+    //自動改行(特定の文字列の直後に改行するようにする)
+    //_text = AutoCRLF(_text)
+
     // ウェイトの挿入や表記の置換
     _words = (/
         "…\n"     ,   "\![quicksection,1]…\![quicksection,0]\n\_w[1000]", /
