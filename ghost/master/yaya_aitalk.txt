@@ -127,34 +127,40 @@ talks : nonoverlap_pool
 
 OnKeyPress
 {
-  SETBALLOONSURFACE
-  --
   case reference[0] {
     when "t" {
+      SETBALLOONSURFACE
+      --
       RandomTalk
     }
     when "r" {
+      SETBALLOONSURFACE
+      --
       "リロードします\![change,ghost,%(sakura_name)]"
     }
     when "m" {
+      SETBALLOONSURFACE
+      --
       '\![raise,OnMouseDoubleClick,0,0,0,0,__SYSTEM_KEYDOWN_COL,0,mouse]'
     }
     when "q" {
+      SETBALLOONSURFACE
+      --
       '\![raise,OnEvent1]'
     }
     when "k" {
+      SETBALLOONSURFACE
+      --
       _t = 'h324209料理は、……少し苦手なの。\nh324203なんというか……h324206いわゆる、味音痴みたいで。\nh324202一度シチューを作ったのだけれど、\nh324205調味料を間違えていたとかで……\n友人からはひどい味だ、って酷評されてね。\nh124209それ以来、料理からは距離をおいていたのだけど……\nh114204もしあなたに食べてもらえるなら、\nもう一度挑戦してみようかしら。\nh124207ああ、もちろん、練習したあとにね。\n\nh114204……それまで、待っていてくれる？'
-      if FUNCTIONEX("saori¥kisaragi¥kisaragi.dll", 'yomi', _t) != -1 {
-        _text = ''
-        for _i=0; _i<ARRAYSIZE(valueex); _i++ {
-          _text += valueex[_i]
-        }
-        _text
+      _Rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", 'parse', _t)
+      _text = ''
+      for _i=0; _i<_Rank; _i++ {
+        _text += valueex[_i][0,CHR(9)] + ' ' + valueex[_i][3,CHR(9)] + '\n'
       }
+      _text
     }
   }
 }
-
 //******************************************************************************
 // 時報
 //******************************************************************************
