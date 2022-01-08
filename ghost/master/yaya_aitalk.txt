@@ -148,17 +148,6 @@ OnKeyPress
       --
       '\![raise,OnEvent1]'
     }
-    when "k" {
-      SETBALLOONSURFACE
-      --
-      _t = 'h324209料理は、……少し苦手なの。\nh324203なんというか……h324206いわゆる、味音痴みたいで。\nh324202一度シチューを作ったのだけれど、\nh324205調味料を間違えていたとかで……\n友人からはひどい味だ、って酷評されてね。\nh124209それ以来、料理からは距離をおいていたのだけど……\nh114204もしあなたに食べてもらえるなら、\nもう一度挑戦してみようかしら。\nh124207ああ、もちろん、練習したあとにね。\n\nh114204……それまで、待っていてくれる？'
-      _Rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", 'parse', _t)
-      _text = ''
-      for _i=0; _i<_Rank; _i++ {
-        _text += valueex[_i][0,CHR(9)] + ' ' + valueex[_i][3,CHR(9)] + '\n'
-      }
-      _text
-    }
   }
 }
 //******************************************************************************
@@ -261,9 +250,6 @@ TextOnlyTranslatorFunc
   _text = _argv[0]
   if ! _argv[1] {
 
-    //自動改行(特定の文字列の直後に改行するようにする)
-    //_text = AutoCRLF(_text)
-
     // ウェイトの挿入や表記の置換
     _words = (/
         "…\n"     ,   "\![quicksection,1]…\![quicksection,0]\n\_w[1000]", /
@@ -283,6 +269,9 @@ TextOnlyTranslatorFunc
 
     //サーフェス入力の簡単化と関数埋め込み: h111101のようにしてサーフェス表示&まばたき補完関数を埋め込む
     _text = RE_REPLACEEX(_text, "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]")
+
+    //自動改行(特定の文字列の直後に改行するようにする)
+    _text = AutoCRLF(_text)
 
     // \Cが文頭以外に含まれている場合、適用されるように加工
     if STRSTR(_text, '\C', 0) > 0 { _text = '\C' + _text }
