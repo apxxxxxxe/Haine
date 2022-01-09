@@ -158,144 +158,65 @@ GETMIN
 //自動改行(特定の文字列の直後に改行するようにする)
 AutoCRLF {
   // _argv[0]: 改行を入れたい文字列
-  _text = _argv[0]
   // 返り値
   _result = ''
-  // 直後に改行を入れる文字列たち
-  _kugirimoji = (/
-      "、",   "記号-読点",    /
-      "。",   "記号-句点",    /
-      "から", "助詞-接続助詞",    /
-      "も",   "助詞-係助詞",    /
-      "は",   "助詞-係助詞",    /
-      "に",   "助詞-副詞化",    /
-      "や",   "助詞-並立助詞",    /
-      "で",   "助詞-格助詞-一般",    /
-      )
-  _kc = ARRAYSIZE(_kugirimoji)
+  // 直後に改行を入れる文字列の品詞
+  _class = "記号-一般, 記号-読点, 記号-句点, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-並立助詞, 助詞-格助詞-一般, 助詞-終助詞"
   // バルーンⅠ行あたりの文字数
-  // 最終的にはプロパティシステムからとった値を反映する
-  _itigyou = 24
+  _max = 24
+  _threshold = TOINT(ROUND(_max / 10.0 * 8.5))
 
-  _flag = 0
-  _wc = 0
+  _mark = CHR(28) // 内部処理に影響しなさそうな制御文字
 
-  _mark = '࿚'
-  _markcnt = 0
-  _null = RE_GREP(_text, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?')
-  _tags = RE_GETSTR
-  _text = RE_REPLACE(_text, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _mark)
+  _lines = RE_SPLIT(_argv[0], '\\n')
+  _linecount = 0
 
-  _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _text)
-  for _i=0; _i<_Rank; _i++ {
-    _word = valueex[_i][0, CHR(9)]
-    _mc = RE_GREP(_word, _mark)
-    if _word == 'EOS' {
-      continue
-    } elseif _mc > 0 {
-      for _j=0; _j<_mc; _j++ {
-        if _tags[_markcnt] == '\0' || _tags[_markcnt] == '\1' || _tags[_markcnt] == '\n' { wordcount = 0 }
-        _result += _tags[_markcnt]
-        _markcnt++
+  for _i=0; _i<ARRAYSIZE(_lines); _i++ {
+    _line = _lines[_linecount]
+    _flag = 0
+    _markcount = 0
+    _line = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _mark)
+    _tags = RE_GETSTR
+
+    _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _line)
+    for _j=0; _j<_Rank; _j++ {
+      _word = valueex[_j][0, CHR(9)]
+      _mc = RE_GREP(_word, _mark)
+      if _word == 'EOS' {
+        break
+      } elseif _mc > 0 {
+        for _k=0; _k<_mc; _k++ {
+          _tag = _tags[_markcount]
+          if RE_GREP(_tag, '\\e|\n') {
+            wordcount = 0
+          }
+          _result += _tags[_markcount]
+          _markcount++
+        }
+      } else {
+        _result += _word
+        wordcount += STRLEN(_word)
+        if wordcount >= _max { // 改行されないまま次の行に達したときは文字カウントを修正
+          wordcount = wordcount % _max
+          _flag = 0
+          continue
+        }
       }
-    } else {
-      _wc = STRLEN(_word)
-      wordcount += _wc
-      _result += _word
-    }
-    for _j=0; _j<_kc; _j+=2 {
-      if _flag == 1 || (_word == _kugirimoji[_j] && valueex[_i][3, CHR(9)] == _kugirimoji[_j+1]) {
-        if wordcount > (_itigyou / 3 * 2) {
-          _result += ' ' + wordcount + '\n'
+      if flag == 1 || RE_GREP(_class, valueex[_j][3, CHR(9)]) { // 区切り文字リストに_wordがあるか探す
+        if RE_GREP(_class, valueex[_j+1][3, CHR(9)]) { // 直後に改行対象があるときは改行を延期("……。"などでの不自然な改行を防ぐ)
+          _flag = 1
+        } elseif wordcount > _threshold { // 改行対象の位置が行の後半なら改行を挿入
+          _result += '\n'
           wordcount = 0
           _flag = 0
         }
-        break
       }
     }
+    if ! RE_GREP(_result, '\\n$') { _result += '\n' }
+    wordcount = 0
+    _linecount++
   }
   _result
-}
-
-// EraseTag: 以下より引用
-// http://emily.shillest.net/ayaya/?Tips/SAKURA%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%97%E3%83%88%E3%82%BF%E3%82%B0%E3%82%92%E5%8F%96%E3%82%8A%E9%99%A4%E3%81%8F
-EraseTag
-{
-  /*******************************************/
-  /* SAKURAスクリプトタグのパターン          */
-  /* ａ）"\" に続いて１文字                  */
-  /* ｂ）"\" に続いて１個以上の "_" と１文字 */
-  /* ｃ）（ａ）（ｂ）に続く "[" から "]"     */
-  /* ｄ）（ａ）（ｂ）に続く１桁数字          */
-  /* "\\" は "\" に                          */
-  /* "[" から "]" の中の "\]" を考慮に入れる */
-  /*******************************************/
-  _str = ""
-  while 1
-  {
-    if (_chr = SUBSTR(_argv[0],0,1)) != "\"
-    {
-      if _chr == "" ; break // 終端なら抜ける
-        _str += _chr
-        _argv[0] = ERASE(_argv[0],0,1)
-    }
-    else
-    {
-      _argv[0] = ERASE(_argv[0],0,1)
-
-      //---- "_" を取り除く
-      for _i = 0 ; (_chr = SUBSTR(_argv[0],0,1)) == "_" ; _i++
-      {
-        _argv[0] = ERASE(_argv[0],0,1)
-      }
-      if _chr == "" ; break // 終端なら抜ける
-
-        //---- １文字削除する
-        _argv[0] = ERASE(_argv[0],0,1)
-
-        if     _chr == "0" && _i == 0 ; _str += "（０）"
-          elseif _chr == "1" && _i == 0 ; _str += "（１）"
-            elseif _chr == "\" && _i == 0 ; _str += "\"
-        else
-        {
-          case SUBSTR(_argv[0],0,1)
-          {
-            //---- １桁数字を取り除く
-            when "0","1","2","3","4","5","6","7","8","9"
-            {
-              _argv[0] = ERASE(_argv[0],0,1)
-            }
-
-            //---- "[" から "]" を取り除く（ネストに対応）
-            //---- "\]" を考慮に入れる
-            when "["
-            {
-              _argv[0] = ERASE(_argv[0],0,1)
-
-              _chr = ""
-              _nest = 0
-              while _nest >= 0
-              {
-                _old = _chr
-                _chr = SUBSTR(_argv[0],0,1)
-                if     _chr == "" ; break // 終端なら抜ける
-                  elseif _chr == "["                ; _nest++
-                    elseif _chr == "]" && _old != "\" ; _nest--
-                      _argv[0] = ERASE(_argv[0],0,1)
-              }
-            }
-          }
-        }
-    }
-  }
-
-  //---- 見栄えを良くする
-  _str = REPLACE(_str,"（０）（１）","（１）")
-  _str = REPLACE(_str,"（１）（０）","（０）")
-  _str = REPLACE(_str,"（０）（０）","（０）")
-  _str = REPLACE(_str,"（１）（１）","（１）")
-
-  _str
 }
 
 //******************************************************************************
