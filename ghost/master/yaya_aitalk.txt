@@ -22,7 +22,6 @@ RandomTalk
 {
   lastanchor = ""
   lastresponce = systemuptime
-  wordcount = 0
   lasttalk = AutoCRLF(talks(RAND(100)) + '\e')
 
   SETBALLOONSURFACE
