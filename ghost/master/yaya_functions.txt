@@ -163,15 +163,23 @@ AutoCRLF {
   _text = SurfaceSnippet(_argv[0])
   // 返り値
   _result = ''
-  // 直後に改行を入れる単語の品詞
-  _class = "記号-一般, 記号-読点, 記号-句点, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-並立助詞, 助詞-格助詞-一般, 助詞-終助詞"
+  // 直後に改行を入れる単語の品詞(primaryのほうがより強力)
+  _class_primary = "記号-一般, 記号-読点, 記号-句点, 助詞-終助詞"
+  _class_secondary = "助詞-接続助詞, 助詞-係助詞, 助詞-副詞化"
+  _class = _class_primary + ', ' + _class_secondary
   // バルーンⅠ行あたりの文字数
-  _max = 24
+  /* なぜか動かないので塩漬け
+  if ISVAR('balloon_cols') {
+    _max = balloon_cols
+  } else {
+    _max = 23
+  }
+  */
+  _max = 23
   // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
-  _threshold = TOINT(ROUND(_max / 3.0 * 2))
-
-  _mark = CHR(28) // 内部処理に影響しなさそうな制御文字
-
+  _threshold = TOINT(ROUND(_max / 5.0 * 3))
+  // 内部処理に影響しなさそうな制御文字
+  _mark = CHR(28)
   // 元の文字列を改行で区切って各々処理する
   _lines = SPLIT(_text, '\n')
   _linecount = 0
@@ -179,31 +187,34 @@ AutoCRLF {
 
   for _i=0; _i<ARRAYSIZE(_lines); _i++ {
     _line = _lines[_linecount]
+    _linewordcount = 0
     _flag = 0
-    _markcount = 0
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
     _line = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _mark)
     // 置換したさくらスクリプトは配列に保持しておいて適宜取り出す
     _tags = RE_GETSTR
+    _linelen = STRLEN(_line) - ARRAYSIZE(_tags)
+    _tagcount = 0
 
-    _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _line)
-    for _j=0; _j<_Rank; _j++ {
+    _rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _line)
+    for _j=0; _j<_rank; _j++ {
       _word = valueex[_j][0, CHR(9)]
       _mc = RE_GREP(_word, _mark)
       if _word == 'EOS' {
         break
       } elseif _mc > 0 {
         for _k=0; _k<_mc; _k++ {
-          _tag = _tags[_markcount]
+          _tag = _tags[_tagcount]
           if RE_GREP(_tag, '\\e|\n') {
             _wordcount = 0
           }
-          _result += _tags[_markcount]
-          _markcount++
+          _result += _tags[_tagcount]
+          _tagcount++
         }
       } else {
         _result += _word
         _wordcount += STRLEN(_word)
+        _linewordcount += STRLEN(_word)
         if _wordcount >= _max {
           // 改行されないまま次の行に達したときは文字カウントを修正
           _wordcount = _wordcount % _max
