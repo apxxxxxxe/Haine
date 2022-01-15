@@ -33,7 +33,7 @@ OnOpenMenu
 
 メインメニュー
 {
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
   "\![set,autoscroll,disable]\_q\*\0/
   //\_l[0,1.2em]------------------------------------/
@@ -190,7 +190,7 @@ Menu_RandomTalk
 {
   TalkStatus = 'talking'
 
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
   "h114201いいわよ。h114205……そうね、\c"
   "h113309なんの話がいいかしら…………h113205そうね、\c"
@@ -205,7 +205,7 @@ Menu_LastTalk
 {
   lastanchor = ""
 
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
   "h111209さっきの話ね。\c"
   --

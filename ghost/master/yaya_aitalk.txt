@@ -24,7 +24,7 @@ RandomTalk
   lastresponce = systemuptime
   lasttalk = AutoCRLF(talks(RAND(100)))
 
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
   lasttalk
 }
@@ -129,27 +129,27 @@ OnKeyPress
 {
   case reference[0] {
     when "t" {
-      SETBALLOONSURFACE
+      SetBalloonSurface
       --
       RandomTalk
     }
     when "r" {
-      SETBALLOONSURFACE
+      SetBalloonSurface
       --
       "リロードします\![change,ghost,%(sakura_name)]"
     }
     when "m" {
-      SETBALLOONSURFACE
+      SetBalloonSurface
       --
       '\![raise,OnMouseDoubleClick,0,0,0,0,__SYSTEM_KEYDOWN_COL,0,mouse]'
     }
     when "q" {
-      SETBALLOONSURFACE
+      SetBalloonSurface
       --
       '\![raise,OnEvent1]'
     }
     when "a" {
-      SETBALLOONSURFACE
+      SetBalloonSurface
       --
       _mark = '@'
       _text = 'fasdlkfj\nakshgkahdkfj\nahkfhdkahfakh\e'

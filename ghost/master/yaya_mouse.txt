@@ -108,7 +108,7 @@ CommonEventMousePre {
 }
 
 OnMouseEvent {
-  SETBALLOONSURFACE + CanselLookAt + NextTouchTalk
+  SetBalloonSurface + CanselLookAt + NextTouchTalk
 }
 
 CommonEventMousePost {

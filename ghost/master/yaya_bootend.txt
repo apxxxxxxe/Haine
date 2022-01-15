@@ -16,7 +16,7 @@ OnFirstBoot
   circadian_rhythm = '設定しない'
   InitializeVariable
   --
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
 
   //---- Vanishカウントを見て、真の初回か否かを判定する
@@ -42,7 +42,7 @@ OnBoot
 {
   InitializeVariable
   --
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
   _timeslot = GetTimeSlot
   if _timeslot == "朝"
@@ -69,7 +69,7 @@ OnBoot
 
 OnClose
 {
-  SETBALLOONSURFACE
+  SetBalloonSurface
   --
   _timeslot = GetTimeSlot
   if _timeslot == "朝"

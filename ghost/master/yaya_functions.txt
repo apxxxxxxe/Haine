@@ -104,7 +104,7 @@ OnSurfaceComplete
   "\_w[%(_delay)]\s[%(_dest_surface)]"
 }
 
-SETBALLOONSURFACE
+SetBalloonSurface
 {
   '\1\s[100000]\0\b[6]'
 }
