@@ -5,9 +5,7 @@
 //初期化処理
 InitializeVariable
 {
-  "\![notify,OnNotifySelfInfo]"
-  --
-  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines]"
+  GetGhostInfo
   --
   MakeKeroBalloownFollow
   --
@@ -38,21 +36,25 @@ GetTimeSlot
   }
 }
 
-OnNotifySelfInfo
+OngetGhostInfo
 {
-  sakura_name = reference[1]
-  sakura_name = '郊外通りのハイネ'
-}
-
-OnGetBalloonInfo
-{
-  balloon.name = reference[0]
-  balloon.lines = reference[1]
+  // sakura側名
+  sakura_name = reference[0]
+  // 現在バルーン名
+  balloon_name = reference[1]
+  // 現在バルーンの最大行数
+  balloon_lines = reference[2]
+  // 現在バルーンのⅠ行あたりの最大文字数(おおよそ)
+  balloon_cols = TOINT(reference[3] / reference[4] / 2)
 }
 
 OnBalloonChange
 {
-  "\![get,property,OnGetBalloonInfo,,currentghost.balloon.name,currentghost.balloon.scope(0).lines]"
+  GetGhostInfo
+}
+
+GetGhostInfo {
+  "\![get,property,OngetGhostInfo,currentghost.sakuraname,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width]"
 }
 
 
