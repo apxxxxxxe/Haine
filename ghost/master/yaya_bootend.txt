@@ -45,6 +45,10 @@ OnBoot
   --
   SetBalloonSurface
   --
+  AutoCRLF(Hello)
+}
+
+Hello {
   _timeslot = GetTimeSlot
   if _timeslot == "朝"
   {
@@ -64,6 +68,7 @@ OnBoot
   }
 }
 
+
 //******************************************************************************
 //終了 OnClose
 //******************************************************************************
@@ -72,6 +77,10 @@ OnClose
 {
   SetBalloonSurface
   --
+  AutoCRLF(Bye)
+}
+
+Bye {
   _timeslot = GetTimeSlot
   if _timeslot == "朝"
   {
