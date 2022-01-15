@@ -165,12 +165,13 @@ AutoCRLF {
   // バルーンⅠ行あたりの文字数
   _max = 24
   // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
-  _threshold = _max - 4
+  _threshold = TOINT(ROUND(_max / 3.0 * 2))
 
   _mark = CHR(28) // 内部処理に影響しなさそうな制御文字
 
   _lines = SPLIT(_text, '\n')
   _linecount = 0
+  _wordcount = 0
 
   for _i=0; _i<ARRAYSIZE(_lines); _i++ {
     _line = _lines[_linecount]
