@@ -133,15 +133,15 @@ OnKeyPress
       --
       RandomTalk
     }
-    when "r" {
-      SetBalloonSurface
-      --
-      "リロードします\![change,ghost,%(sakura_name)]"
-    }
     when "m" {
       SetBalloonSurface
       --
       '\![raise,OnMouseDoubleClick,0,0,0,0,__SYSTEM_KEYDOWN_COL,0,mouse]'
+    }
+    when "r" {
+      SetBalloonSurface
+      --
+      "\1リロードします\![change,ghost,%(sakura_name)]"
     }
     when "d" {
       isdebug = ! isdebug
