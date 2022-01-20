@@ -1,5 +1,0 @@
-charset,UTF-8
-name,霧の郊外にて
-type,balloon
-directory,kirinokougai
-
