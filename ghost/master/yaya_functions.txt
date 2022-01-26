@@ -158,7 +158,7 @@ GETMIN
 }
 
 //自動改行(特定の品詞の単語の直後に改行するようにする。kisaragiが必要)
-AutoCRLF {
+InsertLineFeed {
   // _argv[0]: 改行を入れたい文字列
   _text = SurfaceSnippet(_argv[0])
   // 返り値

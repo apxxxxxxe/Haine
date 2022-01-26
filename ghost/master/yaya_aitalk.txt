@@ -22,7 +22,7 @@ RandomTalk
 {
   lastanchor = ""
   lastresponce = systemuptime
-  lasttalk = AutoCRLF(talks(RAND(100)))
+  lasttalk = InsertLineFeed(talks(RAND(100)))
 
   SetBalloonSurface
   --

@@ -108,7 +108,7 @@ CommonEventMousePre {
 }
 
 OnMouseEvent {
-  AutoCRLF(SetBalloonSurface + CanselLookAt + NextTouchTalk)
+  InsertLineFeed(SetBalloonSurface + CanselLookAt + NextTouchTalk)
 }
 
 CommonEventMousePost {
