@@ -166,17 +166,17 @@ InsertLineFeed {
   // 直後に改行を入れる単語の品詞
   // primaryは該当単語が出現した時点で改行するが、secondaryはそれ以降にprimaryがない場合のみ改行する
   _class_primary = "記号-一般, 記号-読点, 記号-句点"
-  _class_secondary = "助詞-格助詞-一般, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-副助詞, 連体詞, 名詞-接尾-一般, 助詞-終助詞"
+  _class_secondary = "助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-副助詞, 連体詞, 名詞-接尾-一般, 助詞-終助詞"
   _class = _class_primary + ', ' + _class_secondary
   // バルーンⅠ行あたりの文字数
   /* なぜか動かないので塩漬け
      if ISVAR('balloon_cols') {
      _max = balloon_cols
      } else {
-     _max = 26
+     _max = 24
      }
      */
-  _max = 26
+  _max = 24
   // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
   _threshold = TOINT(ROUND(_max / 3.0 * 2))
   // 内部処理に影響しなさそうな制御文字
@@ -194,6 +194,8 @@ InsertLineFeed {
     _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _mark)
     // 置換したさくらスクリプトは配列に保持しておいて適宜取り出す
     _tags = RE_GETSTR
+    // 文末の全角・半角スペースは無駄なので消去
+    _l = RE_REPLACE(_l, '[ 　]' + _mark + '*$', 'pro')
     _linelen = STRLEN(_l) - ARRAYSIZE(_tags)
     _tagcount = 0
 
