@@ -41,7 +41,7 @@ OnOpenMenu
   \_l[0.8em,@2.0em]\![*]\q[話して,Menu_RandomTalk]/
   \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LastTalk]/
   \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]/
-  \_l[0.7em,13.25em]\__q[OnMenuClose]%(ICON('cross'))\__q/
+  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
   if ISFUNC("OnShowTimer") {OnShowTimer}
@@ -84,7 +84,7 @@ OnConfigMenu
   \_l[2em,@1.5em]\q[有効,OnJihouSelected,有効]\_l[@0.5em,]\q[無効,OnJihouSelected,無効]/
   \_l[0.5em,@2em]◆ユーザ生活リズム\_l[@0.5em,]【現在\_l[@0.3em,]%(circadian_rhythm)】/
   \_l[2em,@1.5em]\q[昼型,OnCircadianRhythmSelected,昼型]\_l[@0.5em,]\q[夜型,OnCircadianRhythmSelected,夜型]\_l[@0.5em,]\q[設定しない,OnCircadianRhythmSelected,設定しない]/
-  \_l[0.7em,13.25em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
+  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
   "
   --
   if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
@@ -159,7 +159,7 @@ OnTalkSettingMenu
   \_l[2em,@1.5em]\q[1,OnTalkIntervalSet,60]\_l[@0.5em,]\q[3,OnTalkIntervalSet,180]\_l[@0.5em,]\q[5,OnTalkIntervalSet,300]\_l[@0.5em,]\q[10,OnTalkIntervalSet,600]\_l[@0.5em,]\q[なし,OnTalkIntervalSet,0]/
   \_l[0.5em,@2em]◆トーク話題\_l[@0.5em,]【現在\_l[@0.3em,]%(IsJihouActive)】/
   \_l[2em,@1.5em]\q[有効,OnJihouSelected,有効]\_l[@0.5em,]\q[無効,OnJihouSelected,無効]/
-  \_l[0.7em,13.25em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
+  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
   --
   if ISFUNC("OnShowTimer") {OnShowTimer}
   --
