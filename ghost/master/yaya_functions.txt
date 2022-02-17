@@ -262,6 +262,22 @@ SurfaceSnippet {
   _text
 }
 
+IsUnderLine {
+  if ! _argv[0] {
+    "\f[strike,true]"
+  }
+}
+
+OnTalkTopic {
+  _topicname = reference[0]
+  if EVAL(_topicname) == 1 {
+    EVAL(_topicname + "= 0")
+  } else {
+    EVAL(_topicname + "= 1")
+  }
+  "\C\c\![raise,OnTalkSettingMenu]"
+}
+
 //******************************************************************************
 //最小化からの復帰 OnWindowStateRestore
 //******************************************************************************

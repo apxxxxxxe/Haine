@@ -157,8 +157,11 @@ OnTalkSettingMenu
   "\b[0]\_q/
   \_l[0.5em,1.8em]◆喋り頻度\_l[@0.5em,]【現在\_l[@0.3em,]%(_talkintervalmessage)】/
   \_l[2em,@1.5em]\q[1,OnTalkIntervalSet,60]\_l[@0.5em,]\q[3,OnTalkIntervalSet,180]\_l[@0.5em,]\q[5,OnTalkIntervalSet,300]\_l[@0.5em,]\q[10,OnTalkIntervalSet,600]\_l[@0.5em,]\q[なし,OnTalkIntervalSet,0]/
-  \_l[0.5em,@2em]◆トーク話題\_l[@0.5em,]【現在\_l[@0.3em,]%(IsJihouActive)】/
-  \_l[2em,@1.5em]\q[有効,OnJihouSelected,有効]\_l[@0.5em,]\q[無効,OnJihouSelected,無効]/
+  \_l[0.5em,@2em]◆トーク話題\_l[@0.5em,]/
+  \_l[2em,@1.5em]%(IsUnderLine(TalkTopicLife))\q[日常,OnTalkTopic,TalkTopicLife]\f[default]/
+  \_l[2em,@1.5em]%(IsUnderLine(TalkTopicPlants))\q[植物,OnTalkTopic,TalkTopicPlants]\f[default]/
+  \_l[2em,@1.5em]%(IsUnderLine(TalkTopicAroma))\q[アロマ,OnTalkTopic,TalkTopicAroma]\f[default]/
+  \_l[2em,@1.5em]%(IsUnderLine(TalkTopicHorrow))\q[死,OnTalkTopic,TalkTopicHorrow]\f[default]/
   \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
   --
   if ISFUNC("OnShowTimer") {OnShowTimer}
