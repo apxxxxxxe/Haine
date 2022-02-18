@@ -147,8 +147,9 @@ OnInfo {
   SetBalloonSurface
   --
   "\_q/
-  \_l[0.5em,1.8em] 累計触り回数（頭）：" + sc + "回/
-  \_l[0.5em,@1.5em] 累計触り回数（胸）：" + sc + "回/
+  \_l[0.5em,1.8em] 友好度：" + UpdateKoukando + "（" + UserKoukando + "）/
+  \_l[0.5em,@1.5em] 累計触り回数（頭）：" + touch_count_head + "回/
+  \_l[0.5em,@1.5em] 累計触り回数（胸）：" + touch_count_bust + "回/
   \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
   if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
@@ -184,7 +185,7 @@ OnTalkSettingMenu
   \_l[2em,@1.5em]\q[1,OnTalkIntervalSet,60]\_l[@0.5em,]\q[3,OnTalkIntervalSet,180]\_l[@0.5em,]\q[5,OnTalkIntervalSet,300]\_l[@0.5em,]\q[10,OnTalkIntervalSet,600]\_l[@0.5em,]\q[なし,OnTalkIntervalSet,0]/
   \_l[0.5em,@2em]◆トーク話題\_l[@0.5em,]/
   \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicLife))\q[日常,OnTalkTopic,TalkTopicLife]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicPlants))\q[植物,OnTalkTopic,TalkTopicPlants]\f[default] /
-  \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicAroma))\q[アロマ,OnTalkTopic,TalkTopicAroma]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicHorrow))\q[死,OnTalkTopic,TalkTopicHorrow]\f[default] /
+  \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicAroma))\q[アロマ,OnTalkTopic,TalkTopicAroma]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicHorrow))\q[暗いフォークロア,OnTalkTopic,TalkTopicHorrow]\f[default] /
   \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
   --
   if ISFUNC("OnShowTimer") {OnShowTimer}
@@ -209,7 +210,7 @@ OnMenuClose
 {
   CurrentMenuDialog = ''
   TalkStatus = 'none'
-  touch_count = 0
+  continuous_touch_count = 0
   if ISFUNC("OnReloadTimer") {"\![timerraise,0,0,OnReloadTimer]"} // 予約を削除
 }
 //アンカー　ツールチップ

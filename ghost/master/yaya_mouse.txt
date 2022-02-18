@@ -22,9 +22,20 @@
 
 MouseMove0head : nonoverlap
 {
+  touch_count_head++
+  if continuous_touch_count == 1 {
+    "h111209ふふ……いっぱいなでてくれるのね。\nh111205あなたの手、あたたかくて好きよ。"
+  } elseif continuous_touch_count > 1 {
+    "h111209……。"
+    "h111209……。"
+    "h111209……。"
+    "h111209……。"
+    "h111209……ふふ……。"
+  } else {
   "h111209ん……ありがとう。\nh111205あなたも無理しないでね。"
   "h111209あたたかいのね、あなたの手。"
   "h111209……誰かになでられる機会なんて、\nどんどんなくなってしまうものよね。\n…………h111205うん、ありがとう。\nh114201さ、いらっしゃい。あなたの頭もなでてあげるわh114207。"
+  }
 }
 
 MouseMove0face : nonoverlap
@@ -35,12 +46,18 @@ MouseMove0face : nonoverlap
 
 MouseMove0bust : nonoverlap
 {
-  sc++
-  if touch_count == 1 && RAND(2) == 0 {
-    "h322104%(DialogSurprised)\nh322209ふざけすぎよ、ユーザ。"
-  }else {
+  touch_count_bust++
+  if continuous_touch_count == 0 {
+    "h312408%(DialogSurprised)h312401\_w[700]\nh322209ふざけすぎよ、ユーザ。"
+  } elseif continuous_touch_count == 1 {
     "h124206……気が済んだらやめてね。"
     "h324209……なんというか……困ってしまうわ。"
+  } else {
+    "h124109……。"
+    "h124109……。"
+    "h124109……。"
+    "h124109……。"
+    "h114104……はあ……。"
   }
 }
 
@@ -50,8 +67,10 @@ MouseMove0bust : nonoverlap
 
 MouseDoubleClick0
 {
-  if touch_count > 0 && TalkStatus == 'menu' {
+  if continuous_touch_count == 1 {
     OnOpenMenu("h324201%(DialogConfused)聞こえてるわよ？")
+  } elseif continuous_touch_count > 1 {
+    OnOpenMenu("h324209……。")
   } else {
     OnOpenMenu
   }
@@ -59,7 +78,7 @@ MouseDoubleClick0
 
 MouseDoubleClick0bust
 {
-  sc++
+  touch_count_bust++
   OnOpenMenu("h312109……普通に呼んで。")
 }
 
@@ -69,13 +88,26 @@ MouseDoubleClick0bust
 
 MouseWheelDown0shoulder
 {
-  "h114209ん。\nh114205……。\nh114201………h114204ふふ。"
+  if continuous_touch_count == 1 {
+    "h100000あっ……。h114209…………h114205まだ、こうしていたいの？"
+  } elseif continuous_touch_count > 1 {
+    "h114209……。"
+  } else {
+    "h114209ん。\nh114205……。\nh114201………h114204ふふ。"
+  }
 }
 
 MouseWheelDown0hand
 {
-  "h114202うん？\n……h114205手を引いて、h114204それからどうするの？"
-  "h114204……どこかへ連れて行ってくれるの？"
+  if continuous_touch_count == 1 {
+    "h114205ぎゅーっ……h114201。h114204ふふ。"
+    "h114209……離してくれないの？困ったわね……h114207ふふ……"
+  } elseif continuous_touch_count > 1 {
+    "……。"
+  } else {
+    "h114202うん？\n……h114205手を引いて、h114204それからどうするの？"
+    "h114204……どこかへ連れて行ってくれるの？"
+  }
 }
 
 //******************************************************************************
@@ -84,7 +116,7 @@ MouseWheelDown0hand
 
 OnMouseLookAtbust : nonoverlap
 {
-  sc++
+  touch_count_bust++
   '……h112204視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。'
   '……h212109見すぎよ。'
 }
@@ -106,7 +138,7 @@ OnMouseLookAtBeforeface : nonoverlap
 }
 
 DialogSurprised {
-  'ちょ、ちょっと……'
+  '！……'
   'なっ……'
 }
 
@@ -124,6 +156,7 @@ DialogConfused {
 
 // 触り反応時の共通処理
 CommonEventMousePre {
+  TalkStatus = 'touch'
   lastresponce = systemuptime
   first_touch = 1
 }
@@ -138,9 +171,9 @@ CommonEventMousePost {
 TouchCount {
   // _argv[0]: 触り反応の部位
   if last_touch_part == _argv[0] {
-    touch_count = touch_count + 1
+    continuous_touch_count++
   } else {
-    touch_count = 1
+    continuous_touch_count = 0
   }
   last_touch_part = _argv[0]
   "\![timerraise,30000,1,OnResetTouchCount]"
@@ -148,7 +181,7 @@ TouchCount {
 
 OnResetTouchCount {
   last_touch_part = ""
-  touch_count = 0
+  continuous_touch_count = 0
 }
 
 OnMouseMove

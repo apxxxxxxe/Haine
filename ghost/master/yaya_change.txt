@@ -105,4 +105,7 @@ OnOtherGhostChanged
   AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostChanged")
 }
 
-
+// スリープ・休止状態から復帰
+OnSysResume {
+  'h114201あ、戻ったのね。\nh114207あなたがいないうちに、お茶を淹れなおしておいたわよ。'
+}

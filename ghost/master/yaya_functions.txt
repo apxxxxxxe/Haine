@@ -11,7 +11,7 @@ InitializeVariable
   --
   lastresponce = systemuptime
   uwanosora_minute = 5
-  touch_count = 0
+  continuous_touch_count = 0
   last_touch_part = ''
   first_touch = 0
 }
@@ -131,7 +131,7 @@ SetBalloonSurface
     when 'library' {
       '\b[4]'
     }
-    default {
+    others {
       '\b[6]'
     }
   }
@@ -227,7 +227,10 @@ InsertLineFeed {
       if _mc {
         for _j=0; _j<_mc; _j++ {
           _tag = _tags[_tagcount]
-          _result += _tags[_tagcount]
+          if STRSTR(_tag, '\_l[0', 0) {
+            _wordcount = 0
+          }
+          _result += _tag
           _tagcount++
         }
       } else {
@@ -296,6 +299,54 @@ OnTalkTopic {
     EVAL(_topicname + "= 1")
   }
   "\C\c\![raise,OnTalkSettingMenu]"
+}
+
+ShowTopic {
+  "\_l[0,13.30em]\f[height,11]\f[align,right]\![quicksection,true]"
+  --
+  case _argv[0] {
+    when 'plants' {
+      "植物の話題"
+    }
+    when 'aroma' {
+      "アロマの話題"
+    }
+    when 'horrow' {
+      "暗いフォークロア"
+    }
+    others {
+      "日常の話題"
+    }
+  }
+  --
+  "\![quicksection,false]\_l[0,0]\f[default]"
+}
+
+UserEvaluation {
+  if touch_count_head > touch_count_bust {
+    // 常識人
+  } else {
+    // すけべ人間
+  }
+}
+
+UserKoukando {
+  _s = UpdateKoukando
+  if _s > 10 {
+    //好き
+    'やさしい人'
+  } elseif _s < -10 {
+    //嫌い
+    '苦手な人'
+  } else {
+    //どちらでもない
+    'お客さん'
+  }
+}
+
+UpdateKoukando {
+  koukando = touch_count_head - touch_count_bust + total_talk_count/3
+  koukando
 }
 
 //******************************************************************************
