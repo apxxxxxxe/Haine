@@ -2,7 +2,7 @@
 //関数辞書
 //******************************************************************************
 
-//初期化処理
+//初期化処理 起動毎に呼び出される
 InitializeVariable
 {
   GetGhostInfo
@@ -44,13 +44,27 @@ OngetGhostInfo
   balloon_name = reference[1]
   // 現在バルーンの最大行数
   balloon_lines = reference[2]
+
+  _zenkaku_char_width = reference[4] * 1.5
   // 現在バルーンのⅠ行あたりの最大文字数(おおよそ)
-  balloon_cols = TOINT(reference[3] / reference[4] / 2)
+  balloon_cols = TOINT(ROUND(reference[3] / _zenkaku_char_width))
 }
 
 OnBalloonChange
 {
   GetGhostInfo
+  "\![raise,OnBalloonChangePost]"
+}
+
+OnBalloonChangePost {
+  case reference[0] {
+    when "霧の郊外にて" {
+      balloonwidth = 27
+    }
+    when "sspデフォルト+" {
+      balloonwidth = 24
+    }
+  }
 }
 
 GetGhostInfo {
@@ -108,7 +122,19 @@ OnSurfaceComplete
 
 SetBalloonSurface
 {
-  '\1\s[100000]\0\b[6]'
+  "\1\s[100000]\0"
+  --
+  case _argv[0] {
+    when 'garden' {
+      '\b[0]'
+    }
+    when 'library' {
+      '\b[4]'
+    }
+    default {
+      '\b[6]'
+    }
+  }
 }
 
 OnGetSurfaceInfo
@@ -143,6 +169,7 @@ ICON
     when 'arrow-right' { 'e904' }
     when 'arrow-left'  { 'e905' }
     when 'bubble'      { 'e906' }
+    when 'info'        { 'e907' }
   }
   --
   ']\f[default]'
@@ -169,14 +196,7 @@ InsertLineFeed {
   _class_secondary = "助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-副助詞, 連体詞, 名詞-接尾-一般, 助詞-終助詞"
   _class = _class_primary + ', ' + _class_secondary
   // バルーンⅠ行あたりの文字数
-  /* なぜか動かないので塩漬け
-     if ISVAR('balloon_cols') {
-     _max = balloon_cols
-     } else {
-     _max = 24
-     }
-     */
-  _max = 24
+  _max = balloonwidth
   // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
   _threshold = TOINT(ROUND(_max / 3.0 * 2))
   // 内部処理に影響しなさそうな制御文字
