@@ -35,8 +35,9 @@ MouseMove0face : nonoverlap
 
 MouseMove0bust : nonoverlap
 {
+  sc++
   if touch_count == 1 && RAND(2) == 0 {
-    "h322104ちょ、ちょっと……\nh322209ふざけすぎよ、ユーザ。"
+    "h322104%(DialogSurprised)\nh322209ふざけすぎよ、ユーザ。"
   }else {
     "h124206……気が済んだらやめてね。"
     "h324209……なんというか……困ってしまうわ。"
@@ -49,7 +50,17 @@ MouseMove0bust : nonoverlap
 
 MouseDoubleClick0
 {
-  OnOpenMenu
+  if touch_count > 0 && TalkStatus == 'menu' {
+    OnOpenMenu("h324201%(DialogConfused)聞こえてるわよ？")
+  } else {
+    OnOpenMenu
+  }
+}
+
+MouseDoubleClick0bust
+{
+  sc++
+  OnOpenMenu("h312109……普通に呼んで。")
 }
 
 //******************************************************************************
@@ -73,6 +84,7 @@ MouseWheelDown0hand
 
 OnMouseLookAtbust : nonoverlap
 {
+  sc++
   '……h112204視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。'
   '……h212109見すぎよ。'
 }
@@ -93,6 +105,16 @@ OnMouseLookAtBeforeface : nonoverlap
   "h324201"
 }
 
+DialogSurprised {
+  'ちょ、ちょっと……'
+  'なっ……'
+}
+
+DialogConfused {
+  '……'
+  'あの……'
+}
+
 //******************************************************************************
 //マウス処理部コア
 //AYATEMPLATE.MouseMoveWheelFuncの2番目の数字が「感度」です。
@@ -103,7 +125,6 @@ OnMouseLookAtBeforeface : nonoverlap
 // 触り反応時の共通処理
 CommonEventMousePre {
   lastresponce = systemuptime
-  TalkStatus = 'talking'
   first_touch = 1
 }
 
@@ -122,6 +143,12 @@ TouchCount {
     touch_count = 1
   }
   last_touch_part = _argv[0]
+  "\![timerraise,30000,1,OnResetTouchCount]"
+}
+
+OnResetTouchCount {
+  last_touch_part = ""
+  touch_count = 0
 }
 
 OnMouseMove
@@ -129,6 +156,7 @@ OnMouseMove
   NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
   if NextTouchTalk != '' {
     TouchCount(reference[4])
+    --
     CommonEventMousePre
     '\![raise,OnMouseEvent]'
   }
@@ -150,6 +178,7 @@ OnMouseWheel
 
   if NextTouchTalk != '' {
     TouchCount(reference[4])
+    --
     CommonEventMousePre
     '\![raise,OnMouseEvent]'
   }
@@ -160,6 +189,7 @@ OnMouseDoubleClick
   NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
   if NextTouchTalk != '' {
     TouchCount(reference[4])
+    --
     CommonEventMousePre
     '\![raise,OnMouseEvent]'
   }
@@ -171,6 +201,7 @@ OnMouseClickEx
     NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseWheelClick')
     if NextTouchTalk != '' {
       TouchCount(reference[4])
+      --
       CommonEventMousePre
       '\![raise,OnMouseEvent]'
     }

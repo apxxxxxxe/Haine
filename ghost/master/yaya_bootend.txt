@@ -15,6 +15,7 @@ OnFirstBoot
   IsJihouActive = '有効'
   circadian_rhythm = '設定しない'
   isdebug = 0
+  sc = 0
   InitializeVariable
   --
   SetBalloonSurface
