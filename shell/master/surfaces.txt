@@ -56,29 +56,32 @@ surface131101-131109,131201-131209,131301-131309,131401-131409,132101-132109,132
 surface111101-111109,111201-111209,111301-111309,111401-111409,121101-121209,131101-131109,131201-131209,131301-131309,131401-131409,211101-211109,211201-211209,211301-211309,211401-211409,221101-221109,221201-221209,221301-221309,221401-221409,231101-231109,231201-231209,231301-231309,231401-231409,311101-311109,311201-311209,311301-311309,311401-311409,321101-321109,321201-321209,321301-321309,321401-321409,331101-331109,331201-331209,331301-331309,331401-331409
 {
 
-	//袖
-	animation505310.interval,bind
-	animation505310.pattern0,overlay,1400,0,0,0
-	animation505311.interval,bind
-	animation505311.pattern0,overlay,1401,0,0,0
-	animation505312.interval,bind
-	animation505312.pattern0,overlay,1402,0,0,0
-	animation505313.interval,bind
-	animation505313.pattern0,overlay,1403,0,0,0
-	animation505314.interval,bind
-	animation505314.pattern0,overlay,1404,0,0,0
-	animation505315.interval,bind
-	animation505315.pattern0,overlay,1405,0,0,0
-	animation505316.interval,bind
+  //前手
+  animation505000.interval,runonce
+  animation505000.pattern0,overlay,503,0,0,0
+
+  //袖
+  animation505310.interval,bind
+  animation505310.pattern0,overlay,1400,0,0,0
+  animation505311.interval,bind
+  animation505311.pattern0,overlay,1401,0,0,0
+  animation505312.interval,bind
+  animation505312.pattern0,overlay,1402,0,0,0
+  animation505313.interval,bind
+  animation505313.pattern0,overlay,1403,0,0,0
+  animation505314.interval,bind
+  animation505314.pattern0,overlay,1434,0,0,0
+  animation505315.interval,bind
+  animation505315.pattern0,overlay,1435,0,0,0
+  animation505316.interval,bind
   animation505316.pattern0,overlay,1436,0,0,0
-	animation505318.interval,bind
-  animation505318.pattern0,overlay,1408,0,0,0
-	animation505319.interval,bind
-  animation505319.pattern0,overlay,1409,0,0,0
-  
-	//後ろ手
-	animation502000.interval,runonce
-	animation502000.pattern0,overlay,500,0,0,0
+  animation505318.interval,bind
+  animation505318.pattern0,overlay,1438,0,0,0
+  animation505319.interval,bind
+  animation505319.pattern0,overlay,1439,0,0,0
+
+  collisionex13,hand,polygon,288,423,330,410,336,414,341,422,328,446,317,436,288,442
+  collisionex14,hand,polygon,282,501,262,536,261,550,285,556,299,549,294,521,295,512
 
 }
 
@@ -143,36 +146,6 @@ surface113101-113109,113201-113209,113301-113309,113401-113409,123101-123109,123
 
 	collisionex13,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
 	collisionex14,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
-}
-
-surface114101-114109,114201-114209,114301-114309,114401-114409,124101-124109,124201-124209,124301-124309,124401-124409,134101-134109,134201-134209,134301-134309,134401-134409,214101-214109,214201-214209,214301-214309,214401-214409,224101-224109,224201-224209,224301-224309,224401-224409,234101-234109,234201-234209,234301-234309,234401-234409,314101-314109,314201-314209,314301-314309,314401-314409,324101-324109,324201-324209,324301-324309,324401-324409,334101-334109,334201-334209,334301-334309,334401-334409
-{
-	//前手
-	animation505000.interval,runonce
-	animation505000.pattern0,overlay,503,0,0,0
-
-	//袖
-	animation505310.interval,bind
-	animation505310.pattern0,overlay,1400,0,0,0
-	animation505311.interval,bind
-	animation505311.pattern0,overlay,1401,0,0,0
-	animation505312.interval,bind
-	animation505312.pattern0,overlay,1402,0,0,0
-	animation505313.interval,bind
-	animation505313.pattern0,overlay,1403,0,0,0
-	animation505314.interval,bind
-	animation505314.pattern0,overlay,1434,0,0,0
-	animation505315.interval,bind
-	animation505315.pattern0,overlay,1435,0,0,0
-  animation505316.interval,bind
-  animation505316.pattern0,overlay,1436,0,0,0
-	animation505318.interval,bind
-  animation505318.pattern0,overlay,1438,0,0,0
-	animation505319.interval,bind
-  animation505319.pattern0,overlay,1439,0,0,0
-
-	collisionex13,hand,polygon,288,423,330,410,336,414,341,422,328,446,317,436,288,442
-	collisionex14,hand,polygon,282,501,262,536,261,550,285,556,299,549,294,521,295,512
 }
 
 surface111101-111109,112101-112109,113101-113109,114101-114109,121101-121109,122101-122109,123101-123109,124101-124109,131101-131109,132101-132109,133101-133109,134101-134109,211101-211109,212101-212109,213101-213109,214101-214109,221101-221109,222101-222109,223101-223109,224101-224109,231101-231109,232101-232109,233101-233109,234101-234109,311101-311109,312101-312109,313101-313109,314101-314109,321101-321109,322101-322109,323101-323109,324101-324109,331101-331109,332101-332109,333101-333109,334101-334109
@@ -308,139 +281,8 @@ surface100000
 	element0,overlay,surface100000.png,0,0
 }
 
-//トップス（後ろ手のとき）
-surface111101-111109,111201-111209,111301-111309,111401-111409,121101-121209,131101-131109,131201-131209,131301-131309,131401-131409,211101-211109,211201-211209,211301-211309,211401-211409,221101-221109,221201-221209,221301-221309,221401-221409,231101-231109,231201-231209,231301-231309,231401-231409,311101-311109,311201-311209,311301-311309,311401-311409,321101-321109,321201-321209,321301-321309,321401-321409,331101-331109,331201-331209,331301-331309,331401-331409
+surface.append111101-999909
 {
-	animation502360.interval,bind
-	animation502360.pattern0,insert,505310
-	animation502360.pattern1,insert,505311
-	animation502360.pattern2,insert,505312
-	animation502360.pattern3,insert,505313
-	animation502360.pattern4,insert,505314
-	animation502360.pattern5,insert,505315
-	animation502360.pattern6,insert,505316
-	animation502360.pattern7,insert,505318
-	animation502360.pattern8,insert,505319
-	animation502360.pattern9,overlay,1200,0,0,0
-
-	animation502361.interval,bind
-	animation502361.pattern0,insert,505310
-	animation502361.pattern1,insert,505311
-	animation502361.pattern2,insert,505312
-	animation502361.pattern3,insert,505313
-	animation502361.pattern4,insert,505314
-	animation502361.pattern5,insert,505315
-	animation502361.pattern6,insert,505316
-	animation502361.pattern7,insert,505318
-	animation502361.pattern8,insert,505319
-	animation502361.pattern9,overlay,1201,0,0,0
-
-	//ワンピースではスカート→袖→胴の順にする animation502362も同様
-	animation502362.interval,bind
-	animation502362.pattern0,overlay,1202,0,0,0
-	animation502362.pattern1,insert,505310
-	animation502362.pattern2,insert,505311
-	animation502362.pattern3,insert,505312
-	animation502362.pattern4,insert,505313
-	animation502362.pattern5,insert,505314
-	animation502362.pattern6,insert,505315
-	animation502362.pattern7,insert,505316
-	animation502362.pattern8,insert,505318
-	animation502362.pattern9,insert,505319
-	animation502362.pattern10,overlay,1306,0,0,0
-
-	animation502363.interval,bind
-	animation502363.pattern0,overlay,1203,0,0,0
-	animation502363.pattern1,insert,505310
-	animation502363.pattern2,insert,505311
-	animation502363.pattern3,insert,505312
-	animation502363.pattern4,insert,505313
-	animation502363.pattern5,insert,505314
-	animation502363.pattern6,insert,505315
-	animation502363.pattern7,insert,505316
-	animation502363.pattern8,insert,505316
-	animation502363.pattern9,insert,505318
-	animation502363.pattern10,insert,505319
-	animation502363.pattern11,overlay,1307,0,0,0
-
-	animation502364.interval,bind
-	animation502364.pattern0,insert,505310
-	animation502364.pattern1,insert,505311
-	animation502364.pattern2,insert,505312
-	animation502364.pattern3,insert,505313
-	animation502364.pattern4,insert,505314
-	animation502364.pattern5,insert,505315
-	animation502364.pattern6,insert,505316
-	animation502364.pattern7,insert,505318
-	animation502364.pattern8,insert,505319
-	animation502364.pattern9,overlay,1204,0,0,0
-
-	animation502366.interval,bind
-	animation502366.pattern0,insert,505310
-	animation502366.pattern1,insert,505311
-	animation502366.pattern2,insert,505312
-	animation502366.pattern3,insert,505313
-	animation502366.pattern4,insert,505314
-	animation502366.pattern5,insert,505315
-	animation502366.pattern6,insert,505316
-	animation502366.pattern7,insert,505318
-	animation502366.pattern8,insert,505319
-	animation502366.pattern9,overlay,1206,0,0,0
-	
-	animation502367.interval,bind
-	animation502367.pattern0,insert,505310
-	animation502367.pattern1,insert,505311
-	animation502367.pattern2,insert,505312
-	animation502367.pattern3,insert,505313
-	animation502367.pattern4,insert,505314
-	animation502367.pattern5,insert,505315
-	animation502367.pattern6,insert,505316
-	animation502367.pattern7,insert,505318
-	animation502367.pattern8,insert,505319
-	animation502367.pattern9,overlay,1207,0,0,0
-
-	animation502368.interval,bind
-	animation502368.pattern0,insert,505310
-	animation502368.pattern1,insert,505311
-	animation502368.pattern2,insert,505312
-	animation502368.pattern3,insert,505313
-	animation502368.pattern4,insert,505314
-	animation502368.pattern5,insert,505315
-	animation502368.pattern6,insert,505316
-	animation502368.pattern7,insert,505318
-	animation502368.pattern8,insert,505319
-	animation502368.pattern9,overlay,1208,0,0,0
-
-}
-
-//トップス（後ろ手でないとき）
-surface.append111101-999909,!111101-111109,!111201-111209,!111301-111309,!111401-111409,!121101-121209,!131101-131109,!131201-131209,!131301-131309,!131401-131409,!211101-211109,!211201-211209,!211301-211309,!211401-211409,!221101-221109,!221201-221209,!221301-221309,!221401-221409,!231101-231109,!231201-231209,!231301-231309,!231401-231409,!311101-311109,!311201-311209,!311301-311309,!311401-311409,!321101-321109,!321201-321209,!321301-321309,!321401-321409,!331101-331109,!331201-331209,!331301-331309,!331401-331409
-{
-	animation502360.interval,bind
-	animation502360.pattern0,overlay,1200,0,0,0
-
-	animation502361.interval,bind
-	animation502361.pattern0,overlay,1201,0,0,0
-
-	animation502362.interval,bind
-	animation502362.pattern0,overlay,1202,0,0,0
-	animation502362.pattern1,overlay,1306,0,0,0
-
-	animation502363.interval,bind
-	animation502363.pattern0,overlay,1203,0,0,0
-	animation502363.pattern1,overlay,1307,0,0,0
-
-	animation502364.interval,bind
-	animation502364.pattern0,overlay,1204,0,0,0
-
-	animation502366.interval,bind
-	animation502366.pattern0,overlay,1206,0,0,0
-
-	animation502367.interval,bind
-	animation502367.pattern0,overlay,1207,0,0,0
-
-	animation502368.interval,bind
-	animation502368.pattern0,overlay,1208,0,0,0
 
 }
 
@@ -522,8 +364,32 @@ surface.append111101-999909
 	animation501404.interval,bind
 	animation501404.pattern0,overlay,1554,0,0,0
 	
-	//トップス 502300
+  //トップス
+  animation502360.interval,bind
+  animation502360.pattern0,overlay,1200,0,0,0
 
+  animation502361.interval,bind
+  animation502361.pattern0,overlay,1201,0,0,0
+
+  animation502362.interval,bind
+  animation502362.pattern0,overlay,1202,0,0,0
+  animation502362.pattern1,overlay,1306,0,0,0
+
+  animation502363.interval,bind
+  animation502363.pattern0,overlay,1203,0,0,0
+  animation502363.pattern1,overlay,1307,0,0,0
+
+  animation502364.interval,bind
+  animation502364.pattern0,overlay,1204,0,0,0
+
+  animation502366.interval,bind
+  animation502366.pattern0,overlay,1206,0,0,0
+
+  animation502367.interval,bind
+  animation502367.pattern0,overlay,1207,0,0,0
+
+  animation502368.interval,bind
+  animation502368.pattern0,overlay,1208,0,0,0
 	
 	//トップス+
 	animation506300.interval,bind

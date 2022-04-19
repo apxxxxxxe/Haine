@@ -40,7 +40,7 @@ ResetPomodoroTimer
     PomodoroStatus = 1
     PomodoroCount = 0
     currentpomodoro = pomodoro[0]
-    _ret += "h111204ポモドーロタイマーを開始するわ。\nh114209まずは%(currentpomodoro)分ね。"
+    _ret += "h111204ポモドーロタイマーを開始するわ。\nh111209まずは%(currentpomodoro)分ね。"
   }
   elseif (_argv[0] == pomodoro[0]) // 作業時間が終わったとき
   {
@@ -62,7 +62,7 @@ ResetPomodoroTimer
 OnPomodoroStop
 {
   if (PomodoroCount == 0) {
-    "h114209はい、中断したわ。"
+    "h111209はい、中断したわ。"
   }else {
     "h111207お疲れさま。\n今回は" + PomodoroCount + "セット（" + (pomodoro[0]+pomodoro[1])*PomodoroCount + "分）ね。"
   }
@@ -102,7 +102,7 @@ OnLoopTimerOver
 OnTimerStop
 {
   if (reference[0] == 0) {
-    "h114209はい、中断したわ。"
+    "h111209はい、中断したわ。"
   }else {
     "h111207お疲れさま。\n今回は" + CurrentLoop + "セット（" + CurrentLoop*LoopCount + "分）ね。"
   }

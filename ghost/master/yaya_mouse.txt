@@ -34,7 +34,7 @@ MouseMove0head : nonoverlap
   } else {
   "h111209ん……ありがとう。\nh111205あなたも無理しないでね。"
   "h111209あたたかいのね、あなたの手。"
-  "h111209……誰かになでられる機会なんて、\nどんどんなくなってしまうものよね。\n…………h111205うん、ありがとう。\nh114201さ、いらっしゃい。あなたの頭もなでてあげるわh114207。"
+  "h111209……誰かになでられる機会なんて、\nどんどんなくなってしまうものよね。\n…………h111205うん、ありがとう。\nh111201さ、いらっしゃい。あなたの頭もなでてあげるわh111207。"
   }
 }
 
@@ -50,14 +50,14 @@ MouseMove0bust : nonoverlap
   if continuous_touch_count == 0 {
     "h312408%(DialogSurprised)h312401\_w[700]\nh322209ふざけすぎよ、ユーザ。"
   } elseif continuous_touch_count == 1 {
-    "h124206……気が済んだらやめてね。"
-    "h324209……なんというか……困ってしまうわ。"
+    "h121206……気が済んだらやめてね。"
+    "h321209……なんというか……困ってしまうわ。"
   } else {
-    "h124109……。"
-    "h124109……。"
-    "h124109……。"
-    "h124109……。"
-    "h114104……はあ……。"
+    "h121109……。"
+    "h121109……。"
+    "h121109……。"
+    "h121109……。"
+    "h111104……はあ……。"
   }
 }
 
@@ -68,9 +68,9 @@ MouseMove0bust : nonoverlap
 MouseDoubleClick0
 {
   if continuous_touch_count == 1 {
-    OnOpenMenu("h324201%(DialogConfused)聞こえてるわよ？")
+    OnOpenMenu("h321201%(DialogConfused)聞こえてるわよ？")
   } elseif continuous_touch_count > 1 {
-    OnOpenMenu("h324209……。")
+    OnOpenMenu("h321209……。")
   } else {
     OnOpenMenu
   }
@@ -89,24 +89,24 @@ MouseDoubleClick0bust
 MouseWheelDown0shoulder
 {
   if continuous_touch_count == 1 {
-    "h100000あっ……。h114209…………h114205まだ、こうしていたいの？"
+    "h100000あっ……。h111209…………h111205まだ、こうしていたいの？"
   } elseif continuous_touch_count > 1 {
-    "h114209……。"
+    "h111209……。"
   } else {
-    "h114209ん。\nh114205……。\nh114201………h114204ふふ。"
+    "h111209ん。\nh111205……。\nh111201………h111204ふふ。"
   }
 }
 
 MouseWheelDown0hand
 {
   if continuous_touch_count == 1 {
-    "h114205ぎゅーっ……h114201。h114204ふふ。"
-    "h114209……離してくれないの？困ったわね……h114207ふふ……"
+    "h111205ぎゅーっ……h111201。h111204ふふ。"
+    "h111209……離してくれないの？困ったわね……h111207ふふ……"
   } elseif continuous_touch_count > 1 {
     "……。"
   } else {
-    "h114202うん？\n……h114205手を引いて、h114204それからどうするの？"
-    "h114204……どこかへ連れて行ってくれるの？"
+    "h111202うん？\n……h111205手を引いて、h111204それからどうするの？"
+    "h111204……どこかへ連れて行ってくれるの？"
   }
 }
 
@@ -128,13 +128,13 @@ OnMouseLookAtBeforebust : nonoverlap
 
 OnMouseLookAtface : nonoverlap
 {
-  '……h324207顔に何かついてる？'
+  '……h321207顔に何かついてる？'
   'h321201……h321207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？'
 }
 
 OnMouseLookAtBeforeface : nonoverlap
 {
-  "h324201"
+  "h321201"
 }
 
 DialogSurprised {
