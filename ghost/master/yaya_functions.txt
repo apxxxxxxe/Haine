@@ -10,7 +10,6 @@ InitializeVariable
   MakeKeroBalloownFollow
   --
   lastresponce = systemuptime
-  uwanosora_minute = 5
   continuous_touch_count = 0
   last_touch_part = ''
   first_touch = 0

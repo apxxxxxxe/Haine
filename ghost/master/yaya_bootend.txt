@@ -17,6 +17,8 @@ OnFirstBoot
   isdebug = 0
   touch_count_bust = 0
   total_talk_count = 0
+  uwanosora_minute = 5
+
   InitializeVariable
   --
   SetBalloonSurface
