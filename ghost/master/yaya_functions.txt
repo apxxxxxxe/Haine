@@ -7,6 +7,9 @@ InitializeVariable
 {
   GetGhostInfo
   --
+  // GetGhostInfo後に処理する必要があるのでembedで呼ぶ
+  "\![embed,OnGetShellListInfo]"
+  --
   MakeKeroBalloownFollow
   --
   lastresponce = systemuptime
@@ -35,7 +38,17 @@ GetTimeSlot
   }
 }
 
-OngetGhostInfo
+GetGhostInfo {
+  //0: currentghost.sakuraname
+  //1: currentghost.balloon.name
+  //2: currentghost.balloon.scope(0).lines
+  //3: currentghost.balloon.scope(0).validwidth.initial
+  //4: currentghost.balloon.scope(0).char_width
+  //5: currentghost.shelllist.count
+  "\![get,property,OnGetGhostInfo,currentghost.sakuraname,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width,currentghost.shelllist.count]"
+}
+
+OnGetGhostInfo
 {
   // sakura側名
   sakura_name = reference[0]
@@ -43,10 +56,28 @@ OngetGhostInfo
   balloon_name = reference[1]
   // 現在バルーンの最大行数
   balloon_lines = reference[2]
-
-  _zenkaku_char_width = reference[4] * 1.5
   // 現在バルーンのⅠ行あたりの最大文字数(おおよそ)
+  _zenkaku_char_width = reference[4] * 1.5
   balloon_cols = TOINT(ROUND(reference[3] / _zenkaku_char_width))
+  // シェルの数
+  shell_count = reference[5]
+}
+
+OnGetShellListInfo {
+  _cmd = "\![get,property,OnOnGetShellListInfo,"
+  for _i = 0; _i < shell_count; _i++ {
+    _cmd += "currentghost.shelllist.index(" + _i + ").name"
+  }
+  _cmd += "]"
+
+  _cmd
+}
+
+OnOnGetShellListInfo {
+  shell_list = IARRAY
+  for _i = 0; _i < ARRAYSIZE(reference); _i++ {
+    shell_list = (shell_list,reference[_i])
+  }
 }
 
 OnBalloonChange
@@ -65,11 +96,6 @@ OnBalloonChangePost {
     }
   }
 }
-
-GetGhostInfo {
-  "\![get,property,OngetGhostInfo,currentghost.sakuraname,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width]"
-}
-
 
 OnSurfaceChange
 {
