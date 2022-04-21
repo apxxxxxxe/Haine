@@ -64,7 +64,7 @@ OnGetGhostInfo
 }
 
 OnGetShellListInfo {
-  _cmd = "\![get,property,OnOnGetShellListInfo,"
+  _cmd = "\![get,property,OnGetShellListInfoAfter,"
   for _i = 0; _i < shell_count; _i++ {
     _cmd += "currentghost.shelllist.index(" + _i + ").name"
   }
@@ -73,7 +73,7 @@ OnGetShellListInfo {
   _cmd
 }
 
-OnOnGetShellListInfo {
+OnGetShellListInfoAfter {
   shell_list = IARRAY
   for _i = 0; _i < ARRAYSIZE(reference); _i++ {
     shell_list = (shell_list,reference[_i])
