@@ -20,8 +20,9 @@ var/
 __MACOSX/
 XtraStuf.mac/
 
-
 /developer_options.txt
 /md5buildignore.txt
 
 *.log
+
+sagyou/
