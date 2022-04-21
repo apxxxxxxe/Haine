@@ -10,10 +10,11 @@ var/
 __MACOSX/
 XtraStuf.mac/
 
-
-/developer_options.txt
+sagyou/
 
 *.log
+
+*コピー*
 
 yaya_variable.cfg
 
