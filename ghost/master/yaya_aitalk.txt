@@ -183,26 +183,8 @@ OnKeyPress
       "にしました"
     }
   }
-  // デバッグ用コマンド
-  if isdebug {
-    case reference[0] {
-      when "q" {
-        SetBalloonSurface
-        --
-        '\![raise,OnEvent1]'
-      }
-      when "a" {
-        SetBalloonSurface
-        --
-        _text = lasttalk
-        _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _text)
-        _result = ''
-        for _j=0; _j<_Rank; _j++ {
-          _result += valueex[_j][0, CHR(9)] + ' ' + valueex[_j][3, CHR(9)] + '\n'
-        }
-        _result
-      }
-    }
+  if isdebug && ISFUNC("OnDebugKeyPress") {
+    OnDebugKeyPress(reference[0])
   }
 }
 
