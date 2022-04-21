@@ -23,12 +23,13 @@ file,ghost/master/system/yaya_optional.dic3cabdc8072742677af93f8e44b004e05size
 file,ghost/master/system/yaya_shiori3.dic3762028ca8e4d1dfe0531a684fa7843dsize=52069date=2012-12-21T00:00:00
 file,ghost/master/system_config.txt05002574072b332b7d7c5f769b43d7c3size=896date=2012-12-21T00:00:00
 file,ghost/master/yaya.dll837b6bae4a46f950d6104665e8e859e0size=798720date=2012-12-21T00:00:00
-file,ghost/master/yaya.txt40505d9e48bafc194b86ef8b610acc05size=2085date=2012-12-21T00:00:00
-file,ghost/master/yaya_aitalk.txt432938574a8605157bed88787ef2b745size=22717date=2012-12-21T00:00:00
+file,ghost/master/yaya.txt55d00a6deb1f6daa1fba2ccbc7fed179size=2144date=2012-12-21T00:00:00
+file,ghost/master/yaya_aitalk.txt522f44cb7859c14840f151a903f7c4a3size=22283date=2012-12-21T00:00:00
 file,ghost/master/yaya_bootend.txt65768dd2c37beef10cc958309e883134size=3333date=2012-12-21T00:00:00
 file,ghost/master/yaya_change.txt0679cf9631d9c166d5a6f01a124a7ff2size=3841date=2012-12-21T00:00:00
 file,ghost/master/yaya_communicate.txtd8e41b7ba83b3b7bfacb3bd2cd4b6f3csize=4743date=2012-12-21T00:00:00
 file,ghost/master/yaya_config.txt8c73a9fe62bd648b7fca85dcbc54bdcdsize=3913date=2012-12-21T00:00:00
+file,ghost/master/yaya_debug.txt257e9e81831744c09b935a7c8df8df3asize=952date=2012-12-21T00:00:00
 file,ghost/master/yaya_emerg.txtbea9d31565622fa3115254cf21e5c6c3size=216date=2012-12-21T00:00:00
 file,ghost/master/yaya_emerg_dic.txtf38a75574bd71a22dfd0456f9e182ae4size=813date=2012-12-21T00:00:00
 file,ghost/master/yaya_etc.txt19a7e28b72f4066daac9750dc519ab0fsize=15371date=2012-12-21T00:00:00
@@ -49,63 +50,6 @@ file,shell/master/menu_background.pngc41543a1c48e90d317a73ad509c0011dsize=1109
 file,shell/master/menu_foreground.pnge57c08f18a349362e1ed3904e5d374desize=89date=2012-12-21T00:00:00
 file,shell/master/menu_sidebar.pnga2883faa2f45c823f9c352f97c1ef261size=85date=2012-12-21T00:00:00
 file,shell/master/readme.txt97efd735c5a9dfe40bb5441dfc1118a8size=170date=2012-12-21T00:00:00
-file,shell/master/sagyou/shell.dat0f03a1c0e2cc985bc653d508bd28117fsize=1138date=2012-12-21T00:00:00
-file,shell/master/sagyou/shell.dat.bak0f03a1c0e2cc985bc653d508bd28117fsize=1138date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00206_.png9fa35e37898d56d6c370fabd00b21e3csize=9797date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00211__________.png7e4c9b4d33b216a5086bb31f5b1de974size=14278date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00322_.png3f5f70c9749c4437ea9362d54d316361size=4329date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00350__.png3f5f70c9749c4437ea9362d54d316361size=4329date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00502__.png03f7a1b164abd781a97a07ef893b2a8dsize=11111date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00601__.pngd370e3150bcdfdfdc0163e082a190701size=19263date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00602__.pngf276901b3d9e3f1a80ba0cf081d3450csize=11663date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00619old.pnga97f868aceb674586b4d64cdd76876a7size=38636date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00629aa.png1fcaf242fc8cf6156779645b5df1d84dsize=12337date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00700 - コピー.png7fc6698fb5a5e0a750dc3e673c98d04bsize=35847date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00701 - コピー.png28e218be7cd2d9ed4296c17f2fde4e16size=25511date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00702 - コピー.png2e1ef7d8d26ce227b66b65aac44f957bsize=25611date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00702aa.png1221f6b7dad0cba826db32b43e979cb9size=25654date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00703 - コピー.pngd02e0105db7ddb537be954ed49a74bfbsize=28687date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00704 - コピー.pnga0925b13381a965e4d43037daeaae792size=25135date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00705 - コピー.pngc462340d8ea309a33a2980a8f0a74d6esize=19419date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00706 - コピー.png996957895cb967e4b9b52336c57ed00dsize=26314date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00707 - コピー.pngf9a21a09b29deaa25f222448025cd4e5size=16871date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00708 - コピー.png03f4fb1b2df9b1e494fa6e51e35659d0size=23448date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00709 - コピー.pngbb869903deae9b81743eb8e99c973c52size=31584date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00710_.pngfaa206475b582d6a052e089c4f72458csize=21775date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00799aa.png6a47005c6ab9f8bce834c8586b6043a3size=4455date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000.apd7408bfbb69ed5efe9458a9b9f69563cfsize=99288date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000_.pngba8b65cb287a7beb61e16a729dd3cbd7size=74177date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000___.png27ebc3b23804b27dc5965dac9dc92d72size=74690date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000red.pngea60fa81d239352a98c842968397ded6size=79179date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01001red.png5d3bcb40505d3b4c9f22eba49e76d82asize=15190date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01002.pnge7d350bad1e6d8fb8461adccad0a44b3size=22743date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01100__.pngd7dce5527811ed9ce014b5cb05e85ba5size=38077date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01104.png39d8aea7b9f4e205ddb2127544d8346fsize=24327date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01105.pngfaaeeab65fb1f925869606823ac955acsize=13670date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205.apda675bcb4d131638f18dac3ea17ed4a5dsize=62896date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205.png0b25d64faa154f28a685029a25d4035dsize=19445date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205_.png2b765cbf4d564d89c595ea849bfe48ffsize=14274date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205___.png9e25d93a1688de701e4e948dff44338fsize=6076date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01209.png3358cbd855d9786d8d9adebaaea61b00size=66846date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01209_.png3488c729d0c029193baaf4966d7998b6size=37837date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01302_.png1ff9de86f798201e00fa0087b71ab8b4size=35398date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01304_.pngbcc21be50ef853b3a04a426acc04e0b7size=14730date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01402_.png9b154b1ec536f2a3557fd0c8509466cfsize=8831date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01404_.png28db80a9941daf620bb398c03f12a3f4size=50926date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01406.apdc4dc584642401118cb48033ed106a477size=1089988date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01413.apda1e591368faf243564d98a14b2001050size=79113date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01413.psd55ea3288f3340a36615573cc634712fcsize=359489date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01413_.psd4206ec099ad1094ceb4da52927a3b082size=823679date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01424.apdb7281db55e3983167dd777787a870f48size=186703date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01424.pngbe5faa2b38ee8a8abf3ef5ac037a07a1size=19945date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01434.apdedbccf51e5f420f77c57721e26bcee55size=77474date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01438.apd457cdb029193cf10b93139ad829f81c3size=164448date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01439.apd70c377c5996887483c7f54d69c38a9b8size=286321date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01439.psd95567c72f052557aee78bfae49bcd27esize=1453344date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01808_.pngf7054aa7b3ab3e5167035526223fb2f3size=2838date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01814_.png1a4827f0d2196f3019bab11fbc98e20csize=25472date=2012-12-21T00:00:00
-file,shell/master/sagyou/surfacea9999.png796150f6d09c7e7685a2a6527cdf6542size=5631date=2012-12-21T00:00:00
-file,shell/master/sagyou/surfaceb9999.png908dcd8a5017a35624fc049cbdaf1b25size=6739date=2012-12-21T00:00:00
 file,shell/master/surface00000.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
 file,shell/master/surface00010.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
 file,shell/master/surface00101.png40450de87228b7f88d0a22925ece159fsize=10708date=2012-12-21T00:00:00
