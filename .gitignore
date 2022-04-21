@@ -12,8 +12,9 @@ XtraStuf.mac/
 
 
 /developer_options.txt
-/md5buildignore.txt
 
 *.log
 
 yaya_variable.cfg
+
+debuginfo.txt
