@@ -5,10 +5,7 @@
 //初期化処理 起動毎に呼び出される
 InitializeVariable
 {
-  GetGhostInfo
-  --
-  // GetGhostInfo後に処理する必要があるのでembedで呼ぶ
-  "\![embed,OnGetShellListInfo]"
+  GetProperties
   --
   MakeKeroBalloownFollow
   --
@@ -38,29 +35,50 @@ GetTimeSlot
   }
 }
 
+GetProperties {
+  GetGhostInfo
+  --
+  GetBalloonInfo
+  --
+  GetShellInfo
+  --
+  // GetShellInfo後に処理する必要があるのでembedで呼ぶ
+  "\![embed,OnGetShellListInfo]"
+}
+
 GetGhostInfo {
-  //0: currentghost.sakuraname
-  //1: currentghost.balloon.name
-  //2: currentghost.balloon.scope(0).lines
-  //3: currentghost.balloon.scope(0).validwidth.initial
-  //4: currentghost.balloon.scope(0).char_width
-  //5: currentghost.shelllist.count
-  "\![get,property,OnGetGhostInfo,currentghost.sakuraname,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width,currentghost.shelllist.count]"
+  "\![get,property,OnGetGhostInfo,currentghost.sakuraname]"
+}
+
+GetBalloonInfo {
+  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width]"
+}
+
+GetShellInfo {
+  "\![get,property,OnGetShellInfo,currentghost.shelllist.count]"
 }
 
 OnGetGhostInfo
 {
-  // sakura側名
+  //reference[0]: currentghost.sakuraname
   sakura_name = reference[0]
-  // 現在バルーン名
-  balloon_name = reference[1]
-  // 現在バルーンの最大行数
-  balloon_lines = reference[2]
-  // 現在バルーンのⅠ行あたりの最大文字数(おおよそ)
-  _zenkaku_char_width = reference[4] * 1.5
-  balloon_cols = TOINT(ROUND(reference[3] / _zenkaku_char_width))
-  // シェルの数
-  shell_count = reference[5]
+}
+
+OnGetBalloonInfo {
+  //reference[0]: currentghost.balloon.name
+  //reference[1]: currentghost.balloon.scope(0).lines
+  //reference[2]: currentghost.balloon.scope(0).validwidth.initial
+  //reference[3]: currentghost.balloon.scope(0).char_width
+
+  balloon_name = reference[0]
+  balloon_rows = reference[1]
+  _zenkaku_char_width = reference[3] * 1.75
+  balloon_cols = TOINT(ROUND(reference[2] / _zenkaku_char_width))
+}
+
+OnGetShellInfo {
+  //reference[0]: currentghost.shelllist.count
+  shell_count = reference[0]
 }
 
 OnGetShellListInfo {
@@ -82,8 +100,9 @@ OnGetShellListInfoAfter {
 
 OnBalloonChange
 {
-  GetGhostInfo
-  "\![raise,OnBalloonChangePost]"
+  GetProperties
+  --
+  "\![embed,OnBalloonChangePost]"
 }
 
 OnBalloonChangePost {
@@ -198,15 +217,6 @@ ICON
   }
   --
   ']\f[default]'
-}
-
-GETMIN
-{
-  _min = _argv[0]
-  for _i=0; _i<_argc; _i++ {
-    if _min > _argv[_i] { _min = _argv[_i] }
-  }
-  _min
 }
 
 //自動改行(特定の品詞の単語の直後に改行するようにする。kisaragiが必要)
@@ -327,7 +337,7 @@ OnTalkTopic {
 }
 
 ShowTopic {
-  "\_l[0,13.30em]\f[height,11]\f[align,right]\![quicksection,true]"
+  "\_l[0," + balloon_rows + ".30em]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
     when 'plants' {
