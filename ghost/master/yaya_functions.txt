@@ -51,7 +51,7 @@ GetGhostInfo {
 }
 
 GetBalloonInfo {
-  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width]"
+  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth,currentghost.balloon.scope(0).char_width]"
 }
 
 GetShellInfo {
@@ -72,8 +72,20 @@ OnGetBalloonInfo {
 
   balloon_name = reference[0]
   balloon_rows = reference[1]
-  _zenkaku_char_width = reference[3] * 1.75
-  balloon_cols = TOINT(ROUND(reference[2] / _zenkaku_char_width))
+
+  ERASEVAR("forced_balloon_cols")
+  case balloon_name {
+    when "霧の郊外にて" {
+      balloon_cols = 26
+    }
+    when "SSPデフォルト+" {
+      balloon_cols = 24
+    }
+    others {
+      _zenkaku_char_width = reference[3] * 2
+      balloon_cols = TOINT(reference[2] / _zenkaku_char_width)
+    }
+  }
 }
 
 OnGetShellInfo {
@@ -100,20 +112,14 @@ OnGetShellListInfoAfter {
 
 OnBalloonChange
 {
+  _balloon_name = reference[0]
+
   GetProperties
   --
-  "\![embed,OnBalloonChangePost]"
+  "\![embed,OnBalloonChangePost," + _balloon_name + "]"
 }
 
 OnBalloonChangePost {
-  case reference[0] {
-    when "霧の郊外にて" {
-      balloonwidth = 27
-    }
-    when "sspデフォルト+" {
-      balloonwidth = 24
-    }
-  }
 }
 
 OnSurfaceChange
@@ -231,9 +237,14 @@ InsertLineFeed {
   _class_secondary = "助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-副助詞, 連体詞, 名詞-接尾-一般, 助詞-終助詞"
   _class = _class_primary + ', ' + _class_secondary
   // バルーンⅠ行あたりの文字数
-  _max = balloonwidth
+  _max = 0
+  if ISVAR("forced_balloon_cols") {
+    _max = forced_balloon_cols
+  } else {
+    _max = balloon_cols
+  }
   // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
-  _threshold = TOINT(ROUND(_max / 3.0 * 2))
+  _threshold = TOINT(_max / 3.0 * 2)
   // 内部処理に影響しなさそうな制御文字
   _mark = CHR(28)
   _mark2 = CHR(29)

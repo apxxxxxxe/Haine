@@ -23,26 +23,29 @@ OnDebugKeyPress {
 
       FWRITE(_file,"変数リスト:")
       _var_list = GETVARLIST
-      for _i=0;_i<ARRAYSIZE(_var_list);_i++ {
-        FWRITE(_file,_var_list[_i])
+      foreach _var_list; _func{
+        FWRITE(_file, _var)
       }
 
       FWRITE(_file,"------------------------------")
 
       FWRITE(_file,"関数リスト:")
       _func_list = GETFUNCLIST
-      for _i=0;_i<ARRAYSIZE(_func_list);_i++ {
-        FWRITE(_file,_func_list[_i])
+      foreach _func_list; _func{
+        FWRITE(_file, _func)
       }
 
       FCLOSE(_file)
       "デバッグ情報をファイルに出力"
     }
+    when "n" {
+      ISVAR("forced_balloon_cols")
+    }
     when "i" {
       _infovar = ("sakura_name","balloon_name","balloon_rows","balloon_cols","shell_count","shell_list")
       _dialog = ""
-      for _i=0;_i<ARRAYSIZE(_infovar);_i++ {
-        _dialog += _infovar[_i] + ": " + EVAL(_infovar[_i]) + "\n"
+      foreach _infovar; _iv {
+        _dialog += _iv + ": " + EVAL(_iv) + "\n"
       }
       _dialog
     }
