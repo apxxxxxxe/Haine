@@ -27,7 +27,7 @@ OnMainMenu
   \_l[0.8em,@2.0em]\![*]\q[話して,Menu_RandomTalk]/
   \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LastTalk]/
   \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]/
-  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q/
+  \_l[0.7em," + balloon_rows + "em]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
   if ISFUNC("OnShowTimer") {OnShowTimer}
@@ -72,7 +72,7 @@ OnConfigMenu
   \_l[0.5em,@2em]◆ユーザ生活リズム\_l[@0.5em,]【現在\_l[@0.3em,]%(circadian_rhythm)】/
   \_l[2em,@1.5em]\q[昼型,OnCircadianRhythmSelected,昼型]\_l[@0.5em,]\q[夜型,OnCircadianRhythmSelected,夜型]\_l[@0.5em,]\q[設定しない,OnCircadianRhythmSelected,設定しない]/
   \_l[0.5em,@2em]◆１行あたりの文字数\_l[@0.5em,]\q[【現在 %(balloonwidth)】,OnBalloonWidthConfig]/
-  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
+  \_l[0.7em," + balloon_rows + "em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
   "
   --
   if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
@@ -150,7 +150,7 @@ OnInfo {
   \_l[0.5em,1.8em] 友好度：" + UpdateKoukando + "（" + UserKoukando + "）/
   \_l[0.5em,@1.5em] 累計触り回数（頭）：" + touch_count_head + "回/
   \_l[0.5em,@1.5em] 累計触り回数（胸）：" + touch_count_bust + "回/
-  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
+  \_l[0.7em," + balloon_rows + "em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
   if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
   --
@@ -186,7 +186,7 @@ OnTalkSettingMenu
   \_l[0.5em,@2em]◆トーク話題\_l[@0.5em,]/
   \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicLife))\q[日常,OnTalkTopic,TalkTopicLife]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicPlants))\q[植物,OnTalkTopic,TalkTopicPlants]\f[default] /
   \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicAroma))\q[アロマ,OnTalkTopic,TalkTopicAroma]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicHorrow))\q[暗いフォークロア,OnTalkTopic,TalkTopicHorrow]\f[default] /
-  \_l[0.7em,13.20em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
+  \_l[0.7em," + balloon_rows + "em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
   --
   if ISFUNC("OnShowTimer") {OnShowTimer}
   --

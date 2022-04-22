@@ -38,5 +38,13 @@ OnDebugKeyPress {
       FCLOSE(_file)
       "デバッグ情報をファイルに出力"
     }
+    when "i" {
+      _infovar = ("sakura_name","balloon_name","balloon_rows","balloon_cols","shell_count","shell_list")
+      _dialog = ""
+      for _i=0;_i<ARRAYSIZE(_infovar);_i++ {
+        _dialog += _infovar[_i] + ": " + EVAL(_infovar[_i]) + "\n"
+      }
+      _dialog
+    }
   }
 }
