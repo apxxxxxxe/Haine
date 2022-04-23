@@ -1,5 +1,5 @@
 charset,UTF-8
-file,ghost/master/descript.txt253aa15ef8a406011ea8987cb42dc1bfsize=297date=2012-12-21T00:00:00
+file,ghost/master/descript.txt0fe64aa9afe17fe397b2580c784b22besize=294date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttffde1c018a75996c6b29b32fa5b35af50size=2364date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
