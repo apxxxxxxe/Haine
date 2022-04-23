@@ -24,7 +24,7 @@ file,ghost/master/system/yaya_shiori3.dic3762028ca8e4d1dfe0531a684fa7843dsize=
 file,ghost/master/system_config.txt05002574072b332b7d7c5f769b43d7c3size=896date=2012-12-21T00:00:00
 file,ghost/master/yaya.dll837b6bae4a46f950d6104665e8e859e0size=798720date=2012-12-21T00:00:00
 file,ghost/master/yaya.txt55d00a6deb1f6daa1fba2ccbc7fed179size=2144date=2012-12-21T00:00:00
-file,ghost/master/yaya_aitalk.txt522f44cb7859c14840f151a903f7c4a3size=22283date=2012-12-21T00:00:00
+file,ghost/master/yaya_aitalk.txt1f10805074a2915bd91c3f959965811csize=22517date=2012-12-21T00:00:00
 file,ghost/master/yaya_bootend.txt65768dd2c37beef10cc958309e883134size=3333date=2012-12-21T00:00:00
 file,ghost/master/yaya_change.txt0679cf9631d9c166d5a6f01a124a7ff2size=3841date=2012-12-21T00:00:00
 file,ghost/master/yaya_communicate.txtd8e41b7ba83b3b7bfacb3bd2cd4b6f3csize=4743date=2012-12-21T00:00:00
