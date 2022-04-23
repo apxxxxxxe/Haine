@@ -1,0 +1,53 @@
+
+OnDebugKeyPress {
+  case _argv[0] {
+    when "q" {
+      SetBalloonSurface
+      --
+      '\![raise,OnEvent1]'
+    }
+    when "a" {
+      SetBalloonSurface
+      --
+      _text = lasttalk
+      _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _text)
+      _result = ''
+      for _j=0; _j<_Rank; _j++ {
+        _result += valueex[_j][0, CHR(9)] + ' ' + valueex[_j][3, CHR(9)] + '\n'
+      }
+      _result
+    }
+    when "s" {
+      _file = "../debuginfo.txt"
+      FOPEN(_file,"w")
+
+      FWRITE(_file,"変数リスト:")
+      _var_list = GETVARLIST
+      foreach _var_list; _func{
+        FWRITE(_file, _var)
+      }
+
+      FWRITE(_file,"------------------------------")
+
+      FWRITE(_file,"関数リスト:")
+      _func_list = GETFUNCLIST
+      foreach _func_list; _func{
+        FWRITE(_file, _func)
+      }
+
+      FCLOSE(_file)
+      "デバッグ情報をファイルに出力"
+    }
+    when "n" {
+      ISVAR("forced_balloon_cols")
+    }
+    when "i" {
+      _infovar = ("sakura_name","balloon_name","balloon_rows","balloon_cols","shell_count","shell_list")
+      _dialog = ""
+      foreach _infovar; _iv {
+        _dialog += _iv + ": " + EVAL(_iv) + "\n"
+      }
+      _dialog
+    }
+  }
+}

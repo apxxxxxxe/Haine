@@ -1,36 +1,5 @@
 charset,UTF-8
-file,.git/FETCH_HEAD6c78fc2a3ad18b81eaa2b46ce501add2size=123date=2012-12-21T00:00:00
-file,.git/HEADcf7dd3ce51958c5f13fece957cc417fbsize=21date=2012-12-21T00:00:00
-file,.git/config90e503cdb692eacdfe495ad048d12a4csize=432date=2012-12-21T00:00:00
-file,.git/descriptiona0a7c3fff21f2aea3cfa1d0316dd816csize=73date=2012-12-21T00:00:00
-file,.git/hooks/applypatch-msg.samplece562e08d8098926a3862fc6e7905199size=478date=2012-12-21T00:00:00
-file,.git/hooks/commit-msg.sample579a3c1e12a1e74a98169175fb913012size=896date=2012-12-21T00:00:00
-file,.git/hooks/fsmonitor-watchman.sampleea587b0fae70333bce92257152996e70size=4655date=2012-12-21T00:00:00
-file,.git/hooks/post-update.sample2b7ea5cee3c49ff53d41e00785eb974csize=189date=2012-12-21T00:00:00
-file,.git/hooks/pre-applypatch.sample054f9ffb8bfe04a599751cc757226ddasize=424date=2012-12-21T00:00:00
-file,.git/hooks/pre-commit.sample305eadbbcd6f6d2567e033ad12aabbc4size=1643date=2012-12-21T00:00:00
-file,.git/hooks/pre-merge-commit.sample39cb268e2a85d436b9eb6f47614c3cbcsize=416date=2012-12-21T00:00:00
-file,.git/hooks/pre-push.sample2c642152299a94e05ea26eae11993b13size=1374date=2012-12-21T00:00:00
-file,.git/hooks/pre-rebase.sample56e45f2bcbc8226d2b4200f7c46371bfsize=4898date=2012-12-21T00:00:00
-file,.git/hooks/pre-receive.sample2ad18ec82c20af7b5926ed9cea6aeeddsize=544date=2012-12-21T00:00:00
-file,.git/hooks/prepare-commit-msg.sample2b5c047bdb474555e1787db32b2d2fc5size=1492date=2012-12-21T00:00:00
-file,.git/hooks/push-to-checkout.samplec7ab00c7784efeadad3ae9b228d4b4dbsize=2783date=2012-12-21T00:00:00
-file,.git/hooks/update.sample647ae13c682f7827c22f5fc08a03674esize=3650date=2012-12-21T00:00:00
-file,.git/index05cfee9860ad5b90d11176e11350ce33size=25517date=2012-12-21T00:00:00
-file,.git/info/exclude036208b4a1ab4a235d75c181e685e5a3size=240date=2012-12-21T00:00:00
-file,.git/logs/HEAD49bc788f051fce9dbe2eca4bd7880bccsize=178date=2012-12-21T00:00:00
-file,.git/logs/refs/heads/maindf8089d89c45ddd21d2effa1a256692fsize=187date=2012-12-21T00:00:00
-file,.git/logs/refs/remotes/origin/mainc358a4aff3368cba27c9917825517344size=297date=2012-12-21T00:00:00
-file,.git/objects/pack/pack-2181e492811e08921700f0306637a18ef8b2cd1d.idxd91f5cc5e83a093a8ae156aa5de47f92size=8464date=2012-12-21T00:00:00
-file,.git/objects/pack/pack-2181e492811e08921700f0306637a18ef8b2cd1d.pack8604a5d6e738eda9a0a2beeca0e5fa07size=20027104date=2012-12-21T00:00:00
-file,.git/refs/heads/main788f66bb3c2967d30e3ead885fa0ae86size=41date=2012-12-21T00:00:00
-file,.git/refs/remotes/origin/main788f66bb3c2967d30e3ead885fa0ae86size=41date=2012-12-21T00:00:00
-file,.git/shallow788f66bb3c2967d30e3ead885fa0ae86size=41date=2012-12-21T00:00:00
-file,.github/workflows/md5-CI-build.yaml344a4b228b278240e09e6c88e39f93c3size=404date=2012-12-21T00:00:00
-file,.gitignore7d52affab94a151131660f202602035bsize=171date=2012-12-21T00:00:00
-file,.gitmodulesb3ecf76867a05b5371f9adce0156db6dsize=98date=2012-12-21T00:00:00
-file,developer_options.txt70d5e5f7876fa68bb6125fed446a2d28size=223date=2012-12-21T00:00:00
-file,ghost/master/descript.txt89935a9437d1e256dc001d7f6528b78bsize=227date=2012-12-21T00:00:00
+file,ghost/master/descript.txt253aa15ef8a406011ea8987cb42dc1bfsize=297date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttffde1c018a75996c6b29b32fa5b35af50size=2364date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
@@ -54,23 +23,23 @@ file,ghost/master/system/yaya_optional.dic3cabdc8072742677af93f8e44b004e05size
 file,ghost/master/system/yaya_shiori3.dic3762028ca8e4d1dfe0531a684fa7843dsize=52069date=2012-12-21T00:00:00
 file,ghost/master/system_config.txt05002574072b332b7d7c5f769b43d7c3size=896date=2012-12-21T00:00:00
 file,ghost/master/yaya.dll837b6bae4a46f950d6104665e8e859e0size=798720date=2012-12-21T00:00:00
-file,ghost/master/yaya.txt40505d9e48bafc194b86ef8b610acc05size=2085date=2012-12-21T00:00:00
-file,ghost/master/yaya_aitalk.txt37d34e44f29d4c77b651d7012092d27esize=22382date=2012-12-21T00:00:00
-file,ghost/master/yaya_bootend.txt41143647444a7d9fc655ca87902acff1size=3307date=2012-12-21T00:00:00
+file,ghost/master/yaya.txt55d00a6deb1f6daa1fba2ccbc7fed179size=2144date=2012-12-21T00:00:00
+file,ghost/master/yaya_aitalk.txt1f10805074a2915bd91c3f959965811csize=22517date=2012-12-21T00:00:00
+file,ghost/master/yaya_bootend.txt65768dd2c37beef10cc958309e883134size=3333date=2012-12-21T00:00:00
 file,ghost/master/yaya_change.txt0679cf9631d9c166d5a6f01a124a7ff2size=3841date=2012-12-21T00:00:00
 file,ghost/master/yaya_communicate.txtd8e41b7ba83b3b7bfacb3bd2cd4b6f3csize=4743date=2012-12-21T00:00:00
 file,ghost/master/yaya_config.txt8c73a9fe62bd648b7fca85dcbc54bdcdsize=3913date=2012-12-21T00:00:00
+file,ghost/master/yaya_debug.txt304f12dc3dd9c08fb8162f4fdec0c35esize=1210date=2012-12-21T00:00:00
 file,ghost/master/yaya_emerg.txtbea9d31565622fa3115254cf21e5c6c3size=216date=2012-12-21T00:00:00
 file,ghost/master/yaya_emerg_dic.txtf38a75574bd71a22dfd0456f9e182ae4size=813date=2012-12-21T00:00:00
-file,ghost/master/yaya_etc.txtc01c7a14f1878c4c6ecf0d842f4aa69csize=15375date=2012-12-21T00:00:00
+file,ghost/master/yaya_etc.txt19a7e28b72f4066daac9750dc519ab0fsize=15371date=2012-12-21T00:00:00
 file,ghost/master/yaya_events.txtf26439590a7d5ccab3b17ea1c3dc3debsize=2114date=2012-12-21T00:00:00
-file,ghost/master/yaya_functions.txtcfa480124d499521a56fce22da8bae12size=11009date=2012-12-21T00:00:00
-file,ghost/master/yaya_homeurl.txt6127e90ef9abf5f34911cd16d5d82907size=78date=2012-12-21T00:00:00
+file,ghost/master/yaya_functions.txt8909db8fd01cc36a5ff27f8bb78c8dacsize=12027date=2012-12-21T00:00:00
 file,ghost/master/yaya_input.txt8bcc07b208e5573dd5f6e0beaf6461e3size=217date=2012-12-21T00:00:00
-file,ghost/master/yaya_menu.txt412556d0cc4d7e98095c70dfb4e06591size=7443date=2012-12-21T00:00:00
-file,ghost/master/yaya_mouse.txt317d5fa88b6b2f517935e4c910af22edsize=7283date=2012-12-21T00:00:00
+file,ghost/master/yaya_menu.txt4d9f9493dcc4f6ae0ea620dae44ce062size=7661date=2012-12-21T00:00:00
+file,ghost/master/yaya_mouse.txt894f50750c2f3839b5d5495c9b97ddafsize=7289date=2012-12-21T00:00:00
 file,ghost/master/yaya_string.txt02c0141c43d5024efa6b7144beb9d712size=4126date=2012-12-21T00:00:00
-file,ghost/master/yaya_timer.txt97bfaaedaff7448eeff1171cb950fbcbsize=4950date=2012-12-21T00:00:00
+file,ghost/master/yaya_timer.txt7467fe32dab1762442710561a6c2e022size=4981date=2012-12-21T00:00:00
 file,ghost/master/yaya_tmpl_util.txt9258c5537037669c4e97cd8521c89236size=9645date=2012-12-21T00:00:00
 file,ghost/master/yaya_webclap.txtba8e337017f95cc4eea6606629484f93size=936date=2012-12-21T00:00:00
 file,install.txtc38ba3f9db981fbf47ceeb10e40c9167size=107date=2012-12-21T00:00:00
@@ -80,63 +49,6 @@ file,shell/master/menu_background.pngc41543a1c48e90d317a73ad509c0011dsize=1109
 file,shell/master/menu_foreground.pnge57c08f18a349362e1ed3904e5d374desize=89date=2012-12-21T00:00:00
 file,shell/master/menu_sidebar.pnga2883faa2f45c823f9c352f97c1ef261size=85date=2012-12-21T00:00:00
 file,shell/master/readme.txt97efd735c5a9dfe40bb5441dfc1118a8size=170date=2012-12-21T00:00:00
-file,shell/master/sagyou/shell.dat0f03a1c0e2cc985bc653d508bd28117fsize=1138date=2012-12-21T00:00:00
-file,shell/master/sagyou/shell.dat.bak0f03a1c0e2cc985bc653d508bd28117fsize=1138date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00206_.png9fa35e37898d56d6c370fabd00b21e3csize=9797date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00211__________.png7e4c9b4d33b216a5086bb31f5b1de974size=14278date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00322_.png3f5f70c9749c4437ea9362d54d316361size=4329date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00350__.png3f5f70c9749c4437ea9362d54d316361size=4329date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00502__.png03f7a1b164abd781a97a07ef893b2a8dsize=11111date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00601__.pngd370e3150bcdfdfdc0163e082a190701size=19263date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00602__.pngf276901b3d9e3f1a80ba0cf081d3450csize=11663date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00619old.pnga97f868aceb674586b4d64cdd76876a7size=38636date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00629aa.png1fcaf242fc8cf6156779645b5df1d84dsize=12337date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00700 - コピー.png7fc6698fb5a5e0a750dc3e673c98d04bsize=35847date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00701 - コピー.png28e218be7cd2d9ed4296c17f2fde4e16size=25511date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00702 - コピー.png2e1ef7d8d26ce227b66b65aac44f957bsize=25611date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00702aa.png1221f6b7dad0cba826db32b43e979cb9size=25654date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00703 - コピー.pngd02e0105db7ddb537be954ed49a74bfbsize=28687date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00704 - コピー.pnga0925b13381a965e4d43037daeaae792size=25135date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00705 - コピー.pngc462340d8ea309a33a2980a8f0a74d6esize=19419date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00706 - コピー.png996957895cb967e4b9b52336c57ed00dsize=26314date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00707 - コピー.pngf9a21a09b29deaa25f222448025cd4e5size=16871date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00708 - コピー.png03f4fb1b2df9b1e494fa6e51e35659d0size=23448date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00709 - コピー.pngbb869903deae9b81743eb8e99c973c52size=31584date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00710_.pngfaa206475b582d6a052e089c4f72458csize=21775date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface00799aa.png6a47005c6ab9f8bce834c8586b6043a3size=4455date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000.apd7408bfbb69ed5efe9458a9b9f69563cfsize=99288date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000_.pngba8b65cb287a7beb61e16a729dd3cbd7size=74177date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000___.png27ebc3b23804b27dc5965dac9dc92d72size=74690date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01000red.pngea60fa81d239352a98c842968397ded6size=79179date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01001red.png5d3bcb40505d3b4c9f22eba49e76d82asize=15190date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01002.pnge7d350bad1e6d8fb8461adccad0a44b3size=22743date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01100__.pngd7dce5527811ed9ce014b5cb05e85ba5size=38077date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01104.png39d8aea7b9f4e205ddb2127544d8346fsize=24327date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01105.pngfaaeeab65fb1f925869606823ac955acsize=13670date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205.apda675bcb4d131638f18dac3ea17ed4a5dsize=62896date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205.png0b25d64faa154f28a685029a25d4035dsize=19445date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205_.png2b765cbf4d564d89c595ea849bfe48ffsize=14274date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01205___.png9e25d93a1688de701e4e948dff44338fsize=6076date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01209.png3358cbd855d9786d8d9adebaaea61b00size=66846date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01209_.png3488c729d0c029193baaf4966d7998b6size=37837date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01302_.png1ff9de86f798201e00fa0087b71ab8b4size=35398date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01304_.pngbcc21be50ef853b3a04a426acc04e0b7size=14730date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01402_.png9b154b1ec536f2a3557fd0c8509466cfsize=8831date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01404_.png28db80a9941daf620bb398c03f12a3f4size=50926date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01406.apdc4dc584642401118cb48033ed106a477size=1089988date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01413.apda1e591368faf243564d98a14b2001050size=79113date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01413.psd55ea3288f3340a36615573cc634712fcsize=359489date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01413_.psd4206ec099ad1094ceb4da52927a3b082size=823679date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01424.apdb7281db55e3983167dd777787a870f48size=186703date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01424.pngbe5faa2b38ee8a8abf3ef5ac037a07a1size=19945date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01434.apdedbccf51e5f420f77c57721e26bcee55size=77474date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01438.apd457cdb029193cf10b93139ad829f81c3size=164448date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01439.apd70c377c5996887483c7f54d69c38a9b8size=286321date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01439.psd95567c72f052557aee78bfae49bcd27esize=1453344date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01808_.pngf7054aa7b3ab3e5167035526223fb2f3size=2838date=2012-12-21T00:00:00
-file,shell/master/sagyou/surface01814_.png1a4827f0d2196f3019bab11fbc98e20csize=25472date=2012-12-21T00:00:00
-file,shell/master/sagyou/surfacea9999.png796150f6d09c7e7685a2a6527cdf6542size=5631date=2012-12-21T00:00:00
-file,shell/master/sagyou/surfaceb9999.png908dcd8a5017a35624fc049cbdaf1b25size=6739date=2012-12-21T00:00:00
 file,shell/master/surface00000.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
 file,shell/master/surface00010.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
 file,shell/master/surface00101.png40450de87228b7f88d0a22925ece159fsize=10708date=2012-12-21T00:00:00

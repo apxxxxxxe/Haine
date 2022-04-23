@@ -5,12 +5,11 @@
 //初期化処理 起動毎に呼び出される
 InitializeVariable
 {
-  GetGhostInfo
+  GetProperties
   --
   MakeKeroBalloownFollow
   --
   lastresponce = systemuptime
-  uwanosora_minute = 5
   continuous_touch_count = 0
   last_touch_part = ''
   first_touch = 0
@@ -36,41 +35,92 @@ GetTimeSlot
   }
 }
 
-OngetGhostInfo
-{
-  // sakura側名
-  sakura_name = reference[0]
-  // 現在バルーン名
-  balloon_name = reference[1]
-  // 現在バルーンの最大行数
-  balloon_lines = reference[2]
-
-  _zenkaku_char_width = reference[4] * 1.5
-  // 現在バルーンのⅠ行あたりの最大文字数(おおよそ)
-  balloon_cols = TOINT(ROUND(reference[3] / _zenkaku_char_width))
-}
-
-OnBalloonChange
-{
+GetProperties {
   GetGhostInfo
-  "\![raise,OnBalloonChangePost]"
+  --
+  GetBalloonInfo
+  --
+  GetShellInfo
+  --
+  // GetShellInfo後に処理する必要があるのでembedで呼ぶ
+  "\![embed,OnGetShellListInfo]"
 }
 
-OnBalloonChangePost {
-  case reference[0] {
+GetGhostInfo {
+  "\![get,property,OnGetGhostInfo,currentghost.sakuraname]"
+}
+
+GetBalloonInfo {
+  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth,currentghost.balloon.scope(0).char_width]"
+}
+
+GetShellInfo {
+  "\![get,property,OnGetShellInfo,currentghost.shelllist.count]"
+}
+
+OnGetGhostInfo
+{
+  //reference[0]: currentghost.sakuraname
+  sakura_name = reference[0]
+}
+
+OnGetBalloonInfo {
+  //reference[0]: currentghost.balloon.name
+  //reference[1]: currentghost.balloon.scope(0).lines
+  //reference[2]: currentghost.balloon.scope(0).validwidth.initial
+  //reference[3]: currentghost.balloon.scope(0).char_width
+
+  balloon_name = reference[0]
+  balloon_rows = reference[1]
+
+  ERASEVAR("forced_balloon_cols")
+  case balloon_name {
     when "霧の郊外にて" {
-      balloonwidth = 27
+      balloon_cols = 26
     }
-    when "sspデフォルト+" {
-      balloonwidth = 24
+    when "SSPデフォルト+" {
+      balloon_cols = 24
+    }
+    others {
+      _zenkaku_char_width = reference[3] * 2
+      balloon_cols = TOINT(reference[2] / _zenkaku_char_width)
     }
   }
 }
 
-GetGhostInfo {
-  "\![get,property,OngetGhostInfo,currentghost.sakuraname,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth.initial,currentghost.balloon.scope(0).char_width]"
+OnGetShellInfo {
+  //reference[0]: currentghost.shelllist.count
+  shell_count = reference[0]
 }
 
+OnGetShellListInfo {
+  _cmd = "\![get,property,OnGetShellListInfoAfter,"
+  for _i = 0; _i < shell_count; _i++ {
+    _cmd += "currentghost.shelllist.index(" + _i + ").name"
+  }
+  _cmd += "]"
+
+  _cmd
+}
+
+OnGetShellListInfoAfter {
+  shell_list = IARRAY
+  for _i = 0; _i < ARRAYSIZE(reference); _i++ {
+    shell_list = (shell_list,reference[_i])
+  }
+}
+
+OnBalloonChange
+{
+  _balloon_name = reference[0]
+
+  GetProperties
+  --
+  "\![embed,OnBalloonChangePost," + _balloon_name + "]"
+}
+
+OnBalloonChangePost {
+}
 
 OnSurfaceChange
 {
@@ -175,15 +225,6 @@ ICON
   ']\f[default]'
 }
 
-GETMIN
-{
-  _min = _argv[0]
-  for _i=0; _i<_argc; _i++ {
-    if _min > _argv[_i] { _min = _argv[_i] }
-  }
-  _min
-}
-
 //自動改行(特定の品詞の単語の直後に改行するようにする。kisaragiが必要)
 InsertLineFeed {
   // _argv[0]: 改行を入れたい文字列
@@ -196,9 +237,14 @@ InsertLineFeed {
   _class_secondary = "助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-接続助詞, 助詞-係助詞, 助詞-副詞化, 助詞-副助詞, 連体詞, 名詞-接尾-一般, 助詞-終助詞"
   _class = _class_primary + ', ' + _class_secondary
   // バルーンⅠ行あたりの文字数
-  _max = balloonwidth
+  _max = 0
+  if ISVAR("forced_balloon_cols") {
+    _max = forced_balloon_cols
+  } else {
+    _max = balloon_cols
+  }
   // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
-  _threshold = TOINT(ROUND(_max / 3.0 * 2))
+  _threshold = TOINT(_max / 3.0 * 2)
   // 内部処理に影響しなさそうな制御文字
   _mark = CHR(28)
   _mark2 = CHR(29)
@@ -302,7 +348,7 @@ OnTalkTopic {
 }
 
 ShowTopic {
-  "\_l[0,13.30em]\f[height,11]\f[align,right]\![quicksection,true]"
+  "\_l[0," + balloon_rows + ".30em]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
     when 'plants' {
