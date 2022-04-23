@@ -5,9 +5,8 @@ on:
     tags:
       - 'v*'
 
-
 jobs:
-  release:
+  release-with-tag:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -17,7 +16,7 @@ jobs:
         submodules: true
     - name: Zip output
       run: |
-        zip -r release.zip *
+        zip -r release.zip * -x \*/.git \*/.git/\* \*/.github/\*
     - name: Create release
       id: create_release
       uses: actions/create-release@v1.0.0
