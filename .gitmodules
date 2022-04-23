@@ -1,3 +1,4 @@
 [submodule "kirinokougai"]
 	path = kirinokougai
 	url = https://github.com/apxxxxxxe/kirinokougai
+	branch = main
