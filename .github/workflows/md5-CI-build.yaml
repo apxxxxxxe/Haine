@@ -1,6 +1,10 @@
 name: md5-CI-build
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    tags:
+      - '![v]*'
+  workflow_dispatch:
 
 jobs:
   build:
