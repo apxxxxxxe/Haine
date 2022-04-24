@@ -24,7 +24,7 @@ file,ghost/master/system/yaya_shiori3.dic3762028ca8e4d1dfe0531a684fa7843dsize=
 file,ghost/master/system_config.txt05002574072b332b7d7c5f769b43d7c3size=896date=2012-12-21T00:00:00
 file,ghost/master/yaya.dll837b6bae4a46f950d6104665e8e859e0size=798720date=2012-12-21T00:00:00
 file,ghost/master/yaya.txt55d00a6deb1f6daa1fba2ccbc7fed179size=2144date=2012-12-21T00:00:00
-file,ghost/master/yaya_aitalk.txt1f10805074a2915bd91c3f959965811csize=22517date=2012-12-21T00:00:00
+file,ghost/master/yaya_aitalk.txt98a165a8f0a2dd9a62bb1b9dc8275826size=22639date=2012-12-21T00:00:00
 file,ghost/master/yaya_bootend.txt65768dd2c37beef10cc958309e883134size=3333date=2012-12-21T00:00:00
 file,ghost/master/yaya_change.txt0679cf9631d9c166d5a6f01a124a7ff2size=3841date=2012-12-21T00:00:00
 file,ghost/master/yaya_communicate.txtd8e41b7ba83b3b7bfacb3bd2cd4b6f3csize=4743date=2012-12-21T00:00:00
@@ -34,10 +34,10 @@ file,ghost/master/yaya_emerg.txtbea9d31565622fa3115254cf21e5c6c3size=216date=
 file,ghost/master/yaya_emerg_dic.txtf38a75574bd71a22dfd0456f9e182ae4size=813date=2012-12-21T00:00:00
 file,ghost/master/yaya_etc.txt19a7e28b72f4066daac9750dc519ab0fsize=15371date=2012-12-21T00:00:00
 file,ghost/master/yaya_events.txtf26439590a7d5ccab3b17ea1c3dc3debsize=2114date=2012-12-21T00:00:00
-file,ghost/master/yaya_functions.txt8909db8fd01cc36a5ff27f8bb78c8dacsize=12027date=2012-12-21T00:00:00
+file,ghost/master/yaya_functions.txt6407afc6d4e1d616afcd5ddf5a1097e8size=12016date=2012-12-21T00:00:00
 file,ghost/master/yaya_input.txt8bcc07b208e5573dd5f6e0beaf6461e3size=217date=2012-12-21T00:00:00
 file,ghost/master/yaya_menu.txt4d9f9493dcc4f6ae0ea620dae44ce062size=7661date=2012-12-21T00:00:00
-file,ghost/master/yaya_mouse.txt894f50750c2f3839b5d5495c9b97ddafsize=7289date=2012-12-21T00:00:00
+file,ghost/master/yaya_mouse.txt61708d42c1008684ed81fc3088eb1027size=7174date=2012-12-21T00:00:00
 file,ghost/master/yaya_string.txt02c0141c43d5024efa6b7144beb9d712size=4126date=2012-12-21T00:00:00
 file,ghost/master/yaya_timer.txt7467fe32dab1762442710561a6c2e022size=4981date=2012-12-21T00:00:00
 file,ghost/master/yaya_tmpl_util.txt9258c5537037669c4e97cd8521c89236size=9645date=2012-12-21T00:00:00
