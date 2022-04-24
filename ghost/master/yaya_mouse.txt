@@ -23,9 +23,9 @@
 MouseMove0head : nonoverlap
 {
   touch_count_head++
-  if continuous_touch_count == 1 {
+  if touch_count == 1 {
     "h111209ふふ……いっぱいなでてくれるのね。\nh111205あなたの手、あたたかくて好きよ。"
-  } elseif continuous_touch_count > 1 {
+  } elseif touch_count > 1 {
     "h111209……。"
     "h111209……。"
     "h111209……。"
@@ -47,9 +47,9 @@ MouseMove0face : nonoverlap
 MouseMove0bust : nonoverlap
 {
   touch_count_bust++
-  if continuous_touch_count == 0 {
+  if touch_count == 0 {
     "h312408%(DialogSurprised)h312401\_w[700]\nh322209ふざけすぎよ、ユーザ。"
-  } elseif continuous_touch_count == 1 {
+  } elseif touch_count == 1 {
     "h121206……気が済んだらやめてね。"
     "h321209……なんというか……困ってしまうわ。"
   } else {
@@ -67,9 +67,9 @@ MouseMove0bust : nonoverlap
 
 MouseDoubleClick0
 {
-  if continuous_touch_count == 1 {
+  if touch_count == 2 {
     OnOpenMenu("h321201%(DialogConfused)聞こえてるわよ？")
-  } elseif continuous_touch_count > 1 {
+  } elseif touch_count > 2 {
     OnOpenMenu("h321209……。")
   } else {
     OnOpenMenu
@@ -88,9 +88,9 @@ MouseDoubleClick0bust
 
 MouseWheelDown0shoulder
 {
-  if continuous_touch_count == 1 {
+  if touch_count == 2 {
     "h100000あっ……。h111209…………h111205まだ、こうしていたいの？"
-  } elseif continuous_touch_count > 1 {
+  } elseif touch_count > 2 {
     "h111209……。"
   } else {
     "h111209ん。\nh111205……。\nh111201………h111204ふふ。"
@@ -99,10 +99,10 @@ MouseWheelDown0shoulder
 
 MouseWheelDown0hand
 {
-  if continuous_touch_count == 1 {
+  if touch_count == 2 {
     "h111205ぎゅーっ……h111201。h111204ふふ。"
     "h111209……離してくれないの？困ったわね……h111207ふふ……"
-  } elseif continuous_touch_count > 1 {
+  } elseif touch_count > 2 {
     "……。"
   } else {
     "h111202うん？\n……h111205手を引いて、h111204それからどうするの？"
@@ -162,7 +162,7 @@ CommonEventMousePre {
 }
 
 OnMouseEvent {
-  InsertLineFeed(SetBalloonSurface + CanselLookAt + NextTouchTalk)
+  InsertLineFeed(SetBalloonSurface + CanselLookAt + touch_count + "\n" + NextTouchTalk)
 }
 
 CommonEventMousePost {
@@ -171,17 +171,17 @@ CommonEventMousePost {
 TouchCount {
   // _argv[0]: 触り反応の部位
   if last_touch_part == _argv[0] {
-    continuous_touch_count++
+    touch_count += 1
   } else {
-    continuous_touch_count = 0
+    touch_count = 1
   }
   last_touch_part = _argv[0]
-  "\![timerraise,30000,1,OnResetTouchCount]"
+  "\![timerraise,30000,1,OnTouchCountReset,reset]"
 }
 
-OnResetTouchCount {
+OnTouchCountReset {
+  touch_count = 0
   last_touch_part = ""
-  continuous_touch_count = 0
 }
 
 OnMouseMove
@@ -250,4 +250,3 @@ CanselLookAt {
 OnMouseLookAtBefore {
   "\C\![raise,OnMouseLookAtBefore%(reference[0])]"
 }
-
