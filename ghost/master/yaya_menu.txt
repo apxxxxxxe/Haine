@@ -218,7 +218,7 @@ OnMenuClose
 {
   CurrentMenuDialog = ''
   TalkStatus = 'none'
-  continuous_touch_count = 0
+  touch_count = 0
   if ISFUNC("OnReloadTimer") {"\![timerraise,0,0,OnReloadTimer]"} // 予約を削除
 }
 //アンカー　ツールチップ
