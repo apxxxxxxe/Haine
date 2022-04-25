@@ -21,6 +21,16 @@ MakeKeroBalloownFollow
   '\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]'
 }
 
+PosOffset
+{
+  _offset = balloon_rows
+  if balloon_name == "霧の郊外にて" {
+    _offset += 1
+  }
+  _offset += "em"
+  _offset
+}
+
 //------------------------------------------------------------------------------
 //朝/昼/夜などをおおざっぱに調べる関数
 //------------------------------------------------------------------------------
@@ -348,7 +358,7 @@ OnTalkTopic {
 }
 
 ShowTopic {
-  "\_l[0," + balloon_rows + ".30em]\f[height,11]\f[align,right]\![quicksection,true]"
+  "\_l[0," + PosOffset + "]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
     when 'plants' {
