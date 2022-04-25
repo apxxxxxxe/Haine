@@ -21,20 +21,19 @@
 //******************************************************************************
 
 MouseMove0head : nonoverlap
-{
   touch_count_head++
   if touch_count == 1 {
+    "h111209ん……ありがとう。\nh111205あなたも無理しないでね。"
+    "h111209あたたかいのね、あなたの手。"
+    "h111209……誰かになでられる機会なんて、\nどんどんなくなってしまうものよね。\n…………h111205うん、ありがとう。\nh111201さ、いらっしゃい。あなたの頭もなでてあげるわh111207。"
+  } elseif touch_count == 2 {
     "h111209ふふ……いっぱいなでてくれるのね。\nh111205あなたの手、あたたかくて好きよ。"
-  } elseif touch_count > 1 {
+  } elseif touch_count > 2 {
     "h111209……。"
     "h111209……。"
     "h111209……。"
     "h111209……。"
     "h111209……ふふ……。"
-  } else {
-    "h111209ん……ありがとう。\nh111205あなたも無理しないでね。"
-    "h111209あたたかいのね、あなたの手。"
-    "h111209……誰かになでられる機会なんて、\nどんどんなくなってしまうものよね。\n…………h111205うん、ありがとう。\nh111201さ、いらっしゃい。あなたの頭もなでてあげるわh111207。"
   }
 }
 
@@ -47,9 +46,9 @@ MouseMove0face : nonoverlap
 MouseMove0bust : nonoverlap
 {
   touch_count_bust++
-  if touch_count == 0 {
+  if touch_count == 1 {
     "h312408%(DialogSurprised)h312401\_w[700]\nh322209ふざけすぎよ、ユーザ。"
-  } elseif touch_count == 1 {
+  } elseif touch_count == 2 {
     "h121206……気が済んだらやめてね。"
     "h321209……なんというか……困ってしまうわ。"
   } else {
@@ -67,19 +66,23 @@ MouseMove0bust : nonoverlap
 
 MouseDoubleClick0
 {
-  if touch_count == 2 {
+  if touch_count == 1 {
+    OnOpenMenu
+  } elseif touch_count == 2 {
     OnOpenMenu("h321201%(DialogConfused)聞こえてるわよ？")
   } elseif touch_count > 2 {
     OnOpenMenu("h321209……。")
-  } else {
-    OnOpenMenu
   }
 }
 
 MouseDoubleClick0bust
 {
   touch_count_bust++
-  OnOpenMenu("h312109……普通に呼んで。")
+  if touch_count == 1 {
+    OnOpenMenu("h312109……普通に呼んで。")
+  } elseif touch_count > 1 {
+    OnOpenMenu("h311109……。")
+  }
 }
 
 //******************************************************************************
@@ -88,25 +91,25 @@ MouseDoubleClick0bust
 
 MouseWheelDown0shoulder
 {
-  if touch_count == 2 {
+  if touch_count == 1 {
+    "h111209ん。\nh111205……。\nh111201………h111204ふふ。"
+  } elseif touch_count == 2 {
     "h100000あっ……。h111209…………h111205まだ、こうしていたいの？"
   } elseif touch_count > 2 {
     "h111209……。"
-  } else {
-    "h111209ん。\nh111205……。\nh111201………h111204ふふ。"
   }
 }
 
 MouseWheelDown0hand
 {
-  if touch_count == 2 {
+  if touch_count == 1 {
+    "h111202うん？\n……h111205手を引いて、h111204それからどうするの？"
+    "h111204……どこかへ連れて行ってくれるの？"
+  } elseif touch_count == 2 {
     "h111205ぎゅーっ……h111201。h111204ふふ。"
     "h111209……離してくれないの？困ったわね……h111207ふふ……"
   } elseif touch_count > 2 {
     "……。"
-  } else {
-    "h111202うん？\n……h111205手を引いて、h111204それからどうするの？"
-    "h111204……どこかへ連れて行ってくれるの？"
   }
 }
 
@@ -117,8 +120,8 @@ MouseWheelDown0hand
 OnMouseLookAtbust : nonoverlap
 {
   touch_count_bust++
-  '……h112204視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。'
-  '……h212109見すぎよ。'
+  "……h112204視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。"
+  "……h212109見すぎよ。"
 }
 
 OnMouseLookAtBeforebust : nonoverlap
@@ -128,8 +131,8 @@ OnMouseLookAtBeforebust : nonoverlap
 
 OnMouseLookAtface : nonoverlap
 {
-  '……h321207顔に何かついてる？'
-  'h321201……h321207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？'
+  "……h321207顔に何かついてる？"
+  "h321201……h321207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？"
 }
 
 OnMouseLookAtBeforeface : nonoverlap
@@ -138,13 +141,13 @@ OnMouseLookAtBeforeface : nonoverlap
 }
 
 DialogSurprised {
-  '！……'
-  'なっ……'
+  "！……"
+  "なっ……"
 }
 
 DialogConfused {
-  '……'
-  'あの……'
+  "……"
+  "あの……"
 }
 
 //******************************************************************************
@@ -156,27 +159,20 @@ DialogConfused {
 
 // 触り反応時の共通処理
 CommonEventMousePre {
-  TalkStatus = 'touch'
+  TalkStatus = "touch"
   lastresponce = systemuptime
   first_touch = 1
 }
 
 OnMouseEvent {
-  InsertLineFeed(SetBalloonSurface + CanselLookAt + touch_count + "\n" + NextTouchTalk)
+  "\![timerraise,30000,1,OnTouchCountReset,reset]"
+  --
+  "\1" + touch_count
+  --
+  InsertLineFeed(SetBalloonSurface + CanselLookAt + NextTouchTalk)
 }
 
 CommonEventMousePost {
-}
-
-TouchCount {
-  // _argv[0]: 触り反応の部位
-  if last_touch_part == _argv[0] {
-    touch_count += 1
-  } else {
-    touch_count = 1
-  }
-  last_touch_part = _argv[0]
-  "\![timerraise,30000,1,OnTouchCountReset,reset]"
 }
 
 OnTouchCountReset {
@@ -186,57 +182,29 @@ OnTouchCountReset {
 
 OnMouseMove
 {
-  NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(0,50,'MouseMove')
-  if NextTouchTalk != '' {
-    TouchCount(reference[4])
-    --
+  NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
+  if NextTouchTalk != "" {
     CommonEventMousePre
-    '\![raise,OnMouseEvent]'
-  }
-}
-
-OnMouseWheel
-{
-  NextTouchTalk = ''
-  if TOINT(reference[2]) > 0 {
-    NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelUp')
-  }
-  else {
-    NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelDown')
-  }
-
-  if NextTouchTalk == '' {
-    NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheel')
-  }
-
-  if NextTouchTalk != '' {
-    TouchCount(reference[4])
-    --
-    CommonEventMousePre
-    '\![raise,OnMouseEvent]'
+    "\![raise,OnMouseEvent]"
   }
 }
 
 OnMouseDoubleClick
 {
-  NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
-  if NextTouchTalk != '' {
-    TouchCount(reference[4])
-    --
+  NextTouchTalk = AYATEMPLATE.MouseEventExec("MouseDoubleClick")
+  if NextTouchTalk != "" {
     CommonEventMousePre
-    '\![raise,OnMouseEvent]'
+    "\![raise,OnMouseEvent]"
   }
 }
 
 OnMouseClickEx
 {
-  if reference[5] == 'middle' {
-    NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseWheelClick')
-    if NextTouchTalk != '' {
-      TouchCount(reference[4])
-      --
+  if reference[5] == "middle" {
+    NextTouchTalk = AYATEMPLATE.MouseEventExec("MouseWheelClick")
+    if NextTouchTalk != "" {
       CommonEventMousePre
-      '\![raise,OnMouseEvent]'
+      "\![raise,OnMouseEvent]"
     }
   }
 }
@@ -250,3 +218,82 @@ CanselLookAt {
 OnMouseLookAtBefore {
   "\C\![raise,OnMouseLookAtBefore%(reference[0])]"
 }
+
+IsMouseTalkExist {
+  // _argv[0]: OnMouseClickなど
+  // _argv[1]: reference[3]
+  // _argv[2]: reference[4]
+  _fname1 = _argv[0] + TOSTR(_argv[1]) + TOSTR(_argv[2])
+  _fname2 = _argv[0] + TOSTR(_argv[1])
+
+  if ISFUNC(_fname1) || ISFUNC(_fname2)  {
+    1
+  } else {
+    0
+  }
+}
+
+//******************************************************************************
+//マウスイベントコア
+//******************************************************************************
+
+TouchCount {
+  // _argv[0]: 触り反応の部位
+  if last_touch_part == _argv[0] {
+    touch_count += 1
+  } else {
+    touch_count = 1
+  }
+  last_touch_part = _argv[0]
+}
+
+AYATEMPLATE.MouseEventExec
+{
+  _fname = _argv[0] + TOSTR(reference[3]) + TOSTR(reference[4])
+  if ISFUNC(_fname) {
+    TouchCount(reference[4]) // 追加
+    lastmouseevent = _fname
+    EVAL(_fname)
+    return
+  }
+
+  _fname = _argv[0] + TOSTR(reference[3])
+  if ISFUNC(_fname) {
+    TouchCount(reference[4]) // 追加
+    lastmouseevent = _fname
+    EVAL(_fname)
+    return
+  }
+}
+
+AYATEMPLATE.MouseMoveWheelFunc
+{
+  _side = TOINT(reference[3])
+  if _argv[0] {
+    _side += 10
+  }
+
+  if AYATEMPLATE.strokeid[_side] == reference[4] {
+    if (GETTICKCOUNT - TOINT(AYATEMPLATE.stroketimer[_side])) > 1500 {
+      AYATEMPLATE.stroke[_side] = 1
+    }
+    AYATEMPLATE.stroketimer[_side] = GETTICKCOUNT
+
+    _stroke = TOINT(AYATEMPLATE.stroke[_side])
+    _stroke += 1
+    AYATEMPLATE.stroke[_side] = _stroke
+
+    if _stroke >= _argv[1] {
+      if 'talking' !_in_ status {
+        AYATEMPLATE.MouseEventExec(_argv[2]);
+        AYATEMPLATE.stroke[_side] = 1
+      }
+    }
+  }
+  else {
+    AYATEMPLATE.stroke[_side] = 1
+    AYATEMPLATE.stroketimer[_side] = GETTICKCOUNT
+    AYATEMPLATE.strokeid[_side] = reference[4]
+  }
+}
+

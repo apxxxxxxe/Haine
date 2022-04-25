@@ -273,57 +273,6 @@ On_otherghostname
 
 
 
-//******************************************************************************
-//マウスイベントコア
-//******************************************************************************
-AYATEMPLATE.MouseEventExec
-{
-  _fname = _argv[0] + TOSTR(reference[3]) + TOSTR(reference[4])
-  if ISFUNC(_fname) {
-    lastmouseevent = _fname
-    EVAL(_fname)
-    return
-  }
-
-  _fname = _argv[0] + TOSTR(reference[3])
-  if ISFUNC(_fname) {
-    lastmouseevent = _fname
-    EVAL(_fname)
-    return
-  }
-}
-
-AYATEMPLATE.MouseMoveWheelFunc
-{
-  _side = TOINT(reference[3])
-  if _argv[0] {
-    _side += 10
-  }
-
-  if AYATEMPLATE.strokeid[_side] == reference[4] {
-    if (GETTICKCOUNT - TOINT(AYATEMPLATE.stroketimer[_side])) > 1500 {
-      AYATEMPLATE.stroke[_side] = 1
-    }
-    AYATEMPLATE.stroketimer[_side] = GETTICKCOUNT
-
-    _stroke = TOINT(AYATEMPLATE.stroke[_side])
-    _stroke += 1
-    AYATEMPLATE.stroke[_side] = _stroke
-
-    if _stroke >= _argv[1] {
-      if 'talking' !_in_ status {
-        AYATEMPLATE.MouseEventExec(_argv[2]);
-        AYATEMPLATE.stroke[_side] = 1
-      }
-    }
-  }
-  else {
-    AYATEMPLATE.stroke[_side] = 1
-    AYATEMPLATE.stroketimer[_side] = GETTICKCOUNT
-    AYATEMPLATE.strokeid[_side] = reference[4]
-  }
-}
-
 //------------------------------------------------------------------------------
 //プラグイン
 //------------------------------------------------------------------------------
