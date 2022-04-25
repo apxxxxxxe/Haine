@@ -156,8 +156,8 @@ OnInfo {
   --
   "\_q/
   \_l[0.5em,1.8em] 友好度：" + UpdateKoukando + "（" + UserKoukando + "）/
-  \_l[0.5em,@1.5em] 累計触り回数（頭）：" + touch_count_head + "回/
-  \_l[0.5em,@1.5em] 累計触り回数（胸）：" + touch_count_bust + "回/
+  \_l[0.5em,@1.5em] 累計触り回数（頭）：" + good_touch_count + "回/
+  \_l[0.5em,@1.5em] 累計触り回数（胸）：" + bad_touch_count + "回/
   \_l[0.7em," + balloon_rows + "em]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
   if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}

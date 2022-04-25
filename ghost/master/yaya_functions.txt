@@ -369,7 +369,7 @@ ShowTopic {
 }
 
 UserEvaluation {
-  if touch_count_head > touch_count_bust {
+  if good_touch_count > bad_touch_count {
     // 常識人
   } else {
     // すけべ人間
@@ -391,7 +391,7 @@ UserKoukando {
 }
 
 UpdateKoukando {
-  koukando = touch_count_head - touch_count_bust + total_talk_count/3
+  koukando = good_touch_count - bad_touch_count + total_talk_count/3
   koukando
 }
 
