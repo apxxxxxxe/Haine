@@ -20,7 +20,7 @@
 //撫で反応
 //******************************************************************************
 
-MouseMove0head : nonoverlap
+MouseMove0head : nonoverlap {
 
   good_touch_count++
   if touch_count == 1 {
@@ -167,8 +167,6 @@ CommonEventMousePre {
 
 OnMouseEvent {
   "\![timerraise,30000,1,OnTouchCountReset,reset]"
-  --
-  "\1" + touch_count
   --
   InsertLineFeed(SetBalloonSurface + CanselLookAt + NextTouchTalk)
 }
