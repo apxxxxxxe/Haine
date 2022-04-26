@@ -15,7 +15,8 @@ OnFirstBoot
   IsJihouActive = '有効'
   circadian_rhythm = '設定しない'
   isdebug = 0
-  touch_count_bust = 0
+  good_touch_count = 0
+  bad_touch_count = 0
   total_talk_count = 0
   uwanosora_minute = 5
 
