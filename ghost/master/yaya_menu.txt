@@ -40,8 +40,8 @@ OnMainMenu
 }
 
 DialogNotice {
-  "あ、呼んだかしら？"
-  "ああ、何かしら。"
+  "あφ、呼んだかしら？"
+  "ああφ、何かしら。"
 }
 
 MenuDialog {
