@@ -40,13 +40,10 @@ OnMainMenu
 }
 
 MenuDialog {
-  if (GetSurfaceElements(5) == 6 || GetSurfaceElements(5) == 3) {
-    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(5) - 2) + "\w4h11" + GetSurfaceElements(3) + "201あ、呼んだかしら？"
+  _eyes = GetSurfaceElements(6)
+  if _eyes == 6 || _eyes == 5 {
+    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4h11" + GetSurfaceElements(3) + "201あ、呼んだかしら？"
   } else {
-    if (systemuptime - lastresponce) >= (60 * uwanosora_minute) {
-      // 最後のランダムトーク・触り反応から%(uwanosora_minute)分が経ったとき
-      "……h111201ああ、h111204何かしら。"
-    }
     "h111204はいφ、なにφ？"
     "h111201うんφ、どうしたのφ？"
     "h111201聞くわ。"

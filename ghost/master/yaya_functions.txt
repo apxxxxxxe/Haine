@@ -201,7 +201,7 @@ SetBalloonSurface
 //10000の位:顔色 1000の位:眉 100の位:腕 10の位:口 1の位:目
 GetSurfaceElements
 {
-  _e = CurrentSurface / POW(10, 5 - _argv[0]) % 10
+  _e = current_surface / POW(10, 6 - _argv[0]) % 10
   _e
 }
 

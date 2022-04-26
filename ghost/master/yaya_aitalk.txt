@@ -207,6 +207,13 @@ OnMinuteChange
   {
     "\1%(hour)時だ"
   }
+
+  if (systemuptime - lastresponce) >= (60 * uwanosora_minute) {
+    // 最後のランダムトーク・触り反応から
+    // %(uwanosora_minute)分が経ったとき,上の空になる
+    "h111105"
+    "h111106"
+  }
 }
 
 
