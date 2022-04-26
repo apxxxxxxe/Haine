@@ -46,8 +46,11 @@ DialogNotice {
 
 MenuDialog {
   _eyes = GetSurfaceElements(6)
-  if _eyes == 6 || _eyes == 5 {
-    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4h11" + GetSurfaceElements(3) + "201" + DialogNotice
+  _mouse = GetSurfaceElements(4)
+  if (_eyes == 6 || _eyes == 5) && _mouse == 1 {
+    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4"+ /
+    "h11" + GetSurfaceElements(3) + "201" + /
+    DialogNotice
   } else {
     "h111204はいφ、なにφ？"
     "h111201うんφ、どうしたのφ？"
