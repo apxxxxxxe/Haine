@@ -11,14 +11,14 @@ InitializeVariable
   --
   lastresponce = systemuptime
   touch_count = 0
-  last_touch_part = ''
+  last_touch_part = ""
   first_touch = 0
 }
 
 //\1バルーンを\0サーフェスに追従させる
 MakeKeroBalloownFollow
 {
-  '\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]'
+  "\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]"
 }
 
 PosOffset
@@ -37,11 +37,11 @@ PosOffset
 GetTimeSlot
 {
   case hour{
-    when 22,23,0,1,2,3 {'深夜'}
-    when 4,5,6,7,8,9,10,11 {'朝'}
-    when 12,13 {'昼'}
-    when 14,15,16,17 {'日中'}
-    when 18,19,20,21 {'夜'}
+    when 22,23,0,1,2,3 {"深夜"}
+    when 4,5,6,7,8,9,10,11 {"朝"}
+    when 12,13 {"昼"}
+    when 14,15,16,17 {"日中"}
+    when 18,19,20,21 {"夜"}
   }
 }
 
@@ -185,14 +185,14 @@ SetBalloonSurface
   "\1\s[100000]\0"
   --
   case _argv[0] {
-    when 'garden' {
-      '\b[0]'
+    when "garden" {
+      "\b[0]"
     }
-    when 'library' {
-      '\b[4]'
+    when "library" {
+      "\b[4]"
     }
     others {
-      '\b[6]'
+      "\b[6]"
     }
   }
 }
@@ -217,17 +217,17 @@ ICON
   "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
   --
   case _argv[0] {
-    when 'stopwatch'   { 'e900' }
-    when 'undo'        { 'e901' }
-    when 'cog'         { 'e902' }
-    when 'cross'       { 'e903' }
-    when 'arrow-right' { 'e904' }
-    when 'arrow-left'  { 'e905' }
-    when 'bubble'      { 'e906' }
-    when 'info'        { 'e907' }
+    when "stopwatch"   { "e900" }
+    when "undo"        { "e901" }
+    when "cog"         { "e902" }
+    when "cross"       { "e903" }
+    when "arrow-right" { "e904" }
+    when "arrow-left"  { "e905" }
+    when "bubble"      { "e906" }
+    when "info"        { "e907" }
   }
   --
-  ']\f[default]'
+  "]\f[default]"
 }
 
 //自動改行(特定の品詞の単語の直後に改行するようにする。kisaragiが必要)
@@ -235,11 +235,11 @@ InsertLineFeed {
   // _argv[0]: 改行を入れたい文字列
   _text = SurfaceSnippet(_argv[0])
   // 返り値
-  _result = ''
+  _result = ""
   // 直後に改行を入れる単語の品詞
   _htarget_pre = "名詞-一般"
   _target_pre = "こと, もの, いる, みる, もらう, くれる, ほしい, おく, くる, とき, ない"
-  _htarget_post = "感動詞, 記号-一般, 記号-読点, 記号-句点"
+  _htarget_post = "感動詞, 記号-一般, 記号-読点, 記号-句点, 助詞-格助詞-一般, 助詞-係助詞"
   _target_post = "この, その, あの, どの"
 
   // バルーンⅠ行あたりの文字数
@@ -258,12 +258,10 @@ InsertLineFeed {
   _mark2 = CHR(29)
 
   // 元の文字列を改行で区切って各々処理する
-  _lines = SPLIT(_text, '\n')
+  _lines = SPLIT(_text, "\n")
   foreach _lines; _line {
     _linewordcount = 0
-    _check = 0
     _wordcount = 0
-    _check_wordcount = 0
 
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
     _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _mark)
@@ -271,14 +269,14 @@ InsertLineFeed {
     _tags = RE_GETSTR
 
     // 文末の全角・半角スペースは無駄なので消去
-    _l = RE_REPLACE(_l, '[ 　]' + _mark + '*$', 'pro')
+    _l = RE_REPLACE(_l, "[ 　]" + _mark + "*$", "pro")
     // 文全体の長さ
     _linelen = STRLEN(_l) - ARRAYSIZE(_tags)
     // さくらスクリプトを取り出す際のインデックス
     _tagcount = 0
 
     // 単語に分割する。_rankは単語の総数
-    _rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _l)
+    _rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", "parse", _l)
 
     for _i=0; _i<_rank-1; _i++ {
       // 最後の単語はEOSなのでrank-1でよい
@@ -330,14 +328,14 @@ InsertLineFeed {
         } elseif _current_hinshi _in_ _htarget_post || _current_word _in_ _target_post || /
       _next_hinshi _in_ _htarget_pre || _current_word _in_ _target_post
       {
-        _result += '\n'
+        _result += "\n"
         _wordcount = 0
       }
     }
     // 元の文字列で改行されている位置に改行を挿入(すでに改行されていたらスキップ)
-    if ! RE_GREP(_result, '\\n$')
+    if ! RE_GREP(_result, "\\n$")
     {
-      _result += '\n'
+      _result += "\n"
       _wordcount = 0
     }
   }
@@ -369,13 +367,13 @@ ShowTopic {
   "\_l[0," + PosOffset + "]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
-    when 'plants' {
+    when "plants" {
       "植物の話題"
     }
-    when 'aroma' {
+    when "aroma" {
       "アロマの話題"
     }
-    when 'horrow' {
+    when "horrow" {
       "暗いフォークロア"
     }
     others {
@@ -398,13 +396,13 @@ UserKoukando {
   _s = UpdateKoukando
   if _s > 10 {
     //好き
-    'やさしい人'
+    "やさしい人"
   } elseif _s < -10 {
     //嫌い
-    '苦手な人'
+    "苦手な人"
   } else {
     //どちらでもない
-    '客人'
+    "客人"
   }
 }
 
@@ -419,8 +417,8 @@ UpdateKoukando {
 
 OnWindowStateRestore
 {
-  'h100000h111109\_w[500]h111101'
-  'h100000h111109\_w[500]h111103'
-  'h100000h111105\_w[500]h111101'
+  "h100000h111109\_w[500]h111101"
+  "h100000h111109\_w[500]h111103"
+  "h100000h111105\_w[500]h111101"
 }
 
