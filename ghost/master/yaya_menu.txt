@@ -39,10 +39,15 @@ OnMainMenu
   "\0\_l[0,0]\_q"
 }
 
+DialogNotice {
+  "あ、呼んだかしら？"
+  "ああ、何かしら。"
+}
+
 MenuDialog {
   _eyes = GetSurfaceElements(6)
   if _eyes == 6 || _eyes == 5 {
-    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4h11" + GetSurfaceElements(3) + "201あ、呼んだかしら？"
+    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4h11" + GetSurfaceElements(3) + "201" + DialogNotice
   } else {
     "h111204はいφ、なにφ？"
     "h111201うんφ、どうしたのφ？"
