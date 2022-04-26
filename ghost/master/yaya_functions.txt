@@ -86,7 +86,7 @@ OnGetBalloonInfo {
   ERASEVAR("forced_balloon_cols")
   case balloon_name {
     when "霧の郊外にて" {
-      balloon_cols = 26
+      balloon_cols = 24
     }
     when "SSPデフォルト+" {
       balloon_cols = 24
