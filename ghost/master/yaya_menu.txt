@@ -86,7 +86,7 @@ ShowCurrentBalloonCols {
 }
 
 OnBalloonColsConfig {
-  SetBalloonSurface('libarary')
+  SetBalloonSurface('library')
   --
   '\![open,sliderinput,バルーン設定,60000,' + ShowCurrentBalloonCols + ',0,48]/
   \_qバルーンの１行あたりの文字数を設定できます。\nこの値をもとに一部トークが見やすく改行されます\n(参考："sspデフォルト+"は24文字、\n"霧の郊外にて"は26文字程度を推奨)'
@@ -112,29 +112,6 @@ OnCircadianRhythmSelected
 OnTalkIntervalSet
 {
   aitalkinterval = reference[0]
-  /*
-     _message = ""
-     case aitalkinterval {
-     when 600 {
-     _message = "h111209少しφ、\_w[250]作業のほうに集中するわね"
-     }
-     when 300 {
-     _message = "h111209ゆっくり話しましょう"
-     }
-     when 180 {
-     _message = "h111204いつもどおり話すわ"
-     }
-     when 60 {
-     _message = "h111201たくさんφ？\_w[500]　h111207がんばってみるわ"
-     }
-     when 0 {
-     _message = "h111209静かにしているわ"
-     }
-     others {
-     "\1デバッグ：喋り頻度に意図しない値が入力されました"
-     }
-     }
-     */
   "\C\c"
   --
   OnTalkSettingMenu
