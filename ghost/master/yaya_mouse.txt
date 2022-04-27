@@ -67,12 +67,25 @@ MouseMove0bust : nonoverlap
 
 MouseDoubleClick0
 {
-  if touch_count == 1 {
-    OnOpenMenu
-  } elseif touch_count == 2 {
-    OnOpenMenu("h321201%(DialogConfused)聞こえてるわよ？")
-  } elseif touch_count > 2 {
+  if TalkStatus == 'talking'
+  {
     OnOpenMenu("h321209……。")
+  }
+  else
+  {
+
+    if touch_count == 1
+    {
+      OnOpenMenu
+    }
+    elseif touch_count == 2
+    {
+      OnOpenMenu("h321201%(DialogConfused)聞こえてるわよ？")
+    }
+    elseif touch_count > 2
+    {
+      OnOpenMenu("h321209……。")
+    }
   }
 }
 

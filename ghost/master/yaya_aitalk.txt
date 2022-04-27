@@ -13,6 +13,12 @@ RandomTalk
   SetBalloonSurface
   --
   lasttalk
+  --
+  "\![raise,OnRandomTalkEnd]"
+}
+
+OnRandomTalkEnd {
+  TalkStatus = 'none'
 }
 
 talks : nonoverlap_pool
