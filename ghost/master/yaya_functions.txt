@@ -36,16 +36,37 @@ PosOffset
 //------------------------------------------------------------------------------
 GetTimeSlot
 {
-  case hour{
-    when 22,23,0,1,2,3 {"深夜"}
-    when 4,5,6,7,8,9,10,11 {"朝"}
-    when 12,13 {"昼"}
-    when 14,15,16,17 {"日中"}
-    when 18,19,20,21 {"夜"}
+  case hour {
+    when 22,23,0,1,2,3
+
+    {
+      "深夜"
+    }
+    when 4,5,6,7,8,9,10,11
+
+    {
+      "朝"
+    }
+    when 12,13
+
+    {
+      "昼"
+    }
+    when 14,15,16,17
+
+    {
+      "日中"
+    }
+    when 18,19,20,21
+
+    {
+      "夜"
+    }
   }
 }
 
-GetProperties {
+GetProperties 
+{
   GetGhostInfo
   --
   GetBalloonInfo
@@ -56,15 +77,18 @@ GetProperties {
   "\![embed,OnGetShellListInfo]"
 }
 
-GetGhostInfo {
+GetGhostInfo
+{
   "\![get,property,OnGetGhostInfo,currentghost.sakuraname]"
 }
 
-GetBalloonInfo {
+GetBalloonInfo
+{
   "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth,currentghost.balloon.scope(0).char_width]"
 }
 
-GetShellInfo {
+GetShellInfo
+{
   "\![get,property,OnGetShellInfo,currentghost.shelllist.count]"
 }
 
@@ -74,7 +98,8 @@ OnGetGhostInfo
   sakura_name = reference[0]
 }
 
-OnGetBalloonInfo {
+OnGetBalloonInfo
+{
   //reference[0]: currentghost.balloon.name
   //reference[1]: currentghost.balloon.scope(0).lines
   //reference[2]: currentghost.balloon.scope(0).validwidth.initial
@@ -85,27 +110,37 @@ OnGetBalloonInfo {
 
   ERASEVAR("forced_balloon_cols")
   case balloon_name {
-    when "霧の郊外にて" {
+    when "霧の郊外にて"
+
+    {
       balloon_cols = 24
     }
-    when "SSPデフォルト+" {
+    when "SSPデフォルト+"
+
+    {
       balloon_cols = 24
     }
-    others {
+    others 
+
+    {
       _zenkaku_char_width = reference[3] * 2
       balloon_cols = TOINT(reference[2] / _zenkaku_char_width)
     }
   }
 }
 
-OnGetShellInfo {
+OnGetShellInfo
+{
   //reference[0]: currentghost.shelllist.count
   shell_count = reference[0]
 }
 
-OnGetShellListInfo {
+OnGetShellListInfo
+{
   _cmd = "\![get,property,OnGetShellListInfoAfter,"
-  for _i = 0; _i < shell_count; _i++ {
+  for _i = 0; _i < shell_count; _i++
+
+  {
     _cmd += "currentghost.shelllist.index(" + _i + ").name"
   }
   _cmd += "]"
@@ -113,9 +148,12 @@ OnGetShellListInfo {
   _cmd
 }
 
-OnGetShellListInfoAfter {
+OnGetShellListInfoAfter
+{
   shell_list = IARRAY
-  for _i = 0; _i < ARRAYSIZE(reference); _i++ {
+  for _i = 0; _i < ARRAYSIZE(reference); _i++
+
+  {
     shell_list = (shell_list,reference[_i])
   }
 }
@@ -129,7 +167,8 @@ OnBalloonChange
   "\![embed,OnBalloonChangePost," + _balloon_name + "]"
 }
 
-OnBalloonChangePost {
+OnBalloonChangePost
+{
 }
 
 OnSurfaceChange
@@ -185,13 +224,19 @@ SetBalloonSurface
   "\1\s[100000]\0"
   --
   case _argv[0] {
-    when "garden" {
+    when "garden"
+
+    {
       "\b[0]"
     }
-    when "library" {
+    when "library"
+
+    {
       "\b[4]"
     }
-    others {
+    others 
+
+    {
       "\b[6]"
     }
   }
@@ -199,7 +244,7 @@ SetBalloonSurface
 
 //現在のサーフェス番号を桁で分解して配列として返す
 //10000の位:顔色 1000の位:眉 100の位:腕 10の位:口 1の位:目
-GetSurfaceElements
+GetSurfaceElements 
 {
   _e = current_surface / POW(10, 6 - _argv[0]) % 10
   _e
@@ -210,28 +255,62 @@ ICON
 {
   if (TOINT(_argv[1]) != 0) {
     _fontsize = _argv[1]
-  } else {
+  }
+  else {
     _fontsize = 12
   }
 
   "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
   --
   case _argv[0] {
-    when "stopwatch"   { "e900" }
-    when "undo"        { "e901" }
-    when "cog"         { "e902" }
-    when "cross"       { "e903" }
-    when "arrow-right" { "e904" }
-    when "arrow-left"  { "e905" }
-    when "bubble"      { "e906" }
-    when "info"        { "e907" }
+    when "stopwatch"
+
+    {
+      "e900"
+    }
+    when "undo"
+
+    {
+      "e901"
+    }
+    when "cog"
+
+    {
+      "e902"
+    }
+    when "cross"
+
+    {
+      "e903"
+    }
+    when "arrow-right"
+
+    {
+      "e904"
+    }
+    when "arrow-left"
+
+    {
+      "e905"
+    }
+    when "bubble"
+
+    {
+      "e906"
+    }
+    when "info"
+
+    {
+      "e907"
+    }
   }
   --
   "]\f[default]"
 }
 
 //自動改行(特定の品詞の単語の直後に改行するようにする。kisaragiが必要)
-InsertLineFeed {
+InsertLineFeed
+{
   // _argv[0]: 改行を入れたい文字列
   _text = SurfaceSnippet(_argv[0])
   // 返り値
@@ -246,7 +325,8 @@ InsertLineFeed {
   _max = 0
   if ISVAR("forced_balloon_cols") {
     _max = forced_balloon_cols
-  } else {
+  }
+  else {
     _max = balloon_cols
   }
 
@@ -259,13 +339,19 @@ InsertLineFeed {
 
   // 元の文字列を改行で区切って各々処理する
   _lines = SPLIT(_text, "\n")
-  foreach _lines; _line {
+  foreach _lines; _line
+
+  {
     _linewordcount = 0
     _wordcount = 0
     _tmpwordcount = 0
 
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
-    _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
+    _l = RE_REPLACE(_line, '\\_
+
+        {
+        0,2
+        }[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
     // 置換したさくらスクリプトは配列に保持しておいて適宜取り出す
     _tags = RE_GETSTR
 
@@ -279,7 +365,9 @@ InsertLineFeed {
     // 単語に分割する。_rankは単語の総数
     _rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", "parse", _l)
 
-    for _i=0; _i<_rank-1; _i++ {
+    for _i=0; _i<_rank-1; _i++
+
+    {
       // 最後の単語はEOSなのでrank-1でよい
 
       // _wordに単語を取り出す
@@ -291,10 +379,12 @@ InsertLineFeed {
       _tagmarkcount = RE_GREP(_word, _tagmark)
       if _tagmarkcount {
         // 含まれている場合、検出した数だけリストから取り出す
-        for _j=0; _j<_tagmarkcount; _j++ {
+        for _j=0; _j<_tagmarkcount; _j++
+
+        {
           _tag = _tags[_tagcount]
 
-          if "\_l[0" _in_ _tag{
+          if "\_l[0" _in_ _tag {
             _wordcount = 0
           }
 
@@ -302,7 +392,8 @@ InsertLineFeed {
           //_result += SHIORI3FW.EscapeAllTags(_tag)
           _tagcount++
         }
-      } else {
+      }
+      else {
         // 通常の単語なら、_resultに追加して文字カウント
         _result += _word
         _wordcount += STRLEN(_word)
@@ -321,63 +412,81 @@ InsertLineFeed {
         if _kaigyoumark _in_ _result {
           _result = REPLACE(_result, _kaigyoumark, "\n")
           _wordcount -= _tmpwordcount
-        } else {
+        }
+        else {
           _wordcount %= _max
         }
       }
       elseif _current_hinshi _in_ _htarget_post || _current_word _in_ _target_post || /
-      _next_hinshi _in_ _htarget_pre || _current_word _in_ _target_post
-      {
-        // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
-        _result = REPLACE(_result, _kaigyoumark, "")
-        _result += _kaigyoumark
-        _tmpwordcount = _wordcount
-      }
+        _next_hinshi _in_ _htarget_pre || _current_word _in_ _target_post
+
+        {
+          // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
+          _result = REPLACE(_result, _kaigyoumark, "")
+          _result += _kaigyoumark
+          _tmpwordcount = _wordcount
+        }
     }
 
     // 元の文字列で改行されている位置に改行を挿入(すでに改行されていたらスキップ)
-    if ! RE_GREP(_result, "\\n$")
-    {
+    if ! RE_GREP(_result, "\\n$") {
       _result += "\n"
     }
   }
   _result
 }
 
-SurfaceSnippet {
-  RE_REPLACEEX(_argv[0], "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]")
+SurfaceSnippet
+{
+  RE_REPLACEEX(_argv[0], "h([0-9]
+
+  {
+    6
+  })", "\\0\\![embed,OnSurfaceComplete,$1]")
 }
 
-IsUnderLine {
+IsUnderLine
+{
   if ! _argv[0] {
     "\f[strike,true]"
   }
 }
 
-OnTalkTopic {
+OnTalkTopic
+{
   _topicname = reference[0]
   if EVAL(_topicname) == 1 {
     EVAL(_topicname + "= 0")
-  } else {
+  }
+  else {
     EVAL(_topicname + "= 1")
   }
   "\C\c\![raise,OnTalkSettingMenu]"
 }
 
-ShowTopic {
+ShowTopic
+{
   "\_l[0," + PosOffset + "]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
-    when "plants" {
+    when "plants"
+
+    {
       "植物の話題"
     }
-    when "aroma" {
+    when "aroma"
+
+    {
       "アロマの話題"
     }
-    when "horrow" {
+    when "horrow"
+
+    {
       "暗いフォークロア"
     }
-    others {
+    others 
+
+    {
       "日常の話題"
     }
   }
@@ -385,29 +494,35 @@ ShowTopic {
   "\![quicksection,false]\_l[0,0]\f[default]"
 }
 
-UserEvaluation {
+UserEvaluation
+{
   if good_touch_count > bad_touch_count {
     // 常識人
-  } else {
+  }
+  else {
     // すけべ人間
   }
 }
 
-UserKoukando {
+UserKoukando
+{
   _s = UpdateKoukando
   if _s > 10 {
     //好き
     "やさしい人"
-  } elseif _s < -10 {
+  }
+  elseif _s < -10 {
     //嫌い
     "苦手な人"
-  } else {
+  }
+  else {
     //どちらでもない
     "客人"
   }
 }
 
-UpdateKoukando {
+UpdateKoukando
+{
   koukando = good_touch_count - bad_touch_count + total_talk_count/3
   koukando
 }

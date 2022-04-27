@@ -17,7 +17,8 @@ RandomTalk
   "\![raise,OnRandomTalkEnd]"
 }
 
-OnRandomTalkEnd {
+OnRandomTalkEnd
+{
   TalkStatus = 'none'
 }
 
@@ -26,8 +27,7 @@ talks : nonoverlap_pool
   if TalkTopicLife {
     ShowTopic('life')
     --
-    if hour < 5 || hour > 20
-    {
+    if hour < 5 || hour > 20 {
       'h111105……h111109……h111102、……h111105……h111109。\n\1ハイネの頭がこくり、こくりと揺れている。\0……………h100000…っ！。\n\1\nがくん、とひときわ強く揺れ、ハイネの目がぱっと開いた。\0…………h221205見られてた？\n……h221209ごめんなさいね、ちょっと寝不足で……。'
     }
 
@@ -72,7 +72,7 @@ talks : nonoverlap_pool
     'h111204身体は平気？違和感があればすぐに言うのよ。\n……h111209ふふ、h111205未だに妙な気分だわ。またこうやって人と話せるだなんて。'
     //'h123206あそこでよく迷子になったものよ\_w[750]　…h123209懐かしいわ。\n歩けば歩くほどわからなくなって、\n泣き出したときの声でようやく見つけてもらえて……ね。'
   }
-  if TalkTopicPlants {
+  if TalkTopicPlants  {
     ShowTopic('plants')
     --
     SetBalloonSurface('garden')
@@ -104,8 +104,7 @@ talks : nonoverlap_pool
     // ローズマリー：ハーブ系
     'h111201ローズマリーは、料理にも使われる馴染み深いハーブね。\n独特のすっとした匂いが特徴で、目覚めを良くしたり、集中力を高めてくれるわ。\n系統はもちろんハーブ系。シトラス系や樹木系と相性がいいわ。h113309私はレモンと合わせて爽やかな香りを楽しむのが好き。'
   }
-  if TalkTopicHorrow
-  {
+  if TalkTopicHorrow {
     ShowTopic('horrow')
     --
     SetBalloonSurface('library')
@@ -173,7 +172,7 @@ talks : nonoverlap_pool
 //if文、もしくはcase~when文で分岐させると良いでしょう。
 
 
-OnKeyPress
+OnKeyPress 
 {
   case reference[0] {
     when "t" {
@@ -196,8 +195,12 @@ OnKeyPress
       isValidLookAtResponse = isdebug
       "h111209\1デバッグモードを"
       --
-      if isdebug { "ONにしました。再度dキーでOFF" }
-      else { "OFFにしました" }
+      if isdebug {
+        "ONにしました。再度dキーでOFF"
+      }
+      else {
+        "OFFにしました"
+      }
     }
   }
   if isdebug && ISFUNC("OnDebugKeyPress") {
@@ -215,8 +218,7 @@ OnKeyPress
 
 OnMinuteChange
 {
-  if minute == 0 && IsJihouActive == '有効'
-  {
+  if minute == 0 && IsJihouActive == '有効' {
     "\1%(hour)時だ"
   }
 
@@ -333,7 +335,9 @@ TextOnlyTranslatorFunc
     }
 
     // \Cが文頭以外に含まれている場合、適用されるように加工
-    if STRSTR(_text, '\C', 0) > 0 { _text = '\C' + _text }
+    if STRSTR(_text, '\C', 0) > 0 {
+      _text = '\C' + _text
+    }
 
   }
   _text

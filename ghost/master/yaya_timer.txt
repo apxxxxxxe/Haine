@@ -5,22 +5,18 @@
 
 UpdatePomodoroTimer
 {
-  if PomodoroStatus > 0 // ポモドーロタイマーが作動中なら
-  {
+  if PomodoroStatus > 0 // ポモドーロタイマーが作動中なら {
     TimerSec = systemuptime - base_time // タイマー開始からの秒数
     TimerMin = TimerSec / 60 // タイマー開始からの分数
-    if TimerSec >= (currentpomodoro * 60)
-    {
-      if TalkStatus == 'menu'
-      {
+    if TimerSec >= (currentpomodoro * 60) {
+      if TalkStatus == 'menu' {
         WillResetPomodoro = 1
       }
-      else
-      {
+      else {
         ResetPomodoroTimer(currentpomodoro) // 時間になったらタイムアップ時の処理
       }
     }
-  }
+}
 }
 
 OnPomodoroSet
@@ -35,35 +31,33 @@ ResetPomodoroTimer
      _argv[0]: -1;開始 pomodoro[0];休憩開始 pomodoro[1];作業再開
      */
   _ret = "\_v[sound/柱時計の鐘.mp3]"
-  if _argv[0] == -1 // 開始時
-  {
+  if _argv[0] == -1 // 開始時 {
     PomodoroStatus = 1
     PomodoroCount = 0
     currentpomodoro = pomodoro[0]
     _ret += "h111204ポモドーロタイマーを開始するわ。\nh111209まずは%(currentpomodoro)分ね。"
+}
+elseif (_argv[0] == pomodoro[0]) // 作業時間が終わったとき {
+  currentpomodoro = pomodoro[1]
+  _ret += "h111207お疲れ様。%(_argv[0])分が経過したわ。\nh111204これから%(currentpomodoro)分の休憩ね。"
   }
-  elseif (_argv[0] == pomodoro[0]) // 作業時間が終わったとき
-  {
-    currentpomodoro = pomodoro[1]
-    _ret += "h111207お疲れ様。%(_argv[0])分が経過したわ。\nh111204これから%(currentpomodoro)分の休憩ね。"
-  }
-  elseif (_argv[0] == pomodoro[1]) // 休憩時間が終わったとき
-  {
-    currentpomodoro = pomodoro[0]
-    PomodoroCount += 1
-    _ret += "h111207%(_argv[0])分が経過したわ。\nh111204続けて%(currentpomodoro)分の作業、開始するわね。"
-    _ret += "\nちなみに現在%(PomodoroCount)セット（%(EVAL((pomodoro[0]+pomodoro[1])*PomodoroCount))分）よ。"
+elseif (_argv[0] == pomodoro[1]) // 休憩時間が終わったとき {
+  currentpomodoro = pomodoro[0]
+  PomodoroCount += 1
+  _ret += "h111207%(_argv[0])分が経過したわ。\nh111204続けて%(currentpomodoro)分の作業、開始するわね。"
+  _ret += "\nちなみに現在%(PomodoroCount)セット（%(EVAL((pomodoro[0]+pomodoro[1])*PomodoroCount))分）よ。"
   }
 
-  base_time = systemuptime // 経過時間の基準点を再設定
-  _ret
+base_time = systemuptime // 経過時間の基準点を再設定
+_ret
 }
 
 OnPomodoroStop
 {
   if (PomodoroCount == 0) {
     "h111209はい、中断したわ。"
-  }else {
+  }
+  else {
     "h111207お疲れさま。\n今回は" + PomodoroCount + "セット（" + (pomodoro[0]+pomodoro[1])*PomodoroCount + "分）ね。"
   }
   PomodoroStatus = 0
@@ -93,7 +87,8 @@ OnLoopTimerOver
   if (reference[0] == 100) {
     "%(CurrentLoop)分のループタイマーを開始するわ。"
     LoopCount = 0
-  } else {
+  }
+  else {
     "%(CurrentLoop)分が経過したわ。次は%(CurrentLoop)分後ね。"
     LoopCount += 1
   }
@@ -103,7 +98,8 @@ OnTimerStop
 {
   if (reference[0] == 0) {
     "h111209はい、中断したわ。"
-  }else {
+  }
+  else {
     "h111207お疲れさま。\n今回は" + CurrentLoop + "セット（" + CurrentLoop*LoopCount + "分）ね。"
   }
   PomodoroStatus = 0
@@ -111,17 +107,14 @@ OnTimerStop
 
 OnReloadTimer
 {
-  if PomodoroStatus > 0
-  {
+  if PomodoroStatus > 0 {
     '\C\1\c\_q\f[align,center]'
     --
-    if WillResetPomodoro == 1
-    {
+    if WillResetPomodoro == 1 {
       WillResetPomodoro = 0
       ResetPomodoroTimer(currentpomodoro)
     }
-    else
-    {
+    else {
       OnShowTimer
     }
   }
@@ -150,19 +143,24 @@ OnTimerMenuSelected
 }
 
 // 「BalloonTooltip_[選択肢ID]」にツールチップで表示させるテキストを記述
-BalloonTooltip_OnPomodoroSet { "（作業時間）-(休憩時間)-（大休憩時間）" }
+BalloonTooltip_OnPomodoroSet
+{
+  "（作業時間）-(休憩時間)-（大休憩時間）"
+}
 
 OnShowTimer
 {
   _timerv = ''
   if (PomodoroStatus == 1) {
     _timerv = "\__q[OnPomodoroStop]%(ICON('stopwatch'))\f[height,12] %(PomodoroCount+1)セット目 %(TimerMin)/%(currentpomodoro)分\__q"
-  } elseif (PomodoroStatus == 2) {
+  }
+  elseif (PomodoroStatus == 2) {
     _timerv = "\__q[OnTimerStop,%(LoopCount),%(_totalmin)]%(ICON('stopwatch'))\f[height,12] %(TimerMin)/%(CurrentLoop)分\__q"
   }
   if (PomodoroStatus > 0) {
     "\_l[0," + PosOffset + "]\0\f[align,right]\f[cursorstyle,none]\f[color,175,175,165]%(_timerv)\f[default]"
-  } else {
+  }
+  else {
     "\0\_l[@0.7em,]\__q[OnTimerMenuSelected]%(ICON('stopwatch'))\__q"
   }
 }

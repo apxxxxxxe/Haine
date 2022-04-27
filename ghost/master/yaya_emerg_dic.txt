@@ -19,10 +19,12 @@ OnFirstBoot
   OnBoot
 }
 
-OnKeyPress
+OnKeyPress 
 {
   case reference[0] {
-    when "r" {
+    when "r"
+
+    {
       "リロードします\![change,ghost,郊外通りのハイネ]"
     }
   }

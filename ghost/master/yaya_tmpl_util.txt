@@ -46,18 +46,26 @@ OnAITalk
 //OnAiTalkイベント
 //------------------------------------------------------------------------------
 // OnAiTalk
-// {
-// 	//---- 通常のランダムトーク、ただしチェイン中はチェイントーク
-// 	/*使わない＆アンカー時にうまく動かないのでコメントアウト
-// 	if SHIORI3FW.IsChain {
-// 		AYATEMPLATE.LastTalk = ChainTalk
-// 	}
-// 	else {
-//   */
-// 		AYATEMPLATE.LastTalk = RandomTalk
-// 	//}
-// 	AYATEMPLATE.LastTalk
-// }
+//
+{
+  // 	//---- 通常のランダムトーク、ただしチェイン中はチェイントーク
+  // 	/*使わない＆アンカー時にうまく動かないのでコメントアウト
+  // 	if SHIORI3FW.IsChain
+
+  {
+    // 		AYATEMPLATE.LastTalk = ChainTalk
+    // 	
+  }
+  // 	else
+
+  {
+    //   */
+    // 		AYATEMPLATE.LastTalk = RandomTalk
+    // 	//
+  }
+  // 	AYATEMPLATE.LastTalk
+  //
+}
 
 
 //******************************************************************************
@@ -112,14 +120,17 @@ AYATEMPLATE.MenuItem
   _linefeed = 100
   _n = _argc
   if _n >= 3 {
-    if GETTYPE(_argv[_n-1]) == 1 { //整数
+    if GETTYPE(_argv[_n-1]) == 1 {
+      //整数
       _linefeed = _argv[_n-1]
       _n -= 1
     }
   }
 
   _lftext = ''
-  while _linefeed > 0 {
+  while _linefeed > 0
+
+  {
     if _linefeed >= 100 {
       _lftext += '\n'
     }
@@ -136,7 +147,9 @@ AYATEMPLATE.MenuItem
   AYATEMPLATE.EscapeText( SHIORI3FW.MakeJustText(_argv[0],46) )
   --
   _s = ''
-  for _i = 1 ; _i < _n ; _i++ {
+  for _i = 1 ; _i < _n ; _i++
+
+  {
     _s += ',' + AYATEMPLATE.EscapeText(_argv[_i])
   }
   _s
@@ -164,7 +177,9 @@ AYATEMPLATE.LinkMenuConvert
 {
   _text = ''
   _data = IARRAY
-  for _i = 0 ; _i < _argc ; _i++ {
+  for _i = 0 ; _i < _argc ; _i++
+
+  {
     _data = (RE_SPLIT(_argv[_i],'[ \t]*\|[ \t]*'),'','') //ダミー
     _text += "%(_data[0])%(CHR(1))%(_data[1])%(CHR(1))%(_data[2])%(CHR(1))%(CHR(2))"
   }
@@ -253,12 +268,14 @@ AYATEMPLATE.GetRandomSakuraName
   if ISFUNC('SHIORI3FW.RefreshFMOTable') {
     SHIORI3FW.RefreshFMOTable
     _ghostlist=SHIORI3FW.SakuraNameList
-  }else{
+  }
+  else {
     _ghostlist=ghostexlist
   }
   if ARRAYSIZE(_ghostlist)>0 {
     ANY(_ghostlist)
-  }else{
+  }
+  else {
     ''
   }
 }
@@ -282,7 +299,9 @@ On_installedplugin : void
   AYATEMPLATE.installedplugin_name = IARRAY
   AYATEMPLATE.installedplugin_id = IARRAY
 
-  for _i = 0 ; _i < _n ; _i++ {
+  for _i = 0 ; _i < _n ; _i++
+
+  {
     _a = RE_SPLIT(reference[_i],'[,\x1]')
 
     AYATEMPLATE.installedplugin_name ,= _a[0]

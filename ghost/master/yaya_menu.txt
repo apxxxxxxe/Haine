@@ -11,7 +11,8 @@ OnOpenMenu
   TalkStatus = 'menu'
   if (_argv[0] != "") {
     CurrentMenuDialog = _argv[0]
-  } else {
+  }
+  else {
     CurrentMenuDialog = MenuDialog
   }
   OnMainMenu + CurrentMenuDialog
@@ -30,28 +31,37 @@ OnMainMenu
   \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
-  if ISFUNC("OnShowTimer") {OnShowTimer}
+  if ISFUNC("OnShowTimer") {
+    OnShowTimer
+  }
   --
-  if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
+  if ISFUNC("OnShowTalkSetting") {
+    OnShowTalkSetting
+  }
   --
-  if ISFUNC("OnShowInfo") {OnShowInfo}
+  if ISFUNC("OnShowInfo") {
+    OnShowInfo
+  }
   --
   "\0\_l[0,0]\_q"
 }
 
-DialogNotice {
+DialogNotice
+{
   "あφ、呼んだかしら？"
   "ああφ、何かしら。"
 }
 
-MenuDialog {
+MenuDialog
+{
   _eyes = GetSurfaceElements(6)
   _mouse = GetSurfaceElements(4)
   if (_eyes == 6 || _eyes == 5) && _mouse == 1 {
     "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4"+ /
     "h11" + GetSurfaceElements(3) + "201" + /
     DialogNotice
-  } else {
+  }
+  else {
     "h111204はいφ、なにφ？"
     "h111201うんφ、どうしたのφ？"
     "h111201聞くわ。"
@@ -80,27 +90,35 @@ OnConfigMenu
   \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
   "
   --
-  if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
+  if ISFUNC("OnShowTalkSetting") {
+    OnShowTalkSetting
+  }
   --
-  if ISFUNC("OnShowInfo") {OnShowInfo}
+  if ISFUNC("OnShowInfo") {
+    OnShowInfo
+  }
 }
 
-ShowCurrentBalloonCols {
+ShowCurrentBalloonCols 
+{
   if ISVAR("forced_balloon_cols") {
     forced_balloon_cols
-  } else {
+  }
+  else {
     balloon_cols
   }
 }
 
-OnBalloonColsConfig {
+OnBalloonColsConfig
+{
   SetBalloonSurface('library')
   --
   '\![open,sliderinput,バルーン設定,60000,' + ShowCurrentBalloonCols + ',0,48]/
   \_qバルーンの１行あたりの文字数を設定できます。\nこの値をもとに一部トークが見やすく改行されます\n(参考："sspデフォルト+"は24文字、\n"霧の郊外にて"は26文字程度を推奨)'
 }
 
-バルーン設定を入力した {
+バルーン設定を入力した
+{
   forced_balloon_cols = InputMessage
   "\C\c\![raise,OnConfigMenu]"
 }
@@ -130,7 +148,8 @@ OnShowInfo
   "\_l[@0.7em,]\__q[OnInfo]%(ICON('info'))\__q"
 }
 
-OnInfo {
+OnInfo
+{
   TalkStatus = 'menu'
   '\C\c'
   --
@@ -142,7 +161,9 @@ OnInfo {
   \_l[0.5em,@1.5em] 累計触り回数（胸）：" + bad_touch_count + "回/
   \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
-  if ISFUNC("OnShowTalkSetting") {OnShowTalkSetting}
+  if ISFUNC("OnShowTalkSetting") {
+    OnShowTalkSetting
+  }
   --
   "\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q"
 }
@@ -178,11 +199,15 @@ OnTalkSettingMenu
   \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicAroma))\q[アロマ,OnTalkTopic,TalkTopicAroma]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicHorrow))\q[暗いフォークロア,OnTalkTopic,TalkTopicHorrow]\f[default] /
   \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
   --
-  if ISFUNC("OnShowTimer") {OnShowTimer}
+  if ISFUNC("OnShowTimer") {
+    OnShowTimer
+  }
   --
   "\__q[OnOpenMenu]%(ICON('arrow-left'))\__q"
   --
-  if ISFUNC("OnShowInfo") {OnShowInfo}
+  if ISFUNC("OnShowInfo") {
+    OnShowInfo
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -201,7 +226,9 @@ OnMenuClose
   CurrentMenuDialog = ''
   TalkStatus = 'none'
   touch_count = 0
-  if ISFUNC("OnReloadTimer") {"\![timerraise,0,0,OnReloadTimer]"} // 予約を削除
+  if ISFUNC("OnReloadTimer") {
+    "\![timerraise,0,0,OnReloadTimer]"
+  } // 予約を削除
 }
 //アンカー　ツールチップ
 
