@@ -1,6 +1,6 @@
 charset,UTF-8
 
-name,郊外通りのハイネ
+name,Crave The Grave
 type,ghost
 
 sakura.name,ハイネ
