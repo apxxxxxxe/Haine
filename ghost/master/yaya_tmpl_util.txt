@@ -45,27 +45,19 @@ OnAITalk
 //------------------------------------------------------------------------------
 //OnAiTalkイベント
 //------------------------------------------------------------------------------
-// OnAiTalk
-//
-{
-  // 	//---- 通常のランダムトーク、ただしチェイン中はチェイントーク
-  // 	/*使わない＆アンカー時にうまく動かないのでコメントアウト
-  // 	if SHIORI3FW.IsChain
-
-  {
-    // 		AYATEMPLATE.LastTalk = ChainTalk
-    // 	
-  }
-  // 	else
-
-  {
-    //   */
-    // 		AYATEMPLATE.LastTalk = RandomTalk
-    // 	//
-  }
-  // 	AYATEMPLATE.LastTalk
-  //
+/*
+   OnAiTalk
+   {
+//---- 通常のランダムトーク、ただしチェイン中はチェイントーク
+if SHIORI3FW.IsChain {
+AYATEMPLATE.LastTalk = ChainTalk
 }
+else {
+AYATEMPLATE.LastTalk = RandomTalk
+//  }
+AYATEMPLATE.LastTalk
+}
+*/
 
 
 //******************************************************************************

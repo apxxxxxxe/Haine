@@ -65,7 +65,7 @@ GetTimeSlot
   }
 }
 
-GetProperties 
+GetProperties
 {
   GetGhostInfo
   --
@@ -120,7 +120,7 @@ OnGetBalloonInfo
     {
       balloon_cols = 24
     }
-    others 
+    others
 
     {
       _zenkaku_char_width = reference[3] * 2
@@ -234,7 +234,7 @@ SetBalloonSurface
     {
       "\b[4]"
     }
-    others 
+    others
 
     {
       "\b[6]"
@@ -244,7 +244,7 @@ SetBalloonSurface
 
 //現在のサーフェス番号を桁で分解して配列として返す
 //10000の位:顔色 1000の位:眉 100の位:腕 10の位:口 1の位:目
-GetSurfaceElements 
+GetSurfaceElements
 {
   _e = current_surface / POW(10, 6 - _argv[0]) % 10
   _e
@@ -347,11 +347,7 @@ InsertLineFeed
     _tmpwordcount = 0
 
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
-    _l = RE_REPLACE(_line, '\\_
-
-        {
-        0,2
-        }[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
+    _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
     // 置換したさくらスクリプトは配列に保持しておいて適宜取り出す
     _tags = RE_GETSTR
 
@@ -438,11 +434,7 @@ InsertLineFeed
 
 SurfaceSnippet
 {
-  RE_REPLACEEX(_argv[0], "h([0-9]
-
-  {
-    6
-  })", "\\0\\![embed,OnSurfaceComplete,$1]")
+  RE_REPLACEEX(_argv[0], "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]")
 }
 
 IsUnderLine
@@ -484,7 +476,7 @@ ShowTopic
     {
       "暗いフォークロア"
     }
-    others 
+    others
 
     {
       "日常の話題"

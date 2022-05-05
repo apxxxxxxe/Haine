@@ -249,120 +249,90 @@ OnUpdate.OnMD5CompareFailure
 //ヘッドラインセンス
 //******************************************************************************
 
+/*
 //------------------------------------------------------------------------------
 //ヘッドラインセンス開始
 //------------------------------------------------------------------------------
-//OnHeadlinesenseBegin
-//
+OnHeadlinesenseBegin
 {
-  //  "\0\s[0]%(reference[0])ヘッドライン取得中。\e"
-  //
+"\0\s[0]%(reference[0])ヘッドライン取得中。\e"
 }
 
 //------------------------------------------------------------------------------
 //ヘッドライン読み上げ
 //------------------------------------------------------------------------------
-//OnHeadlinesense.OnFind
-//
+OnHeadlinesense.OnFind
 {
-  //  //---- はじめのセリフ
-  //  if reference[2] == "First" || reference[2] == "First and Last"
-  //
-
-  {
-    //    //---- 最初のページ
-    //    "\0\b2\s[0]%(reference[0])のヘッドラインですよっ。"
-    //
-  }
-  //  elseif reference[2] == "Next"
-  //
-
-  {
-    //    //---- 真ん中あたりのページ
-    //    "\0\b2\s[0]%(reference[0])ヘッドライン、続き。"
-    //
-  }
-  //  elseif reference[2] == "Last"
-  //
-
-  {
-    //    //---- 最後のページ
-    //    "\0\b2\s[0]%(reference[0])ヘッドライン、これが最後のページです。"
-    //
-  }
-  //  --
-  //  //---- ヘッドライン本体
-  //  "\n\n%(reference[3])\n\n"
-  //  --
-  //  //---- 選択肢
-  //  if reference[2] == "First" || reference[2] == "Next"
-  //
-
-  {
-    //    //---- 次のページがある場合
-    //    AYATEMPLATE.MenuItem("次のページ","")
-    //    --
-    //    AYATEMPLATE.MenuItem("サイトへ",reference[1])
-    //    --
-    //    AYATEMPLATE.MenuItem("やめ","Menu_HEADLINECANCEL",150)
-    //
-  }
-  //  else
-  //
-
-  {
-    //    //---- 次のページがない場合
-    //    AYATEMPLATE.MenuItem("サイトへ",reference[1])
-    //    --
-    //    AYATEMPLATE.MenuItem("やめ","Menu_HEADLINECANCEL",150)
-    //
-  }
-  //
+//---- はじめのセリフ
+if reference[2] == "First" || reference[2] == "First and Last"
+{
+//---- 最初のページ
+"\0\b2\s[0]%(reference[0])のヘッドラインですよっ。"
+}
+elseif reference[2] == "Next"
+{
+//---- 真ん中あたりのページ
+"\0\b2\s[0]%(reference[0])ヘッドライン、続き。"
+}
+elseif reference[2] == "Last"
+{
+//---- 最後のページ
+"\0\b2\s[0]%(reference[0])ヘッドライン、これが最後のページです。"
+}
+--
+//---- ヘッドライン本体
+"\n\n%(reference[3])\n\n"
+--
+//---- 選択肢
+if reference[2] == "First" || reference[2] == "Next"
+{
+//---- 次のページがある場合
+AYATEMPLATE.MenuItem("次のページ","")
+--
+AYATEMPLATE.MenuItem("サイトへ",reference[1])
+--
+AYATEMPLATE.MenuItem("やめ","Menu_HEADLINECANCEL",150)
+}
+else
+{
+//---- 次のページがない場合
+AYATEMPLATE.MenuItem("サイトへ",reference[1])
+--
+AYATEMPLATE.MenuItem("やめ","Menu_HEADLINECANCEL",150)
+}
 }
 
 //------------------------------------------------------------------------------
 //ヘッドライン更新が無かった
 //------------------------------------------------------------------------------
-//OnHeadlinesenseComplete
-//
+OnHeadlinesenseComplete
 {
-  //  "h111109\1更新なし\n%(reference[0])\e"
-  //
+"h111109\1更新なし\n%(reference[0])\e"
 }
 
 //------------------------------------------------------------------------------
 //ヘッドラインセンス失敗
 //------------------------------------------------------------------------------
-//OnHeadlinesenseFailure
-//
+OnHeadlinesenseFailure
 {
-  //  "\0\s[0]ヘッドラインセンスに失敗しました。\n\n理由："
-  //  --
-  //  if reference[0] == "can't download"
-  //
-
-  {
-    //    "ダウンロード失敗。"
-    //
-  }
-  //  elseif reference[0] == "can't analyze"
-  //
-
-  {
-    //    "ヘッドライン解析失敗。"
-    //
-  }
-  //  else
-  //
-
-  {
-    //    "謎。"
-    //
-  }
-  //  --
-  //  "\e"
-  //
+"\0\s[0]ヘッドラインセンスに失敗しました。\n\n理由："
+--
+if reference[0] == "can't download"
+{
+"ダウンロード失敗。"
 }
+elseif reference[0] == "can't analyze"
+{
+  "ヘッドライン解析失敗。"
+}
+else
+{
+  "謎。"
+}
+--
+"\e"
+}
+*/
 
 
 //******************************************************************************

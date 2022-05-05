@@ -30,38 +30,32 @@
    */
 
 
+/*
 //Emilyへ切り替え
-//OnGhostChanging_Emily
-//
+OnGhostChanging_Emily
 {
-  //  "\0\s[0]エミリさんに切り替えです。\w5\1お芋食べてるかな。"
-  //
+"\0\s[0]エミリさんに切り替えです。\w5\1お芋食べてるかな。"
 }
 
 //Emilyから切り替り
-//OnGhostChanged_Emily
-//
+OnGhostChanged_Emily
 {
-  //  "\0\s[0]エミリさんから交代してきました。\w5\1よろしくな。"
-  //
+"\0\s[0]エミリさんから交代してきました。\w5\1よろしくな。"
 }
 
 
 //その他のゴーストへ切り替え
-//OnGhostChangingOther
-//
+OnGhostChangingOther
 {
-  //  OnClose
-  //
+OnClose
 }
 
 //その他のゴーストから切り替り
-//OnGhostChangedOther
-//
+OnGhostChangedOther
 {
-  //  OnBoot
-  //
+OnBoot
 }
+*/
 
 //******************************************************************************
 //この下は切り替えトーク処理用
