@@ -430,6 +430,15 @@ ShowTopic
   "\![quicksection,false]\_l[0,0]\f[default]"
 }
 
+FogHighlight {
+  _color = "200,0,0"
+  "\f[color," + _color + "]"
+  --
+  _argv[0]
+  --
+  "\f[color,default]"
+}
+
 UserKoukando
 {
   _s = UpdateKoukando
