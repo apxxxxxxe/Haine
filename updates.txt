@@ -34,7 +34,7 @@ file,ghost/master/yaya_emerg.txtbea9d31565622fa3115254cf21e5c6c3size=216date=
 file,ghost/master/yaya_emerg_dic.txt5963863a281f72ddf9d1e23cccb2ace9size=821date=2012-12-21T00:00:00
 file,ghost/master/yaya_etc.txte1c6a44db2a89dff7111f11db36da247size=15090date=2012-12-21T00:00:00
 file,ghost/master/yaya_events.txt7e0cf7256805a11a36500b1eacc0bfcfsize=2115date=2012-12-21T00:00:00
-file,ghost/master/yaya_functions.txt222e9412e2ea6ab268c8291174816099size=11948date=2012-12-21T00:00:00
+file,ghost/master/yaya_functions.txt8e383f2bd39a231ad3283d3dc681e03csize=12068date=2012-12-21T00:00:00
 file,ghost/master/yaya_input.txt8bcc07b208e5573dd5f6e0beaf6461e3size=217date=2012-12-21T00:00:00
 file,ghost/master/yaya_menu.txt05369111de9d240f75f00b5d30703344size=7019date=2012-12-21T00:00:00
 file,ghost/master/yaya_mouse.txtfaa44966a73dacd35d9ab939a5089f78size=8494date=2012-12-21T00:00:00
