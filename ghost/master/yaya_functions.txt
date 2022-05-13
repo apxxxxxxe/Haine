@@ -110,19 +110,13 @@ OnGetBalloonInfo
 
   ERASEVAR("forced_balloon_cols")
   case balloon_name {
-    when "霧の郊外にて"
-
-    {
+    when "霧の郊外にて"{
       balloon_cols = 24
     }
-    when "SSPデフォルト+"
-
-    {
+    when "SSPデフォルト+"{
       balloon_cols = 24
     }
-    others
-
-    {
+    others {
       _zenkaku_char_width = reference[3] * 2
       balloon_cols = TOINT(reference[2] / _zenkaku_char_width)
     }
@@ -138,9 +132,7 @@ OnGetShellInfo
 OnGetShellListInfo
 {
   _cmd = "\![get,property,OnGetShellListInfoAfter,"
-  for _i = 0; _i < shell_count; _i++
-
-  {
+  for _i = 0; _i < shell_count; _i++{
     _cmd += "currentghost.shelllist.index(" + _i + ").name"
   }
   _cmd += "]"
@@ -151,24 +143,14 @@ OnGetShellListInfo
 OnGetShellListInfoAfter
 {
   shell_list = IARRAY
-  for _i = 0; _i < ARRAYSIZE(reference); _i++
-
-  {
+  for _i = 0; _i < ARRAYSIZE(reference); _i++{
     shell_list = (shell_list,reference[_i])
   }
 }
 
 OnBalloonChange
 {
-  _balloon_name = reference[0]
-
-  GetProperties
-  --
-  "\![embed,OnBalloonChangePost," + _balloon_name + "]"
-}
-
-OnBalloonChangePost
-{
+  GetBalloonInfo
 }
 
 OnSurfaceChange
@@ -213,8 +195,6 @@ OnSurfaceComplete
     "\s[%(_dest_surface)]"
     return
   }
-  //--
-  //"\_q_s:%(_dest_surface)\n_dest_eyes:%(_dest_eyes)\n_dest_remain:%(_dest_remain)\n_from_eyes:%(_from_eyes)\n_middle:%(_middle_surface)\_q\n"
   --
   "\_w[%(_delay)]\s[%(_dest_surface)]"
 }
@@ -263,44 +243,28 @@ ICON
   "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
   --
   case _argv[0] {
-    when "stopwatch"
-
-    {
+    when "stopwatch"{
       "e900"
     }
-    when "undo"
-
-    {
+    when "undo"{
       "e901"
     }
-    when "cog"
-
-    {
+    when "cog"{
       "e902"
     }
-    when "cross"
-
-    {
+    when "cross"{
       "e903"
     }
-    when "arrow-right"
-
-    {
+    when "arrow-right"{
       "e904"
     }
-    when "arrow-left"
-
-    {
+    when "arrow-left"{
       "e905"
     }
-    when "bubble"
-
-    {
+    when "bubble"{
       "e906"
     }
-    when "info"
-
-    {
+    when "info"{
       "e907"
     }
   }
@@ -330,18 +294,14 @@ InsertLineFeed
     _max = balloon_cols
   }
 
-  // 閾値: これ以上の文字数で対象の単語が現れたときに改行する
-  _threshold = TOINT(_max / 3.0 * 2)
-
   // 内部処理に影響しなさそうな制御文字
   _tagmark = CHR(28)
   _kaigyoumark = CHR(29)
 
   // 元の文字列を改行で区切って各々処理する
   _lines = SPLIT(_text, "\n")
-  foreach _lines; _line
-
-  {
+  for _i=0; _i<ARRAYSIZE(_lines); _i++{
+    _line = _lines[_i]
     _linewordcount = 0
     _wordcount = 0
     _tmpwordcount = 0
@@ -352,7 +312,7 @@ InsertLineFeed
     _tags = RE_GETSTR
 
     // 文末の全角・半角スペースは無駄なので消去
-    _l = RE_REPLACE(_l, "[ 　]" + _tagmark + "*$", "pro")
+    _l = RE_REPLACE(_l, "[ 　]" + _tagmark + "*$", "")
     // 文全体の長さ
     _linelen = STRLEN(_l) - ARRAYSIZE(_tags)
     // さくらスクリプトを取り出す際のインデックス
@@ -361,13 +321,11 @@ InsertLineFeed
     // 単語に分割する。_rankは単語の総数
     _rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", "parse", _l)
 
-    for _i=0; _i<_rank-1; _i++
-
-    {
+    for _j=0; _j<_rank-1; _j++{
       // 最後の単語はEOSなのでrank-1でよい
 
       // _wordに単語を取り出す
-      _word = valueex[_i][0, CHR(9)]
+      _word = valueex[_j][0, CHR(9)]
 
       // _wordに_tagmark(さくらスクリプト)が含まれているかチェック
       // 通常の単語に含まれていること（例: りんご_tagmark）はなく、
@@ -375,15 +333,11 @@ InsertLineFeed
       _tagmarkcount = RE_GREP(_word, _tagmark)
       if _tagmarkcount {
         // 含まれている場合、検出した数だけリストから取り出す
-        for _j=0; _j<_tagmarkcount; _j++
-
-        {
+        for _k=0; _k<_tagmarkcount; _k++{
           _tag = _tags[_tagcount]
-
           if "\_l[0" _in_ _tag {
             _wordcount = 0
           }
-
           _result += _tag
           //_result += SHIORI3FW.EscapeAllTags(_tag)
           _tagcount++
@@ -397,10 +351,10 @@ InsertLineFeed
       }
 
       // 品詞と単語を取り出して判定の準備
-      _current_hinshi = valueex[_i][3, CHR(9)]
-      _current_word = valueex[_i][0, CHR(9)]
-      _next_hinshi = valueex[_i+1][3, CHR(9)]
-      _next_word = valueex[_i+1][0, CHR(9)]
+      _current_hinshi = valueex[_j][3, CHR(9)]
+      _current_word = valueex[_j][0, CHR(9)]
+      _next_hinshi = valueex[_j+1][3, CHR(9)]
+      _next_word = valueex[_j+1][0, CHR(9)]
 
       // 実際に改行を挿入する処理
       if _wordcount > _max {
@@ -414,9 +368,7 @@ InsertLineFeed
         }
       }
       elseif _current_hinshi _in_ _htarget_post || _current_word _in_ _target_post || /
-        _next_hinshi _in_ _htarget_pre || _current_word _in_ _target_post
-
-        {
+        _next_hinshi _in_ _htarget_pre || _current_word _in_ _target_post {
           // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
           _result = REPLACE(_result, _kaigyoumark, "")
           _result += _kaigyoumark
@@ -425,7 +377,7 @@ InsertLineFeed
     }
 
     // 元の文字列で改行されている位置に改行を挿入(すでに改行されていたらスキップ)
-    if ! RE_GREP(_result, "\\n$") {
+    if ! RE_GREP(_result, "\\n$") && _i < ARRAYSIZE(_lines)-1 {
       _result += "\n"
     }
   }
@@ -461,39 +413,21 @@ ShowTopic
   "\_l[0," + PosOffset + "]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
-    when "plants"
-
-    {
+    when "plants"{
       "植物の話題"
     }
-    when "aroma"
-
-    {
+    when "aroma"{
       "アロマの話題"
     }
-    when "horrow"
-
-    {
+    when "horrow"{
       "暗いフォークロア"
     }
-    others
-
-    {
+    others {
       "日常の話題"
     }
   }
   --
   "\![quicksection,false]\_l[0,0]\f[default]"
-}
-
-UserEvaluation
-{
-  if good_touch_count > bad_touch_count {
-    // 常識人
-  }
-  else {
-    // すけべ人間
-  }
 }
 
 UserKoukando
@@ -515,7 +449,7 @@ UserKoukando
 
 UpdateKoukando
 {
-  koukando = good_touch_count - bad_touch_count + total_talk_count/3
+  koukando = good_touch_count + bad_touch_count + total_talk_count/3
   koukando
 }
 

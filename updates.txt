@@ -1,5 +1,5 @@
 charset,UTF-8
-file,ghost/master/descript.txt0fe64aa9afe17fe397b2580c784b22besize=294date=2012-12-21T00:00:00
+file,ghost/master/descript.txt2bf63a7422251f0123c9f53942ab80b3size=285date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttffde1c018a75996c6b29b32fa5b35af50size=2364date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
@@ -24,8 +24,8 @@ file,ghost/master/system/yaya_shiori3.dic3762028ca8e4d1dfe0531a684fa7843dsize=
 file,ghost/master/system_config.txt05002574072b332b7d7c5f769b43d7c3size=896date=2012-12-21T00:00:00
 file,ghost/master/yaya.dllaf48cecf4b3b9eecc2de59738459fb11size=839680date=2012-12-21T00:00:00
 file,ghost/master/yaya.txt55d00a6deb1f6daa1fba2ccbc7fed179size=2144date=2012-12-21T00:00:00
-file,ghost/master/yaya_aitalk.txt03e552891f4aed036ce43c77b8fa6f8bsize=23030date=2012-12-21T00:00:00
-file,ghost/master/yaya_bootend.txt45956b62c254d612b4dfdd01f0519644size=3323date=2012-12-21T00:00:00
+file,ghost/master/yaya_aitalk.txte04ec917398799441bd9134b445ae1b4size=23042date=2012-12-21T00:00:00
+file,ghost/master/yaya_bootend.txtf6be9af11a01b261e39df08cd3f1581csize=3313date=2012-12-21T00:00:00
 file,ghost/master/yaya_change.txte7bf8a798bc1f148218d7dcbf6eda0bcsize=3810date=2012-12-21T00:00:00
 file,ghost/master/yaya_communicate.txt3b383ac93bd300a571a702b670dfdfb3size=4720date=2012-12-21T00:00:00
 file,ghost/master/yaya_config.txt8c73a9fe62bd648b7fca85dcbc54bdcdsize=3913date=2012-12-21T00:00:00
@@ -34,16 +34,16 @@ file,ghost/master/yaya_emerg.txtbea9d31565622fa3115254cf21e5c6c3size=216date=
 file,ghost/master/yaya_emerg_dic.txt5963863a281f72ddf9d1e23cccb2ace9size=821date=2012-12-21T00:00:00
 file,ghost/master/yaya_etc.txte1c6a44db2a89dff7111f11db36da247size=15090date=2012-12-21T00:00:00
 file,ghost/master/yaya_events.txt7e0cf7256805a11a36500b1eacc0bfcfsize=2115date=2012-12-21T00:00:00
-file,ghost/master/yaya_functions.txt7fdbf12599cdd8ab5b527c31d57378b1size=12592date=2012-12-21T00:00:00
+file,ghost/master/yaya_functions.txt222e9412e2ea6ab268c8291174816099size=11948date=2012-12-21T00:00:00
 file,ghost/master/yaya_input.txt8bcc07b208e5573dd5f6e0beaf6461e3size=217date=2012-12-21T00:00:00
 file,ghost/master/yaya_menu.txt05369111de9d240f75f00b5d30703344size=7019date=2012-12-21T00:00:00
-file,ghost/master/yaya_mouse.txt18b531c22bbcd44fb179fffcab97bbc2size=8551date=2012-12-21T00:00:00
+file,ghost/master/yaya_mouse.txtfaa44966a73dacd35d9ab939a5089f78size=8494date=2012-12-21T00:00:00
 file,ghost/master/yaya_string.txt17eef0b57ef0f882431e7edc3249cb57size=4129date=2012-12-21T00:00:00
 file,ghost/master/yaya_timer.txtd546f84155943e14e8490e113773fbe7size=4925date=2012-12-21T00:00:00
 file,ghost/master/yaya_tmpl_util.txt6e24f6679a019041a7522735561ff8a4size=8279date=2012-12-21T00:00:00
 file,ghost/master/yaya_webclap.txt010b6fcc10130300543c196550079feesize=950date=2012-12-21T00:00:00
 file,install.txtc38ba3f9db981fbf47ceeb10e40c9167size=107date=2012-12-21T00:00:00
-file,readme.txtb85ea14d97f9cd4176c8184093e71522size=34date=2012-12-21T00:00:00
+file,readme.txtcd2f2f72a13aad831d11eb75701ca6dasize=190date=2012-12-21T00:00:00
 file,shell/master/descript.txt5dba0446859f31ecea751b4c78d399c1size=5871date=2012-12-21T00:00:00
 file,shell/master/menu_background.pngc41543a1c48e90d317a73ad509c0011dsize=1109date=2012-12-21T00:00:00
 file,shell/master/menu_foreground.pnge57c08f18a349362e1ed3904e5d374desize=89date=2012-12-21T00:00:00
@@ -78,8 +78,10 @@ file,shell/master/surface00500.pngd1c47dc4cc470dd91d0e76e389fc2c3asize=12363d
 file,shell/master/surface00501.pnge9a431caf78d8b297c2a923b32886459size=12001date=2012-12-21T00:00:00
 file,shell/master/surface00502.pnge443b04f37c248c25ada9349b78f03e5size=12534date=2012-12-21T00:00:00
 file,shell/master/surface00503.png0cab0b1d73a101967e243797629bd5dcsize=21281date=2012-12-21T00:00:00
+file,shell/master/surface00504.png88bdd9df90b7d4324879f4e87d78257fsize=10393date=2012-12-21T00:00:00
 file,shell/master/surface00601.png6a68156831646ba29c8c29ab5246f661size=18500date=2012-12-21T00:00:00
 file,shell/master/surface00602.png81a8b9816c3def0672e263cae6f55e96size=23232date=2012-12-21T00:00:00
+file,shell/master/surface00604.pnge9789b78d669655c9877cd6a0276265dsize=22857date=2012-12-21T00:00:00
 file,shell/master/surface00700.pnge103b9d07cd2d2ece5b7751232a28548size=35847date=2012-12-21T00:00:00
 file,shell/master/surface00701.png0a48ea992602e73a749661951d7e2484size=25511date=2012-12-21T00:00:00
 file,shell/master/surface00702.pngfc3c0a5294cbb76e595025862171394dsize=19981date=2012-12-21T00:00:00
@@ -192,4 +194,4 @@ file,shell/master/surface01817.pngf4f961ed97489a49a7f5c025cf9468ddsize=4258da
 file,shell/master/surface01900.png0e600257a5adc2145db1662a913a4375size=18383date=2012-12-21T00:00:00
 file,shell/master/surface01901.pnga102cdadb2575e79b862b03f1d59daa2size=24582date=2012-12-21T00:00:00
 file,shell/master/surface100000.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
-file,shell/master/surfaces.txt6aa48e05f89bbb7c10d89d7adbe104ffsize=31429date=2012-12-21T00:00:00
+file,shell/master/surfaces.txt900ed5193b6471587d2703b51dfcfe94size=32978date=2012-12-21T00:00:00
