@@ -20,7 +20,7 @@ OnOpenMenu
 
 OnMainMenu
 {
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
   "\![set,autoscroll,disable]\_q\*\0/
   //\_l[0,1.2em]------------------------------------/
@@ -79,7 +79,7 @@ OnConfigMenu
 
 全般設定メニュー
 {
-  SetBalloonSurface('library')
+  SetBalloonSurfaceSakura('library')
   --
   "\_q/
   \_l[0.5em,1.8em]◆時報\_l[@0.5em,]【現在\_l[@0.3em,]%(IsJihouActive)】/
@@ -111,7 +111,7 @@ ShowCurrentBalloonCols
 
 OnBalloonColsConfig
 {
-  SetBalloonSurface('library')
+  SetBalloonSurfaceSakura('library')
   --
   '\![open,sliderinput,バルーン設定,60000,' + ShowCurrentBalloonCols + ',0,48]/
   \_qバルーンの１行あたりの文字数を設定できます。\nこの値をもとに一部トークが見やすく改行されます\n(参考："sspデフォルト+"は24文字、\n"霧の郊外にて"は26文字程度を推奨)'
@@ -153,7 +153,7 @@ OnInfo
   TalkStatus = 'menu'
   '\C\c'
   --
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
   "\_q/
   \_l[0.5em,1.8em] 友好度：" + UpdateKoukando + "（" + UserKoukando + "）/
@@ -189,7 +189,7 @@ OnTalkSettingMenu
     _talkintervalmessage = "%(_talkintervalmin)分"
   }
 
-  SetBalloonSurface('garden')
+  SetBalloonSurfaceSakura('garden')
   --
   "\_q/
   \_l[0.5em,1.8em]◆喋り頻度\_l[@0.5em,]【現在\_l[@0.3em,]%(_talkintervalmessage)】/
@@ -237,7 +237,7 @@ Menu_RandomTalk
 {
   TalkStatus = 'talking'
 
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
   "h111201いいわよ。h111205……そうね、\c"
   "h113309なんの話がいいかしら…………h113205そうね、\c"
@@ -252,7 +252,7 @@ Menu_LastTalk
 {
   lastanchor = ""
 
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
   "h111209さっきの話ね。\c"
   --

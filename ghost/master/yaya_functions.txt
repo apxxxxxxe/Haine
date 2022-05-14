@@ -199,25 +199,48 @@ OnSurfaceComplete
   "\_w[%(_delay)]\s[%(_dest_surface)]"
 }
 
-SetBalloonSurface
+SetBalloonSurfaceSakura
 {
-  "\1\s[100000]\0"
+  "\0"
   --
   case _argv[0] {
-    when "garden"
-
-    {
+    when "garden"{
       "\b[0]"
     }
-    when "library"
-
-    {
+    when "library"{
       "\b[4]"
     }
-    others
-
-    {
+    when "large" {
+      "\b[2]"
+    }
+    when "plain" {
+      "\b[8]"
+    }
+    others {
       "\b[6]"
+    }
+  }
+}
+
+SetBalloonSurfaceKero
+{
+  "\1"
+  --
+  case _argv[0] {
+    when "garden"{
+      "\b[2]"
+    }
+    when "library"{
+      "\b[6]"
+    }
+    when "large" {
+      "\b[4]"
+    }
+    when "plain" {
+      "\b[10]"
+    }
+    others {
+      "\b[0]"
     }
   }
 }

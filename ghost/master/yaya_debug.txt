@@ -2,17 +2,13 @@
 OnDebugKeyPress 
 {
   case _argv[0] {
-    when "q"
-
-    {
-      SetBalloonSurface
+    when "q"{
+      SetBalloonSurfaceSakura
       --
       '\![raise,OnEvent1]'
     }
-    when "a"
-
-    {
-      SetBalloonSurface
+    when "a"{
+      SetBalloonSurfaceSakura
       --
       _text = lasttalk
       _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _text)
@@ -24,9 +20,7 @@ OnDebugKeyPress
       }
       _result
     }
-    when "s"
-
-    {
+    when "s"{
       _file = "../debuginfo.txt"
       FOPEN(_file,"w")
 
@@ -51,22 +45,8 @@ OnDebugKeyPress
       FCLOSE(_file)
       "デバッグ情報をファイルに出力"
     }
-    when "n"
-
-    {
-      ISVAR("forced_balloon_cols")
-    }
-    when "i"
-
-    {
-      _infovar = ("sakura_name","balloon_name","balloon_rows","balloon_cols","shell_count","shell_list")
-      _dialog = ""
-      foreach _infovar; _iv
-
-      {
-        _dialog += _iv + ": " + EVAL(_iv) + "\n"
-      }
-      _dialog
+    when "n"{
+      OnEvent1_1
     }
   }
 }

@@ -22,7 +22,7 @@ OnFirstBoot
 
   InitializeVariable
   --
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
 
   //---- Vanishカウントを見て、真の初回か否かを判定する
@@ -45,7 +45,7 @@ OnBoot
 {
   InitializeVariable
   --
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
   InsertLineFeed(Hello)
 }
@@ -74,7 +74,7 @@ Hello
 
 OnClose
 {
-  SetBalloonSurface
+  SetBalloonSurfaceSakura
   --
   InsertLineFeed(Bye)
 }

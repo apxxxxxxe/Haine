@@ -179,7 +179,7 @@ OnMouseEvent
 {
   "\![timerraise,30000,1,OnTouchCountReset,reset]"
   --
-  InsertLineFeed(SetBalloonSurface + CanselLookAt + NextTouchTalk)
+  InsertLineFeed(SetBalloonSurfaceSakura + CanselLookAt + NextTouchTalk)
 }
 
 CommonEventMousePost
