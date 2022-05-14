@@ -358,7 +358,7 @@ InsertLineFeed
         // 含まれている場合、検出した数だけリストから取り出す
         for _k=0; _k<_tagmarkcount; _k++{
           _tag = _tags[_tagcount]
-          if "\_l[0" _in_ _tag {
+          if "\_l[0" _in_ _tag || "\x" _in_ _tag || "\c" _in_ _tag {
             _wordcount = 0
           }
           _result += _tag
@@ -390,8 +390,11 @@ InsertLineFeed
           _wordcount %= _max
         }
       }
-      elseif _current_hinshi _in_ _htarget_post || _current_word _in_ _target_post || /
-        _next_hinshi _in_ _htarget_pre || _current_word _in_ _target_post {
+      elseif /
+        _current_hinshi _in_ _htarget_post || /
+        _current_word _in_ _target_post || /
+        _next_hinshi _in_ _htarget_pre && ! _current_hinshi _in_ _htarget_pre || /
+        _current_word _in_ _target_post {
           // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
           _result = REPLACE(_result, _kaigyoumark, "")
           _result += _kaigyoumark
@@ -399,8 +402,8 @@ InsertLineFeed
         }
     }
 
-    // 元の文字列で改行されている位置に改行を挿入(すでに改行されていたらスキップ)
-    if ! RE_GREP(_result, "\\n$") && _i < ARRAYSIZE(_lines)-1 {
+    // 元の文字列で改行されている位置に改行を挿入
+    if _i < ARRAYSIZE(_lines)-1 {
       _result += "\n"
     }
   }
