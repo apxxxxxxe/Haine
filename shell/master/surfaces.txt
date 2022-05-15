@@ -188,6 +188,7 @@ surface111101-111109,112101-112109,113101-113109,114101-114109,121101-121109,122
 	animation500399.pattern0,overlay,350,0,0,0
 
 	animation500401.interval,talk
+  animation500401.option,shared-index
 	animation500401.pattern0,stop,500399
 	animation500401.pattern1,overlay,304,0,0,0
 	animation500401.pattern2,overlay,350,100,0,0
@@ -207,6 +208,7 @@ surface111201-111209,112201-112209,113201-113209,114201-114209,121201-121209,122
 	animation500399.pattern0,overlay,322,0,0,0
 
 	animation500401.interval,talk
+  animation500401.option,shared-index
 	animation500401.pattern0,stop,500399
 	animation500401.pattern1,overlay,303,0,0,0
 	animation500401.pattern2,overlay,322,100,0,0
@@ -237,6 +239,7 @@ surface111101,111201,111301,111401,112101,112201,112301,112401,113101,113201,113
 {
 	//Ç±Ç¡Çøñ⁄
 	animation500300.interval,runonce+rarely
+  animation500300.option,shared-index
 	animation500300.pattern0,overlay,202,0,0,0
 	animation500300.pattern1,overlay,208,4000,0,0
 	animation500300.pattern2,overlay,212,100,0,0
@@ -248,6 +251,7 @@ surface111102,111202,111302,111402,112102,112202,112302,112402,113102,113202,113
 {
 	//è„ÇÃãÛñ⁄
 	animation500300.interval,runonce+rarely
+  animation500300.option,shared-index
 	animation500300.pattern0,overlay,207,0,0,0
 	animation500300.pattern1,overlay,211,4000,0,0
 	animation500300.pattern2,overlay,212,100,0,0
@@ -259,6 +263,7 @@ surface111103,111203,111303,111403,112103,112203,112303,112403,113103,113203,113
 {
 	//Ç†Ç¡Çøñ⁄
 	animation500300.interval,runonce+rarely
+  animation500300.option,shared-index
 	animation500300.pattern0,overlay,205,0,0,0
 	animation500300.pattern1,overlay,210,4000,0,0
 	animation500300.pattern2,overlay,212,100,0,0
