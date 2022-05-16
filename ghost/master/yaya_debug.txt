@@ -13,9 +13,7 @@ OnDebugKeyPress
       _text = lasttalk
       _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _text)
       _result = ''
-      for _j=0; _j<_Rank; _j++
-
-      {
+      for _j=0; _j<_Rank; _j++{
         _result += valueex[_j][0, CHR(9)] + ' ' + valueex[_j][3, CHR(9)] + '\n'
       }
       _result
