@@ -178,6 +178,10 @@ talks : nonoverlap_pool
 
 OnKeyPress
 {
+  if isKeyBlocked {
+    return
+  }
+
   case reference[0] {
     when "t" {
       SetBalloonSurfaceSakura
