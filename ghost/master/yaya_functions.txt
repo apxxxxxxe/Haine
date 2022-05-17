@@ -110,13 +110,14 @@ OnGetBalloonInfo
 
   ERASEVAR("forced_balloon_cols")
   case balloon_name {
-    when "霧の郊外にて"{
+    when "霧の郊外にて" {
       balloon_cols = 24
     }
-    when "SSPデフォルト+"{
+    when "SSPデフォルト+" {
       balloon_cols = 24
     }
-    others {
+    others
+    {
       _zenkaku_char_width = reference[3] * 2
       balloon_cols = TOINT(reference[2] / _zenkaku_char_width)
     }
@@ -132,7 +133,7 @@ OnGetShellInfo
 OnGetShellListInfo
 {
   _cmd = "\![get,property,OnGetShellListInfoAfter,"
-  for _i = 0; _i < shell_count; _i++{
+  for _i = 0; _i < shell_count; _i++ {
     _cmd += "currentghost.shelllist.index(" + _i + ").name"
   }
   _cmd += "]"
@@ -143,7 +144,7 @@ OnGetShellListInfo
 OnGetShellListInfoAfter
 {
   shell_list = IARRAY
-  for _i = 0; _i < ARRAYSIZE(reference); _i++{
+  for _i = 0; _i < ARRAYSIZE(reference); _i++ {
     shell_list = (shell_list,reference[_i])
   }
 }
@@ -204,10 +205,10 @@ SetBalloonSurfaceSakura
   "\0"
   --
   case _argv[0] {
-    when "garden"{
+    when "garden" {
       "\b[0]"
     }
-    when "library"{
+    when "library" {
       "\b[4]"
     }
     when "large" {
@@ -216,7 +217,8 @@ SetBalloonSurfaceSakura
     when "plain" {
       "\b[8]"
     }
-    others {
+    others
+    {
       "\b[6]"
     }
   }
@@ -227,10 +229,10 @@ SetBalloonSurfaceKero
   "\1"
   --
   case _argv[0] {
-    when "garden"{
+    when "garden" {
       "\b[2]"
     }
-    when "library"{
+    when "library" {
       "\b[6]"
     }
     when "large" {
@@ -239,7 +241,8 @@ SetBalloonSurfaceKero
     when "plain" {
       "\b[10]"
     }
-    others {
+    others
+    {
       "\b[0]"
     }
   }
@@ -266,28 +269,28 @@ ICON
   "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
   --
   case _argv[0] {
-    when "stopwatch"{
+    when "stopwatch" {
       "e900"
     }
-    when "undo"{
+    when "undo" {
       "e901"
     }
-    when "cog"{
+    when "cog" {
       "e902"
     }
-    when "cross"{
+    when "cross" {
       "e903"
     }
-    when "arrow-right"{
+    when "arrow-right" {
       "e904"
     }
-    when "arrow-left"{
+    when "arrow-left" {
       "e905"
     }
-    when "bubble"{
+    when "bubble" {
       "e906"
     }
-    when "info"{
+    when "info" {
       "e907"
     }
   }
@@ -323,7 +326,7 @@ InsertLineFeed
 
   // 元の文字列を改行で区切って各々処理する
   _lines = SPLIT(_text, "\n")
-  for _i=0; _i<ARRAYSIZE(_lines); _i++{
+  for _i=0; _i<ARRAYSIZE(_lines); _i++ {
     _line = _lines[_i]
     _linewordcount = 0
     _wordcount = 0
@@ -344,7 +347,7 @@ InsertLineFeed
     // 単語に分割する。_rankは単語の総数
     _rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", "parse", _l)
 
-    for _j=0; _j<_rank-1; _j++{
+    for _j=0; _j<_rank-1; _j++ {
       // 最後の単語はEOSなのでrank-1でよい
 
       // _wordに単語を取り出す
@@ -356,7 +359,7 @@ InsertLineFeed
       _tagmarkcount = RE_GREP(_word, _tagmark)
       if _tagmarkcount {
         // 含まれている場合、検出した数だけリストから取り出す
-        for _k=0; _k<_tagmarkcount; _k++{
+        for _k=0; _k<_tagmarkcount; _k++ {
           _tag = _tags[_tagcount]
           if "\_l[0" _in_ _tag || "\x" _in_ _tag || "\c" _in_ _tag {
             _wordcount = 0
@@ -394,7 +397,8 @@ InsertLineFeed
         _current_hinshi _in_ _htarget_post || /
         _current_word _in_ _target_post || /
         _next_hinshi _in_ _htarget_pre && ! _current_hinshi _in_ _htarget_pre || /
-        _current_word _in_ _target_post {
+        _current_word _in_ _target_post
+        {
           // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
           _result = REPLACE(_result, _kaigyoumark, "")
           _result += _kaigyoumark
@@ -439,16 +443,17 @@ ShowTopic
   "\_l[0," + PosOffset + "]\f[height,11]\f[align,right]\![quicksection,true]"
   --
   case _argv[0] {
-    when "plants"{
+    when "plants" {
       "植物の話題"
     }
-    when "aroma"{
+    when "aroma" {
       "アロマの話題"
     }
-    when "horrow"{
+    when "horrow" {
       "暗いフォークロア"
     }
-    others {
+    others
+    {
       "日常の話題"
     }
   }
@@ -456,7 +461,8 @@ ShowTopic
   "\![quicksection,false]\_l[0,0]\f[default]"
 }
 
-FogHighlight {
+FogHighlight
+{
   _color = "200,0,0"
   "\f[color," + _color + "]"
   --

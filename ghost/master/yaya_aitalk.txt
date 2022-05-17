@@ -74,7 +74,7 @@ talks : nonoverlap_pool
     "h111204身体は平気？違和感があればすぐに言うのよ。\n……h111209ふふ、h111205未だに妙な気分だわ。またこうやって人と話せるだなんて。"
     //"h123206あそこでよく迷子になったものよ\_w[750]　…h123209懐かしいわ。\n歩けば歩くほどわからなくなって、\n泣き出したときの声でようやく見つけてもらえて……ね。"
   }
-  if TalkTopicPlants  {
+  if TalkTopicPlants {
     ShowTopic("plants")
     --
     SetBalloonSurfaceSakura("garden")

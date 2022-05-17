@@ -2,23 +2,23 @@
 OnDebugKeyPress 
 {
   case _argv[0] {
-    when "q"{
+    when "q" {
       SetBalloonSurfaceSakura
       --
       '\![raise,OnEvent1]'
     }
-    when "a"{
+    when "a" {
       SetBalloonSurfaceSakura
       --
       _text = lasttalk
       _Rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _text)
       _result = ''
-      for _j=0; _j<_Rank; _j++{
+      for _j=0; _j<_Rank; _j++ {
         _result += valueex[_j][0, CHR(9)] + ' ' + valueex[_j][3, CHR(9)] + '\n'
       }
       _result
     }
-    when "s"{
+    when "s" {
       _file = "../debuginfo.txt"
       FOPEN(_file,"w")
 
@@ -43,7 +43,7 @@ OnDebugKeyPress
       FCLOSE(_file)
       "デバッグ情報をファイルに出力"
     }
-    when "n"{
+    when "n" {
       OnEvent1_1
     }
   }

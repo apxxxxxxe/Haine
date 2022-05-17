@@ -54,7 +54,8 @@ AYATEMPLATE.LastTalk = ChainTalk
 }
 else {
 AYATEMPLATE.LastTalk = RandomTalk
-//  }
+//
+}
 AYATEMPLATE.LastTalk
 }
 */
