@@ -11,7 +11,7 @@ OnFirstBoot
 {
   //---- 変数の初期化
   username         = "ユーザ"
-  teachusername    = 0  // ユーザー名覚え用
+  teachusername    = 0
   IsJihouActive = '有効'
   circadian_rhythm = '設定しない'
   isdebug = 0
@@ -20,21 +20,7 @@ OnFirstBoot
   total_talk_count = 0
   uwanosora_minute = 5
 
-  InitializeVariable
-  --
-  SetBalloonSurfaceSakura
-  --
-
-  //---- Vanishカウントを見て、真の初回か否かを判定する
-  if reference[0] == 0 {
-    //---- ほんとうに初めての起動
-    "初回起動"
-  }
-  else {
-    //---- 再インストール後の初回起動
-    if reference[0] > 0 {
-    }
-  }
+  OnBoot
 }
 
 
@@ -47,7 +33,12 @@ OnBoot
   --
   SetBalloonSurfaceSakura
   --
-  InsertLineFeed(Hello)
+  if !isEvent1End {
+    OnEvent1_1
+  }
+  else {
+    InsertLineFeed(Hello)
+  }
 }
 
 Hello
