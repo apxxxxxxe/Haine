@@ -470,9 +470,11 @@ FogHighlight
   "\f[color,default]"
 }
 
-UserKoukando
+UserRating
 {
-  _s = UpdateKoukando
+  UpdateUserRating
+
+  _s = user_honesty
   if _s > 10 {
     "やさしいのね"
   }
@@ -484,10 +486,10 @@ UserKoukando
   }
 }
 
-UpdateKoukando
+UpdateUserRating
 {
-  koukando = good_touch_count - bad_touch_count + total_talk_count/3
-  koukando
+  likability = good_touch_count + bad_touch_count + total_talk_count/3
+  user_honesty = good_touch_count - bad_touch_count
 }
 
 //******************************************************************************
