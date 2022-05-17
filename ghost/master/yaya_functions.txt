@@ -13,6 +13,7 @@ InitializeVariable
   touch_count = 0
   last_touch_part = ""
   first_touch = 0
+  isKeyBlocked = 0
 }
 
 //\1バルーンを\0サーフェスに追従させる
