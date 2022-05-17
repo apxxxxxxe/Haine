@@ -25,7 +25,7 @@ OnKeyPress
     when "r"
 
     {
-      "リロードします\![change,ghost,郊外通りのハイネ]"
+      "リロードします\![change,ghost,Crave The Grave]"
     }
   }
 }
