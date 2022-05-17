@@ -308,7 +308,7 @@ InsertLineFeed
   // 直前・直後に改行を入れる品詞と単語を列挙
   _htarget_pre = "名詞-一般"
   _target_pre = "こと, もの, いる, みる, もらう, くれる, ほしい, おく, くる, とき, ない"
-  _htarget_post = "感動詞, 記号-一般, 記号-読点, 記号-句点"
+  _htarget_post = "感動詞, 記号-一般, 記号-読点, 記号-句点, 助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-格助詞-連語, 助詞-係助詞, 助詞-終助詞, 助詞-接続助詞, 助詞-特殊, 助詞-副詞化, 助詞-副助詞, 助詞-並立助詞"
   _target_post = "この, その, あの, どの"
 
   // バルーンⅠ行あたりの文字数
@@ -365,7 +365,6 @@ InsertLineFeed
             _wordcount = 0
           }
           _result += _tag
-          //_result += SHIORI3FW.EscapeAllTags(_tag)
           _tagcount++
         }
       }
@@ -463,7 +462,7 @@ ShowTopic
 
 FogHighlight
 {
-  _color = "200,0,0"
+  _color = "160,192,192"
   "\f[color," + _color + "]"
   --
   _argv[0]
@@ -475,22 +474,19 @@ UserKoukando
 {
   _s = UpdateKoukando
   if _s > 10 {
-    //好き
-    "やさしい人"
+    "やさしいのね"
   }
   elseif _s < -10 {
-    //嫌い
-    "苦手な人"
+    "欲望に忠実ね"
   }
   else {
-    //どちらでもない
-    "客人"
+    "久しぶりの客人"
   }
 }
 
 UpdateKoukando
 {
-  koukando = good_touch_count + bad_touch_count + total_talk_count/3
+  koukando = good_touch_count - bad_touch_count + total_talk_count/3
   koukando
 }
 
