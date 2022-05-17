@@ -8,11 +8,9 @@ sakura.seriko.alignmenttodesktop,free
 kero.seriko.alignmenttodesktop,free
 
 seriko.use_self_alpha,1
-sakura.defaultleft,-100
-kero.defaultleft,-100
-sakura.balloon.offsetx,120
-sakura.balloon.offsety,170
-kero.balloon.offsetx,184
+sakura.balloon.offsetx,150
+sakura.balloon.offsety,150
+kero.balloon.offsetx,150
 kero.balloon.offsety,380
 
 sakura.bindoption.group,頭,multiple
