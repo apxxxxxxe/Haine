@@ -90,7 +90,7 @@ GetBalloonInfo
 
 GetShellInfo
 {
-  "\![get,property,OnGetShellInfo,currentghost.shelllist.count]"
+  "\![get,property,OnGetShellInfo,currentghost.shelllist.current.name,currentghost.shelllist.count]"
 }
 
 OnGetGhostInfo
@@ -127,8 +127,10 @@ OnGetBalloonInfo
 
 OnGetShellInfo
 {
-  //reference[0]: currentghost.shelllist.count
-  shell_count = reference[0]
+  //reference[0]: currentghost.shelllist.current.name
+  //reference[1]: currentghost.shelllist.count
+  shell_name = reference[0]
+  shell_count = reference[1]
 }
 
 OnGetShellListInfo

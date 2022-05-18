@@ -1,0 +1,17 @@
+OnDressupChanged {
+  case shell_name {
+    when "master" {
+      if reference[2] == 1 { // 着せられたとき
+      } else { // 脱がされたとき
+        case reference[3] {
+          when "トップス" {
+            "h211108\_w[1000]h211101h211204"
+          }
+          when "ボトムス" {
+            "h211108\_w[1000]h211101h221209"
+          }
+        }
+      }
+    }
+  }
+}
