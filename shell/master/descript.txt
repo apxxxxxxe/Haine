@@ -103,7 +103,9 @@ sakura.bindgroup505314.name,袖,ハーフ白
 sakura.bindgroup505315.name,袖,ハーフ黒
 sakura.bindgroup505316.name,袖,パフ白
 sakura.bindgroup505318.name,袖,長白
+sakura.bindgroup505318.addid,595318
 sakura.bindgroup505319.name,袖,長黒
+sakura.bindgroup505319.addid,595319
 sakura.bindgroup505318.default,1
 
 sakura.bindoption.group,ボトムス
