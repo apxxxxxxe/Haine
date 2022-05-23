@@ -59,9 +59,10 @@ sakura.bindgroup506799.name,前髪B,前
 sakura.bindgroup506699.name,前髪B,後
 sakura.bindgroup506799.default,1
 
-sakura.bindoption.group,髪+
-sakura.bindgroup506790.name,髪+,横髪A
-sakura.bindgroup506791.name,髪+,横髪B
+sakura.bindoption.group,横髪,multiple
+sakura.bindgroup506790.name,横髪,横髪A
+sakura.bindgroup506791.name,横髪,横髪B
+sakura.bindgroup506792.name,横髪,横髪C
 sakura.bindgroup506790.default,1
 
 sakura.bindoption.group,トップス
