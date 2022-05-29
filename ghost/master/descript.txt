@@ -3,6 +3,10 @@ charset,UTF-8
 name,Crave The Grave
 type,ghost
 
+craftman,ape
+craftmanw,ape
+craftmanurl,https://apxxxxxxe.github.io/ukagaka/
+
 sakura.name,ハイネ
 kero.name,
 
