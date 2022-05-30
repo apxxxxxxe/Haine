@@ -208,21 +208,21 @@ SetBalloonSurfaceSakura
   "\0"
   --
   case _argv[0] {
-    when "garden" {
-      "\b[0]"
-    }
-    when "library" {
-      "\b[4]"
-    }
     when "large" {
       "\b[2]"
+    }
+    when "garden" {
+      "\b[4]"
+    }
+    when "library" {
+      "\b[6]"
     }
     when "plain" {
       "\b[8]"
     }
     others
     {
-      "\b[6]"
+      "\b[0]"
     }
   }
 }
@@ -232,14 +232,17 @@ SetBalloonSurfaceKero
   "\1"
   --
   case _argv[0] {
-    when "garden" {
+    when "living" {
       "\b[2]"
-    }
-    when "library" {
-      "\b[6]"
     }
     when "large" {
       "\b[4]"
+    }
+    when "garden" {
+      "\b[6]"
+    }
+    when "library" {
+      "\b[8]"
     }
     when "plain" {
       "\b[10]"
