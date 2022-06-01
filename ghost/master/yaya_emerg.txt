@@ -8,4 +8,3 @@ charset.extension, UTF-8
 include, system_config.txt
 
 dic, yaya_emerg_dic.txt
-dic, yaya_homeurl.txt
