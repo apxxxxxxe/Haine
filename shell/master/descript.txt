@@ -137,16 +137,16 @@ sakura.bindgroup501404.name,靴下+,ガーターベルト黒
 sakura.bindgroup501401.default,1
 
 sakura.bindoption.group,靴
-sakura.bindgroup508351.name,靴,おでこ靴黒
-sakura.bindgroup508352.name,靴,おでこ靴白
-sakura.bindgroup508353.name,靴,おでこ靴赤
-sakura.bindgroup508354.name,靴,黒
-sakura.bindgroup508356.name,靴,白
-sakura.bindgroup508357.name,靴,ローファー
-sakura.bindgroup508360.name,靴,ブーツ黒
-sakura.bindgroup508361.name,靴,ブーツ茶
-sakura.bindgroup508358.name,靴,サンダル黒
-sakura.bindgroup508359.name,靴,サンダル白
-sakura.bindgroup508351.default,1
+sakura.bindgroup503351.name,靴,おでこ靴黒
+sakura.bindgroup503352.name,靴,おでこ靴白
+sakura.bindgroup503353.name,靴,おでこ靴赤
+sakura.bindgroup503354.name,靴,黒
+sakura.bindgroup503356.name,靴,白
+sakura.bindgroup503357.name,靴,ローファー
+sakura.bindgroup503360.name,靴,ブーツ黒
+sakura.bindgroup503361.name,靴,ブーツ茶
+sakura.bindgroup503358.name,靴,サンダル黒
+sakura.bindgroup503359.name,靴,サンダル白
+sakura.bindgroup503351.default,1
 
 sakura.menu,auto

@@ -599,26 +599,26 @@ surface.append111101-999909
   animation504375.pattern0,overlay,1305,0,0,0
 
   //靴
-  animation508351.interval,bind
-  animation508351.pattern0,overlay,1600,0,0,0
-  animation508352.interval,bind
-  animation508352.pattern0,overlay,1601,0,0,0
-  animation508353.interval,bind
-  animation508353.pattern0,overlay,1602,0,0,0
-  animation508354.interval,bind
-  animation508354.pattern0,overlay,1603,0,0,0
-  animation508356.interval,bind
-  animation508356.pattern0,overlay,1604,0,0,0
-  animation508357.interval,bind
-  animation508357.pattern0,overlay,1605,0,0,0
-  animation508358.interval,bind
-  animation508358.pattern0,overlay,1606,0,0,0
-  animation508359.interval,bind
-  animation508359.pattern0,overlay,1607,0,0,0
-  animation508360.interval,bind
-  animation508360.pattern0,overlay,1608,0,0,0
-  animation508361.interval,bind
-  animation508361.pattern0,overlay,1609,0,0,0
+  animation503351.interval,bind
+  animation503351.pattern0,overlay,1600,0,0,0
+  animation503352.interval,bind
+  animation503352.pattern0,overlay,1601,0,0,0
+  animation503353.interval,bind
+  animation503353.pattern0,overlay,1602,0,0,0
+  animation503354.interval,bind
+  animation503354.pattern0,overlay,1603,0,0,0
+  animation503356.interval,bind
+  animation503356.pattern0,overlay,1604,0,0,0
+  animation503357.interval,bind
+  animation503357.pattern0,overlay,1605,0,0,0
+  animation503358.interval,bind
+  animation503358.pattern0,overlay,1606,0,0,0
+  animation503359.interval,bind
+  animation503359.pattern0,overlay,1607,0,0,0
+  animation503360.interval,bind
+  animation503360.pattern0,overlay,1608,0,0,0
+  animation503361.interval,bind
+  animation503361.pattern0,overlay,1609,0,0,0
   //手animation5099999
 
 }
