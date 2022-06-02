@@ -24,9 +24,7 @@ OnDebugKeyPress
 
       FWRITE(_file,"変数リスト:")
       _var_list = GETVARLIST
-      foreach _var_list; _func
-
-      {
+      foreach _var_list; _func {
         FWRITE(_file, _var)
       }
 
@@ -34,9 +32,7 @@ OnDebugKeyPress
 
       FWRITE(_file,"関数リスト:")
       _func_list = GETFUNCLIST
-      foreach _func_list; _func
-
-      {
+      foreach _func_list; _func {
         FWRITE(_file, _func)
       }
 
@@ -44,7 +40,7 @@ OnDebugKeyPress
       "デバッグ情報をファイルに出力"
     }
     when "n" {
-      OnEvent1_1
+      イベント回想メニュー
     }
   }
 }
