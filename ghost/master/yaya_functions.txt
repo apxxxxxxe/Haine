@@ -11,7 +11,7 @@ InitializeVariable
   --
   lastresponce = systemuptime
   touch_count = 0
-  last_touch_part = ""
+  last_touch_part = ''
   first_touch = 0
   isKeyBlocked = 0
 }
@@ -19,16 +19,16 @@ InitializeVariable
 //\1バルーンを\0サーフェスに追従させる
 MakeKeroBalloownFollow
 {
-  "\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]"
+  '\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]'
 }
 
 PosOffset
 {
   _offset = balloon_rows
-  if balloon_name == "霧の郊外にて" {
+  if balloon_name == '霧の郊外にて' {
     _offset += 1
   }
-  _offset += "em"
+  _offset += 'em'
   _offset
 }
 
@@ -41,27 +41,27 @@ GetTimeSlot
     when 22,23,0,1,2,3
 
     {
-      "深夜"
+      '深夜'
     }
     when 4,5,6,7,8,9,10,11
 
     {
-      "朝"
+      '朝'
     }
     when 12,13
 
     {
-      "昼"
+      '昼'
     }
     when 14,15,16,17
 
     {
-      "日中"
+      '日中'
     }
     when 18,19,20,21
 
     {
-      "夜"
+      '夜'
     }
   }
 }
@@ -75,22 +75,22 @@ GetProperties
   GetShellInfo
   --
   // GetShellInfo後に処理する必要があるのでembedで呼ぶ
-  "\![embed,OnGetShellListInfo]"
+  '\![embed,OnGetShellListInfo]'
 }
 
 GetGhostInfo
 {
-  "\![get,property,OnGetGhostInfo,currentghost.sakuraname]"
+  '\![get,property,OnGetGhostInfo,currentghost.sakuraname]'
 }
 
 GetBalloonInfo
 {
-  "\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth,currentghost.balloon.scope(0).char_width]"
+  '\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth,currentghost.balloon.scope(0).char_width]'
 }
 
 GetShellInfo
 {
-  "\![get,property,OnGetShellInfo,currentghost.shelllist.current.name,currentghost.shelllist.count]"
+  '\![get,property,OnGetShellInfo,currentghost.shelllist.current.name,currentghost.shelllist.count]'
 }
 
 OnGetGhostInfo
@@ -109,12 +109,12 @@ OnGetBalloonInfo
   balloon_name = reference[0]
   balloon_rows = reference[1]
 
-  ERASEVAR("forced_balloon_cols")
+  ERASEVAR('forced_balloon_cols')
   case balloon_name {
-    when "霧の郊外にて" {
+    when '霧の郊外にて' {
       balloon_cols = 24
     }
-    when "SSPデフォルト+" {
+    when 'SSPデフォルト+' {
       balloon_cols = 24
     }
     others
@@ -135,11 +135,11 @@ OnGetShellInfo
 
 OnGetShellListInfo
 {
-  _cmd = "\![get,property,OnGetShellListInfoAfter,"
+  _cmd = '\![get,property,OnGetShellListInfoAfter,'
   for _i = 0; _i < shell_count; _i++ {
-    _cmd += "currentghost.shelllist.index(" + _i + ").name"
+    _cmd += 'currentghost.shelllist.index(' + _i + ').name'
   }
-  _cmd += "]"
+  _cmd += ']'
 
   _cmd
 }
@@ -205,51 +205,51 @@ OnSurfaceComplete
 
 SetBalloonSurfaceSakura
 {
-  "\0"
+  '\0'
   --
   case _argv[0] {
-    when "large" {
-      "\b[2]"
+    when 'large' {
+      '\b[2]'
     }
-    when "garden" {
-      "\b[4]"
+    when 'garden' {
+      '\b[4]'
     }
-    when "library" {
-      "\b[6]"
+    when 'library' {
+      '\b[6]'
     }
-    when "plain" {
-      "\b[8]"
+    when 'plain' {
+      '\b[8]'
     }
     others
     {
-      "\b[0]"
+      '\b[0]'
     }
   }
 }
 
 SetBalloonSurfaceKero
 {
-  "\1"
+  '\1'
   --
   case _argv[0] {
-    when "living" {
-      "\b[2]"
+    when 'living' {
+      '\b[2]'
     }
-    when "large" {
-      "\b[4]"
+    when 'large' {
+      '\b[4]'
     }
-    when "garden" {
-      "\b[6]"
+    when 'garden' {
+      '\b[6]'
     }
-    when "library" {
-      "\b[8]"
+    when 'library' {
+      '\b[8]'
     }
-    when "plain" {
-      "\b[10]"
+    when 'plain' {
+      '\b[10]'
     }
     others
     {
-      "\b[0]"
+      '\b[0]'
     }
   }
 }
@@ -275,33 +275,33 @@ ICON
   "\f[cursorstyle,none]\f[height,%(_fontsize)]\f[name,icomoon.ttf]\_u[0x"
   --
   case _argv[0] {
-    when "stopwatch" {
-      "e900"
+    when 'stopwatch' {
+      'e900'
     }
-    when "undo" {
-      "e901"
+    when 'undo' {
+      'e901'
     }
-    when "cog" {
-      "e902"
+    when 'cog' {
+      'e902'
     }
-    when "cross" {
-      "e903"
+    when 'cross' {
+      'e903'
     }
-    when "arrow-right" {
-      "e904"
+    when 'arrow-right' {
+      'e904'
     }
-    when "arrow-left" {
-      "e905"
+    when 'arrow-left' {
+      'e905'
     }
-    when "bubble" {
-      "e906"
+    when 'bubble' {
+      'e906'
     }
-    when "info" {
-      "e907"
+    when 'info' {
+      'e907'
     }
   }
   --
-  "]\f[default]"
+  ']\f[default]'
 }
 
 //自動改行(特定の品詞の単語の直後に改行するようにする。kisaragiが必要)
@@ -310,16 +310,16 @@ InsertLineFeed
   // _argv[0]: 改行を入れたい文字列
   _text = SurfaceSnippet(_argv[0])
   // 返り値
-  _result = ""
+  _result = ''
   // 直前・直後に改行を入れる品詞と単語を列挙
-  _htarget_pre = "名詞-一般"
-  _target_pre = "こと, もの, いる, みる, もらう, くれる, ほしい, おく, くる, とき, ない"
-  _htarget_post = "感動詞, 記号-一般, 記号-読点, 記号-句点, 助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-格助詞-連語, 助詞-係助詞, 助詞-終助詞, 助詞-接続助詞, 助詞-特殊, 助詞-副詞化, 助詞-副助詞, 助詞-並立助詞"
-  _target_post = "この, その, あの, どの"
+  _htarget_pre = '名詞-一般'
+  _target_pre = 'こと, もの, いる, みる, もらう, くれる, ほしい, おく, くる, とき, ない'
+  _htarget_post = '感動詞, 記号-一般, 記号-読点, 記号-句点, 助詞-格助詞-一般, 助詞-格助詞-引用, 助詞-格助詞-連語, 助詞-係助詞, 助詞-終助詞, 助詞-接続助詞, 助詞-特殊, 助詞-副詞化, 助詞-副助詞, 助詞-並立助詞'
+  _target_post = 'この, その, あの, どの'
 
   // バルーンⅠ行あたりの文字数
   _max = 0
-  if ISVAR("forced_balloon_cols") {
+  if ISVAR('forced_balloon_cols') {
     _max = forced_balloon_cols
   }
   else {
@@ -333,11 +333,11 @@ InsertLineFeed
   _scope = 0
 
   // 元の文字列を改行で区切って各々処理する
-  _lines = SPLIT(_text, "\n")
+  _lines = SPLIT(_text, '\n')
   for _i=0; _i<ARRAYSIZE(_lines); _i++ {
     _line = _lines[_i]
-    _wordcount = (IARRAY, 0)
-    _tmpwordcount = (IARRAY, 0)
+    _wordcount = (0, 0)
+    _tmpwordcount = (0, 0)
 
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
     _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
@@ -345,14 +345,14 @@ InsertLineFeed
     _tags = RE_GETSTR
 
     // 文末の全角・半角スペースは無駄なので消去
-    _l = RE_REPLACE(_l, "[ 　]" + _tagmark + "*$", "")
+    _l = RE_REPLACE(_l, '[ 　]' + _tagmark + '*$', '')
     // 文全体の長さ
     _linelen = STRLEN(_l) - ARRAYSIZE(_tags)
     // さくらスクリプトを取り出す際のインデックス
     _tagcount = 0
 
     // 単語に分割する。_rankは単語の総数
-    _rank = FUNCTIONEX("SAORI\kisaragi\kisaragi.dll", "parse", _l)
+    _rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _l)
 
     for _j=0; _j<_rank-1; _j++ {
       // 最後の単語はEOSなのでrank-1でよい
@@ -368,10 +368,10 @@ InsertLineFeed
         // 含まれている場合、検出した数だけリストから取り出す
         for _k=0; _k<_tagmarkcount; _k++ {
           _tag = _tags[_tagcount]
-          if RE_GREP(_tag, "\\[0-9][^w]?") {
-            _scope = TOINT(REPLACE(RE_GETSTR()[0],"\",""))
+          if RE_GREP(_tag, '\\[0-9][^w]?') {
+            _scope = TOINT(REPLACE(RE_GETSTR()[0],'\',''))
           }
-          if "\_l[0" _in_ _tag || "\x" _in_ _tag || "\c" _in_ _tag {
+          if '\_l[0' _in_ _tag || '\x' _in_ _tag || '\c' _in_ _tag {
             _wordcount[_scope] = 0
           }
           _result += _tag
@@ -394,7 +394,7 @@ InsertLineFeed
       if _wordcount[_scope] > _max {
         // 次の行に渡りそうなとき、最後に該当した文節部分で改行する
         if _kaigyoumark _in_ _result {
-          _result = REPLACE(_result, _kaigyoumark, "\n")
+          _result = REPLACE(_result, _kaigyoumark, '\n')
           _wordcount[_scope] -= _tmpwordcount[_scope]
         }
         else {
@@ -407,8 +407,8 @@ InsertLineFeed
         _next_hinshi _in_ _htarget_pre && ! _current_hinshi _in_ _htarget_pre || /
         _current_word _in_ _target_post
         {
-          // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
-          _result = REPLACE(_result, _kaigyoumark, "")
+          // 改行候補になる文節に目印(_kaigyoumark)をつけておく
+          _result = REPLACE(_result, _kaigyoumark, '')
           _result += _kaigyoumark
           _tmpwordcount[_scope] = _wordcount[_scope]
         }
@@ -416,7 +416,7 @@ InsertLineFeed
 
     // 元の文字列で改行されている位置に改行を挿入
     if _i < ARRAYSIZE(_lines)-1 {
-      _result += "\n"
+      _result += '\n'
     }
   }
   _result
@@ -424,13 +424,13 @@ InsertLineFeed
 
 SurfaceSnippet
 {
-  RE_REPLACEEX(_argv[0], "h([0-9]{6})", "\\0\\![embed,OnSurfaceComplete,$1]")
+  RE_REPLACEEX(_argv[0], 'h([0-9]{6})', '\\0\\![embed,OnSurfaceComplete,$1]')
 }
 
 IsUnderLine
 {
   if ! _argv[0] {
-    "\f[strike,true]"
+    '\f[strike,true]'
   }
 }
 
@@ -438,45 +438,45 @@ OnTalkTopic
 {
   _topicname = reference[0]
   if EVAL(_topicname) == 1 {
-    EVAL(_topicname + "= 0")
+    EVAL(_topicname + '= 0')
   }
   else {
-    EVAL(_topicname + "= 1")
+    EVAL(_topicname + '= 1')
   }
-  "\C\c\![raise,OnTalkSettingMenu]"
+  '\C\c\![raise,OnTalkSettingMenu]'
 }
 
 ShowTopic
 {
-  "\_l[0," + PosOffset + "]\f[height,11]\f[align,right]\![quicksection,true]"
+  '\_l[0,' + PosOffset + ']\f[height,11]\f[align,right]\![quicksection,true]'
   --
   case _argv[0] {
-    when "plants" {
-      "植物の話題"
+    when 'plants' {
+      '植物の話題'
     }
-    when "aroma" {
-      "アロマの話題"
+    when 'aroma' {
+      'アロマの話題'
     }
-    when "horrow" {
-      "暗いフォークロア"
+    when 'horrow' {
+      '暗いフォークロア'
     }
     others
     {
-      "日常の話題"
+      '日常の話題'
     }
   }
   --
-  "\![quicksection,false]\_l[0,0]\f[default]"
+  '\![quicksection,false]\_l[0,0]\f[default]'
 }
 
 FogHighlight
 {
-  _color = "160,192,192"
-  "\f[color," + _color + "]"
+  _color = '160,192,192'
+  '\f[color,' + _color + ']'
   --
   _argv[0]
   --
-  "\f[color,default]"
+  '\f[color,default]'
 }
 
 UserRating
@@ -485,13 +485,13 @@ UserRating
 
   _s = user_honesty
   if _s > 10 {
-    "やさしいのね"
+    'やさしいのね'
   }
   elseif _s < -10 {
-    "欲望に忠実ね"
+    '欲望に忠実ね'
   }
   else {
-    "久しぶりの客人"
+    '久しぶりの客人'
   }
 }
 
@@ -507,8 +507,8 @@ UpdateUserRating
 
 OnWindowStateRestore
 {
-  "h100000h111109\_w[500]h111101"
-  "h100000h111109\_w[500]h111103"
-  "h100000h111105\_w[500]h111101"
+  'h100000h111109\_w[500]h111101'
+  'h100000h111109\_w[500]h111103'
+  'h100000h111105\_w[500]h111101'
 }
 

@@ -2,12 +2,12 @@
 OnDebugKeyPress 
 {
   case _argv[0] {
-    when "q" {
+    when 'q' {
       SetBalloonSurfaceSakura
       --
       '\![raise,OnEvent1]'
     }
-    when "a" {
+    when 'a' {
       SetBalloonSurfaceSakura
       --
       _text = lasttalk
@@ -18,28 +18,28 @@ OnDebugKeyPress
       }
       _result
     }
-    when "s" {
-      _file = "../debuginfo.txt"
-      FOPEN(_file,"w")
+    when 's' {
+      _file = '../debuginfo.txt'
+      FOPEN(_file,'w')
 
-      FWRITE(_file,"変数リスト:")
+      FWRITE(_file,'変数リスト:')
       _var_list = GETVARLIST
       foreach _var_list; _func {
         FWRITE(_file, _var)
       }
 
-      FWRITE(_file,"------------------------------")
+      FWRITE(_file,'------------------------------')
 
-      FWRITE(_file,"関数リスト:")
+      FWRITE(_file,'関数リスト:')
       _func_list = GETFUNCLIST
       foreach _func_list; _func {
         FWRITE(_file, _func)
       }
 
       FCLOSE(_file)
-      "デバッグ情報をファイルに出力"
+      'デバッグ情報をファイルに出力'
     }
-    when "n" {
+    when 'n' {
       イベント回想メニュー
     }
   }
