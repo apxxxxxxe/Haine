@@ -330,13 +330,14 @@ InsertLineFeed
   _tagmark = CHR(28)
   _kaigyoumark = CHR(29)
 
+  _scope = 0
+
   // 元の文字列を改行で区切って各々処理する
   _lines = SPLIT(_text, "\n")
   for _i=0; _i<ARRAYSIZE(_lines); _i++ {
     _line = _lines[_i]
-    _linewordcount = 0
-    _wordcount = 0
-    _tmpwordcount = 0
+    _wordcount = (IARRAY, 0)
+    _tmpwordcount = (IARRAY, 0)
 
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
     _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
@@ -367,8 +368,11 @@ InsertLineFeed
         // 含まれている場合、検出した数だけリストから取り出す
         for _k=0; _k<_tagmarkcount; _k++ {
           _tag = _tags[_tagcount]
+          if RE_GREP(_tag, "\\[0-9][^w]?") {
+            _scope = TOINT(REPLACE(RE_GETSTR()[0],"\",""))
+          }
           if "\_l[0" _in_ _tag || "\x" _in_ _tag || "\c" _in_ _tag {
-            _wordcount = 0
+            _wordcount[_scope] = 0
           }
           _result += _tag
           _tagcount++
@@ -377,8 +381,7 @@ InsertLineFeed
       else {
         // 通常の単語なら、_resultに追加して文字カウント
         _result += _word
-        _wordcount += STRLEN(_word)
-        _linewordcount += STRLEN(_word)
+        _wordcount[_scope] += STRLEN(_word)
       }
 
       // 品詞と単語を取り出して判定の準備
@@ -388,14 +391,14 @@ InsertLineFeed
       _next_word = valueex[_j+1][0, CHR(9)]
 
       // 実際に改行を挿入する処理
-      if _wordcount > _max {
+      if _wordcount[_scope] > _max {
         // 次の行に渡りそうなとき、最後に該当した文節部分で改行する
         if _kaigyoumark _in_ _result {
           _result = REPLACE(_result, _kaigyoumark, "\n")
-          _wordcount -= _tmpwordcount
+          _wordcount[_scope] -= _tmpwordcount[_scope]
         }
         else {
-          _wordcount %= _max
+          _wordcount[_scope] %= _max
         }
       }
       elseif /
@@ -407,7 +410,7 @@ InsertLineFeed
           // まだ行に余裕があるなら、改行候補になる文節に目印(_kaigyoumark)をつけておく
           _result = REPLACE(_result, _kaigyoumark, "")
           _result += _kaigyoumark
-          _tmpwordcount = _wordcount
+          _tmpwordcount[_scope] = _wordcount[_scope]
         }
     }
 
