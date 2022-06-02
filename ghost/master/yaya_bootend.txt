@@ -34,11 +34,23 @@ OnBoot
   SetBalloonSurfaceSakura
   --
   if !isEvent1End {
-    OnEvent1_1
+    "\![raise,OnEvent1_1]"
   }
   else {
+    if TalkTopicHorrow {
+      InsertLineFeed(Dead)
+    }
     InsertLineFeed(Hello)
   }
+}
+
+Dead
+{
+  _c = "φ、\_w[800]"
+  _p = "φ。\_w[1200]"
+
+  "\0\s[411101]……。\1ドアを開けると、ハイネが首を吊っていた%(_p)\n\0\n\nぶちっ。\1縄が切れ、彼女の体が鈍い音を立てて床に落ちる%(_p)\0\n\n……げほっ、けふっ。\n……h111104ああ、%(username)。h111204いらっしゃい。"
+  "\0\s[411101]……。\1ドアを開けると、ハイネが倒れていた%(_p)\nぱっくりと裂けた首元を中心に、大きな血溜まりができている%(_p)\n\0\n\nしゅわ、しゅわ。\1見る間に血が蒸発し、" + FogHighlight("霧") + "へと変わっていく%(_p)\n首の傷は、時が巻き戻るようにふさがった%(_p)\0\n\n……はぁ。\n……h111104ああ、%(username)。h111204いらっしゃい。"
 }
 
 Hello
@@ -68,6 +80,8 @@ OnClose
   SetBalloonSurfaceSakura
   --
   InsertLineFeed(Bye)
+  --
+  "\-"
 }
 
 Bye
@@ -90,4 +104,7 @@ Bye
   }
 }
 
-
+OnNotifyDressupInfo
+{
+  dressupInfo_ary = reference
+}
