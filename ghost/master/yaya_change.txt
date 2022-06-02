@@ -42,20 +42,19 @@ OnGhostChanged_Emily
 {
 "\0\s[0]エミリさんから交代してきました。\w5\1よろしくな。"
 }
-
+*/
 
 //その他のゴーストへ切り替え
 OnGhostChangingOther
 {
-OnClose
+  OnClose
 }
 
 //その他のゴーストから切り替り
 OnGhostChangedOther
 {
-OnBoot
+  OnBoot
 }
-*/
 
 //******************************************************************************
 //この下は切り替えトーク処理用
@@ -89,22 +88,22 @@ OnGhostCalled
 
 OnGhostCallComplete
 {
-  AYATEMPLATE.ExecuteChangeCallTalk("OnGhostCallComplete")
+  // AYATEMPLATE.ExecuteChangeCallTalk("OnGhostCallComplete")
 }
 
 OnOtherGhostClosed
 {
-  AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostClosed")
+  // AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostClosed")
 }
 
 OnOtherGhostBooted
 {
-  AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostBooted")
+  // AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostBooted")
 }
 
 OnOtherGhostChanged
 {
-  AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostChanged")
+  // AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostChanged")
 }
 
 // スリープ・休止状態から復帰
