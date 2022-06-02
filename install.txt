@@ -3,3 +3,5 @@ type,ghost
 name,郊外通りのハイネ
 directory,Haine
 balloon.directory,kirinokougai
+
+robots,noindex
