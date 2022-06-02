@@ -180,11 +180,11 @@ OnMouseEvent
 {
   "\![timerraise,30000,1,OnTouchCountReset,reset]"
   --
-  InsertLineFeed(SetBalloonSurfaceSakura + CanselLookAt + NextTouchTalk)
-}
-
-CommonEventMousePost
-{
+  SetBalloonSurfaceSakura
+  --
+  CanselLookAt
+  --
+  InsertLineFeed(NextTouchTalk)
 }
 
 OnTouchCountReset
@@ -195,11 +195,7 @@ OnTouchCountReset
 
 OnMouseMove
 {
-  NextTouchTalk = AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
-  if NextTouchTalk != "" {
-    CommonEventMousePre
-    "\![raise,OnMouseEvent]"
-  }
+  AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
 }
 
 OnMouseDoubleClick
@@ -271,7 +267,6 @@ AYATEMPLATE.MouseEventExec
   _fname = _argv[0] + TOSTR(reference[3]) + TOSTR(reference[4])
   if ISFUNC(_fname) {
     TouchCount(reference[4]) // 追加
-    lastmouseevent = _fname
     EVAL(_fname)
     return
   }
@@ -279,7 +274,6 @@ AYATEMPLATE.MouseEventExec
   _fname = _argv[0] + TOSTR(reference[3])
   if ISFUNC(_fname) {
     TouchCount(reference[4]) // 追加
-    lastmouseevent = _fname
     EVAL(_fname)
     return
   }
@@ -304,8 +298,14 @@ AYATEMPLATE.MouseMoveWheelFunc
 
     if _stroke >= _argv[1] {
       if 'talking' !_in_ status {
-        AYATEMPLATE.MouseEventExec(_argv[2]);
         AYATEMPLATE.stroke[_side] = 1
+        // ↓追加・変更
+        NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
+        if NextTouchTalk != "" {
+          CommonEventMousePre
+          "\![raise,OnMouseEvent]"
+        }
+        // ↑追加・変更ここまで
       }
     }
   }
