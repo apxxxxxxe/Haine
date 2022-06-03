@@ -327,7 +327,7 @@ InsertLineFeed
   // 返り値
   _result = ''
   // 直前・直後に改行を入れる品詞と単語を列挙
-  _htarget_pre = '名詞-一般'
+  _htarget_pre = '名詞-一般, 記号-括弧開'
   _target_pre = 'こと, もの, いる, みる, もらう, くれる, ほしい, おく, くる, とき, ない'
   _htarget_post = '/
   感動詞, /
