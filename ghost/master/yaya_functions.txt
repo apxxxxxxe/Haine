@@ -63,29 +63,19 @@ PosOffset
 GetTimeSlot
 {
   case hour {
-    when 22,23,0,1,2,3
-
-    {
+    when 22,23,0,1,2,3 {
       '深夜'
     }
-    when 4,5,6,7,8,9,10,11
-
-    {
+    when 4,5,6,7,8,9,10,11 {
       '朝'
     }
-    when 12,13
-
-    {
+    when 12,13 {
       '昼'
     }
-    when 14,15,16,17
-
-    {
+    when 14,15,16,17 {
       '日中'
     }
-    when 18,19,20,21
-
-    {
+    when 18,19,20,21 {
       '夜'
     }
   }
@@ -361,8 +351,14 @@ InsertLineFeed
   _lines = SPLIT(_text, '\n')
   for _i=0; _i<ARRAYSIZE(_lines); _i++ {
     _line = _lines[_i]
-    _wordcount = (0, 0)
-    _tmpwordcount = (0, 0)
+
+    // _wordcountと_tmpwordcountはスコープの数だけ要る とりあえず10確保
+    _ary = IARRAY
+    for _j=0; _j<10; _j++ {
+      _ary = (_ary, 0)
+    }
+    _wordcount = _ary
+    _tmpwordcount = _ary
 
     // 文字カウントに支障をきたすのでさくらスクリプトを目印用文字列に置換
     _l = RE_REPLACE(_line, '\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
@@ -372,7 +368,7 @@ InsertLineFeed
     // 文末の全角・半角スペースは無駄なので消去
     _l = RE_REPLACE(_l, '[ 　]' + _tagmark + '*$', '')
     // 文全体の長さ
-    _linelen = STRLEN(_l) - ARRAYSIZE(_tags)
+    _linelen = STRLEN(_l) - (ARRAYSIZE(_tags) * STRLEN(_tagmark))
     // さくらスクリプトを取り出す際のインデックス
     _tagcount = 0
 
@@ -382,23 +378,26 @@ InsertLineFeed
     for _j=0; _j<_rank-1; _j++ {
       // 最後の単語はEOSなのでrank-1でよい
 
-      // _wordに単語を取り出す
+      // _wordに平文の単語を取り出す
       _word = valueex[_j][0, CHR(9)]
 
       // _wordに_tagmark(さくらスクリプト)が含まれているかチェック
-      // 通常の単語に含まれていること（例: りんご_tagmark）はなく、
-      // _tagmark自体が連続して１単語とされることがある(例: _tagmark_tagmark)
       _tagmarkcount = RE_GREP(_word, _tagmark)
       if _tagmarkcount {
-        // 含まれている場合、検出した数だけリストから取り出す
+        // 含まれている場合、検出した数だけリストから取り出して_tagmarkの位置に挿入
         for _k=0; _k<_tagmarkcount; _k++ {
           _tag = _tags[_tagcount]
-          if RE_GREP(_tag, '\\[0-9][^w]?') {
-            _scope = TOINT(REPLACE(RE_GETSTR()[0],'\',''))
+
+          // タグがスコープ変更(\0,\1,\p[2],...)なら、そのスコープを_scope変数に代入
+          if RE_GREP(_tag, '\\[01][^w]?') || RE_GREP(_tag, '\\p\[\d+\]') {
+            _scope = TOINT(RE_REPLACE(RE_GETSTR()[0], '[^\d]', ''))
           }
+
+          // カーソルを先頭に戻すタグなら文字カウントを0に
           if '\_l[0' _in_ _tag || '\x' _in_ _tag || '\c' _in_ _tag {
             _wordcount[_scope] = 0
           }
+
           _result += _tag
           _tagcount++
         }
