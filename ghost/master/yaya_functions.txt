@@ -2,6 +2,17 @@
 //関数辞書
 //******************************************************************************
 
+// 初期化関数
+// 変数が存在しない場合のみ代入する
+InitVar
+{
+  _var_name = _argv[0]
+  _value = _argv[1]
+  if !ISVAR(_var_name) {
+    EVAL(_var_name + "=" + _value)
+  }
+}
+
 //初期化処理 起動毎に呼び出される
 InitializeVariable
 {
@@ -9,6 +20,20 @@ InitializeVariable
   --
   MakeKeroBalloownFollow
   --
+
+  //---- 変数の初期化(初回起動時のみ設定)
+  InitVar('username', 'ユーザ')
+  InitVar('teachusername', 0)
+  InitVar('IsJihouActive', '有効')
+  InitVar('circadian_rhythm', '設定しない')
+  InitVar('isdebug', 0)
+  InitVar('good_touch_count', 0)
+  InitVar('bad_touch_count', 0)
+  InitVar('total_talk_count', 0)
+  InitVar('uwanosora_minute', 5)
+  InitVar('hasSuicideInfo', 0)
+
+  //---- 変数の初期化(起動毎に設定)
   lastresponce = systemuptime
   touch_count = 0
   last_touch_part = ''

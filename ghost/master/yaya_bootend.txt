@@ -3,26 +3,7 @@
 // 起動/終了トーク辞書
 //******************************************************************************
 
-//******************************************************************************
-//初回起動 OnFirstBoot
-//******************************************************************************
-
-OnFirstBoot
-{
-  //---- 変数の初期化
-  username         = "ユーザ"
-  teachusername    = 0
-  IsJihouActive = '有効'
-  circadian_rhythm = '設定しない'
-  isdebug = 0
-  good_touch_count = 0
-  bad_touch_count = 0
-  total_talk_count = 0
-  uwanosora_minute = 5
-
-  OnBoot
-}
-
+// OnFirstBootは省略: 初回起動トークはOnBoot内,フラグ変数で管理
 
 //******************************************************************************
 //通常の起動 OnBoot
@@ -37,7 +18,7 @@ OnBoot
     "\![raise,OnEvent1_1]"
   }
   else {
-    if TalkTopicHorrow {
+    if hasSuicideInfo {
       InsertLineFeed(Dead)
     }
     InsertLineFeed(Hello)
