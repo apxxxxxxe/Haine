@@ -97,7 +97,7 @@ else {
     --
     "\C\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
     --
-    EVAL(reference[0])
+    InsertLineFeed(EVAL(reference[0]))
   }
 }
 }
