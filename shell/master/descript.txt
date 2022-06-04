@@ -30,7 +30,7 @@ sakura.bindgroup506510.name,頭,モノクル
 sakura.bindgroup506511.name,頭,モノクル
 
 sakura.bindoption.group,後髪,mustselect
-sakura.bindgroup500100.name,後髪,A
+sakura.bindgroup500100.name,後髪,デフォルト
 sakura.bindgroup500102.name,後髪,B
 sakura.bindgroup500107.name,後髪,C
 sakura.bindgroup500109.name,後髪,D
@@ -41,7 +41,7 @@ sakura.bindgroup500106.name,後髪,H
 sakura.bindgroup500100.default,1
 
 sakura.bindoption.group,前髪,mustselect
-sakura.bindgroup506702.name,前髪,A
+sakura.bindgroup506702.name,前髪,デフォルト
 sakura.bindgroup506706.name,前髪,B
 sakura.bindgroup506700.name,前髪,C
 sakura.bindgroup506701.name,前髪,D
@@ -64,6 +64,8 @@ sakura.bindgroup506790.name,横髪,横髪A
 sakura.bindgroup506791.name,横髪,横髪B
 sakura.bindgroup506792.name,横髪,横髪C
 sakura.bindgroup506790.default,1
+sakura.bindgroup506791.default,1
+sakura.bindgroup506792.default,1
 
 sakura.bindoption.group,トップス
 sakura.bindgroup502362.name,トップス,ワンピース白
@@ -73,7 +75,7 @@ sakura.bindgroup502364.name,トップス,ブラウス白B
 sakura.bindgroup502361.name,トップス,ブラウス黒A
 sakura.bindgroup502366.name,トップス,ブラウス黒B
 sakura.bindgroup502368.name,トップス,パフワンピース黒
-sakura.bindgroup502363.default,1
+sakura.bindgroup502361.default,1
 
 sakura.bindoption.group,トップス+,multiple
 sakura.bindgroup506300.name,トップス+,襟A
@@ -92,9 +94,8 @@ sakura.bindgroup506312.name,トップス+,リボン大黒
 sakura.bindgroup506313.name,トップス+,リボン大白
 sakura.bindgroup504417.name,トップス+,スカート装飾黒
 sakura.bindgroup504418.name,トップス+,スカート装飾白
-
-
 sakura.bindgroup506304.default,1
+sakura.bindgroup504510.default,1
 
 sakura.bindoption.group,袖
 sakura.bindgroup505310.name,袖,袖白
@@ -116,6 +117,7 @@ sakura.bindgroup504372.name,ボトムス,フリル黒
 sakura.bindgroup504373.name,ボトムス,フレア白
 sakura.bindgroup504374.name,ボトムス,ショートパンツ
 sakura.bindgroup504375.name,ボトムス,スラックス
+sakura.bindgroup504371.default,1
 
 sakura.bindoption.group,靴下
 sakura.bindgroup501380.name,靴下,ハイソ白
