@@ -161,10 +161,16 @@ surface113101-113109,113201-113209,113301-113309,113401-113409,123101-123109,123
   animation505315.pattern0,overlay,1405,0,0,0
   animation505316.interval,bind
   animation505316.pattern0,overlay,1406,0,0,0
+
   animation505318.interval,bind
-  animation505318.pattern0,overlay,1408,0,0,0
+  animation505318.pattern0,overlay,3408,0,0,0
+  animation595318.interval,bind
+  animation595318.pattern0,overlay,3508,0,0,0
+
   animation505319.interval,bind
-  animation505319.pattern0,overlay,1409,0,0,0
+  animation505319.pattern0,overlay,3409,0,0,0
+  animation595319.interval,bind
+  animation595319.pattern0,overlay,3509,0,0,0
 
   collisionex13,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
   collisionex14,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
