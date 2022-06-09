@@ -489,9 +489,12 @@ ShowTopic
     when 'horrow' {
       '暗いフォークロア'
     }
+    when 'life' {
+      '日常の話題'
+    }
     others
     {
-      '日常の話題'
+      _argv[0]
     }
   }
   --
