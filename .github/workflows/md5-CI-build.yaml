@@ -5,15 +5,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  check:
     if: ${{ !startsWith(github.ref, 'refs/tags/') }}
     runs-on: windows-latest
     steps:
-    - name: disable auto crlf
-      uses: steve02081504/disable-autocrlf@v1
-    - name: checkout
-      uses: actions/checkout@v2
-    - name: updates build
-      uses: Taromati2/ukagaka-mirror-md5-CI-build@v1
-      with:
-        build-mode: other
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: shiori-check
+        uses: Taromati2/yaya-CI-check@v1
+        with:
+          shiori-path: .\ghost\master\yaya.dll
+  build:
+    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    runs-on: windows-latest
+    needs: check
+    steps:
+      - name: disable auto crlf
+        uses: steve02081504/disable-autocrlf@v1
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: updates build
+        uses: Taromati2/ukagaka-mirror-md5-CI-build@v1
+        with:
+          build-mode: other
