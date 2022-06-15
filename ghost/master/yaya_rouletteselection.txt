@@ -1,0 +1,117 @@
+// ルーレット選択関数
+// arrayとして定義されたトーク群からルーレット選択する。
+// 各トークに重みづけをし、判定のたびに選ばれたトークの重みはリセット、残りは重み+1する。
+// より自然かつ万遍ないトークができたらいいな
+
+roulette.exec
+{
+  _name = _argv[0]
+
+  roulette.getcumsum(_name)
+
+  _totalweight = EVAL(_name+'.totalweight')
+  _cumsum = EVAL(_name+'.cumsum')
+
+  _index = roulette.binsearch(_name)
+
+  --
+  amam
+  --
+
+  // 選ばれなかったトークの重みを増やす
+  EVAL(_name+'.weights += 3')
+
+  // 選ばれなかったトークの重みを1に
+  EVAL(_name+'.weights['+_index+'] = 1')
+
+  _e = ''
+  if index == -1 {
+    _e = 'ランダムトーク処理時にエラーが発生しました'
+  }
+  elseif _index > ARRAYSIZE(EVAL(_name)) {
+    _e = '異常なインデックス:' + _index + '\n'
+  }
+  _e + _index + EVAL(_name+'['+_index+']')
+}
+
+roulette.getcumsum
+{
+  _name = _argv[0]
+
+  _willreset = 0
+
+  if ISVAR(_name+'.count') {
+    if EVAL(_name+'.count') != ARRAYSIZE(EVAL(_name)) {
+      // _nameの要素数に変化があったとき
+      _willreset = 1
+    }
+  }
+  else {
+    // _nameにおける初回
+    _willreset = 1
+  }
+
+  _weights = IARRAY
+  if ISVAR(_name+'.weights') {
+    _weights = IARRAY
+    _weights = EVAL(_name+'.weights')
+  } else {
+    // _nameにおける初回
+    _willreset = 1
+  }
+
+  if _willreset {
+    // _nameにおける変数の初期化処理
+    _weights = IARRAY
+    for _i=0; _i<ARRAYSIZE(EVAL(_name)); _i++ {
+      _weights = (_weights, 1)
+    }
+    LETTONAME(_name+'.weights', _weights)
+    LETTONAME(_name+'.count', ARRAYSIZE(EVAL(_name)))
+  }
+
+  _cumsum = (IARRAY, 0)
+  for _i=0; _i<ARRAYSIZE(_weights); _i++ {
+    _cumsum = (_cumsum, _cumsum[_i]+_weights[_i])
+  }
+
+  LETTONAME(_name+'.totalweight', _cumsum[ARRAYSIZE(_cumsum)-1])
+  LETTONAME(_name+'.cumsum', _cumsum)
+}
+
+roulette.binsearch
+{
+  _name = _argv[0]
+
+  _cumsum = EVAL(_name+'.cumsum')
+  _value = RAND(EVAL(_name+'.totalweight'))
+
+  _low = 0
+  _high = ARRAYSIZE(_cumsum) -1
+
+  if _value <= _cumsum[_low] {
+    0
+    return
+  }
+  elseif _value > _cumsum[_high] {
+    -1
+    return
+  }
+
+  while 1
+  {
+    _i = TOINT((_low+_high)/2)
+
+    if _cumsum[_i] >= _value {
+      _high = _i
+    }
+    else {
+      _low = _i
+    }
+
+    if _high-_low == 1 {
+      _high-1
+      return
+    }
+  }
+}

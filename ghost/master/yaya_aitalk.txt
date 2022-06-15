@@ -6,12 +6,12 @@ RandomTalk
 {
   lastanchor = ""
   lastresponce = systemuptime
-  lasttalk = InsertLineFeed(talks(RAND(100)))
   TalkStatus = "talking"
   total_talk_count++
 
   SetBalloonSurfaceSakura
   --
+  lasttalk = roulette.exec('talks')
   lasttalk
   --
   "\![raise,OnRandomTalkEnd]"
@@ -22,7 +22,7 @@ OnRandomTalkEnd
   TalkStatus = "none"
 }
 
-talks : random_pool
+talks : array
 {
   SetBalloonSurfaceSakura + ShowTopic("特殊な話題") + talk_special
 
@@ -38,7 +38,7 @@ talks : random_pool
 
 }
 
-talk_life : nonoverlap_pool
+talk_life : array
 {
 
   "h111209一人は寂しい……h111206と言いたいところだけど、正直に言うとそれほど苦ではないの。\nh121205一人になってからずいぶん経って、\n大事な人達のことすら、思い返すこと自体が減って……h121209もう顔すらおぼつかない。h111205それでも、思い出は消えないわ。h111209私はそれで、大丈夫。"
@@ -87,7 +87,7 @@ talk_life : nonoverlap_pool
   "h111204身体は平気？違和感があればすぐに言うのよ。\n……h111205未だに妙な気分だわ。またこうやって人と話せるだなんて。\n\nh111209影になった人たちとも話そうとしたけれど、だめね。\nh111206彼らはもう、新しいことができないみたい。"
 }
 
-talk_hollow : nonoverlap_pool
+talk_hollow : array
 {
   "h211209誰もがいつか、冷たい土の中で眠り、停滞するの。永遠、そう、永遠に……。\n穏やかで幸せなのかしら。h111205それとも、文字通り想像を絶する苦しみがあるのかしら。"
   "h111209カエルの足に電流を流す実験。\n生体電気の発見に繋がったといわれるあの現象は、h111205\_a[見世物]死者の蘇りを謳う見世物\_aに利用されたことがあったの。"
@@ -107,7 +107,7 @@ talk_hollow : nonoverlap_pool
 
 }
 
-talk_special
+talk_special : array
 {
   UpdateUserRating
 
