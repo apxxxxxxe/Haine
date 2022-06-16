@@ -6,5 +6,5 @@
 - 内容には大幅な変更が入ることがあります
 - 具体的な進行状況は次リンクから確認できます → [Todo](https://github.com/apxxxxxxe/Haine/projects/1#card-75060855)
 
-## これは何？
-デスクトップマスコット「伺か」ゴースト「Crave The Grave」  
+## 伺かゴースト「Crave The Grave」
+![screenshot](https://github.com/apxxxxxxe/Haine/raw/image/haine.png)
