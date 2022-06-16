@@ -22,7 +22,7 @@ file,ghost/master/system/yaya_compatible.dic1bf4ba4fc5fe991a067fe7ac923ed9b4si
 file,ghost/master/system/yaya_optional.dic3cabdc8072742677af93f8e44b004e05size=9967date=2012-12-21T00:00:00
 file,ghost/master/system/yaya_shiori3.dic3762028ca8e4d1dfe0531a684fa7843dsize=52069date=2012-12-21T00:00:00
 file,ghost/master/system_config.txt05002574072b332b7d7c5f769b43d7c3size=896date=2012-12-21T00:00:00
-file,ghost/master/yaya.dll58fc69ef315965ef7328a69476767006size=876544date=2012-12-21T00:00:00
+file,ghost/master/yaya.dll5c438e37e9fa5b97bb16c9b7ed2b25d7size=880640date=2012-12-21T00:00:00
 file,ghost/master/yaya.txt98013406da896072211ad43a598f7468size=2311date=2012-12-21T00:00:00
 file,ghost/master/yaya_aitalk.txt3cd3651c6ae6f8b4ee199357be169176size=21728date=2012-12-21T00:00:00
 file,ghost/master/yaya_bootend.txt587958b4324155b8ff7e67591782676csize=3573date=2012-12-21T00:00:00
@@ -42,7 +42,7 @@ file,ghost/master/yaya_mouse.txta4241f4637d5b8c93c843d2aa1c1517fsize=8690date
 file,ghost/master/yaya_rouletteselection.txtc9e38318c2c88920c90597ffd97d08a8size=2374date=2012-12-21T00:00:00
 file,ghost/master/yaya_string.txt17eef0b57ef0f882431e7edc3249cb57size=4129date=2012-12-21T00:00:00
 file,ghost/master/yaya_timer.txtd546f84155943e14e8490e113773fbe7size=4925date=2012-12-21T00:00:00
-file,ghost/master/yaya_tmpl_util.txt30fba813deb7b4dc9989b59a2b241b93size=8295date=2012-12-21T00:00:00
+file,ghost/master/yaya_tmpl_util.txt534c7d6715180a8704b4ae7dbc0840bdsize=8317date=2012-12-21T00:00:00
 file,ghost/master/yaya_webclap.txt010b6fcc10130300543c196550079feesize=950date=2012-12-21T00:00:00
 file,install.txt154a64af4fa75d4714685036906983f2size=125date=2012-12-21T00:00:00
 file,readme.txtcd2f2f72a13aad831d11eb75701ca6dasize=190date=2012-12-21T00:00:00
