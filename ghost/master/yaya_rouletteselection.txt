@@ -14,24 +14,21 @@ roulette.exec
 
   _index = roulette.binsearch(_name)
 
-  --
-  amam
-  --
-
   // 選ばれなかったトークの重みを増やす
-  EVAL(_name+'.weights += 3')
+  EVAL(_name+'.weights += 10')
 
   // 選ばれなかったトークの重みを1に
   EVAL(_name+'.weights['+_index+'] = 1')
 
-  _e = ''
   if index == -1 {
-    _e = 'ランダムトーク処理時にエラーが発生しました'
+    'error: ランダムトーク処理時にエラーが発生しました'
+    return
   }
   elseif _index > ARRAYSIZE(EVAL(_name)) {
-    _e = '異常なインデックス:' + _index + '\n'
+    'error: 異常なインデックス:' + _index
+    return
   }
-  _e + _index + EVAL(_name+'['+_index+']')
+  EVAL(_name+'['+_index+']')
 }
 
 roulette.getcumsum

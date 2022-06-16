@@ -11,7 +11,7 @@ RandomTalk
 
   SetBalloonSurfaceSakura
   --
-  lasttalk = roulette.exec('talks')
+  lasttalk = InsertLineFeed(roulette.exec('talks'))
   lasttalk
   --
   "\![raise,OnRandomTalkEnd]"

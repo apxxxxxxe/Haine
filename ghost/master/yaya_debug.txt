@@ -42,5 +42,33 @@ OnDebugKeyPress
     when 'n' {
       イベント回想メニュー
     }
+    when 'f' {
+      _name = 'talks'
+      roulette.getcumsum(_name)
+
+      _a = ''
+      _b = EVAL(_name+'.cumsum') 
+      foreach _b; _c {
+        _a += _c + ','
+      }
+      _a + '\n'
+      --
+      '@\n'
+      --
+      _a = ''
+      _b = EVAL(_name+'.weights') 
+      foreach _b; _c {
+        _a += _c + ','
+      }
+      _a + '\n'
+      --
+      '@\n'
+      --
+      EVAL(_name+'.totalweight')  + '\n'
+      --
+      '@\n'
+      --
+      EVAL(_name+'.count')  + '\n'
+    }
   }
 }
