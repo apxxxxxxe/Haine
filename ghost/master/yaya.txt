@@ -31,6 +31,7 @@ dic, yaya_webclap.txt              // Web拍手機能辞書
 dic, yaya_events.txt               // 進行イベント辞書
 dic, yaya_debug.txt                // デバッグ処理辞書
 dic, yaya_dressup.txt              // 着せ替え処理辞書
+dic, yaya_init.txt
 dic, yaya_rouletteselection.txt
 
 

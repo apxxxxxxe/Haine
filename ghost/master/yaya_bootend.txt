@@ -5,12 +5,19 @@
 
 // OnFirstBootは省略: 初回起動トークはOnBoot内,フラグ変数で管理
 
+//ゴーストのロード
+//起動毎の変数の初期化などはここで
+OnGhostLoad
+{
+  InitializeVariable
+}
+
 //******************************************************************************
 //通常の起動 OnBoot
 //******************************************************************************
 OnBoot
 {
-  InitializeVariable
+  InitialScripts
   --
   SetBalloonSurfaceSakura
   --
