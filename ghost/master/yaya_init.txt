@@ -38,6 +38,9 @@ InitializeVariable
   isKeyBlocked = 0
 
   getSuntimes
+
+  // SAORI-basicの入出力をUTF-8で行うように設定
+  FUNCTIONEX('saori\proxy_ex.dll', '/charset', 'UTF-8')
 }
 
 // スクリプトによる初期化処理
@@ -62,10 +65,18 @@ getDate
 getSuntimes
 {
   _suntimes = FUNCTIONEX('saori\proxy_ex.dll', 'sunset.exe', getDate)
+
   _sunrise = _suntimes[0,';']
   sunrisetime = (TOINT(_sunrise[0,',']), TOINT(_sunrise[1,',']), TOINT(_sunrise[2,',']))
+  sunrisetime.hour = TOINT(_sunrise[0,','])
+  sunrisetime.minute = TOINT(_sunrise[1,','])
+  sunrisetime.second = TOINT(_sunrise[2,','])
+
   _sunset = _suntimes[1,';']
   sunsettime = (TOINT(_sunset[0,',']), TOINT(_sunset[1,',']), TOINT(_sunset[2,',']))
+  sunsettime.hour = TOINT(_sunset[0,','])
+  sunsettime.minute = TOINT(_sunset[1,','])
+  sunsettime.second = TOINT(_sunset[2,','])
 }
 
 GetProperties

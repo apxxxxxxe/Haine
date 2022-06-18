@@ -234,6 +234,7 @@ OnMinuteChange
 //---------------------------------------------------------------------------
 OnSecondChange
 {
+  now = (hour, minute, second)
   ghostuptime = systemuptime - ghostboottime
   UpdatePomodoroTimer
 }

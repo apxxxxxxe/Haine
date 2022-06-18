@@ -12,30 +12,6 @@ PosOffset
   _offset
 }
 
-//------------------------------------------------------------------------------
-//朝/昼/夜などをおおざっぱに調べる関数
-//------------------------------------------------------------------------------
-GetTimeSlot
-{
-  case hour {
-    when 22,23,0,1,2,3 {
-      '深夜'
-    }
-    when 4,5,6,7,8,9,10,11 {
-      '朝'
-    }
-    when 12,13 {
-      '昼'
-    }
-    when 14,15,16,17 {
-      '日中'
-    }
-    when 18,19,20,21 {
-      '夜'
-    }
-  }
-}
-
 OnBalloonChange
 {
   GetBalloonInfo
@@ -411,5 +387,131 @@ OnWindowStateRestore
   'h100000h111109\_w[500]h111101'
   'h100000h111109\_w[500]h111103'
   'h100000h111105\_w[500]h111101'
+}
+
+//******************************************************************************
+//時刻系関数
+//******************************************************************************
+
+CompareTime
+{
+  // 時刻の大小を比べて返す関数
+  // 前者をa,後者をbとすると、
+  // a > b :  1
+  // a < b : -1
+  // a = b :  0
+  // を返す。
+
+  // _argv[0]: a.hour
+  // _argv[1]: a.minute
+  // _argv[2]: a.second
+  // _argv[3]: b.hour
+  // _argv[4]: b.minute
+  // _argv[5]: b.second
+
+  _a.hour   = _argv[0]
+  _a.minute = _argv[1]
+  _a.second = _argv[2]
+  _b.hour   = _argv[3]
+  _b.minute = _argv[4]
+  _b.second = _argv[5]
+
+  if _a.hour > _b.hour {
+    1
+  }
+  elseif _a.hour < _b.hour {
+    -1
+  }
+  else {
+    if _a.minute > _b.minute {
+      1
+    }
+    elseif _a.minute < _b.minute {
+      -1
+    }
+    else {
+      if _a.second > _a.second {
+        1
+      }
+      elseif _a.second < _a.second {
+        -1
+      }
+      else {
+        0
+      }
+    }
+  }
+}
+
+CalcTime
+{
+  // _argv[0]: hour
+  // _argv[1]: minute
+  // _argv[2]: second
+  // _argv[3]: 差分minute
+
+  _hour = _argv[0]
+  _minute = _argv[1] + _argv[3]
+  _second = _argv[2]
+
+  if _minute > 60 {
+    _hour += _minute / 60 % 24
+    _minute %= 60
+  }
+  elseif _minute < 0 {
+    _hour -= (-1*_minute) / 60 + 1
+    while _hour < 0
+    {
+      _hour += 24
+    }
+    while _minute < 0
+    {
+      _minute += 60
+    }
+  }
+
+  (_hour, _minute, _second)
+}
+
+GetTimeSlot
+{
+  if CompareTime(now, CalcTime(sunrisetime, -30)) >= 0 && CompareTime(now, sunrisetime) < 0 {
+    // 日の出30分前～日の出
+    '日の出直前'
+    return
+  }
+  elseif CompareTime(now, CalcTime(sunrisetime, 30)) < 0 && CompareTime(now, sunrisetime) >= 0 {
+    // 日の出～日の出30分後
+    '日の出直後'
+    return
+  }
+  elseif CompareTime(now, CalcTime(sunsettime, -30)) >= 0 && CompareTime(now, sunsettime) < 0 {
+    // 日没30分前～日没
+    '黄昏時'
+    return
+  }
+  elseif CompareTime(now, CalcTime(sunsettime, 30)) < 0 && CompareTime(now, sunsettime) >= 0 {
+    // 日没～日没30分後
+    '日没直後'
+    return
+  }
+
+  case now[0] {
+    when 22,23,0,1,2,3 {
+      '深夜'
+    }
+    when 4,5,6,7,8,9,10,11 {
+      '朝'
+    }
+    when 12,13 {
+      '昼'
+    }
+    when 14,15,16,17 {
+      '日中'
+    }
+    when 18,19,20,21 {
+      '夜'
+    }
+  }
 }
 

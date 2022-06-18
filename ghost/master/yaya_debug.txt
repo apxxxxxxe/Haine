@@ -43,32 +43,45 @@ OnDebugKeyPress
       イベント回想メニュー
     }
     when 'f' {
-      _name = 'talks'
-      roulette.getcumsum(_name)
+      _ret = ''
+      foreach sunrisetime; _s {
+        _ret += _s + ','
+      }
+      _ret += '\n'
+      foreach sunsettime; _s {
+        _ret += _s + ','
+      }
+      _ret
 
-      _a = ''
-      _b = EVAL(_name+'.cumsum') 
-      foreach _b; _c {
-        _a += _c + ','
-      }
-      _a + '\n'
       --
-      '@\n'
+      '\n\n'
       --
-      _a = ''
-      _b = EVAL(_name+'.weights') 
-      foreach _b; _c {
-        _a += _c + ','
-      }
-      _a + '\n'
+
+      now = (4,40,0)
+      GetTimeSlot + '\n'
       --
-      '@\n'
+      now = (19,0,0)
+      GetTimeSlot + '\n'
       --
-      EVAL(_name+'.totalweight')  + '\n'
+      now = (4,0,0)
+      GetTimeSlot + '\n'
       --
-      '@\n'
-      --
-      EVAL(_name+'.count')  + '\n'
     }
   }
+}
+
+On_tamaOpen
+{
+  SETTAMAHWND(reference[0])
+  SHIORI3FW.Push_X_SSTP_PassThru('Title','tama test: Taromati2')//これらの設定はすべて任意です。
+  SHIORI3FW.Push_X_SSTP_PassThru('Icon','IMG_PATH/ico/tama.ico')
+  SHIORI3FW.Push_X_SSTP_PassThru('border.color','626262')
+  SHIORI3FW.Push_X_SSTP_PassThru('background.color','1e1e1e')
+  SHIORI3FW.Push_X_SSTP_PassThru('default.color','4ec9b0')//およびその他の設定は、tama.txtにあります。
+  'tamaが開いた'
+}
+On_tamaExit
+{
+  SETTAMAHWND(0)
+  'tamaが閉じた'
 }
