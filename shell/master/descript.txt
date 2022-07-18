@@ -24,10 +24,10 @@ sakura.bindgroup507007.addid,500050
 sakura.bindgroup507002.name,頭,カチューシャ
 sakura.bindgroup507003.name,頭,ピアスA
 sakura.bindgroup507004.name,頭,ピアスB
-sakura.bindgroup506508.name,頭,モノクル
-sakura.bindgroup506509.name,頭,モノクル
-sakura.bindgroup506510.name,頭,モノクル
-sakura.bindgroup506511.name,頭,モノクル
+sakura.bindgroup506508.name,頭,メガネ黒
+sakura.bindgroup506509.name,頭,メガネ赤
+sakura.bindgroup506510.name,頭,モノクル左
+sakura.bindgroup506511.name,頭,モノクル右
 
 sakura.bindoption.group,後髪,mustselect
 sakura.bindgroup500100.name,後髪,デフォルト
