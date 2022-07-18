@@ -43,29 +43,7 @@ OnDebugKeyPress
       イベント回想メニュー
     }
     when 'f' {
-      _ret = ''
-      foreach sunrisetime; _s {
-        _ret += _s + ','
-      }
-      _ret += '\n'
-      foreach sunsettime; _s {
-        _ret += _s + ','
-      }
-      _ret
-
-      --
-      '\n\n'
-      --
-
-      now = (4,40,0)
-      GetTimeSlot + '\n'
-      --
-      now = (19,0,0)
-      GetTimeSlot + '\n'
-      --
-      now = (4,0,0)
-      GetTimeSlot + '\n'
-      --
+      dressup.exec
     }
   }
 }

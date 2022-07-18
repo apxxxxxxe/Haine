@@ -91,8 +91,3 @@ Bye
     "h111209遅くまでお疲れさま。\nh111204いい夢を、ユーザ。"
   }
 }
-
-OnNotifyDressupInfo
-{
-  dressupInfo_ary = reference
-}

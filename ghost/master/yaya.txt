@@ -24,25 +24,25 @@ charset.extension, UTF-8 // SAORI入出力
 //------------------------------------------------------------------------------
 //以下は紺野ややめのテンプレート
 //------------------------------------------------------------------------------
-dic, yaya_tmpl_util.txt       // テンプレート共通処理
+dic, yaya_tmpl_util.dic       // テンプレート共通処理
 
-dic, yaya_string.txt               // 文字列リソース辞書
-dic, yaya_aitalk.txt               // ランダムトーク辞書
-dic, yaya_bootend.txt              // 起動/終了トーク辞書
-dic, yaya_change.txt               // 切り替えトーク辞書
-dic, yaya_communicate.txt          // コミュニケート辞書
-dic, yaya_mouse.txt                // マウス入力関連辞書
-dic, yaya_menu.txt                 // メニュー処理辞書
-dic, yaya_etc.txt                  // 種々のイベント辞書
-dic, yaya_functions.txt            // 関数辞書
-//dic, yaya_timer.txt                // タイマー機能辞書
-dic, yaya_input.txt                // ユーザー入力機能辞書
-dic, yaya_webclap.txt              // Web拍手機能辞書
-dic, yaya_events.txt               // 進行イベント辞書
-dic, yaya_debug.txt                // デバッグ処理辞書
-dic, yaya_dressup.txt              // 着せ替え処理辞書
-dic, yaya_init.txt
-dic, yaya_rouletteselection.txt
+dic, yaya_string.dic               // 文字列リソース辞書
+dic, yaya_aitalk.dic               // ランダムトーク辞書
+dic, yaya_bootend.dic              // 起動/終了トーク辞書
+dic, yaya_change.dic               // 切り替えトーク辞書
+dic, yaya_communicate.dic          // コミュニケート辞書
+dic, yaya_mouse.dic                // マウス入力関連辞書
+dic, yaya_menu.dic                 // メニュー処理辞書
+dic, yaya_etc.dic                  // 種々のイベント辞書
+dic, yaya_functions.dic            // 関数辞書
+//dic, yaya_timer.dic                // タイマー機能辞書
+dic, yaya_input.dic                // ユーザー入力機能辞書
+dic, yaya_webclap.dic              // Web拍手機能辞書
+dic, yaya_events.dic               // 進行イベント辞書
+dic, yaya_debug.dic                // デバッグ処理辞書
+dic, yaya_dressup.dic              // 着せ替え処理辞書
+dic, yaya_init.dic
+dic, yaya_rouletteselection.dic
 
 
 //------------------------------------------------------------------------------
