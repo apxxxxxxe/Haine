@@ -52,11 +52,15 @@ MouseMove0bust : nonoverlap
 {
   _on = '\0\![bind,ex,胴体霧,1]'
   _off = '\0\![bind,ex,胴体霧,0]'
-  _dialog = '\1腕がハイネの身体をすり抜けたφ。\_w[1200]'
+  _dialog = ''
+  if !firsttouch.bust {
+	firsttouch.bust = 1
+	_dialog = '\1腕がハイネの身体をすり抜けたφ。\_w[1200]'
+  }
   bad_touch_count++
 
   "%(_on)h111205っと……。%(_dialog)%(_off)h111204残念でした。"
-  "%(_on)%(_dialog)h111205軽々しいわね。女性の胸なのよ。%(_off)"
+  "h111105%(_on)%(_dialog)h111104軽々しいわね。h111109女性の胸なのよ。%(_off)"
 }
 
 //******************************************************************************
@@ -308,7 +312,8 @@ AYATEMPLATE.MouseMoveWheelFunc
           CommonEventMousePre
           "\![raise,OnMouseEvent]"
         }
-        // ↑追加・変更ここまで
+        // ↑追加・変更ここまで
+
       }
     }
   }

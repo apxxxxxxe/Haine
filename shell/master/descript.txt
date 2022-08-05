@@ -151,4 +151,7 @@ sakura.bindgroup503358.name,靴,サンダル黒
 sakura.bindgroup503359.name,靴,サンダル白
 sakura.bindgroup503351.default,1
 
+sakura.bindoption.group,ex
+sakura.bindgroup700000.name,ex,胴体霧
+
 sakura.menu,auto
