@@ -8,6 +8,7 @@ _CATALOG.VIX
 profile/
 var/
 __MACOSX/
+.vscode/
 XtraStuf.mac/
 
 sagyou/
