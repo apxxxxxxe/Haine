@@ -30,20 +30,6 @@
    */
 
 
-/*
-//Emilyへ切り替え
-OnGhostChanging_Emily
-{
-"\0\s[0]エミリさんに切り替えです。\w5\1お芋食べてるかな。"
-}
-
-//Emilyから切り替り
-OnGhostChanged_Emily
-{
-"\0\s[0]エミリさんから交代してきました。\w5\1よろしくな。"
-}
-*/
-
 //その他のゴーストへ切り替え
 OnGhostChangingOther
 {
@@ -64,46 +50,37 @@ OnGhostChangedOther
 
 OnGhostChanging
 {
-  AYATEMPLATE.ExecuteChangeCallTalk("OnGhostChanging","OnClose")
+  OnClose
 }
 
 OnGhostChanged
 {
-  MakeKeroBalloownFollow
-  --
-  AYATEMPLATE.ExecuteChangeCallTalk("OnGhostChanged","OnBoot")
+  OnBoot
 }
 
 OnGhostCalling
 {
-  AYATEMPLATE.ExecuteChangeCallTalk("OnGhostCalling")
 }
 
 OnGhostCalled
 {
-  MakeKeroBalloownFollow
-  --
-  AYATEMPLATE.ExecuteChangeCallTalk("OnGhostCalled","OnBoot")
+  OnBoot
 }
 
 OnGhostCallComplete
 {
-  // AYATEMPLATE.ExecuteChangeCallTalk("OnGhostCallComplete")
 }
 
 OnOtherGhostClosed
 {
-  // AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostClosed")
 }
 
 OnOtherGhostBooted
 {
-  // AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostBooted")
 }
 
 OnOtherGhostChanged
 {
-  // AYATEMPLATE.ExecuteChangeCallTalk("OnOtherGhostChanged")
 }
 
 // スリープ・休止状態から復帰

@@ -17,19 +17,22 @@ OnGhostLoad
 //******************************************************************************
 OnBoot
 {
+  _text = ""
   InitialScripts
   --
   SetBalloonSurfaceSakura
   --
   if !isEvent1End {
     "\![raise,OnEvent1_1]"
+	return
   }
   else {
-    if hasSuicideInfo {
-      InsertLineFeed(Dead)
+    if ISVAR("hasSuicideInfo") && hasSuicideInfo {
+      _text = Dead
     }
-    InsertLineFeed(Hello)
+    _text = Hello
   }
+  InsertLineFeed(_text)
 }
 
 Dead
