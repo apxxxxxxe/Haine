@@ -72,10 +72,10 @@ SetBalloonSurfaceSakura
       '\b[2]'
     }
     when 'garden' {
-      '\b[4]'
+      '\b[6]'
     }
     when 'library' {
-      '\b[6]'
+      '\b[4]'
     }
     when 'plain' {
       '\b[8]'
