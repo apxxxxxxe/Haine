@@ -4,6 +4,7 @@
 
 RandomTalk
 {
+  UpdateUserRating
   lastanchor = ""
   lastresponce = systemuptime
   TalkStatus = "talking"
@@ -24,18 +25,19 @@ OnRandomTalkEnd
 
 talks : array
 {
-  SetBalloonSurfaceSakura + ShowTopic("特殊な話題") + talk_special
+  talk_special
 
   if TalkTopicLife {
     SetBalloonSurfaceSakura + ShowTopic("life") + talk_life
   }
+
   if TalkTopicHorrow {
     SetBalloonSurfaceSakura("library") + ShowTopic("horrow") + talk_hollow
   }
+
   if !TalkTopicHorrow && !TalkTopicLife {
     "h121109……今は話すことがないわ。\1\_q(トーク設定→トーク話題からいずれかの話題を有効にしてください)"
   }
-
 }
 
 talk_life : array
@@ -111,13 +113,15 @@ talk_hollow : array
 
 talk_special : array
 {
-  UpdateUserRating
-
+  _ary = IARRAY()
   if user_honesty < 0 {
-    "h111209あなたは、ずいぶん私の身体に興味があるみたいね。\n……h111204ふふ。良いのよ、そのままで。\nh111209私も嬉しいの。あなたの好きなもの、好きなこと、それに狂っている様子を間近で見られるのだもの。"
+    _ary ,= "h111209あなたは、ずいぶん私の身体に興味があるみたいね。\n……h111204ふふ。良いのよ、そのままで。\nh111209私も嬉しいの。あなたの好きなもの、好きなこと、それに狂っている様子を間近で見られるのだもの。"
   }
   if hasSuicideInfo {
-    "h111201ユーザ、あのね。\nh111202これは、真偽がはっきりしてから言おうと思っていたことなのだけど……。\nh111101私の、h111104死から蘇生するまでの時間が延びていっているようなの。\n……h111202今までになかったことよ。これが続けば、私は１度の死で、より長く眠ることができる。そしていつか、永遠の終わりが来る…………h111206というのは、さすがに楽観的かしら。\nh111202それでも、大きな進展だわ。h111209私は確実に、死に近づいている。"
+    _ary ,= "h111201ユーザ、あのね。\nh111202これは、真偽がはっきりしてから言おうと思っていたことなのだけど……。\nh111101私の、h111104死から蘇生するまでの時間が延びていっているようなの。\n……h111202今までになかったことよ。これが続けば、私は１度の死で、より長く眠ることができる。そしていつか、永遠の終わりが来る…………h111206というのは、さすがに楽観的かしら。\nh111202それでも、大きな進展だわ。h111209私は確実に、死に近づいている。"
+  }
+  if ARRAYSIZE(_ary) {
+    SetBalloonSurfaceSakura + ShowTopic("特殊な話題") + _ary
   }
 }
 
