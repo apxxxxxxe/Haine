@@ -49,6 +49,8 @@ Dead
 Hello
 {
   _timeslot = GetTimeSlot
+  ShowTopic(_timeslot)
+  --
   if _timeslot == "朝" {
     "h111201あら、早いのね。\nh111207おはよう、ユーザ。"
   }
