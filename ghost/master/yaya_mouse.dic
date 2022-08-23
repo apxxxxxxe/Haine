@@ -90,7 +90,7 @@ MouseDoubleClick0bust
   bad_touch_count++
   if touch_count == 1 {
     OnOpenMenu("h112209あら、悪戯はだめよ。")
-    OnOpenMenu("h212204どさくさに紛れて、ってやつ？h212207意外と小賢しいのね。")
+    OnOpenMenu("h212204どさくさに紛れて触ろうって？h212207意外と小賢しいのね。")
   }
   elseif touch_count > 1 {
     OnOpenMenu("h212204確信犯ね。大胆だこと。")
