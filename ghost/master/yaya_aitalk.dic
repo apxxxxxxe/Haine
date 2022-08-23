@@ -287,7 +287,11 @@ OnTranslate
 {
   _text = reference[0]
 
-  _text = TextOnlyTranslator(_text,"TextOnlyTranslatorFunc")
+  if willTranslate {
+    _text = TextOnlyTranslator(_text,"TextOnlyTranslatorFunc")
+  } else {
+	willTranslate = 1
+  }
 
   _text
 }
@@ -328,7 +332,7 @@ TextOnlyTranslatorFunc
     _words = (/
         "…\n"     ,   "\![quicksection,1]…\![quicksection,0]\n\_w[1000]", /
         "…"       ,   "\![quicksection,1]…\_w[500]\![quicksection,0]",    /
-        "。"      ,   " \_w[1200]",                                      /
+        "。"      ,   "\_l[@0.5em]\_w[1200]",                                      /
         "、"      ,   "、\_w[600]",                                       /
         "！"      ,   "！\_w[900]",                                       /
         "かしら？",   "かしら　\_w[1200]",                                /
