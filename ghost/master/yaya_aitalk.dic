@@ -25,65 +25,50 @@ OnRandomTalkEnd
 
 talks : array
 {
-  talk_special
-
   SetBalloonSurfaceSakura + talk_all
-
-  if TalkTopicLife {
-    SetBalloonSurfaceSakura + ShowTopic("life") + talk_life
-  }
-
-  if TalkTopicHorrow {
-    SetBalloonSurfaceSakura("library") + ShowTopic("horrow") + talk_hollow
-  }
-
-  if !TalkTopicHorrow && !TalkTopicLife {
-    // はなすことがない
-  }
 }
 
 talk_all : array
 {
-	if isMad {
-		"あなた。聞こえているのでしょう、あなた。"
-		"終わっても終わっても届かないのよ。いつまでも……いつまでもいつまでも！"
-		"いつまでこんなことを続ければいいの。"
+	{
+		SetBalloonSurfaceSakura("library")
+		--
+		"h111101あなた。聞こえているのでしょう、あなた。"
+		"h111105終わっても終わっても届かないのよ。いつまでも……いつまでもいつまでも！"
+		"h121105いつまでこんなことを続ければいいの。"
 	}
 
-	if isMiserable {
-		"こうして肉を焼いていると惨めになるわ。死にたいと言いながら生きるための作業をしている。この体にもはや食事は要らないのだから、なおさら。"
-		"毎日の習慣をこなせば、いくらか正気が保てるのでしょう。日常に散りばめた正気のかけらを集めているの。"
+	{
+		SetBalloonSurfaceSakura("library")
+		--
+		"h111105こうして肉を焼いていると惨めになるわ。死にたいと言いながら生きるための作業をしている。h121205この体にもはや食事は要らないのだから、なおさら。"
+		"h111104毎日の習慣をこなせば、いくらか正気が保てるのでしょう。h111105日常に散りばめた正気のかけらを集めているの。"
 	}
 
-	if isThankful {
-		"あなたが来てくれていなければ死んでいたかもしれないわ。いえ、死んではいるのだけど。ふふ。それでもこうして笑えているのだもの。"
-		"頭のおかしい女のもとに足しげく通うのは、頭のおかしい%(sex)。気が合うわね？ふふ。"
+	{
+		SetBalloonSurfaceSakura()
+		--
+		"/
+		h111209デストルドーを肯定するために。h111204あなたもそうなのでしょう？/
+		"
+
+		"/
+		h111205\1ハイネは棒状の道具をカチャカチャと並べている。/
+		\0h111201ふふ、気になる？h111205これはエンバーミングツール。\n/
+		遺体の保存処理をするときに使う道具よ。\n/
+		腐敗しやすい内臓は、これらを使って取り出されるの。\n/
+		もしあなたがここで死んだら、h111204これで丁寧に処置してあげる。\n/
+		h111207嬉しいでしょう？/
+		"
 	}
 
-	"/
-	デストルドーを肯定するために。あなたもそうなのでしょう？/
-	"
+	{
+		SetBalloonSurfaceSakura('garden')
+		--
+		"h111201あなたが来てくれていなければ死んでいたかもしれないわ。h111209いえ、死んではいるのだけど。ふふ。h111204それでもこうして笑えているのだもの。"
 
-    "/
-	\1ハイネは棒状の道具をカチャカチャと並べている。/
-	\0ふふ、気になる？これはエンバーミングツール。\n/
-	遺体の保存処理をするときに使う道具よ。\n/
-	腐敗しやすい内臓は、これらを使って取り出されるの。\n/
-	もしあなたがここで死んだら、これで丁寧に処置してあげる。\n/
-	嬉しいでしょう？/
-	"
-}
-
-talk_life : array
-{
-}
-
-talk_hollow : array
-{
-}
-
-talk_special : array
-{
+		"h111209頭のおかしい女のもとに足しげく通うのは、頭のおかしい%(sex)。h111204気が合うわね？h111207ふふ。"
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -110,7 +95,7 @@ OnKeyPress
     when "r" {
       SetBalloonSurfaceSakura
       --
-      "\1リロードします\![change,ghost,%(sakura_name)]"
+      "\1\![reload,shiori]shioriをリロードしました"
     }
     when "d" {
       isdebug = ! isdebug
@@ -125,6 +110,7 @@ OnKeyPress
       }
     }
   }
+
   if isdebug && ISFUNC("OnDebugKeyPress") {
     OnDebugKeyPress(reference[0])
   }
@@ -249,12 +235,12 @@ TextOnlyTranslatorFunc
     _words = (/
         "…\n"     ,   "\![quicksection,1]…\![quicksection,0]\n\_w[1000]", /
         "…"       ,   "\![quicksection,1]…\_w[500]\![quicksection,0]",    /
-        "。"      ,   "\_l[@0.5em]\_w[1200]",                                      /
-        "、"      ,   "、\_w[600]",                                       /
-        "！"      ,   "！\_w[900]",                                       /
-        "かしら？",   "かしら　\_w[1200]",                                /
-        "？"      ,   "？\_w[1200]",                                      /
-        "\n\n"    ,   "\n\_w[1000]\n"                                     /
+        "。"      ,   "。\_w[1200]",                                        /
+        "、"      ,   "、\_w[600]",                                         /
+        "！"      ,   "！\_w[900]",                                         /
+        "かしら？",   "かしら　\_w[1200]",                                  /
+        "？"      ,   "？\_w[1200]",                                        /
+        "\n\n"    ,   "\n\_w[1000]\n"                                       /
         )
     for _i = 0; _i < ARRAYSIZE(_words); _i+=2 {
       _text = REPLACE(_text,_words[_i],_words[_i + 1])

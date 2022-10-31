@@ -28,12 +28,10 @@ OnBoot
     "\![raise,OnEvent1_1]"
 	return
   }
-  else {
-    if ISVAR("hasSuicideInfo") && hasSuicideInfo {
-      _text = Dead
-    }
-    _text = Hello
+  if ISVAR("hasSuicideInfo") && hasSuicideInfo {
+    _text = Dead
   }
+  _text = Hello
   InsertLineFeed(_text)
 }
 
@@ -48,20 +46,17 @@ Dead
 
 Hello
 {
+  'h111204hello'
   _timeslot = GetTimeSlot
   ShowTopic(_timeslot)
   --
   if _timeslot == "朝" {
-    "h111201あら、早いのね。\nh111207おはよう、ユーザ。"
   }
   elseif _timeslot == "昼" || _timeslot == "日中" {
-    "h111201ちょうどあなたが来るんじゃないかと\n思っていたところだったのよ。\nh111207いらっしゃい。h111204すぐにお茶の準備をするわね。"
   }
   elseif _timeslot == "夜" {
-    "h111207こんばんは。h111204いい夜ね、ユーザ。"
   }
   else {
-    "h111207こんばんは。h111204いい夜ね、ユーザ。\n……さて、夜ふかしする悪い子には、\nにがーいお茶を用意してあげようかしら……h111207なんてね。\nh111204いつもどおり淹れてあげるから、あがって待っていて頂戴h111207。"
   }
 }
 
@@ -81,6 +76,7 @@ OnClose
 
 Bye
 {
+  'h111207bye\_w[1200]'
   _timeslot = GetTimeSlot
   if _timeslot == "朝" {
     if circadian_rhythm == "夜型" {

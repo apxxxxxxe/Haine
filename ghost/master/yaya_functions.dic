@@ -200,24 +200,7 @@ ShowTopic
 {
   '\_l[0,' + PosOffset + ']\f[height,11]\f[align,right]\![quicksection,true]'
   --
-  case _argv[0] {
-    when 'plants' {
-      '植物の話題'
-    }
-    when 'aroma' {
-      'アロマの話題'
-    }
-    when 'horrow' {
-      '暗いフォークロア'
-    }
-    when 'life' {
-      '日常の話題'
-    }
-    others
-    {
-      _argv[0]
-    }
-  }
+  _argv[0]
   --
   '\![quicksection,false]\_l[0,0]\f[default]'
 }

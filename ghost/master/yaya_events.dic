@@ -19,13 +19,10 @@ OnEvent1_1
 {
   isKeyBlocked = 1
 
-  _text = "\t\*h100000" + SetBalloonSurfaceSakura("plain") + "/
-  \_l[0," + (balloon_rows/2-1) + "em]\f[align,center]/
+  "\t\*h100000" + SetBalloonSurfaceSakura("plain") + "\_l[0," + (balloon_rows/2-1) + "em]\f[align,center]/
   \![*]\q[私が出会った少女の話をしよう。,OnEvent1_2,0]\n/
   \![*]\q[僕が出会った少女の話をしよう。,OnEvent1_2,1]/
   "
-
-  InsertLineFeed(_text)
 }
 
 OnEvent1_2
@@ -33,10 +30,12 @@ OnEvent1_2
   case reference[0] {
     when 0 {
       user_me = "私"
+	  sex = "女"
     }
     others
     {
       user_me = "僕"
+	  sex = "男"
     }
   }
 
