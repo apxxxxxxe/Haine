@@ -46,7 +46,6 @@ Dead
 
 Hello
 {
-  'h111204hello'
   _timeslot = GetTimeSlot
   ShowTopic(_timeslot)
   --
@@ -58,6 +57,7 @@ Hello
   }
   else {
   }
+  'h111204hello'
 }
 
 
@@ -76,7 +76,6 @@ OnClose
 
 Bye
 {
-  'h111207bye\_w[1200]'
   _timeslot = GetTimeSlot
   if _timeslot == "朝" {
     if circadian_rhythm == "夜型" {
@@ -88,4 +87,5 @@ Bye
   }
   else {
   }
+  'h111207bye\_w[1200]'
 }
