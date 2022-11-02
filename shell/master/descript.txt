@@ -41,17 +41,16 @@ sakura.bindgroup500106.name,後髪,H
 sakura.bindgroup500100.default,1
 
 sakura.bindoption.group,前髪,mustselect
-sakura.bindgroup506702.name,前髪,デフォルト
-sakura.bindgroup506706.name,前髪,B
-sakura.bindgroup506700.name,前髪,C
-sakura.bindgroup506701.name,前髪,D
-sakura.bindgroup506703.name,前髪,E
-sakura.bindgroup506704.name,前髪,F
-sakura.bindgroup506705.name,前髪,G
-sakura.bindgroup506707.name,前髪,H
-sakura.bindgroup506708.name,前髪,I
-sakura.bindgroup506709.name,前髪,J
-sakura.bindgroup506710.name,前髪,K
+sakura.bindgroup506701.name,前髪,デフォルト
+sakura.bindgroup506701.addid,500351
+sakura.bindgroup506702.name,前髪,A
+sakura.bindgroup506702.addid,500352
+sakura.bindgroup506703.name,前髪,B
+sakura.bindgroup506703.addid,500353
+sakura.bindgroup506704.name,前髪,C
+sakura.bindgroup506704.addid,500354
+sakura.bindgroup506705.name,前髪,D
+sakura.bindgroup506705.addid,500355
 sakura.bindgroup506702.default,1
 
 sakura.bindoption.group,前髪B
