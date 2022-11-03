@@ -245,12 +245,12 @@ Menu_RandomTalk
 
   SetBalloonSurfaceSakura
   --
-  "h111201いいわよ。h111205……そうね、\c"
-  "h113309なんの話がいいかしら…………h113205そうね、\c"
-  --
-  RandomTalk
-  --
-  '\![raise,OnRandomTalkExEnd]'
+  TextOnlyTranslatorFunc(DialogMenuRandomTalk) + RandomTalk
+}
+
+DialogMenuRandomTalk {
+  'h111201いいわよ。h111205……そうね、\c'
+  'h113309なんの話がいいかしら…………h113205そうね、\c'
 }
 
 //---- さっきの話は
