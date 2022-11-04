@@ -1,0 +1,579 @@
+# サンプルファイル
+
+# yamlファイルはparts,baseの２分類で構成される。
+#
+# - base: 頭や胴体など、全サーフェスに共通するパーツの定義。
+#         [構造]
+#         base:              # 基点
+#           text: ...        # 共通のサーフェス定義
+#
+# - parts: 目や口など、サーフェスごとに変わりうるパーツの定義
+#         [構造]
+#         parts:             # 基点
+#           - group: 〇〇    # 「目」「口」など、そのグループ名が何であるかの目安。
+#             details:       # 詳細情報の基点
+#               - name: △△ # 「半目」「閉じ目」など、そのパーツが何であるかの目安。
+#                 text: ...  # そのパーツのサーフェス定義。
+
+parts:
+  - group: 顔色
+    details:
+      - name: 通常顔
+        text: |
+
+      - name: 照れ顔
+        text: |
+          animation500600.interval,runonce
+          animation500600.pattern0,overlay,101,0,0,0
+
+      - name: 焦り顔
+        text: |
+          animation500600.interval,runonce
+          animation500600.pattern0,overlay,102,0,0,0
+
+      - name: シルエット化
+        text: |
+          animation510000.interval,runonce
+          animation510000.pattern0,overlayfast,1,0,0,0
+        
+      - name: 血+照れ
+        text: |
+          animation500550.interval,runonce
+          animation500550.pattern0,overlay,2000,0,0,0
+          animation500600.interval,runonce
+          animation500600.pattern0,overlay,101,0,0,0
+
+  - group: 眉
+    details:
+      - name: 通常眉
+        text: |
+          animation500500.interval,runonce
+          animation500500.pattern0,overlay,408,0,0,0
+  
+      - name: 困り眉
+        text: |
+          animation500500.interval,runonce
+          animation500500.pattern0,overlay,404,0,0,0
+  
+      - name: 怒り眉
+        text: |
+          animation500500.interval,runonce
+          animation500500.pattern0,overlay,400,0,0,0
+  
+      - name: 驚き眉
+        text: |
+          animation500500.interval,runonce
+          animation500500.pattern0,overlay,409,0,0,0
+
+  - group: 腕
+    details:
+      - name: 前手
+        text: |
+          animation505000.interval,runonce
+          animation505000.pattern0,overlay,503,0,0,0
+
+          animation505310.interval,bind
+          animation505310.pattern0,overlay,1400,0,0,0
+          animation505311.interval,bind
+          animation505311.pattern0,overlay,1401,0,0,0
+          animation505312.interval,bind
+          animation505312.pattern0,overlay,1402,0,0,0
+          animation505313.interval,bind
+          animation505313.pattern0,overlay,1403,0,0,0
+          animation505314.interval,bind
+          animation505314.pattern0,overlay,1434,0,0,0
+          animation505315.interval,bind
+          animation505315.pattern0,overlay,1435,0,0,0
+          animation505316.interval,bind
+          animation505316.pattern0,overlay,1436,0,0,0
+          animation505318.interval,bind
+          animation505318.pattern0,overlay,1438,0,0,0
+          animation505319.interval,bind
+          animation505319.pattern0,overlay,1439,0,0,0
+
+          collisionex13,hand,polygon,288,423,330,410,336,414,341,422,328,446,317,436,288,442
+          collisionex14,hand,polygon,282,501,262,536,261,550,285,556,299,549,294,521,295,512
+
+      - name: 胸に手
+        text: |
+          animation504000.interval,runonce
+          animation504000.pattern0,overlay,501,0,0,0
+
+          animation590000.interval,runonce
+          animation590000.pattern0,overlay,601,0,0,0
+
+          animation505310.interval,bind
+          animation505310.pattern0,overlay,1400,0,0,0
+          animation505311.interval,bind
+          animation505311.pattern0,overlay,1401,0,0,0
+          animation505312.interval,bind
+          animation505312.pattern0,overlay,1402,0,0,0
+          animation505313.interval,bind
+          animation505313.pattern0,overlay,1403,0,0,0
+          animation505314.interval,bind
+          animation505314.pattern0,overlay,1404,0,0,0
+          animation505315.interval,bind
+          animation505315.pattern0,overlay,1405,0,0,0
+          animation505316.interval,bind
+          animation505316.pattern0,overlay,1406,0,0,0
+
+          animation505318.interval,bind
+          animation505318.pattern0,overlay,2408,0,0,0
+          animation595318.interval,bind
+          animation595318.pattern0,overlay,2508,0,0,0
+
+          animation505319.interval,bind
+          animation505319.pattern0,overlay,2409,0,0,0
+          animation595319.interval,bind
+          animation595319.pattern0,overlay,2509,0,0,0
+
+      - name: 考える手
+        text: |
+          animation504000.interval,runonce
+          animation504000.pattern0,overlay,502,0,0,0
+          
+          animation590000.interval,runonce
+          animation590000.pattern0,overlay,602,0,0,0
+          
+          animation505310.interval,bind
+          animation505310.pattern0,overlay,1400,0,0,0
+          animation505311.interval,bind
+          animation505311.pattern0,overlay,1401,0,0,0
+          animation505312.interval,bind
+          animation505312.pattern0,overlay,1402,0,0,0
+          animation505313.interval,bind
+          animation505313.pattern0,overlay,1403,0,0,0
+          animation505314.interval,bind
+          animation505314.pattern0,overlay,1404,0,0,0
+          animation505315.interval,bind
+          animation505315.pattern0,overlay,1405,0,0,0
+          animation505316.interval,bind
+          animation505316.pattern0,overlay,1406,0,0,0
+
+          animation505318.interval,bind
+          animation505318.pattern0,overlay,3408,0,0,0
+          animation595318.interval,bind
+          animation595318.pattern0,overlay,3508,0,0,0
+
+          animation505319.interval,bind
+          animation505319.pattern0,overlay,3409,0,0,0
+          animation595319.interval,bind
+          animation595319.pattern0,overlay,3509,0,0,0
+
+          collisionex13,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
+          collisionex14,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
+
+      - name: 本の手
+        text: |
+          animation504000.interval,runonce
+          animation504000.pattern0,overlay,504,0,0,0
+          
+          animation590000.interval,runonce
+          animation590000.pattern0,overlay,604,0,0,0
+          
+          animation505310.interval,bind
+          animation505310.pattern0,overlay,1400,0,0,0
+          animation505311.interval,bind
+          animation505311.pattern0,overlay,1401,0,0,0
+          animation505312.interval,bind
+          animation505312.pattern0,overlay,1402,0,0,0
+          animation505313.interval,bind
+          animation505313.pattern0,overlay,1403,0,0,0
+          animation505314.interval,bind
+          animation505314.pattern0,overlay,1404,0,0,0
+          animation505315.interval,bind
+          animation505315.pattern0,overlay,1405,0,0,0
+          animation505316.interval,bind
+          animation505316.pattern0,overlay,1406,0,0,0
+          animation505318.interval,bind
+          animation505318.pattern0,overlay,1408,0,0,0
+          animation505319.interval,bind
+          animation505319.pattern0,overlay,1409,0,0,0
+
+          collisionex13,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
+          collisionex14,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
+
+  - group: 口
+    details:
+      - name: 通常口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,350,0,0,0
+
+          animation500401.interval,talk
+          animation500401.option,shared-index
+          animation500401.pattern0,stop,500399
+          animation500401.pattern1,overlay,304,0,0,0
+          animation500401.pattern2,overlay,350,100,0,0
+          animation500401.pattern3,overlay,304,100,0,0
+          animation500401.pattern4,overlay,351,100,0,0
+          animation500401.pattern5,overlay,350,100,0,0
+          animation500401.pattern6,overlay,362,80,0,0
+          animation500401.pattern7,overlay,304,80,0,0
+          animation500401.pattern8,overlay,-1,80,0,0
+          animation500401.pattern9,start,500399
+
+      - name: 笑い口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,322,0,0,0
+
+          animation500401.interval,talk
+          animation500401.option,shared-index
+          animation500401.pattern0,stop,500399
+          animation500401.pattern1,overlay,303,0,0,0
+          animation500401.pattern2,overlay,322,100,0,0
+          animation500401.pattern3,overlay,303,100,0,0
+          animation500401.pattern4,overlay,361,100,0,0
+          animation500401.pattern5,overlay,322,100,0,0
+          animation500401.pattern6,overlay,362,80,0,0
+          animation500401.pattern7,overlay,303,80,0,0
+          animation500401.pattern8,overlay,-1,80,0,0
+          animation500401.pattern9,start,500399
+          
+      - name: 微笑口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,323,0,0,0
+
+          animation500401.interval,talk
+          animation500401.option,shared-index
+          animation500401.pattern0,stop,500399
+          animation500401.pattern1,overlay,303,0,0,0
+          animation500401.pattern2,overlay,323,50,0,0
+          animation500401.pattern3,overlay,303,100,0,0
+          animation500401.pattern4,overlay,361,100,0,0
+          animation500401.pattern5,overlay,323,50,0,0
+          animation500401.pattern6,overlay,362,80,0,0
+          animation500401.pattern7,overlay,303,80,0,0
+          animation500401.pattern8,overlay,-1,80,0,0
+          animation500401.pattern9,start,500399
+          
+      - name: ぽかん口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,363,0,0,0
+
+  - group: 目
+    details:
+      - name: こっち目
+        text: |
+          animation500300.interval,runonce+rarely
+          animation500300.option,shared-index
+          animation500300.pattern0,overlay,201,0,0,0
+          animation500300.pattern1,overlay,209,4000,0,0
+          animation500300.pattern2,overlay,204,100,0,0
+          animation500300.pattern3,overlay,201,100,0,0
+  
+      - name: 上の空
+        text: |
+          animation500300.interval,runonce+rarely
+          animation500300.option,shared-index
+          animation500300.pattern0,overlay,202,0,0,0
+          animation500300.pattern1,overlay,209,4000,0,0
+          animation500300.pattern2,overlay,205,100,0,0
+          animation500300.pattern3,overlay,202,100,0,0
+          
+      - name: あっち目
+        text: |
+          animation500300.interval,runonce+rarely
+          animation500300.option,shared-index
+          animation500300.pattern0,overlay,203,0,0,0
+          animation500300.pattern1,overlay,209,4000,0,0
+          animation500300.pattern2,overlay,206,100,0,0
+          animation500300.pattern3,overlay,203,100,0,0
+  
+      - name: こっち半目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,204,0,0,0
+  
+      - name: 上の空半目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,205,0,0,0
+  
+      - name: あっち半目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,206,0,0,0
+  
+      - name: にこ目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,207,0,0,0
+  
+      - name: 驚き目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,208,0,0,0
+  
+      - name: 閉じ目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,209,0,0,0
+
+      - name: dummy
+        text: |
+
+base: |
+  collisionex12,bust,polygon,228,327,271,304,316,325,318,347,311,378,231,375,225,349
+  collisionex10,shoulder,polygon,205,319,206,309,214,301,229,299,251,293,248,312
+  collisionex11,shoulder,polygon,292,293,309,299,332,302,339,315,301,315
+  collisionex7,mouse,ellipse,260,259,283,268
+  collisionex8,head,polygon,292,134,319,151,340,176,339,192,292,190,240,192,201,187,213,158,230,140,259,127
+  collisionex6,face,polygon,270,285,239,267,227,246,220,214,222,189,227,173,315,170,320,189,321,210,315,245,305,268
+  //collision1,152,114,384,326,hair
+  
+  //後髪
+  animation500100.interval,bind
+  animation500100.pattern0,overlay,1100,0,0,0
+  animation500101.interval,bind
+  animation500101.pattern0,overlay,1101,0,0,0
+  animation500103.interval,bind
+  animation500103.pattern0,overlay,1103,0,0,0  
+  animation500106.interval,bind
+  animation500106.pattern0,overlay,1106,0,0,0
+  animation500107.interval,bind
+  animation500107.pattern0,overlay,1107,0,0,0
+  animation500108.interval,bind
+  animation500108.pattern0,overlay,1108,0,0,0
+  animation500109.interval,bind
+  animation500109.pattern0,overlay,1109,0,0,0
+  animation500110.interval,bind
+  animation500110.pattern0,overlay,1110,0,0,0
+
+  //素体
+  animation500200.interval,runonce
+  animation500200.pattern0,overlay,1000,0,0,0
+
+  //後ろ手151
+  
+  //頭
+  animation500201.interval,runonce
+  animation500201.pattern0,overlay,1001,0,0,0
+
+  //目300
+  
+  //髪の影
+  animation500351.interval,bind
+  animation500351.pattern0,overlay,751,0,0,0
+  animation500352.interval,bind
+  animation500352.pattern0,overlay,752,0,0,0
+  animation500353.interval,bind
+  animation500353.pattern0,overlay,753,0,0,0
+  animation500354.interval,bind
+  animation500354.pattern0,overlay,754,0,0,0
+  animation500355.interval,bind
+  animation500355.pattern0,overlay,755,0,0,0
+  
+  //口400,401
+  
+  //眉500
+  
+  //照れ顔600
+  
+  //靴下
+  animation501380.interval,bind
+  animation501380.pattern0,overlay,1500,0,0,0
+  animation501381.interval,bind
+  animation501381.pattern0,overlay,1501,0,0,0
+  animation501382.interval,bind
+  animation501382.pattern0,overlay,1502,0,0,0
+  animation501383.interval,bind
+  animation501383.pattern0,overlay,1503,0,0,0
+  animation501384.interval,bind
+  animation501384.pattern0,overlay,1504,0,0,0
+  animation501385.interval,bind
+  animation501385.pattern0,overlay,1505,0,0,0
+  animation501386.interval,bind
+  animation501386.pattern0,overlay,1506,0,0,0
+  animation501387.interval,bind
+  animation501387.pattern0,overlay,1507,0,0,0
+
+  //靴下＋
+  animation501400.interval,bind
+  animation501400.pattern0,overlay,1550,0,0,0
+  animation501401.interval,bind
+  animation501401.pattern0,overlay,1551,0,0,0
+  animation501402.interval,bind
+  animation501402.pattern0,overlay,1552,0,0,0
+  animation501403.interval,bind
+  animation501403.pattern0,overlay,1553,0,0,0
+  animation501404.interval,bind
+  animation501404.pattern0,overlay,1554,0,0,0
+  
+  //トップス
+  animation502360.interval,bind
+  animation502360.pattern0,overlay,1200,0,0,0
+
+  animation502361.interval,bind
+  animation502361.pattern0,overlay,1201,0,0,0
+
+  animation502362.interval,bind
+  animation502362.pattern0,overlay,1202,0,0,0
+  animation502362.pattern1,overlay,1306,0,0,0
+
+  animation502363.interval,bind
+  animation502363.pattern0,overlay,1203,0,0,0
+  animation502363.pattern1,overlay,1307,0,0,0
+
+  animation502364.interval,bind
+  animation502364.pattern0,overlay,1204,0,0,0
+
+  animation502366.interval,bind
+  animation502366.pattern0,overlay,1206,0,0,0
+
+  animation502367.interval,bind
+  animation502367.pattern0,overlay,1207,0,0,0
+
+  animation502368.interval,bind
+  animation502368.pattern0,overlay,1208,0,0,0
+  
+  //トップス+
+  animation506300.interval,bind
+  animation506300.pattern0,overlay,1800,0,0,0
+  animation506301.interval,bind
+  animation506301.pattern0,overlay,1801,0,0,0
+  animation506303.interval,bind
+  animation506303.pattern0,overlay,1803,0,0,0
+  animation506304.interval,bind
+  animation506304.pattern0,overlay,1804,0,0,0
+  animation506305.interval,bind
+  animation506305.pattern0,overlay,1805,0,0,0
+  animation506306.interval,bind
+  animation506306.pattern0,overlay,1806,0,0,0
+  animation506307.interval,bind
+  animation506307.pattern0,overlay,1807,0,0,0
+  animation506308.interval,bind
+  animation506308.pattern0,overlay,1808,0,0,0
+  animation506309.interval,bind
+  animation506309.pattern0,overlay,1809,0,0,0
+  animation506312.interval,bind
+  animation506312.pattern0,overlay,1812,0,0,0
+  animation506313.interval,bind
+  animation506313.pattern0,overlay,1813,0,0,0
+  animation506314.interval,bind
+  animation506314.pattern0,overlay,1814,0,0,0
+  animation506316.interval,bind
+  animation506316.pattern0,overlay,1817,0,0,0
+  animation506298.interval,bind
+  animation506298.pattern0,overlay,1815,0,0,0
+  
+  //コルセットのみ腕より下に
+  animation504510.interval,bind
+  animation504510.pattern0,overlay,1810,0,0,0
+  animation504511.interval,bind
+  animation504511.pattern0,overlay,1811,0,0,0
+
+  animation504417.interval,bind
+  animation504417.pattern0,overlay,1900,0,0,0
+  animation504418.interval,bind
+  animation504418.pattern0,overlay,1901,0,0,0
+  
+  //手back4000
+
+  //帽子
+  animation507000.interval,bind
+  animation507000.pattern0,overlay,1700,0,0,0
+  animation500050.interval,bind
+  animation500050.pattern0,overlay,1707,0,0,0
+  animation507001.interval,bind
+  animation507001.pattern0,overlay,1701,0,0,0
+  animation507002.interval,bind
+  animation507002.pattern0,overlay,1702,0,0,0
+  animation507003.interval,bind
+  animation507003.pattern0,overlay,1703,0,0,0
+  animation507004.interval,bind
+  animation507004.pattern0,overlay,1704,0,0,0
+  animation507005.interval,bind
+  animation507005.pattern0,overlay,1705,0,0,0
+  animation507006.interval,bind
+  animation507006.pattern0,overlay,1706,0,0,0
+  animation507007.interval,bind
+  animation507007.pattern0,overlay,1708,0,0,0
+  animation506508.interval,bind
+  animation506508.pattern0,overlay,1709,0,0,0
+  animation506509.interval,bind
+  animation506509.pattern0,overlay,1710,0,0,0
+  animation506510.interval,bind
+  animation506510.pattern0,overlay,1711,0,0,0
+  animation506511.interval,bind
+  animation506511.pattern0,overlay,1712,0,0,0
+  
+  //袖 507000
+  
+  //髪+
+  animation506150.interval,bind
+  animation506150.pattern0,overlay,1150,0,0,0
+  animation506790.interval,bind
+  animation506790.pattern0,overlay,1151,0,0,0
+  animation506791.interval,bind
+  animation506791.pattern0,overlay,1152,0,0,0
+  animation506792.interval,bind
+  animation506792.pattern0,overlay,1153,0,0,0
+  
+  //前髪
+  animation506701.interval,bind
+  animation506701.pattern0,overlay,701,0,0,0
+  animation506702.interval,bind
+  animation506702.pattern0,overlay,702,0,0,0
+  animation506703.interval,bind
+  animation506703.pattern0,overlay,703,0,0,0
+  animation506704.interval,bind
+  animation506704.pattern0,overlay,704,0,0,0
+  animation506705.interval,bind
+  animation506705.pattern0,overlay,705,0,0,0
+  
+  // メッシュ
+  animation506698.interval,bind
+  animation506698.pattern0,overlay,798,0,0,0
+  animation506798.interval,bind
+  animation506798.pattern0,overlay,798,0,0,0
+  animation506699.interval,bind
+  animation506699.pattern0,overlay,799,0,0,0
+  animation506799.interval,bind
+  animation506799.pattern0,overlay,799,0,0,0
+  
+  //ボトムス
+  animation504370.interval,bind
+  animation504370.pattern0,overlay,1300,0,0,0
+  animation504371.interval,bind
+  animation504371.pattern0,overlay,1301,0,0,0
+  animation504372.interval,bind
+  animation504372.pattern0,overlay,1302,0,0,0
+  animation504373.interval,bind
+  animation504373.pattern0,overlay,1303,0,0,0
+  animation504374.interval,bind
+  animation504374.pattern0,overlay,1304,0,0,0
+  animation504375.interval,bind
+  animation504375.pattern0,overlay,1305,0,0,0
+
+  //靴
+  animation503351.interval,bind
+  animation503351.pattern0,overlay,1600,0,0,0
+  animation503352.interval,bind
+  animation503352.pattern0,overlay,1601,0,0,0
+  animation503353.interval,bind
+  animation503353.pattern0,overlay,1602,0,0,0
+  animation503354.interval,bind
+  animation503354.pattern0,overlay,1603,0,0,0
+  animation503356.interval,bind
+  animation503356.pattern0,overlay,1604,0,0,0
+  animation503357.interval,bind
+  animation503357.pattern0,overlay,1605,0,0,0
+  animation503358.interval,bind
+  animation503358.pattern0,overlay,1606,0,0,0
+  animation503359.interval,bind
+  animation503359.pattern0,overlay,1607,0,0,0
+  animation503360.interval,bind
+  animation503360.pattern0,overlay,1608,0,0,0
+  animation503361.interval,bind
+  animation503361.pattern0,overlay,1609,0,0,0
+  //手animation5099999
+
+  animation700000.interval,bind+always
+  animation700000.pattern0,reduce,50000,0,0,0
+  animation700000.pattern1,reduce,50001,300,0,0
+  animation700000.pattern2,reduce,50000,300,0,0
+
