@@ -25,11 +25,6 @@ OnRandomTalkEnd
 
 talks : array
 {
-  SetBalloonSurfaceSakura + talk_all
-}
-
-talk_all : array
-{
 	{
 		SetBalloonSurfaceSakura("library")
 		--
