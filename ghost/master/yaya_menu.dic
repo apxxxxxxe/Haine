@@ -9,13 +9,7 @@
 OnOpenMenu
 {
   TalkStatus = 'menu'
-  if (_argv[0] != "") {
-    CurrentMenuDialog = _argv[0]
-  }
-  else {
-    CurrentMenuDialog = MenuDialog
-  }
-  OnMainMenu + CurrentMenuDialog
+  OnMainMenu
 }
 
 OnMainMenu
@@ -23,9 +17,7 @@ OnMainMenu
   SetBalloonSurfaceSakura
   --
   "\![set,autoscroll,disable]\_q\*\0/
-  //\_l[0,1.2em]------------------------------------/
-  \_l[0,1.2em]/
-  \_l[0.8em,@2.0em]\![*]\q[話して,Menu_RandomTalk]/
+  \_l[0.8em,2.5em]\![*]\q[話して,Menu_RandomTalk]/
   \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LastTalk]/
   \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]"
   --
@@ -49,29 +41,6 @@ OnMainMenu
   }
   --
   "\0\_l[0,0]\_q"
-}
-
-DialogNotice
-{
-  "あφ、呼んだかしら？"
-  "ああφ、何かしら。"
-}
-
-MenuDialog
-{
-  _eyes = GetSurfaceElements(6)
-  _mouse = GetSurfaceElements(4)
-  if (_eyes == 6 || _eyes == 5) && _mouse == 1 {
-    "……h11" + GetSurfaceElements(3) + "10" + EVAL(GetSurfaceElements(6) - 3) + "\w4"+ /
-    "h11" + GetSurfaceElements(3) + "201" + /
-    DialogNotice
-  }
-  else {
-    "h111204はいφ、なにφ？"
-    "h111201うんφ、どうしたのφ？"
-    "h111201聞くわ。"
-    "h111101どうしたのφ？"
-  }
 }
 
 OnConfigMenu
@@ -229,7 +198,6 @@ OnChoiceTimeout
 
 OnMenuClose
 {
-  CurrentMenuDialog = ''
   TalkStatus = 'none'
   touch_count = 0
   if ISFUNC("OnReloadTimer") {
