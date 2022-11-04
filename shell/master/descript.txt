@@ -31,13 +31,12 @@ sakura.bindgroup506511.name,頭,モノクル右
 
 sakura.bindoption.group,後髪,mustselect
 sakura.bindgroup500100.name,後髪,デフォルト
-sakura.bindgroup500102.name,後髪,B
-sakura.bindgroup500107.name,後髪,C
-sakura.bindgroup500109.name,後髪,D
-sakura.bindgroup500101.name,後髪,E
-sakura.bindgroup500103.name,後髪,F
-sakura.bindgroup500110.name,後髪,G
-sakura.bindgroup500106.name,後髪,H
+sakura.bindgroup500107.name,後髪,A
+sakura.bindgroup500109.name,後髪,B
+sakura.bindgroup500101.name,後髪,C
+sakura.bindgroup500103.name,後髪,D
+sakura.bindgroup500110.name,後髪,E
+sakura.bindgroup500106.name,後髪,F
 sakura.bindgroup500100.default,1
 
 sakura.bindoption.group,前髪,mustselect
@@ -51,7 +50,7 @@ sakura.bindgroup506704.name,前髪,C
 sakura.bindgroup506704.addid,500354
 sakura.bindgroup506705.name,前髪,D
 sakura.bindgroup506705.addid,500355
-sakura.bindgroup506702.default,1
+sakura.bindgroup506701.default,1
 
 sakura.bindoption.group,横髪,multiple
 sakura.bindgroup506790.name,横髪,A
