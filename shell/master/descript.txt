@@ -102,10 +102,22 @@ sakura.bindgroup505313.name,袖,フリル袖黒
 sakura.bindgroup505314.name,袖,ハーフ白
 sakura.bindgroup505315.name,袖,ハーフ黒
 sakura.bindgroup505316.name,袖,パフ白
+sakura.bindgroup505317.name,袖,パフ黒
 sakura.bindgroup505318.name,袖,長白
 sakura.bindgroup505318.addid,595318
 sakura.bindgroup505319.name,袖,長黒
 sakura.bindgroup505319.addid,595319
+
+sakura.bindgroup505310.addid,500160
+sakura.bindgroup505312.addid,500162
+sakura.bindgroup505313.addid,500163
+sakura.bindgroup505314.addid,500164
+sakura.bindgroup505315.addid,500165
+sakura.bindgroup505316.addid,500166
+sakura.bindgroup505317.addid,500167
+sakura.bindgroup505318.addid,500168
+sakura.bindgroup505319.addid,500169
+
 sakura.bindgroup505318.default,1
 
 sakura.bindoption.group,ボトムス
@@ -115,15 +127,19 @@ sakura.bindgroup504372.name,ボトムス,フリル黒
 sakura.bindgroup504373.name,ボトムス,フレア白
 sakura.bindgroup504374.name,ボトムス,ショートパンツ
 sakura.bindgroup504375.name,ボトムス,スラックス
+sakura.bindgroup508000.name,ボトムス,フレア黒めくれ
+sakura.bindgroup508001.name,ボトムス,フレア長黒めくれ
 sakura.bindgroup504371.default,1
 
 sakura.bindoption.group,靴下
-sakura.bindgroup501380.name,靴下,ハイソ白
-sakura.bindgroup501381.name,靴下,ハイソ黒
+sakura.bindgroup501388.name,靴下,タイツ白
+sakura.bindgroup501389.name,靴下,タイツ黒
 sakura.bindgroup501384.name,靴下,ニーソ白A
 sakura.bindgroup501382.name,靴下,ニーソ白B
 sakura.bindgroup501385.name,靴下,ニーソ黒A
 sakura.bindgroup501383.name,靴下,ニーソ黒B
+sakura.bindgroup501380.name,靴下,ハイソ白
+sakura.bindgroup501381.name,靴下,ハイソ黒
 sakura.bindgroup501386.name,靴下,ソックス白
 sakura.bindgroup501387.name,靴下,ソックス黒
 sakura.bindgroup501380.default,1

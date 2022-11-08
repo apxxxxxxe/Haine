@@ -69,6 +69,9 @@ parts:
     details:
       - name: 前手
         text: |
+          animation500201.interval,runonce
+          animation500201.pattern0,overlay,1002,0,0,0
+
           animation505000.interval,runonce
           animation505000.pattern0,overlay,503,0,0,0
 
@@ -86,16 +89,21 @@ parts:
           animation505315.pattern0,overlay,1435,0,0,0
           animation505316.interval,bind
           animation505316.pattern0,overlay,1436,0,0,0
+          animation505317.interval,bind
+          animation505317.pattern0,overlay,1437,0,0,0
           animation505318.interval,bind
           animation505318.pattern0,overlay,1438,0,0,0
           animation505319.interval,bind
           animation505319.pattern0,overlay,1439,0,0,0
 
-          collisionex13,hand,polygon,288,423,330,410,336,414,341,422,328,446,317,436,288,442
-          collisionex14,hand,polygon,282,501,262,536,261,550,285,556,299,549,294,521,295,512
+          collisionex14,hand,polygon,288,423,330,410,336,414,341,422,328,446,317,436,288,442
+          collisionex15,hand,polygon,282,501,262,536,261,550,285,556,299,549,294,521,295,512
 
       - name: 胸に手
         text: |
+          animation500201.interval,runonce
+          animation500201.pattern0,overlay,1002,0,0,0
+
           animation504000.interval,runonce
           animation504000.pattern0,overlay,501,0,0,0
 
@@ -116,6 +124,8 @@ parts:
           animation505315.pattern0,overlay,1405,0,0,0
           animation505316.interval,bind
           animation505316.pattern0,overlay,1406,0,0,0
+          animation505317.interval,bind
+          animation505317.pattern0,overlay,1407,0,0,0
 
           animation505318.interval,bind
           animation505318.pattern0,overlay,2408,0,0,0
@@ -129,6 +139,9 @@ parts:
 
       - name: 考える手
         text: |
+          animation500201.interval,runonce
+          animation500201.pattern0,overlay,1002,0,0,0
+
           animation504000.interval,runonce
           animation504000.pattern0,overlay,502,0,0,0
           
@@ -149,6 +162,8 @@ parts:
           animation505315.pattern0,overlay,1405,0,0,0
           animation505316.interval,bind
           animation505316.pattern0,overlay,1406,0,0,0
+          animation505317.interval,bind
+          animation505317.pattern0,overlay,1407,0,0,0
 
           animation505318.interval,bind
           animation505318.pattern0,overlay,3408,0,0,0
@@ -160,38 +175,35 @@ parts:
           animation595319.interval,bind
           animation595319.pattern0,overlay,3509,0,0,0
 
-          collisionex13,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
-          collisionex14,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
+          collisionex14,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
+          collisionex15,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
 
-      - name: 本の手
+      - name: 後ろ手
         text: |
-          animation504000.interval,runonce
-          animation504000.pattern0,overlay,504,0,0,0
-          
-          animation590000.interval,runonce
-          animation590000.pattern0,overlay,604,0,0,0
-          
-          animation505310.interval,bind
-          animation505310.pattern0,overlay,1400,0,0,0
-          animation505311.interval,bind
-          animation505311.pattern0,overlay,1401,0,0,0
-          animation505312.interval,bind
-          animation505312.pattern0,overlay,1402,0,0,0
-          animation505313.interval,bind
-          animation505313.pattern0,overlay,1403,0,0,0
-          animation505314.interval,bind
-          animation505314.pattern0,overlay,1404,0,0,0
-          animation505315.interval,bind
-          animation505315.pattern0,overlay,1405,0,0,0
-          animation505316.interval,bind
-          animation505316.pattern0,overlay,1406,0,0,0
-          animation505318.interval,bind
-          animation505318.pattern0,overlay,1408,0,0,0
-          animation505319.interval,bind
-          animation505319.pattern0,overlay,1409,0,0,0
+          animation500150.interval,runonce
+          animation500150.pattern0,overlay,503,0,0,0
 
-          collisionex13,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
-          collisionex14,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
+          animation500160.interval,bind
+          animation500160.pattern0,overlay,1400,0,0,0
+          animation500161.interval,bind
+          animation500161.pattern0,overlay,1401,0,0,0
+          animation500162.interval,bind
+          animation500162.pattern0,overlay,1402,0,0,0
+          animation500163.interval,bind
+          animation500163.pattern0,overlay,1403,0,0,0
+          animation500164.interval,bind
+          animation500164.pattern0,overlay,1434,0,0,0
+          animation500165.interval,bind
+          animation500165.pattern0,overlay,1435,0,0,0
+          animation500166.interval,bind
+          animation500166.pattern0,overlay,1436,0,0,0
+          animation500167.interval,bind
+          animation500167.pattern0,overlay,1437,0,0,0
+          animation500168.interval,bind
+          animation500168.pattern1,overlay,1438,0,0,0
+          animation500169.interval,bind
+          animation500169.pattern0,overlay,1439,0,0,0
+
 
   - group: 口
     details:
@@ -201,7 +213,6 @@ parts:
           animation500399.pattern0,overlay,350,0,0,0
 
           animation500401.interval,talk
-          animation500401.option,shared-index
           animation500401.pattern0,stop,500399
           animation500401.pattern1,overlay,304,0,0,0
           animation500401.pattern2,overlay,350,100,0,0
@@ -219,7 +230,6 @@ parts:
           animation500399.pattern0,overlay,322,0,0,0
 
           animation500401.interval,talk
-          animation500401.option,shared-index
           animation500401.pattern0,stop,500399
           animation500401.pattern1,overlay,303,0,0,0
           animation500401.pattern2,overlay,322,100,0,0
@@ -237,7 +247,6 @@ parts:
           animation500399.pattern0,overlay,323,0,0,0
 
           animation500401.interval,talk
-          animation500401.option,shared-index
           animation500401.pattern0,stop,500399
           animation500401.pattern1,overlay,303,0,0,0
           animation500401.pattern2,overlay,323,50,0,0
@@ -254,12 +263,23 @@ parts:
           animation500399.interval,runonce
           animation500399.pattern0,overlay,363,0,0,0
 
+          animation500401.interval,talk
+          animation500401.pattern0,stop,500399
+          animation500401.pattern1,overlay,363,0,0,0
+          animation500401.pattern2,overlay,350,100,0,0
+          animation500401.pattern3,overlay,363,100,0,0
+          animation500401.pattern4,overlay,351,100,0,0
+          animation500401.pattern5,overlay,350,100,0,0
+          animation500401.pattern6,overlay,362,80,0,0
+          animation500401.pattern7,overlay,363,80,0,0
+          animation500401.pattern8,overlay,-1,80,0,0
+          animation500401.pattern9,start,500399
+
   - group: 目
     details:
       - name: こっち目
         text: |
           animation500300.interval,runonce+rarely
-          animation500300.option,shared-index
           animation500300.pattern0,overlay,201,0,0,0
           animation500300.pattern1,overlay,209,4000,0,0
           animation500300.pattern2,overlay,204,100,0,0
@@ -268,7 +288,6 @@ parts:
       - name: 上の空
         text: |
           animation500300.interval,runonce+rarely
-          animation500300.option,shared-index
           animation500300.pattern0,overlay,202,0,0,0
           animation500300.pattern1,overlay,209,4000,0,0
           animation500300.pattern2,overlay,205,100,0,0
@@ -277,7 +296,6 @@ parts:
       - name: あっち目
         text: |
           animation500300.interval,runonce+rarely
-          animation500300.option,shared-index
           animation500300.pattern0,overlay,203,0,0,0
           animation500300.pattern1,overlay,209,4000,0,0
           animation500300.pattern2,overlay,206,100,0,0
@@ -350,8 +368,8 @@ base: |
   //後ろ手151
   
   //頭
-  animation500201.interval,runonce
-  animation500201.pattern0,overlay,1001,0,0,0
+  animation500202.interval,runonce
+  animation500202.pattern0,overlay,1001,0,0,0
 
   //目300
   
@@ -372,7 +390,7 @@ base: |
   //眉500
   
   //照れ顔600
-  
+
   //靴下
   animation501380.interval,bind
   animation501380.pattern0,overlay,1500,0,0,0
@@ -390,6 +408,10 @@ base: |
   animation501386.pattern0,overlay,1506,0,0,0
   animation501387.interval,bind
   animation501387.pattern0,overlay,1507,0,0,0
+  animation501388.interval,bind
+  animation501388.pattern0,overlay,1508,0,0,0
+  animation501389.interval,bind
+  animation501389.pattern0,overlay,1509,0,0,0
 
   //靴下＋
   animation501400.interval,bind
@@ -501,6 +523,12 @@ base: |
   animation506511.interval,bind
   animation506511.pattern0,overlay,1712,0,0,0
   
+  //めくれスカート
+  animation508000.interval,bind
+  animation508000.pattern0,overlay,1350,0,0,0
+  animation508001.interval,bind
+  animation508001.pattern0,overlay,1350,0,0,0
+  
   //袖 507000
   
   //髪+
@@ -538,7 +566,9 @@ base: |
   //ボトムス
   animation504370.interval,bind
   animation504370.pattern0,overlay,1300,0,0,0
+  animation504370.collisionex13,skirt,polygon,141,613,213,463,337,463,407,613,336,650,281,652,191,638
   animation504371.interval,bind
+  animation504371.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
   animation504371.pattern0,overlay,1301,0,0,0
   animation504372.interval,bind
   animation504372.pattern0,overlay,1302,0,0,0

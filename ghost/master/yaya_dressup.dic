@@ -4,6 +4,11 @@ OnDressupChanged
     when 'master' {
       if reference[2] == 1 {
         // 着せられたとき
+        case reference[3] {
+          when 'ボトムス' {
+			currentBottoms = reference[1]
+          }
+        }
       } else
       {
         if TalkStatus == 'none' {
