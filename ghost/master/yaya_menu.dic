@@ -132,6 +132,7 @@ OnInfo
   --
   "\_q/
   \_l[0.5em,1.8em] 友好度：" + likability +"/
+  \_l[0.5em,@1.5em] 現在テンション：%(CalcTension)/
   \_l[0.5em,@1.5em] ユーザ誠実度：" + user_honesty + "（" + UserRating + "）/
   \_l[0.5em,@1.5em] 累計触り回数（頭）：" + good_touch_count + "回/
   \_l[0.5em,@1.5em] 累計触り回数（胸）：" + bad_touch_count + "回/

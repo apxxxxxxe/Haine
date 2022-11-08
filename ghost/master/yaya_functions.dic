@@ -375,3 +375,14 @@ GetTimeSlot
   }
 }
 
+CalcTension {
+	_pi = 3.14159265358
+	_a = 5
+	_period = 60 * 67
+
+	_x = systemuptime % _period
+
+	_rad = 2 * _pi / _period * _x
+
+	SIN(_rad) * _a
+}
