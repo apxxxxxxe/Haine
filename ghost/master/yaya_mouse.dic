@@ -34,10 +34,20 @@ MouseMove0face : nonoverlap
 
 MouseMove0bust : nonoverlap
 {
+  // 怒られるまでの回数
+  _threshold = 7
+
   bad_touch_count++
-  "h111204……外ではこれが普通なの？h111207違うわよね。"
-  "h111202……いくら他人の目がないとはいえ、h111205品性を疑うわ。"
-  "h111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。h111201許されると思ったの？h111204わきまえなさい。"
+  if touch_count < _threshold {
+    "h111201ずいぶん必死ね。h111304楽しいの？"
+    "h111201……外ではこれが普通なの？h111204違うわよね。"
+    "h111202……いくら他人の目がないとはいえ、h111205品性を疑うわ。"
+	"h111304面白い顔。h111309鏡で見せてあげたいわ。"
+  } elseif touch_count == _threshold {
+	"h111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。h111201許されていると思ったの？\nh111204わきまえなさい。"
+  } else {
+	"h111204\1自重しよう……。"
+  }
 }
 
 //******************************************************************************
@@ -52,27 +62,40 @@ MouseDoubleClick0
 //******************************************************************************
 // めくり反応（上ホイール）
 //******************************************************************************
-MouseWheelUp0skirt
+MouseWheelUp0skirt : nonoverlap
 {
+	// 呆れ/怒られるまでの回数
+	_threshold = 3
+
 	_validBottoms = ("フレア黒", "フレア長黒")
 	if !ISVAR("currentBottoms") {
 	  "\1(めくり反応を正しく動かすためには初期設定が必要です。\n着せ替えメニューから最低１回ボトムスを着せ替えてください。)"
 	} elseif ASEARCH(currentBottoms, _validBottoms) == -1 {
 	  // めくり非対応のボトムス
 	} else {
-	  "/
-	  \t/
-	  \![bind,ボトムス,%(currentBottoms)めくれ,1]/
-	  "
+	  "\t\0"
 	  --
-	  "h214402……！\n"
-	  "h244402……！\n"
+	  "\![bind,ボトムス,%(currentBottoms)めくれ,1]"
+	  --
+	  if touch_count < _threshold {
+		// 赤面
+		"h244402……！\n"
+	  } else {
+		// 真顔
+		"h114105……\n"
+	  }
 	  --
 	  "\![bind,ボトムス,%(currentBottoms),1]"
 	  --
-	  "\s[111304]……覚えておきなさい。"
-	  "\s[111204]……悪戯がすぎるわよ。"
-	  "\s[111105]……何が楽しいんだか。"
+	  if touch_count < _threshold {
+		"h131404あなたねえ。\nh131104やっていいことと悪いことがあるわよ。"
+		"h111301\_w[100]h111304やってくれたわね。"
+		"h111301\_w[100]h111304覚えておきなさい。"
+	  } else {
+		"h111101\_w[100]h111104悪戯がすぎるわよ。"
+		"h111103……h111106何が楽しいんだか。"
+		"h111309……屈辱というやつね。h111204いつか必ず返すわ。"
+	  }
 	}
 }
 
@@ -108,33 +131,6 @@ MouseWheelDown0hand
   }
 }
 
-//******************************************************************************
-// 見つめ反応（静止時）
-//******************************************************************************
-
-OnMouseLookAtbust : nonoverlap
-{
-  bad_touch_count++
-  "……h112204視線って案外わかるのよ？\nやるならh112207悟られないようにしないと。"
-  "……h212109見すぎよ。"
-}
-
-OnMouseLookAtBeforebust : nonoverlap
-{
-  "h112104"
-}
-
-OnMouseLookAtface : nonoverlap
-{
-  "……h321207顔に何かついてる？"
-  "h321201……h321207そんなに見つめられると、困ってしまうわ。\nh121204面白いわけでもないでしょう？"
-}
-
-OnMouseLookAtBeforeface : nonoverlap
-{
-  "h321201"
-}
-
 DialogSurprised
 {
   "！……"
@@ -154,23 +150,25 @@ DialogConfused
 //変更の必要はありません。
 //******************************************************************************
 
-// 触り反応時の共通処理
-CommonEventMousePre
+// 共通処理
+OnMouseEvent
 {
   TalkStatus = "touch"
   lastresponce = systemuptime
   first_touch = 1
-}
 
-OnMouseEvent
-{
   "\![timerraise,30000,1,OnTouchCountReset,reset]"
   --
   SetBalloonSurfaceSakura
   --
-  CanselLookAt
-  --
   InsertLineFeed(NextTouchTalk)
+  --
+  "\![raise,OnAfterMouseEvent]"
+}
+
+OnAfterMouseEvent
+{
+  TalkStatus = 'none'
 }
 
 OnTouchCountReset
@@ -188,7 +186,6 @@ OnMouseDoubleClick
 {
   NextTouchTalk = AYATEMPLATE.MouseEventExec("MouseDoubleClick")
   if NextTouchTalk != "" {
-    CommonEventMousePre
     "\![raise,OnMouseEvent]"
   }
 }
@@ -198,7 +195,6 @@ OnMouseClickEx
   if reference[5] == "middle" {
     NextTouchTalk = AYATEMPLATE.MouseEventExec("MouseWheelClick")
     if NextTouchTalk != "" {
-      CommonEventMousePre
       "\![raise,OnMouseEvent]"
     }
   }
@@ -219,18 +215,6 @@ OnMouseWheel
 	}
 	
 	_result
-}
-
-CanselLookAt
-{
-  "\![timerraise,0,1,OnMouseLookAtBefore%(_argv[0])]"
-  --
-  "\![timerraise,0,1,OnMouseLookAt%(_argv[0])]"
-}
-
-OnMouseLookAtBefore
-{
-  "\C\![raise,OnMouseLookAtBefore%(reference[0])]"
 }
 
 IsMouseTalkExist
@@ -305,7 +289,6 @@ AYATEMPLATE.MouseMoveWheelFunc
         // ↓追加・変更
         NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
         if NextTouchTalk != "" {
-          CommonEventMousePre
           "\![raise,OnMouseEvent]"
         }
         // ↑追加・変更ここまで
