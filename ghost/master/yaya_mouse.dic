@@ -88,6 +88,8 @@ MouseWheelUp0skirt : nonoverlap
 	  "\![bind,ボトムス,%(currentBottoms),1]"
 	  --
 	  if touch_count < _threshold {
+		"h241102\_w[500]"
+		--
 		"h131404あなたねえ。\nh131104やっていいことと悪いことがあるわよ。"
 		"h111301\_w[100]h111304やってくれたわね。"
 		"h111301\_w[100]h111304覚えておきなさい。"
