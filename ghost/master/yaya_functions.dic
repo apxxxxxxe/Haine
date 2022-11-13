@@ -118,7 +118,7 @@ SetBalloonSurfaceKero
 //10000の位:顔色 1000の位:眉 100の位:腕 10の位:口 1の位:目
 GetSurfaceElements
 {
-  _e = current_surface / POW(10, 6 - _argv[0]) % 10
+  _e = current_surface / POW(10, 7 - _argv[0]) % 10
   _e
 }
 
@@ -174,7 +174,7 @@ InsertLineFeed {
 
 SurfaceSnippet
 {
-  RE_REPLACEEX(_argv[0], 'h([0-9]{6})', '\\0\\![embed,OnSurfaceComplete,$1]')
+  RE_REPLACEEX(_argv[0], 'h([0-9]{7})', '\\0\\![embed,OnSurfaceComplete,$1]')
 }
 
 IsUnderLine
@@ -243,10 +243,10 @@ UpdateUserRating
 
 OnWindowStateRestore
 {
-  'h100000h111109\_w[500]h111101'
-  'h100000h111109\_w[500]h111103'
-  'h100000h111105\_w[500]h111101'
-  "h100000h111103\_w[2500]h111101\_w[500]h111204"
+  'h1000000h1111109\_w[500]h1111101'
+  'h1000000h1111109\_w[500]h1111103'
+  'h1000000h1111105\_w[500]h1111101'
+  "h1000000h1111103\_w[2500]h1111101\_w[500]h1111204"
 }
 
 //******************************************************************************
@@ -376,13 +376,16 @@ GetTimeSlot
 }
 
 CalcTension {
-	_pi = 3.14159265358
-	_a = 5
-	_period = 60 * 67
+	// とりうる範囲は0~100の整数
+	// 0からスタート
 
-	_x = systemuptime % _period
+	_pi = 3.114159265358
+	_max = 100
+	_T = 60 * 67
 
-	_rad = 2 * _pi / _period * _x
+	_x = ghostuptime % _T
 
-	SIN(_rad) * _a
+	_rad = 2 * _pi / _T * _x
+
+	TOINT(ROUND(((-1*COS(_rad)+1)/2)*_max))
 }

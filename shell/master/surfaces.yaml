@@ -16,6 +16,32 @@
 #                 text: ...  # そのパーツのサーフェス定義。
 
 parts:
+  - group: スカート
+    details:
+      - name: 通常スカート
+        text: |
+          animation504370.interval,bind
+          animation504370.pattern0,overlay,1300,0,0,0
+          animation504370.collisionex13,skirt,polygon,141,613,213,463,337,463,407,613,336,650,281,652,191,638
+          animation504371.interval,bind
+          animation504371.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
+          animation504371.pattern0,overlay,1301,0,0,0
+          animation504372.interval,bind
+          animation504372.pattern0,overlay,1302,0,0,0
+          animation504373.interval,bind
+          animation504373.pattern0,overlay,1303,0,0,0
+          animation504374.interval,bind
+          animation504374.pattern0,overlay,1304,0,0,0
+          animation504375.interval,bind
+          animation504375.pattern0,overlay,1305,0,0,0
+      
+      - name: めくれスカート
+        text: |
+          animation508000.interval,bind
+          animation508000.pattern0,overlay,1350,0,0,0
+          animation508001.interval,bind
+          animation508001.pattern0,overlay,1351,0,0,0
+
   - group: 顔色
     details:
       - name: 通常顔
@@ -203,7 +229,6 @@ parts:
           animation500168.pattern1,overlay,1438,0,0,0
           animation500169.interval,bind
           animation500169.pattern0,overlay,1439,0,0,0
-
 
   - group: 口
     details:
@@ -523,12 +548,6 @@ base: |
   animation506511.interval,bind
   animation506511.pattern0,overlay,1712,0,0,0
   
-  //めくれスカート
-  animation508000.interval,bind
-  animation508000.pattern0,overlay,1350,0,0,0
-  animation508001.interval,bind
-  animation508001.pattern0,overlay,1351,0,0,0
-  
   //袖 507000
   
   //髪+
@@ -562,22 +581,6 @@ base: |
   animation506699.pattern0,overlay,799,0,0,0
   animation506799.interval,bind
   animation506799.pattern0,overlay,799,0,0,0
-  
-  //ボトムス
-  animation504370.interval,bind
-  animation504370.pattern0,overlay,1300,0,0,0
-  animation504370.collisionex13,skirt,polygon,141,613,213,463,337,463,407,613,336,650,281,652,191,638
-  animation504371.interval,bind
-  animation504371.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
-  animation504371.pattern0,overlay,1301,0,0,0
-  animation504372.interval,bind
-  animation504372.pattern0,overlay,1302,0,0,0
-  animation504373.interval,bind
-  animation504373.pattern0,overlay,1303,0,0,0
-  animation504374.interval,bind
-  animation504374.pattern0,overlay,1304,0,0,0
-  animation504375.interval,bind
-  animation504375.pattern0,overlay,1305,0,0,0
 
   //靴
   animation503351.interval,bind

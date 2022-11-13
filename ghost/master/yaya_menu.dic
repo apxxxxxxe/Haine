@@ -218,8 +218,8 @@ Menu_RandomTalk
 }
 
 DialogMenuRandomTalk {
-  'h111201いいわよ。h111205……そうね、\c'
-  'h113309なんの話がいいかしら…………h113205そうね、\c'
+  'h1111201いいわよ。h1111205……そうね、\c'
+  'h1113309なんの話がいいかしら…………h1113205そうね、\c'
 }
 
 //---- さっきの話は
@@ -229,7 +229,7 @@ Menu_LastTalk
 
   SetBalloonSurfaceSakura
   --
-  "h111209さっきの話ね。\c"
+  "h1111209さっきの話ね。\c"
   --
   lasttalk
 }

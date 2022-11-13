@@ -122,13 +122,13 @@ sakura.bindgroup505318.default,1
 
 sakura.bindoption.group,ボトムス
 sakura.bindgroup504370.name,ボトムス,フレア黒
+sakura.bindgroup504370.addid,508000
 sakura.bindgroup504371.name,ボトムス,フレア長黒
+sakura.bindgroup504371.addid,508001
 sakura.bindgroup504372.name,ボトムス,フリル黒
 sakura.bindgroup504373.name,ボトムス,フレア白
 sakura.bindgroup504374.name,ボトムス,ショートパンツ
 sakura.bindgroup504375.name,ボトムス,スラックス
-sakura.bindgroup508000.name,ボトムス,フレア黒めくれ
-sakura.bindgroup508001.name,ボトムス,フレア長黒めくれ
 sakura.bindgroup504371.default,1
 
 sakura.bindoption.group,靴下
