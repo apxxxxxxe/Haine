@@ -19,11 +19,13 @@ OnGhostLoad
 //******************************************************************************
 OnBoot
 {
-  _text = ""
+  GetProperties
+  --
   InitialScripts
   --
   SetBalloonSurfaceSakura
   --
+  _text = ""
   if !isEvent1End {
     "\![raise,OnEvent1_1]"
 	return

@@ -46,9 +46,11 @@ InitializeVariable
 // スクリプトによる初期化処理
 InitialScripts
 {
-  GetProperties
-  --
   MakeKeroBalloownFollow
+  --
+  _underwear = ("A", "B")
+  _u = _underwear[RAND(ARRAYSIZE(_underwear))]
+  "\0\![bind,下着,%(_u),1]"
 }
 
 //\1バルーンを\0サーフェスに追従させる
