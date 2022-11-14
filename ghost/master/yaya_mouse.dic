@@ -265,12 +265,20 @@ AYATEMPLATE.MouseEventExec
 
 AYATEMPLATE.MouseMoveWheelFunc
 {
+  _interval = 1000
+
+  // 前回ホイールトークから_interval[ms]経っていない場合はなにもしない
+  if GETTICKCOUNT < wheel_inputtable_tick {
+  	return
+  }
+
   _side = TOINT(reference[3])
   if _argv[0] {
     _side += 10
   }
 
   if AYATEMPLATE.strokeid[_side] == reference[4] {
+	// 前回ころころから1500msたっていたらカウンタをリセット
     if (GETTICKCOUNT - TOINT(AYATEMPLATE.stroketimer[_side])) > 1500 {
       AYATEMPLATE.stroke[_side] = 1
     }
@@ -279,17 +287,14 @@ AYATEMPLATE.MouseMoveWheelFunc
     _stroke = TOINT(AYATEMPLATE.stroke[_side])
     _stroke += 1
     AYATEMPLATE.stroke[_side] = _stroke
-
     if _stroke >= _argv[1] {
       if 'talking' !_in_ status {
+		wheel_inputtable_tick = GETTICKCOUNT + _interval
         AYATEMPLATE.stroke[_side] = 1
-        // ↓追加・変更
         NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
         if NextTouchTalk != "" {
           "\![raise,OnMouseEvent]"
         }
-        // ↑追加・変更ここまで
-
       }
     }
   }
