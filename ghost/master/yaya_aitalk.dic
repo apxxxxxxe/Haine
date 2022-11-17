@@ -27,15 +27,11 @@ talks : array
 {
 	_max = 100
 
-	if CalcTension < _max/4 {
+	if CalcTension < _max/5 {
 		SetBalloonSurfaceSakura("library")
 		--
 		"/
 		h1111101あなた。聞こえているのでしょう、あなた。/
-		"
-
-		"/
-		h1111105終わっても終わっても届かないのよ。いつまでも……h1131405いつまでもいつまでも……！/
 		"
 
 		"/
@@ -47,18 +43,24 @@ talks : array
 		"
 
 		"/
-		h1111205小さな問題を解決すれば、少しの間だけ息ができる。\n/
-		h1111209この倦みきった箱庭の中で、私は溺れ続けているの。/
+		h1111103変化のない毎日のなか、小さな問題を見つけて、解決して、その繰り返し。\n/
+		h1121302この倦みきった箱庭の中では、h1121305それが全てよ。/
 		"
 
 		"/
-		h1111105さむい……。\n/
+		h1112105さむい……。\n/
 		どれだけ暖炉に火をくべても寒いの。\n/
-		肌が冷たくてぴりぴりする。……h1112105どうして？/
+		肌が冷たくてぴりぴりする。……h1112109どうして？/
+		"
+
+		"/
+		h1122102息が、うまく吸えないの。ずっと胸が詰まっているみたい。\n/
+		h1122105何もしていないのにこれだもの。\n/
+		h1122209……本当に、いやになるわ。/
 		"
 	}
 
-	elseif CalcTension < _max/4*2 {
+	elseif CalcTension < _max/5*2 {
 		SetBalloonSurfaceSakura("library")
 		--
 		"/
@@ -75,7 +77,7 @@ talks : array
 		"
 	}
 
-	elseif CalcTension < _max/4*3 {
+	elseif CalcTension < _max/5*3 {
 		SetBalloonSurfaceSakura()
 		--
 		"/
@@ -149,9 +151,9 @@ OnKeyPress
       "\![raise,OnMouseDoubleClick,0,0,0,0,__SYSTEM_KEYDOWN_COL,0,mouse]"
     }
     when "r" {
-      SetBalloonSurfaceSakura
-      --
-      "\1\![reload,shiori]shioriをリロードしました"
+      "\![reload,shiori]"
+	  --
+	  OnBoot
     }
     when "d" {
       isdebug = ! isdebug

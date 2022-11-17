@@ -57,6 +57,11 @@ parts:
           animation500600.interval,runonce
           animation500600.pattern0,overlay,102,0,0,0
 
+      - name: 涙顔
+        text: |
+          animation500600.interval,runonce
+          animation500600.pattern0,overlay,103,0,0,0
+
       - name: シルエット化
         text: |
           animation510000.interval,runonce

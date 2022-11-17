@@ -15,6 +15,45 @@
 //部位はありません。
 //******************************************************************************
 
+//******************************************************************************
+//セリフ
+//******************************************************************************
+
+DialogSurprised
+{
+  "！……"
+  "なっ……"
+}
+
+DialogConfused
+{
+  "……"
+  "あの……"
+}
+
+// セクハラ反応-驚き/恥ずかしさ
+DialogTouchSexialSurprised : nonoverlap
+{
+	"h1131404このっ……。\nh1131109……こほん。h1131204やっていいことと悪いことがあるわよ。"
+	"h1111301\_w[100]h1111304覚えておきなさい。\nh1111309いつか、後悔するぐらいあなたを辱めてあげる。"
+    "h1111201……外ではこれが普通なの？h1111204違うわよね。"
+    "h1111202……いくら他人の目がないとはいえ、h1111205品性を疑うわ。"
+}
+
+// セクハラ反応-呆れ気味
+DialogTouchSexialAkire : nonoverlap
+{
+    "h1111201さっきからずいぶん必死ね。\nh1111304ばかみたいな顔してるわよ。"
+	"h1111304面白い顔。h1111309鏡で見せてあげたいわ。"
+	"h1111101\_w[100]h1111104悪戯がすぎるわよ。"
+	"h1111103はあ……h1111106何が楽しいんだか。"
+}
+
+DialogTouchDisturbedSexial : nonoverlap
+{
+	"h1111104……話していたのだけど？"
+	"h1111304……呆れた。相手の話を聞いていられないの？\nh1111309発情期の猿のほうがいくらかましね。"
+}
 
 //******************************************************************************
 //撫で反応
@@ -39,12 +78,14 @@ MouseMove0bust : nonoverlap
 
   bad_touch_count++
   if touch_count < _threshold {
-    "h1111201ずいぶん必死ね。h1111304楽しいの？"
-    "h1111201……外ではこれが普通なの？h1111204違うわよね。"
-    "h1111202……いくら他人の目がないとはいえ、h1111205品性を疑うわ。"
-	"h1111304面白い顔。h1111309鏡で見せてあげたいわ。"
+	DialogTouchSexialSurprised
   } elseif touch_count == _threshold {
-	"h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。h1111201許されていると思ったの？\nh1111204わきまえなさい。"
+	"h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。"
+	--
+	"h1111201許されていると思ったの？\n"
+	--
+	"h1111304残念だけど、それほど気は長くないの。"
+	"h1111204わきまえなさい。"
   } else {
 	"h1111204\1自重しよう……。"
   }
@@ -67,32 +108,22 @@ MouseWheelUp0skirt : nonoverlap
 	// 呆れ/怒られるまでの回数
 	_threshold = 3
 
-	_validBottoms = ("フレア黒", "フレア長黒")
-	if ASEARCH(currentBottoms, _validBottoms) == -1 {
-	  // めくり非対応のボトムス
-	  "\1(このボトムスはめくれないようだ)"
-	} else {
-	  "\t\0"
-	  --
-	  if touch_count < _threshold {
+	if !SHIORI3FW.CanTalk {
+		"h2144402……\n"
+		--
+		DialogTouchDisturbedSexial
+	} elseif touch_count < _threshold {
 		// 赤面
 		"h2244402……！\n"
-	  } else {
-		// 真顔
-		"h2114105……\n"
-	  }
-	  --
-	  if touch_count < _threshold {
+		--
 		"h1241102\_w[500]"
 		--
-		"h1131404あなたねえ。\nh1131104やっていいことと悪いことがあるわよ。"
-		"h1111301\_w[100]h1111304やってくれたわね。"
-		"h1111301\_w[100]h1111304覚えておきなさい。"
-	  } else {
-		"h1111101\_w[100]h1111104悪戯がすぎるわよ。"
-		"h1111103……h1111106何が楽しいんだか。"
-		"h1111309……屈辱というやつね。h1111204いつか必ず返すわ。"
-	  }
+		DialogTouchSexialSurprised
+	} else {
+		// 真顔
+		"h2114104……\n"
+		--
+		DialogTouchSexialAkire
 	}
 }
 
@@ -103,41 +134,21 @@ MouseWheelUp0skirt : nonoverlap
 MouseWheelDown0shoulder
 {
   if touch_count == 1 {
-    "h1111209ん。\nh1111205……。\nh1111201………h1111204ふふ。"
   }
   elseif touch_count == 2 {
-    "h1000000あっ……。h1111209…………h1111205まだ、こうしていたいの？"
   }
   elseif touch_count > 2 {
-    "h1111209……。"
   }
 }
 
 MouseWheelDown0hand
 {
   if touch_count == 1 {
-    "h1111202うん？\n……h1111205手を引いて、h1111204それからどうするの？"
-    "h1111204……どこかへ連れて行ってくれるの？\n1111209残念だけど、私はここを動かないわよ。"
   }
   elseif touch_count == 2 {
-    "h1111205ぎゅーっ……h1111201。h1111204ふふ。"
-    "h1111209……離してくれないの？困ったわね……h1111207ふふ……"
   }
   elseif touch_count > 2 {
-    "……。"
   }
-}
-
-DialogSurprised
-{
-  "！……"
-  "なっ……"
-}
-
-DialogConfused
-{
-  "……"
-  "あの……"
 }
 
 //******************************************************************************
@@ -176,7 +187,11 @@ OnTouchCountReset
 
 OnMouseMove
 {
-  AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
+  _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
+  if _result != "" && !SHIORI3FW.CanTalk {
+	_result = DialogTouchDisturbedSexial
+  }
+  _result
 }
 
 OnMouseDoubleClick
@@ -267,7 +282,7 @@ AYATEMPLATE.MouseMoveWheelFunc
 {
   _interval = 1000
 
-  // 前回ホイールトークから_interval[ms]経っていない場合はなにもしない
+  // 前回ホイールトークから_interval[ms]経っていない&喋ってない場合はなにもしない
   if GETTICKCOUNT < wheel_inputtable_tick {
   	return
   }
@@ -288,14 +303,12 @@ AYATEMPLATE.MouseMoveWheelFunc
     _stroke += 1
     AYATEMPLATE.stroke[_side] = _stroke
     if _stroke >= _argv[1] {
-      if 'talking' !_in_ status {
-		wheel_inputtable_tick = GETTICKCOUNT + _interval
-        AYATEMPLATE.stroke[_side] = 1
-        NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
-        if NextTouchTalk != "" {
-          "\![raise,OnMouseEvent]"
-        }
-      }
+	  wheel_inputtable_tick = GETTICKCOUNT + _interval
+	  AYATEMPLATE.stroke[_side] = 1
+	  NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
+	  if NextTouchTalk != "" {
+		  "\![raise,OnMouseEvent]"
+	  }
     }
   }
   else {

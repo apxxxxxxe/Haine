@@ -11,7 +11,7 @@ OnDressupChanged
         }
       } else
       {
-        if TalkStatus == 'none' {
+        if SHIORI3FW.CanTalk {
           // 脱がされたとき
           case reference[3] {
             when 'トップス' {
