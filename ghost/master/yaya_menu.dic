@@ -8,7 +8,6 @@
 //------------------------------------------------------------------------------
 OnOpenMenu
 {
-  TalkStatus = 'menu'
   OnMainMenu
 }
 
@@ -45,7 +44,6 @@ OnMainMenu
 
 OnConfigMenu
 {
-  TalkStatus = 'menu'
   '\C\c'
   --
   "%(全般設定メニュー)\e"
@@ -125,7 +123,6 @@ OnShowInfo
 OnInfo
 {
   UpdateUserRating
-  TalkStatus = 'menu'
   '\C\c'
   --
   SetBalloonSurfaceSakura
@@ -152,7 +149,6 @@ OnShowTalkSetting
 
 OnTalkSettingMenu
 {
-  TalkStatus = 'menu'
   '\C\c'
   --
   "%(喋り設定メニュー)\e"
@@ -199,7 +195,6 @@ OnChoiceTimeout
 
 OnMenuClose
 {
-  TalkStatus = 'none'
   touch_count = 0
   if ISFUNC("OnReloadTimer") {
     "\![timerraise,0,0,OnReloadTimer]"
@@ -210,7 +205,6 @@ OnMenuClose
 //---- 何か話して
 Menu_RandomTalk
 {
-  TalkStatus = 'talking'
 
   SetBalloonSurfaceSakura
   --

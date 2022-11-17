@@ -161,7 +161,6 @@ MouseWheelDown0hand
 // 共通処理
 OnMouseEvent
 {
-  TalkStatus = "touch"
   lastresponce = systemuptime
   first_touch = 1
 
@@ -170,13 +169,6 @@ OnMouseEvent
   SetBalloonSurfaceSakura
   --
   InsertLineFeed(NextTouchTalk)
-  --
-  "\![raise,OnAfterMouseEvent]"
-}
-
-OnAfterMouseEvent
-{
-  TalkStatus = 'none'
 }
 
 OnTouchCountReset

@@ -7,20 +7,12 @@ RandomTalk
   UpdateUserRating
   lastanchor = ""
   lastresponce = systemuptime
-  TalkStatus = "talking"
   total_talk_count++
 
   SetBalloonSurfaceSakura
   --
   lasttalk = InsertLineFeed(roulette.exec('talks'))
   lasttalk
-  --
-  "\![raise,OnRandomTalkEnd]"
-}
-
-OnRandomTalkEnd
-{
-  TalkStatus = "none"
 }
 
 talks : array
@@ -232,7 +224,6 @@ OnSurfaceRestore
 
 OnBalloonBreak
 {
-  TalkStatus = "none"
 }
 
 OnBalloonClose
