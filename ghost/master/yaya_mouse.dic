@@ -37,7 +37,7 @@ DialogTouchSexialSurprised : nonoverlap
 	"h1131404このっ……。\nh1131109……こほん。h1131204やっていいことと悪いことがあるわよ。"
 	"h1111301\_w[100]h1111304覚えておきなさい。\nh1111309いつか、後悔するぐらいあなたを辱めてあげる。"
     "h1111201……外ではこれが普通なの？h1111204違うわよね。"
-    "h1111202……いくら他人の目がないとはいえ、h1111205品性を疑うわ。"
+    "h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。"
 }
 
 // セクハラ反応-呆れ気味
@@ -108,7 +108,7 @@ MouseWheelUp0skirt : nonoverlap
 	// 呆れ/怒られるまでの回数
 	_threshold = 3
 
-	if !SHIORI3FW.CanTalk {
+	if IsTalking {
 		"h2144402……\n"
 		--
 		DialogTouchDisturbedSexial
@@ -180,7 +180,7 @@ OnTouchCountReset
 OnMouseMove
 {
   _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
-  if _result != "" && !SHIORI3FW.CanTalk {
+  if _result != "" && IsTalking {
 	_result = DialogTouchDisturbedSexial
   }
   _result

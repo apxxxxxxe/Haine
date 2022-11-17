@@ -307,6 +307,10 @@ TextOnlyTranslatorFunc
     }
 
   }
+
+  // 末尾のウェイトを削除(statusの'talking'判定を見た目通りにするため)
+  _text = RE_REPLACE(_text, '\\_w\[\d+\]$', '')
+
   _text
 }
 
