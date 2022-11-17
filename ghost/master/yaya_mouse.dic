@@ -303,11 +303,11 @@ AYATEMPLATE.MouseMoveWheelFunc
     _stroke += 1
     AYATEMPLATE.stroke[_side] = _stroke
     if _stroke >= _argv[1] {
-	  wheel_inputtable_tick = GETTICKCOUNT + _interval
 	  AYATEMPLATE.stroke[_side] = 1
 	  NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
 	  if NextTouchTalk != "" {
-		  "\![raise,OnMouseEvent]"
+		wheel_inputtable_tick = GETTICKCOUNT + _interval
+		"\![raise,OnMouseEvent]"
 	  }
     }
   }
