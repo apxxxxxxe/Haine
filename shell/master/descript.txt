@@ -168,8 +168,9 @@ sakura.bindgroup500250.name,下着,A
 sakura.bindgroup500251.name,下着,B
 sakura.bindgroup500250.default,1
 
-sakura.bindoption.group,ex
-sakura.bindgroup700000.name,ex,胴体霧
+sakura.bindoption.group,ex,multiple
+sakura.bindgroup700000.name,ex,霧消え
+sakura.bindgroup750000.name,ex,霧覆い
 
 sakura.menuitemex1,頭,507001
 sakura.menuitemex2,頭,507005
