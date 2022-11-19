@@ -670,13 +670,18 @@ surface.append1111101-2644410
   animation503361.pattern0,overlay,1609,0,0,0
   //手animation5099999
   
+  animation650000.interval,bind
+  animation650000.pattern0,reduce,90000,0,0,0
+  
   animation700000.interval,bind+always
   animation700000.pattern0,reduce,50000,0,0,0
   animation700000.pattern1,reduce,50001,1500,0,0
-  animation700000.pattern2,reduce,50000,1500,0,0
+  animation700000.pattern2,reduce,50002,1500,0,0
+  animation700000.pattern3,reduce,50000,1500,0,0
   
   animation750000.interval,bind+always
   animation750000.pattern0,overlay,55000,0,0,0
   animation750000.pattern1,overlay,55001,1500,0,0
-  animation750000.pattern2,overlay,55000,1500,0,0
+  animation750000.pattern2,overlay,55002,1500,0,0
+  animation750000.pattern3,overlay,55000,1500,0,0
 }
