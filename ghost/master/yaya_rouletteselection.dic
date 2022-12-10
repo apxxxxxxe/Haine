@@ -20,7 +20,7 @@ roulette.exec
   // 選ばれなかったトークの重みを1に
   EVAL(_name+'.weights['+_index+'] = 1')
 
-  if index == -1 {
+  if _index == -1 {
     'error: ランダムトーク処理時にエラーが発生しました'
     return
   }
@@ -52,7 +52,8 @@ roulette.getcumsum
   if ISVAR(_name+'.weights') {
     _weights = IARRAY
     _weights = EVAL(_name+'.weights')
-  } else {
+  }
+  else {
     // _nameにおける初回
     _willreset = 1
   }
@@ -69,7 +70,7 @@ roulette.getcumsum
 
   _cumsum = (IARRAY, 0)
   for _i=0; _i<ARRAYSIZE(_weights); _i++ {
-    _cumsum = (_cumsum, _cumsum[_i]+_weights[_i])
+    _cumsum = (_cumsum, _cumsum[_i] + _weights[_i])
   }
 
   LETTONAME(_name+'.totalweight', _cumsum[ARRAYSIZE(_cumsum)-1])
@@ -84,7 +85,7 @@ roulette.binsearch
   _value = RAND(EVAL(_name+'.totalweight'))
 
   _low = 0
-  _high = ARRAYSIZE(_cumsum) -1
+  _high = ARRAYSIZE(_cumsum) - 1
 
   if _value <= _cumsum[_low] {
     0
@@ -95,8 +96,7 @@ roulette.binsearch
     return
   }
 
-  while 1
-  {
+  while 1 {
     _i = TOINT((_low+_high)/2)
 
     if _cumsum[_i] >= _value {
@@ -106,8 +106,8 @@ roulette.binsearch
       _low = _i
     }
 
-    if _high-_low == 1 {
-      _high-1
+    if _high - _low == 1 {
+      _high - 1
       return
     }
   }

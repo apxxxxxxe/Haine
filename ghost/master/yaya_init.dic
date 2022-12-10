@@ -37,6 +37,7 @@ InitializeVariable
   first_touch = 0
   isKeyBlocked = 0
   wheel_inputtable_tick = 0
+  conditionrecovery = 0
 
   getSuntimes
 

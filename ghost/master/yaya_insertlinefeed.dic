@@ -6,13 +6,15 @@
 //******************************************************************************
 
 //自動改行(文節区切りで改行するようにする。kisaragiが必要)
-InsertLineFeed.Exec {
-	InsertLineFeed.Wakachi(_argv[0])
-	InsertLineFeed.Render()
+InsertLineFeed.Exec
+{
+  InsertLineFeed.Wakachi(_argv[0])
+  InsertLineFeed.Render()
 }
 
 // 文字列を文節に分割し、配列に格納する
-InsertLineFeed.Wakachi {
+InsertLineFeed.Wakachi
+{
   InsertLineFeed.wakachi = (IARRAY, '')
   InsertLineFeed.wordcounts = (IARRAY, 0)
 
@@ -22,18 +24,18 @@ InsertLineFeed.Wakachi {
   // _wordcountはスコープの数だけ要る とりあえず10確保
   _ary = IARRAY
   for _j=0; _j<10; _j++ {
-	  _ary = (_ary, 0)
+    _ary = (_ary, 0)
   }
   _wordcount = _ary
 
   // 直前・直後に改行を入れる品詞と単語を列挙
-  _htarget= '名詞, 動詞, 接頭詞, 副詞, 感動詞, 形容詞, 形容動詞, 連体詞'
+  _htarget = '名詞, 動詞, 接頭詞, 副詞, 感動詞, 形容詞, 形容動詞, 連体詞'
 
   // 内部処理に影響しなさそうな制御文字
   _tagmark = CHR(28)
   _delim = CHR(31)
 
-  _text = RE_REPLACEEX(_text,  '(\\n|\\_l\[0|\\x|\\c|\\[01]|\\p\[\d+\])', _delim + '$1')
+  _text = RE_REPLACEEX(_text, '(\\n|\\_l\[0|\\x|\\c|\\[01]|\\p\[\d+\])', _delim+'$1')
 
   // 元の文字列を_delimで区切って各々処理する
   _lines = SPLIT(_text, _delim)
@@ -53,8 +55,8 @@ InsertLineFeed.Wakachi {
     // 単語に分割する。_rankは単語の総数
     _rank = FUNCTIONEX('SAORI\kisaragi\kisaragi.dll', 'parse', _l)
 
-	_afterPrePos = 0
-	_afterSahenNoun = 0
+    _afterPrePos = 0
+    _afterSahenNoun = 0
 
     for _j=0; _j<_rank-1; _j++ {
       // 最後の単語はEOSなのでrank-1でよい
@@ -64,95 +66,92 @@ InsertLineFeed.Wakachi {
 
       if _tagmark _in_ _word {
         // _wordに_tagmark(さくらスクリプト)が含まれている場合、検出した数だけリストから取り出して_tagmarkの位置に挿入
-        for _k=0; _k<RE_GREP(_word, _tagmark); _k++ {
-		  InsertLineFeed.wakachi[ARRAYSIZE(InsertLineFeed.wakachi)-1] += _tags[_tagcount]
+        for _k=0; _k<RE_GREP(_word,_tagmark); _k++ {
+          InsertLineFeed.wakachi[ARRAYSIZE(InsertLineFeed.wakachi) - 1] += _tags[_tagcount]
           _tagcount++
         }
-		continue
+        continue
       }
 
-	  _posinfo = valueex[_j][3, CHR(9)]
-	  _pos = SPLIT(_posinfo, '-')[0]
-	  _pos_detail = SUBSTR(_posinfo, STRLEN(_pos), 100)
+      _posinfo = valueex[_j][3, CHR(9)]
+      _pos = SPLIT(_posinfo, '-')[0]
+      _pos_detail = SUBSTR(_posinfo, STRLEN(_pos), 100)
 
-	  _noBreak = _pos !_in_ _htarget
-	  _noBreak = _noBreak || '接尾' _in_ _pos_detail
-	  _noBreak = _noBreak || (_pos == '動詞' && 'サ変接続' _in_ _pos_detail)
-	  _noBreak = _noBreak || '非自立' _in_ _pos_detail
-	  _noBreak = _noBreak || _afterPrepos
-	  _noBreak = _noBreak || (_afterSahenNoun && 'サ変動詞' _in_ _pos_detail)
+      _noBreak = _pos !_in_ _htarget
+      _noBreak = _noBreak || '接尾' _in_ _pos_detail
+      _noBreak = _noBreak || (_pos == '動詞' && 'サ変接続' _in_ _pos_detail)
+      _noBreak = _noBreak || '非自立' _in_ _pos_detail
+      _noBreak = _noBreak || _afterPrePos
+      _noBreak = _noBreak || (_afterSahenNoun && 'サ変動詞' _in_ _pos_detail)
 
-	  if !_noBreak {
-		InsertLineFeed.wakachi ,= ''
-		InsertLineFeed.wordcounts ,= 0
-	  }
+      if !_noBreak {
+        InsertLineFeed.wakachi ,= ''
+        InsertLineFeed.wordcounts ,= 0
+      }
 
-	  InsertLineFeed.wakachi[ARRAYSIZE(InsertLineFeed.wakachi)-1] += _word
-	  InsertLineFeed.wordcounts[ARRAYSIZE(InsertLineFeed.wordcounts)-1] += STRLEN(_word)
+      InsertLineFeed.wakachi[ARRAYSIZE(InsertLineFeed.wakachi) - 1] += _word
+      InsertLineFeed.wordcounts[ARRAYSIZE(InsertLineFeed.wordcounts) - 1] += STRLEN(_word)
 
-	  _afterPrePos = _pos == '接頭詞'
-	  _afterSahenNoun = 'サ変接続' _in_ _pos_detail
+      _afterPrePos = _pos == '接頭詞'
+      _afterSahenNoun = 'サ変接続' _in_ _pos_detail
     }
 
-	InsertLineFeed.wakachi ,= ''
-	InsertLineFeed.wordcounts ,= 0
-
+    InsertLineFeed.wakachi ,= ''
+    InsertLineFeed.wordcounts ,= 0
   }
 
   for _i=0; _i<ARRAYSIZE(InsertLineFeed.wakachi); _i++ {
-	if InsertLineFeed.wakachi[_i] == '' && InsertLineFeed.wordcounts == 0 {
-		InsertLineFeed.wakachi[_i] = IARRAY
-		InsertLineFeed.wordcounts[_i] = IARRAY
-	}
+    if InsertLineFeed.wakachi[_i] == '' && InsertLineFeed.wordcounts == 0 {
+      InsertLineFeed.wakachi[_i] = IARRAY
+      InsertLineFeed.wordcounts[_i] = IARRAY
+    }
   }
-
 }
 
 // Watachiで生成した文節群をきれいにバルーンに並べる
-InsertLineFeed.Render {
-	_result = ""
+InsertLineFeed.Render
+{
+  _result = ""
 
-	// バルーンⅠ行あたりの文字数(標準的なバルーンなら24前後)
-	_max = 0
-	if ISVAR('forced_balloon_cols') {
-	  _max = forced_balloon_cols
-	}
-	else {
-	  _max = balloon_cols
-	}
+  // バルーンⅠ行あたりの文字数(標準的なバルーンなら24前後)
+  _max = 0
+  if ISVAR('forced_balloon_cols') {
+    _max = forced_balloon_cols
+  }
+  else {
+    _max = balloon_cols
+  }
 
-	// _wordcountはゴーストのスコープの数だけ要る とりあえず10確保
-	_ary = IARRAY
-	for _j=0; _j<10; _j++ {
-		_ary = (_ary, 0)
-	}
-	_wordcount = _ary
+  // _wordcountはゴーストのスコープの数だけ要る とりあえず10確保
+  _ary = IARRAY
+  for _j=0; _j<10; _j++ {
+    _ary = (_ary, 0)
+  }
+  _wordcount = _ary
 
-	_scope = 0
+  _scope = 0
 
-	for _i=0; _i<ARRAYSIZE(InsertLineFeed.wakachi); _i++ {
-		_bunsetu = InsertLineFeed.wakachi[_i]
-		_wc = InsertLineFeed.wordcounts[_i]
+  for _i=0; _i<ARRAYSIZE(InsertLineFeed.wakachi); _i++ {
+    _bunsetu = InsertLineFeed.wakachi[_i]
+    _wc = InsertLineFeed.wordcounts[_i]
 
-		// タグがスコープ変更(\0,\1,\p[2],...)なら、そのスコープを_scope変数に代入
-		if RE_SEARCH(_bunsetu, '(\\[01][^w]?|\\p\[\d+\])') {
-			_scope = TOINT(RE_REPLACE(RE_GETSTR()[0], '[^0-9]', ''))
-		}
+    // タグがスコープ変更(\0,\1,\p[2],...)なら、そのスコープを_scope変数に代入
+    if RE_SEARCH(_bunsetu, '(\\[01][^w]?|\\p\[\d+\])') {
+      _scope = TOINT(RE_REPLACE(RE_GETSTR()[0], '[^0-9]', ''))
+    }
 
-		if RE_SEARCH(_bunsetu, '(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)') {
-			_wordcount[_scope] = 0
-		}
+    if RE_SEARCH(_bunsetu, '(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)') {
+      _wordcount[_scope] = 0
+    }
 
-		if _wordcount[_scope] + _wc > _max {
-			// _result += _wordcount[_scope]
-			_result += '\n'
-			_wordcount[_scope] = 0
-		}
+    if _wordcount[_scope] + _wc > _max {
+      // _result += _wordcount[_scope]
+      _result += '\n'
+      _wordcount[_scope] = 0
+    }
 
-		_wordcount[_scope] += _wc
-		_result += _bunsetu
-		// _result += _wordcount[_scope]
-		// _result += _scope
-	}
-	_result
+    _wordcount[_scope] += _wc
+    _result += _bunsetu
+  }
+  _result
 }

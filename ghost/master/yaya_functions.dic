@@ -2,6 +2,16 @@
 //関数辞書
 //******************************************************************************
 
+GetCondition
+{
+  // コンディションの最大値かつ初期値
+  _maxcondition = 60 * 60
+  // コンディションの下がり幅
+  _conditiondownward = ghostuptime
+
+  _maxcondition + conditionrecovery - _conditiondownward
+}
+
 // 話し中かどうかを判別する関数
 // スクリプト再生中&バルーン表示中の場合を話し中とする
 IsTalking
