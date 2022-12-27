@@ -8,7 +8,7 @@ craftmanw,ape
 craftmanurl,https://apxxxxxxe.github.io/ukagaka/
 
 sakura.name,ハイネ
-kero.name,
+kero.name,霧
 
 homeurl,https://raw.githubusercontent.com/apxxxxxxe/Haine/main/
 
