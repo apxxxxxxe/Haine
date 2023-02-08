@@ -78,16 +78,16 @@ OnClose
 
 Bye
 {
-  _timeslot = GetTimeSlot
-  if _timeslot == "朝" {
-    if circadian_rhythm == "夜型" {
-    }
-  }
-  elseif _timeslot == "昼" || _timeslot == "日中" {
-  }
-  elseif _timeslot == "夜" {
-  }
-  else {
-  }
-  'h1111207bye\_w[1200]'
+  'h1111209'
+  'h1111207'
+	--
+	'あなたに'
+	--
+	'すばらしき朝'
+	'蜜のようなまどろみ'
+	'暗くて静かな安らぎ'
+	'良き終わり'
+	'孤独と救い'
+	--
+	'がありますようにh1111209。\_w[1200]'
 }
