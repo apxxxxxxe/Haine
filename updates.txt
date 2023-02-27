@@ -1,6 +1,6 @@
 charset,UTF-8
-file,a.dic11e03a309c112849bec97955df081f47size=4388date=2012-12-21T00:00:00
 file,ghost/master/descript.txt671f8e584b0f8f38769a07235103427bsize=384date=2012-12-21T00:00:00
+file,ghost/master/draft.dicc69d6cfdba9a1a3d0c06315cb931e4a2size=5542date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttffde1c018a75996c6b29b32fa5b35af50size=2364date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
@@ -27,8 +27,8 @@ file,ghost/master/system/yaya_base/shiori3.dic6b2e77a7bd03766ec73c7f9360cd7df5
 file,ghost/master/system_config.txt226ea3aa3cfcb1f7fbb56267c2e66378size=678date=2012-12-21T00:00:00
 file,ghost/master/yaya.dll56e3af56c88e696cea1f39d53b239cefsize=880640date=2012-12-21T00:00:00
 file,ghost/master/yaya.txt702121cc5e8dad2522843ef7d6f9000asize=2862date=2012-12-21T00:00:00
-file,ghost/master/yaya_aitalk.dic2fe3d1058acc6f77e556ed7ef898ef6esize=10170date=2012-12-21T00:00:00
-file,ghost/master/yaya_bootend.dicb9c624e882371a679aba1b8cdb9b89dfsize=2448date=2012-12-21T00:00:00
+file,ghost/master/yaya_aitalk.dic0a671b875c5ed8f230e008ca56e5a0fesize=10321date=2012-12-21T00:00:00
+file,ghost/master/yaya_bootend.dic2978f76028c5c53f729cdfce493971aesize=2441date=2012-12-21T00:00:00
 file,ghost/master/yaya_change.dic06f9efae0e4bd42b5e4d32ffec0ed5f6size=3011date=2012-12-21T00:00:00
 file,ghost/master/yaya_communicate.dic3b383ac93bd300a571a702b670dfdfb3size=4720date=2012-12-21T00:00:00
 file,ghost/master/yaya_debug.dic9fb63fb49525f67586da9e783b515d44size=1558date=2012-12-21T00:00:00
