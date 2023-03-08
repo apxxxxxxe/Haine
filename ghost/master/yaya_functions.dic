@@ -406,3 +406,13 @@ CalcTension {
 
 	TOINT(ROUND(((-1*COS(_rad)+1)/2)*_max))
 }
+
+ShowUserEmotions
+{
+	_emo_labels = ("喜び", "悲しみ", "怒り", "不満", "不安")
+  _emotions = "\f[height,10]%(_emo_labels[0])\f[height,default]%(user_emotions[0])"
+  for _i=1; _i<ARRAYSIZE(user_emotions); _i++ {
+    _emotions += "     \f[height,10]%(_emo_labels[_i])\f[height,default]%(user_emotions[_i])"
+  }
+  "\1\_q\_l[0,%(balloon_rows)em]\f[align,center]%(_emotions)\_q"
+}

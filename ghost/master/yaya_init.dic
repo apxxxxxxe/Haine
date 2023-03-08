@@ -9,7 +9,7 @@ InitVar
   _var_name = _argv[0]
   _value = _argv[1]
   if !ISVAR(_var_name) {
-    EVAL(_var_name + "=" + _value)
+    EVAL(_var_name+'='+_value)
   }
 }
 
@@ -38,6 +38,7 @@ InitializeVariable
   isKeyBlocked = 0
   wheel_inputtable_tick = 0
   conditionrecovery = 0
+  user_emotions = (1, 1, 1, 1, 1)
 
   getSuntimes
 
@@ -50,7 +51,7 @@ InitialScripts
 {
   MakeKeroBalloownFollow
   --
-  _underwear = ("A", "B")
+  _underwear = ('A', 'B')
   _u = _underwear[RAND(ARRAYSIZE(_underwear))]
   "\0\![bind,下着,%(_u),1]"
 }
@@ -70,17 +71,17 @@ getSuntimes
 {
   _suntimes = FUNCTIONEX('saori\proxy_ex.dll', 'sunset.exe', getDate)
 
-  _sunrise = _suntimes[0,';']
-  sunrisetime = (TOINT(_sunrise[0,',']), TOINT(_sunrise[1,',']), TOINT(_sunrise[2,',']))
-  sunrisetime.hour = TOINT(_sunrise[0,','])
-  sunrisetime.minute = TOINT(_sunrise[1,','])
-  sunrisetime.second = TOINT(_sunrise[2,','])
+  _sunrise = _suntimes[0, ';']
+  sunrisetime = (TOINT(_sunrise[0, ',']), TOINT(_sunrise[1, ',']), TOINT(_sunrise[2, ',']))
+  sunrisetime.hour = TOINT(_sunrise[0, ','])
+  sunrisetime.minute = TOINT(_sunrise[1, ','])
+  sunrisetime.second = TOINT(_sunrise[2, ','])
 
-  _sunset = _suntimes[1,';']
-  sunsettime = (TOINT(_sunset[0,',']), TOINT(_sunset[1,',']), TOINT(_sunset[2,',']))
-  sunsettime.hour = TOINT(_sunset[0,','])
-  sunsettime.minute = TOINT(_sunset[1,','])
-  sunsettime.second = TOINT(_sunset[2,','])
+  _sunset = _suntimes[1, ';']
+  sunsettime = (TOINT(_sunset[0, ',']), TOINT(_sunset[1, ',']), TOINT(_sunset[2, ',']))
+  sunsettime.hour = TOINT(_sunset[0, ','])
+  sunsettime.minute = TOINT(_sunset[1, ','])
+  sunsettime.second = TOINT(_sunset[2, ','])
 }
 
 GetProperties
@@ -134,10 +135,9 @@ OnGetBalloonInfo
     when 'SSPデフォルト+' {
       balloon_cols = 24
     }
-    others
-    {
+    others {
       _zenkaku_char_width = reference[3] * 2
-      balloon_cols = TOINT(reference[2] / _zenkaku_char_width)
+      balloon_cols = TOINT(reference[2]/_zenkaku_char_width)
     }
   }
 }
@@ -153,7 +153,7 @@ OnGetShellInfo
 OnGetShellListInfo
 {
   _cmd = '\![get,property,OnGetShellListInfoAfter,'
-  for _i = 0; _i < shell_count; _i++ {
+  for _i=0; _i<shell_count; _i++ {
     _cmd += 'currentghost.shelllist.index(' + _i + ').name'
   }
   _cmd += ']'
@@ -164,8 +164,7 @@ OnGetShellListInfo
 OnGetShellListInfoAfter
 {
   shell_list = IARRAY
-  for _i = 0; _i < ARRAYSIZE(reference); _i++ {
-    shell_list = (shell_list,reference[_i])
+  for _i=0; _i<ARRAYSIZE(reference); _i++ {
+    shell_list = (shell_list, reference[_i])
   }
 }
-
