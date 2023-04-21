@@ -15,31 +15,31 @@ OnMainMenu
 {
   SetBalloonSurfaceSakura
   --
-  "\![set,autoscroll,disable]\_q\*\0/
+  '\![set,autoscroll,disable]\_q\*\0/
   \_l[0.8em,2.5em]\![*]\q[話して,Menu_RandomTalk]/
   \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LastTalk]/
-  \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]"
+  \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]'
   --
-  if ISFUNC("On_dressup.exec") {
-    "\_l[0.8em,@1.3em]\![*]\q[着せ替え,On_dressup.exec]"
+  if ISFUNC('On_dressup.exec') {
+    '\_l[0.8em,@1.3em]\![*]\q[着せ替え,On_dressup.exec]'
   }
   --
-  "\_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q/
+  '\_l[0.7em,' + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
-  if ISFUNC("OnShowTimer") {
+  if ISFUNC('OnShowTimer') {
     OnShowTimer
   }
   --
-  if ISFUNC("OnShowTalkSetting") {
+  if ISFUNC('OnShowTalkSetting') {
     OnShowTalkSetting
   }
   --
-  if ISFUNC("OnShowInfo") {
+  if ISFUNC('OnShowInfo') {
     OnShowInfo
   }
   --
-  "\0\_l[0,0]\_q"
+  '\0\_l[0,0]\_q'
 }
 
 OnConfigMenu
@@ -58,22 +58,22 @@ OnConfigMenu
   \_l[2em,@1.5em]\q[有効,OnJihouSelected,有効]\_l[@0.5em,]\q[無効,OnJihouSelected,無効]/
   \_l[0.5em,@2em]◆ユーザ生活リズム\_l[@0.5em,]【現在\_l[@0.3em,]%(circadian_rhythm)】/
   \_l[2em,@1.5em]\q[昼型,OnCircadianRhythmSelected,昼型]\_l[@0.5em,]\q[夜型,OnCircadianRhythmSelected,夜型]\_l[@0.5em,]\q[設定しない,OnCircadianRhythmSelected,設定しない]/
-  \_l[0.5em,@2em]◆１行あたりの文字数\_l[@0.5em,]\q[【現在 " + ShowCurrentBalloonCols + "】,OnBalloonColsConfig]/
-  \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
+  \_l[0.5em,@2em]◆１行あたりの文字数\_l[@0.5em,]\q[【現在 " + ShowCurrentBalloonCols + '】,OnBalloonColsConfig]/
+  \_l[0.7em,' + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnOpenMenu]%(ICON('arrow-left'))\__q/
   "
   --
-  if ISFUNC("OnShowTalkSetting") {
+  if ISFUNC('OnShowTalkSetting') {
     OnShowTalkSetting
   }
   --
-  if ISFUNC("OnShowInfo") {
+  if ISFUNC('OnShowInfo') {
     OnShowInfo
   }
 }
 
-ShowCurrentBalloonCols 
+ShowCurrentBalloonCols
 {
-  if ISVAR("forced_balloon_cols") {
+  if ISVAR('forced_balloon_cols') {
     forced_balloon_cols
   }
   else {
@@ -92,7 +92,7 @@ OnBalloonColsConfig
 バルーン設定を入力した
 {
   forced_balloon_cols = InputMessage
-  "\C\c\![raise,OnConfigMenu]"
+  '\C\c\![raise,OnConfigMenu]'
 }
 
 OnJihouSelected
@@ -110,7 +110,7 @@ OnCircadianRhythmSelected
 OnTalkIntervalSet
 {
   aitalkinterval = reference[0]
-  "\C\c"
+  '\C\c'
   --
   OnTalkSettingMenu
 }
@@ -127,15 +127,15 @@ OnInfo
   --
   SetBalloonSurfaceSakura
   --
-  "\_q/
-  \_l[0.5em,1.8em] 友好度：" + likability +"/
+  '\_q/
+  \_l[0.5em,1.8em] 友好度：' + likability + "/
   \_l[0.5em,@1.5em] 現在テンション：%(CalcTension)/
-  \_l[0.5em,@1.5em] ユーザ誠実度：" + user_honesty + "（" + UserRating + "）/
-  \_l[0.5em,@1.5em] 累計触り回数（頭）：" + good_touch_count + "回/
-  \_l[0.5em,@1.5em] 累計触り回数（胸）：" + bad_touch_count + "回/
-  \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
+  \_l[0.5em,@1.5em] ユーザ誠実度：" + user_honesty + '（' + UserRating + '）/
+  \_l[0.5em,@1.5em] 累計触り回数（頭）：' + good_touch_count + '回/
+  \_l[0.5em,@1.5em] 累計触り回数（胸）：' + bad_touch_count + '回/
+  \_l[0.7em,' + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
-  if ISFUNC("OnShowTalkSetting") {
+  if ISFUNC('OnShowTalkSetting') {
     OnShowTalkSetting
   }
   --
@@ -157,7 +157,7 @@ OnTalkSettingMenu
 喋り設定メニュー
 {
   _talkintervalmin = aitalkinterval / 60
-  _talkintervalmessage = "なし"
+  _talkintervalmessage = 'なし'
   if _talkintervalmin != 0 {
     _talkintervalmessage = "%(_talkintervalmin)分"
   }
@@ -171,13 +171,13 @@ OnTalkSettingMenu
   \_l[2em,@1.5em]\![*]%(IsUnderLine(TalkTopicLife))\q[日常,OnTalkTopic,TalkTopicLife]\f[default]\_l[6em,]\![*]%(IsUnderLine(TalkTopicHorrow))\q[暗いフォークロア,OnTalkTopic,TalkTopicHorrow]\f[default] /
   \_l[0.7em," + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q\_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q\_l[@0.7em,]"
   --
-  if ISFUNC("OnShowTimer") {
+  if ISFUNC('OnShowTimer') {
     OnShowTimer
   }
   --
   "\__q[OnOpenMenu]%(ICON('arrow-left'))\__q"
   --
-  if ISFUNC("OnShowInfo") {
+  if ISFUNC('OnShowInfo') {
     OnShowInfo
   }
 }
@@ -196,13 +196,11 @@ OnChoiceTimeout
 OnMenuClose
 {
   touch_count = 0
-  if ISFUNC("OnReloadTimer") {
-    "\![timerraise,0,0,OnReloadTimer]"
+  if ISFUNC('OnReloadTimer') {
+    '\![timerraise,0,0,OnReloadTimer]'
   } // 予約を削除
 }
-//アンカー　ツールチップ
-
-//---- 何か話して
+//アンカー　ツールチップ//---- 何か話して
 Menu_RandomTalk
 {
 
@@ -211,7 +209,8 @@ Menu_RandomTalk
   TextOnlyTranslatorFunc(DialogMenuRandomTalk) + RandomTalk
 }
 
-DialogMenuRandomTalk {
+DialogMenuRandomTalk
+{
   'h1111201いいわよ。h1111205……そうね、\c'
   'h1113309なんの話がいいかしら…………h1113205そうね、\c'
 }
@@ -219,11 +218,11 @@ DialogMenuRandomTalk {
 //---- さっきの話は
 Menu_LastTalk
 {
-  lastanchor = ""
+  lastanchor = ''
 
   SetBalloonSurfaceSakura
   --
-  "h1111209さっきの話ね。\c"
+  'h1111209さっきの話ね。\c'
   --
   lasttalk
 }

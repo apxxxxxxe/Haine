@@ -11,7 +11,7 @@
 
 OnBoot
 {
-  "\1\s[100000]\0\s[324109]致命的エラー発生"
+  '\1\s[100000]\0\s[324109]致命的エラー発生'
 }
 
 OnFirstBoot
@@ -19,13 +19,11 @@ OnFirstBoot
   OnBoot
 }
 
-OnKeyPress 
+OnKeyPress
 {
   case reference[0] {
-    when "r"
-
-    {
-      "リロードします\![change,ghost,Crave The Grave]"
+    when 'r' {
+      'リロードします\![change,ghost,Crave The Grave]'
     }
   }
 }

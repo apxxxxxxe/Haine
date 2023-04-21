@@ -16,7 +16,7 @@ GetCondition
 // スクリプト再生中&バルーン表示中の場合を話し中とする
 IsTalking
 {
-	'talking' _in_ status && 'balloon(0=' _in_ status
+  'talking' _in_ status && 'balloon(0=' _in_ status
 }
 
 PosOffset
@@ -97,8 +97,7 @@ SetBalloonSurfaceSakura
     when 'plain' {
       '\b[8]'
     }
-    others
-    {
+    others {
       '\b[0]'
     }
   }
@@ -124,8 +123,7 @@ SetBalloonSurfaceKero
     when 'plain' {
       '\b[10]'
     }
-    others
-    {
+    others {
       '\b[0]'
     }
   }
@@ -135,7 +133,7 @@ SetBalloonSurfaceKero
 //10000の位:顔色 1000の位:眉 100の位:腕 10の位:口 1の位:目
 GetSurfaceElements
 {
-  _e = current_surface / POW(10, 7 - _argv[0]) % 10
+  _e = current_surface / POW(10, 7-_argv[0]) % 10
   _e
 }
 
@@ -181,12 +179,13 @@ ICON
   ']\f[default]'
 }
 
-InsertLineFeed {
-	// 文字数計算のため、OnTranslate処理をこちらで先に行う
-	willTranslate = 0
-	_text = TextOnlyTranslatorFunc(SurfaceSnippet(_argv[0]))
+InsertLineFeed
+{
+  // 文字数計算のため、OnTranslate処理をこちらで先に行う
+  willTranslate = 0
+  _text = TextOnlyTranslatorFunc(SurfaceSnippet(_argv[0]))
 
-	InsertLineFeed.Exec(_text)
+  InsertLineFeed.Exec(_text)
 }
 
 SurfaceSnippet
@@ -196,7 +195,7 @@ SurfaceSnippet
 
 IsUnderLine
 {
-  if ! _argv[0] {
+  if !_argv[0] {
     '\f[strike,true]'
   }
 }
@@ -205,10 +204,10 @@ OnTalkTopic
 {
   _topicname = reference[0]
   if EVAL(_topicname) == 1 {
-    EVAL(_topicname + '= 0')
+    EVAL(_topicname+'= 0')
   }
   else {
-    EVAL(_topicname + '= 1')
+    EVAL(_topicname+'= 1')
   }
   '\C\c\![raise,OnTalkSettingMenu]'
 }
@@ -250,7 +249,7 @@ UserRating
 
 UpdateUserRating
 {
-  likability = good_touch_count + bad_touch_count + total_talk_count/3
+  likability = good_touch_count + bad_touch_count + total_talk_count / 3
   user_honesty = good_touch_count - bad_touch_count
 }
 
@@ -263,7 +262,7 @@ OnWindowStateRestore
   'h1000000h1111109\_w[500]h1111101'
   'h1000000h1111109\_w[500]h1111103'
   'h1000000h1111105\_w[500]h1111101'
-  "h1000000h1111103\_w[2500]h1111101\_w[500]h1111204"
+  'h1000000h1111103\_w[2500]h1111101\_w[500]h1111204'
 }
 
 //******************************************************************************
@@ -286,10 +285,10 @@ CompareTime
   // _argv[4]: b.minute
   // _argv[5]: b.second
 
-  _a.hour   = _argv[0]
+  _a.hour = _argv[0]
   _a.minute = _argv[1]
   _a.second = _argv[2]
-  _b.hour   = _argv[3]
+  _b.hour = _argv[3]
   _b.minute = _argv[4]
   _b.second = _argv[5]
 
@@ -336,13 +335,11 @@ CalcTime
     _minute %= 60
   }
   elseif _minute < 0 {
-    _hour -= (-1*_minute) / 60 + 1
-    while _hour < 0
-    {
+    _hour -= (-1 * _minute) / 60 + 1
+    while _hour < 0 {
       _hour += 24
     }
-    while _minute < 0
-    {
+    while _minute < 0 {
       _minute += 60
     }
   }
@@ -392,24 +389,25 @@ GetTimeSlot
   }
 }
 
-CalcTension {
-	// とりうる範囲は0~100の整数
-	// 0からスタート
+CalcTension
+{
+  // とりうる範囲は0~100の整数
+  // 0からスタート
 
-	_pi = 3.114159265358
-	_max = 100
-	_T = 60 * 67
+  _pi = 3.114159265358
+  _max = 100
+  _T = 60 * 67
 
-	_x = ghostuptime % _T
+  _x = ghostuptime % _T
 
-	_rad = 2 * _pi / _T * _x
+  _rad = 2 * _pi / _T * _x
 
-	TOINT(ROUND(((-1*COS(_rad)+1)/2)*_max))
+  TOINT(ROUND(((-1*COS(_rad)+1)/2)*_max))
 }
 
 ShowUserEmotions
 {
-	_emo_labels = ("喜び", "悲しみ", "怒り", "不満", "不安")
+  _emo_labels = ('喜び', '悲しみ', '怒り', '不満', '不安')
   _emotions = "\f[height,10]%(_emo_labels[0])\f[height,default]%(user_emotions[0])"
   for _i=1; _i<ARRAYSIZE(user_emotions); _i++ {
     _emotions += "     \f[height,10]%(_emo_labels[_i])\f[height,default]%(user_emotions[_i])"

@@ -6,11 +6,11 @@ OnDressupChanged
         // 着せられたとき
         case reference[3] {
           when 'ボトムス' {
-			currentBottoms = reference[1]
+            currentBottoms = reference[1]
           }
         }
-      } else
-      {
+      }
+      else {
         if SHIORI3FW.CanTalk {
           // 脱がされたとき
           case reference[3] {
@@ -98,7 +98,7 @@ dressup.exec
 
   for _i=0; _i<ARRAYSIZE(categories_info_ary); _i++ {
     _info = categories_info_ary[_i]
-    _left_panel += '\_l[0,' + (_i*(_fsize_left+2)) + ']'
+    _left_panel += '\_l[0,' + (_i * (_fsize_left + 2)) + ']'
     _name = _info[0]
     if STRLEN(_name) > _max_width {
       _max_width = STRLEN(_name)
@@ -122,7 +122,7 @@ dressup.exec
     _info = _parts_ary[_i]
     _name = _info[0]
     _is_equiped = TOINT(_info[2])
-    _right_panel += '\f[height,' + _fsize_left + ']\_l[' + (_max_width+1) + 'em,' + (_i*(_fsize_right+2)) + ']'
+    _right_panel += '\f[height,' + _fsize_left + ']\_l[' + (_max_width + 1) + 'em,' + (_i * (_fsize_right + 2)) + ']'
     _right_panel += '\f[height,' + _fsize_right + ']'
 
     if _is_equiped {
@@ -150,8 +150,8 @@ dressup.dress
   _parts_index = _argv[1]
   _equip_status = _argv[2]
 
-  _category_name = categories_info_ary[_category_index][0] 
-  _part_name = parts_info_ary[_category_index][_parts_index,';'][0]
+  _category_name = categories_info_ary[_category_index][0]
+  _part_name = parts_info_ary[_category_index][_parts_index, ';'][0]
 
   '\![bind,' + _category_name + ',' + _part_name + ']'
   --

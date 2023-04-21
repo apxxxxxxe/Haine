@@ -1,5 +1,4 @@
-
-OnDebugKeyPress 
+OnDebugKeyPress
 {
   case _argv[0] {
     when 'q' {
@@ -20,17 +19,17 @@ OnDebugKeyPress
     }
     when 's' {
       _file = '../debuginfo.txt'
-      FOPEN(_file,'w')
+      FOPEN(_file, 'w')
 
-      FWRITE(_file,'変数リスト:')
+      FWRITE(_file, '変数リスト:')
       _var_list = GETVARLIST
       foreach _var_list; _func {
         FWRITE(_file, _var)
       }
 
-      FWRITE(_file,'------------------------------')
+      FWRITE(_file, '------------------------------')
 
-      FWRITE(_file,'関数リスト:')
+      FWRITE(_file, '関数リスト:')
       _func_list = GETFUNCLIST
       foreach _func_list; _func {
         FWRITE(_file, _func)
@@ -51,11 +50,11 @@ OnDebugKeyPress
 On_tamaOpen
 {
   SETTAMAHWND(reference[0])
-  SHIORI3FW.Push_X_SSTP_PassThru('Title','tama test: Taromati2')//これらの設定はすべて任意です。
-  SHIORI3FW.Push_X_SSTP_PassThru('Icon','IMG_PATH/ico/tama.ico')
-  SHIORI3FW.Push_X_SSTP_PassThru('border.color','626262')
-  SHIORI3FW.Push_X_SSTP_PassThru('background.color','1e1e1e')
-  SHIORI3FW.Push_X_SSTP_PassThru('default.color','4ec9b0')//およびその他の設定は、tama.txtにあります。
+  SHIORI3FW.Push_X_SSTP_PassThru('Title', 'tama test: Taromati2') //これらの設定はすべて任意です。
+  SHIORI3FW.Push_X_SSTP_PassThru('Icon', 'IMG_PATH/ico/tama.ico')
+  SHIORI3FW.Push_X_SSTP_PassThru('border.color', '626262')
+  SHIORI3FW.Push_X_SSTP_PassThru('background.color', '1e1e1e')
+  SHIORI3FW.Push_X_SSTP_PassThru('default.color', '4ec9b0') //およびその他の設定は、tama.txtにあります。
   'tamaが開いた'
 }
 On_tamaExit

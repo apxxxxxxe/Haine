@@ -6,7 +6,6 @@
 // 通常はここをいじる必要はありません。
 //**** 注意 ********************************************************************
 
-
 //******************************************************************************
 //起動・終了初期化
 //******************************************************************************
@@ -42,25 +41,6 @@ OnAITalk
   RandomTalk
 }
 
-//------------------------------------------------------------------------------
-//OnAiTalkイベント
-//------------------------------------------------------------------------------
-/*
-   OnAiTalk
-   {
-//---- 通常のランダムトーク、ただしチェイン中はチェイントーク
-if SHIORI3FW.IsChain {
-AYATEMPLATE.LastTalk = ChainTalk
-}
-else {
-AYATEMPLATE.LastTalk = RandomTalk
-//
-}
-AYATEMPLATE.LastTalk
-}
-*/
-
-
 //******************************************************************************
 //メニュー関係
 //******************************************************************************
@@ -79,27 +59,27 @@ OnChoiceSelect
 
 OnAnchorSelect
 {
-  if RE_SEARCH(reference[0],'^(http|https)://') {
+  if RE_SEARCH(reference[0], '^(http|https)://') {
     if basewarename == 'SSP' {
-      "\C"
+      '\C'
     }
-  --
-  "\j[%(AYATEMPLATE.EscapeText(reference[0]))]"
-}
-else {
-  if ISFUNC(reference[0]) {
-    if lastanchor == reference[0] {
-      return
-    }
-    lastanchor = reference[0]
-    _lines = "%property[currentghost.balloon.scope(0).lines]" //現在バルーンの表示可能行数
-    _lines = '"' + _lines + '"'
     --
-    "\C\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
-    --
-    InsertLineFeed(EVAL(reference[0]))
+    "\j[%(AYATEMPLATE.EscapeText(reference[0]))]"
   }
-}
+  else {
+    if ISFUNC(reference[0]) {
+      if lastanchor == reference[0] {
+        return
+      }
+      lastanchor = reference[0]
+      _lines = "%property[currentghost.balloon.scope(0).lines]" //現在バルーンの表示可能行数
+      _lines = '"' + _lines + '"'
+      --
+      "\C\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
+      --
+      InsertLineFeed(EVAL(reference[0]))
+    }
+  }
 }
 
 //------------------------------------------------------------------------------
@@ -115,15 +95,13 @@ AYATEMPLATE.MenuItem
   if _n >= 3 {
     if GETTYPE(_argv[_n-1]) == 1 {
       //整数
-      _linefeed = _argv[_n-1]
+      _linefeed = _argv[_n - 1]
       _n -= 1
     }
   }
 
   _lftext = ''
-  while _linefeed > 0
-
-  {
+  while _linefeed > 0 {
     if _linefeed >= 100 {
       _lftext += '\n'
     }
@@ -137,12 +115,10 @@ AYATEMPLATE.MenuItem
   --
   '\![*]\q['
   --
-  AYATEMPLATE.EscapeText( SHIORI3FW.MakeJustText(_argv[0],46) )
+  AYATEMPLATE.EscapeText(SHIORI3FW.MakeJustText(_argv[0], 46))
   --
   _s = ''
-  for _i = 1 ; _i < _n ; _i++
-
-  {
+  for _i=1; _i<_n; _i++ {
     _s += ',' + AYATEMPLATE.EscapeText(_argv[_i])
   }
   _s
@@ -155,8 +131,8 @@ AYATEMPLATE.MenuItem
 AYATEMPLATE.EscapeText
 {
   _r = _argv[0]
-  if RE_SEARCH(_r,'["\[\]]') {
-    '"' + REPLACE(_r,'"','""') + '"'
+  if RE_SEARCH(_r, '["\[\]]') {
+    '"' + REPLACE(_r, '"', '""') + '"'
   }
   else {
     _r
@@ -170,13 +146,11 @@ AYATEMPLATE.LinkMenuConvert
 {
   _text = ''
   _data = IARRAY
-  for _i = 0 ; _i < _argc ; _i++
-
-  {
-    _data = (RE_SPLIT(_argv[_i],'[ \t]*\|[ \t]*'),'','') //ダミー
+  for _i=0; _i<_argc; _i++ {
+    _data = (RE_SPLIT(_argv[_i], '[ \t]*\|[ \t]*'), '', '') //ダミー
     _text += "%(_data[0])%(CHR(1))%(_data[1])%(CHR(1))%(_data[2])%(CHR(1))%(CHR(2))"
   }
-  _text;
+  _text
 }
 
 //******************************************************************************
@@ -185,9 +159,8 @@ AYATEMPLATE.LinkMenuConvert
 
 AYATEMPLATE.ExecuteChangeCallTalk
 {
-  AYATEMPLATE.ExecuteGhostNameFunc(_argv[0],reference[0],_argv[1])
+  AYATEMPLATE.ExecuteGhostNameFunc(_argv[0], reference[0], _argv[1])
 }
-
 
 //******************************************************************************
 //切り替え/コミュ共通コア（ゴースト名付加関数呼び出し）
@@ -222,14 +195,14 @@ AYATEMPLATE.ExecuteGhostNameFunc
   }
 
   /*
-     if _argc >= 2 {
-     _script = EVAL(_argv[2])
-     if STRLEN(_script) != 0 {
-     REPLACE(_script,"\-","")
-     return
-     }
-     }
-     */
+  if _argc >= 2 {
+  _script = EVAL(_argv[2])
+  if STRLEN(_script) != 0 {
+  REPLACE(_script,"\-","")
+  return
+  }
+  }
+  */
 }
 
 //******************************************************************************
@@ -240,34 +213,34 @@ AYATEMPLATE.ExecuteGhostNameFunc
 AYATEMPLATE.ExecuteTalkToTalk
 {
   //まず話しかける相手を決める
-  _ghostname=AYATEMPLATE.GetRandomSakuraName()
-  res_reference0=_ghostname
+  _ghostname = AYATEMPLATE.GetRandomSakuraName()
+  res_reference0 = _ghostname
 
   DUMPVAR()
 
   //共通コアを使って関数呼び出し
-  AYATEMPLATE.ExecuteGhostNameFunc('TalkTo',_ghostname,'TalkToNobody')
+  AYATEMPLATE.ExecuteGhostNameFunc('TalkTo', _ghostname, 'TalkToNobody')
 }
 
 //話しかけに応答する
 AYATEMPLATE.ExecuteReplyToTalk
 {
-  AYATEMPLATE.ExecuteGhostNameFunc('ReplyTo',_argv[0])
+  AYATEMPLATE.ExecuteGhostNameFunc('ReplyTo', _argv[0])
 }
 
 //話しかける相手をランダムに決定
 AYATEMPLATE.GetRandomSakuraName
 {
-  _ghostlist=IARRAY
+  _ghostlist = IARRAY
   //FMOが使える場合はFMOから読みます
   if ISFUNC('SHIORI3FW.RefreshFMOTable') {
     SHIORI3FW.RefreshFMOTable
-    _ghostlist=SHIORI3FW.SakuraNameList
+    _ghostlist = SHIORI3FW.SakuraNameList
   }
   else {
-    _ghostlist=ghostexlist
+    _ghostlist = ghostexlist
   }
-  if ARRAYSIZE(_ghostlist)>0 {
+  if ARRAYSIZE(_ghostlist) > 0 {
     ANY(_ghostlist)
   }
   else {
@@ -283,8 +256,6 @@ On_otherghostname
   ghostexcount = ARRAYSIZE(ghostexlist)
 }
 
-
-
 //------------------------------------------------------------------------------
 //プラグイン
 //------------------------------------------------------------------------------
@@ -294,10 +265,8 @@ On_installedplugin : void
   AYATEMPLATE.installedplugin_name = IARRAY
   AYATEMPLATE.installedplugin_id = IARRAY
 
-  for _i = 0 ; _i < _n ; _i++
-
-  {
-    _a = RE_SPLIT(reference[_i],'[,\x1]')
+  for _i=0; _i<_n; _i++ {
+    _a = RE_SPLIT(reference[_i], '[,\x1]')
 
     AYATEMPLATE.installedplugin_name ,= _a[0]
     AYATEMPLATE.installedplugin_id ,= _a[1]
@@ -311,11 +280,11 @@ AYATEMPLATE.IsPluginExist
     return
   }
 
-  if ASEARCH(_argv[0],AYATEMPLATE.installedplugin_id) >= 0 {
+  if ASEARCH(_argv[0], AYATEMPLATE.installedplugin_id) >= 0 {
     1
     return
   }
-  if ASEARCH(_argv[0],AYATEMPLATE.installedplugin_name) >= 0 {
+  if ASEARCH(_argv[0], AYATEMPLATE.installedplugin_name) >= 0 {
     1
     return
   }

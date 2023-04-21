@@ -111,7 +111,7 @@ InsertLineFeed.Wakachi
 // Watachiで生成した文節群をきれいにバルーンに並べる
 InsertLineFeed.Render
 {
-  _result = ""
+  _result = ''
 
   // バルーンⅠ行あたりの文字数(標準的なバルーンなら24前後)
   _max = 0

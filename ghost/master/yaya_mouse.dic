@@ -3,7 +3,6 @@
 // マウス入力関連辞書
 //******************************************************************************
 
-
 //******************************************************************************
 //マウス処理部
 //
@@ -21,38 +20,38 @@
 
 DialogSurprised
 {
-  "！……"
-  "なっ……"
+  '！……'
+  'なっ……'
 }
 
 DialogConfused
 {
-  "……"
-  "あの……"
+  '……'
+  'あの……'
 }
 
 // セクハラ反応-驚き/恥ずかしさ
 DialogTouchSexialSurprised : nonoverlap
 {
-	"h1131404このっ……。h1131109……こほん。\nh1131204やっていいことと悪いことがあるわよ、%(username)。"
-	"h1111304覚えておきなさい。\nh1111309いつか、後悔するぐらいあなたを辱めてあげる。"
-    "h1111201……外ではこれが普通なの？h1111204違うわよね。"
-    "h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。"
+  "h1131404このっ……。h1131109……こほん。\nh1131204やっていいことと悪いことがあるわよ、%(username)。"
+  'h1111304覚えておきなさい。\nh1111309いつか、後悔するぐらいあなたを辱めてあげる。'
+  'h1111201……外ではこれが普通なの？h1111204違うわよね。'
+  'h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。'
 }
 
 // セクハラ反応-呆れ気味
 DialogTouchSexialAkire : nonoverlap
 {
-    "h1111201さっきからずいぶん必死ね。\nh1111304ばかみたいな顔してるわよ。"
-	"h1111304面白い顔。h1111309鏡で見せてあげたいわ。"
-	"h1111104悪戯がすぎるわよ。"
-	"h1111103はあ……h1111106何が楽しいんだか。"
+  'h1111201さっきからずいぶん必死ね。\nh1111304ばかみたいな顔してるわよ。'
+  'h1111304面白い顔。h1111309鏡で見せてあげたいわ。'
+  'h1111104悪戯がすぎるわよ。'
+  'h1111103はあ……h1111106何が楽しいんだか。'
 }
 
 DialogTouchDisturbedSexial : nonoverlap
 {
-	"h1111104……話していたのだけど？"
-	"h1111304……呆れた。相手の話を聞いていられないの？\nh1111309発情期の猿のほうがいくらかましね。"
+  'h1111104……話していたのだけど？'
+  'h1111304……呆れた。相手の話を聞いていられないの？\nh1111309発情期の獣のほうがいくらかましね。'
 }
 
 //******************************************************************************
@@ -62,13 +61,13 @@ DialogTouchDisturbedSexial : nonoverlap
 MouseMove0head : nonoverlap
 {
   good_touch_count++
-  "h1111105……あたたかいのね、あなたの手。"
-  "h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。"
+  'h1111105……あたたかいのね、あなたの手。'
+  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。'
 }
 
 MouseMove0face : nonoverlap
 {
-  "h1121207くすぐったい。"
+  'h1121207くすぐったい。'
 }
 
 MouseMove0bust : nonoverlap
@@ -78,16 +77,18 @@ MouseMove0bust : nonoverlap
 
   bad_touch_count++
   if touch_count < _threshold {
-	DialogTouchSexialSurprised
-  } elseif touch_count == _threshold {
-	"h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。"
-	--
-	"h1111201許されていると思ったの？\n"
-	--
-	"h1111304残念だけど、それほど気は長くないの。"
-	"h1111204わきまえなさい。"
-  } else {
-	"h1111204\1自重しよう……。"
+    DialogTouchSexialSurprised
+  }
+  elseif touch_count == _threshold {
+    'h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。'
+    --
+    'h1111201許されていると思ったの？\n'
+    --
+    'h1111304残念だけど、それほど気は長くないの。'
+    'h1111204わきまえなさい。'
+  }
+  else {
+    'h1111204\1自重しよう……。'
   }
 }
 
@@ -105,26 +106,28 @@ MouseDoubleClick0
 //******************************************************************************
 MouseWheelUp0skirt : nonoverlap
 {
-	// 呆れ/怒られるまでの回数
-	_threshold = 3
+  // 呆れ/怒られるまでの回数
+  _threshold = 3
 
-	if IsTalking {
-		"h2144402……\n"
-		--
-		DialogTouchDisturbedSexial
-	} elseif touch_count < _threshold {
-		// 赤面
-		"h2244402……！\n"
-		--
-		"h1241102\_w[500]"
-		--
-		DialogTouchSexialSurprised
-	} else {
-		// 真顔
-		"h2114104……\n"
-		--
-		DialogTouchSexialAkire
-	}
+  if IsTalking {
+    'h2144402……\n'
+    --
+    DialogTouchDisturbedSexial
+  }
+  elseif touch_count < _threshold {
+    // 赤面
+    'h2244402……！\n'
+    --
+    'h1241102\_w[500]'
+    --
+    DialogTouchSexialSurprised
+  }
+  else {
+    // 真顔
+    'h2114104……\n'
+    --
+    DialogTouchSexialAkire
+  }
 }
 
 //******************************************************************************
@@ -164,7 +167,7 @@ OnMouseEvent
   lastresponce = systemuptime
   first_touch = 1
 
-  "\![timerraise,30000,1,OnTouchCountReset,reset]"
+  '\![timerraise,30000,1,OnTouchCountReset,reset]'
   --
   SetBalloonSurfaceSakura
   --
@@ -174,51 +177,51 @@ OnMouseEvent
 OnTouchCountReset
 {
   touch_count = 0
-  last_touch_part = ""
+  last_touch_part = ''
 }
 
 OnMouseMove
 {
-  _result = AYATEMPLATE.MouseMoveWheelFunc(0,50,"MouseMove")
-  if _result != "" && IsTalking {
-	_result = DialogTouchDisturbedSexial
+  _result = AYATEMPLATE.MouseMoveWheelFunc(0, 50, 'MouseMove')
+  if _result != '' && IsTalking {
+    _result = DialogTouchDisturbedSexial
   }
   _result
 }
 
 OnMouseDoubleClick
 {
-  NextTouchTalk = AYATEMPLATE.MouseEventExec("MouseDoubleClick")
-  if NextTouchTalk != "" {
-    "\![raise,OnMouseEvent]"
+  NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
+  if NextTouchTalk != '' {
+    '\![raise,OnMouseEvent]'
   }
 }
 
 OnMouseClickEx
 {
-  if reference[5] == "middle" {
-    NextTouchTalk = AYATEMPLATE.MouseEventExec("MouseWheelClick")
-    if NextTouchTalk != "" {
-      "\![raise,OnMouseEvent]"
+  if reference[5] == 'middle' {
+    NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseWheelClick')
+    if NextTouchTalk != '' {
+      '\![raise,OnMouseEvent]'
     }
   }
 }
 
 OnMouseWheel
 {
-	_result = ''
-	if TOINT(reference[2]) > 0 {
-		_result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelUp')
-	}
-	else {
-		_result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheelDown')
-	}
-	
-	if _result == '' {
-		_result = AYATEMPLATE.MouseMoveWheelFunc(1,4,'MouseWheel')
-	}
-	
-	_result
+  _result = ''
+  if TOINT(reference[2]) > 0 {
+    _result = AYATEMPLATE.MouseMoveWheelFunc(1, 4, 'MouseWheelUp')
+  }
+  else {
+    _result = AYATEMPLATE.MouseMoveWheelFunc(1, 4, 'MouseWheelDown')
+  }
+
+  if _result == '' {
+    _result = AYATEMPLATE.MouseMoveWheelFunc(1, 4, 'MouseWheel')
+  }
+
+  _result
 }
 
 IsMouseTalkExist
@@ -276,7 +279,7 @@ AYATEMPLATE.MouseMoveWheelFunc
 
   // 前回ホイールトークから_interval[ms]経っていない&喋ってない場合はなにもしない
   if GETTICKCOUNT < wheel_inputtable_tick {
-  	return
+    return
   }
 
   _side = TOINT(reference[3])
@@ -285,7 +288,7 @@ AYATEMPLATE.MouseMoveWheelFunc
   }
 
   if AYATEMPLATE.strokeid[_side] == reference[4] {
-	// 前回ころころから1500msたっていたらカウンタをリセット
+    // 前回ころころから1500msたっていたらカウンタをリセット
     if (GETTICKCOUNT - TOINT(AYATEMPLATE.stroketimer[_side])) > 1500 {
       AYATEMPLATE.stroke[_side] = 1
     }
@@ -295,12 +298,12 @@ AYATEMPLATE.MouseMoveWheelFunc
     _stroke += 1
     AYATEMPLATE.stroke[_side] = _stroke
     if _stroke >= _argv[1] {
-	  AYATEMPLATE.stroke[_side] = 1
-	  NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2]);
-	  if NextTouchTalk != "" {
-		wheel_inputtable_tick = GETTICKCOUNT + _interval
-		"\![raise,OnMouseEvent]"
-	  }
+      AYATEMPLATE.stroke[_side] = 1
+      NextTouchTalk = AYATEMPLATE.MouseEventExec(_argv[2])
+      if NextTouchTalk != '' {
+        wheel_inputtable_tick = GETTICKCOUNT + _interval
+        '\![raise,OnMouseEvent]'
+      }
     }
   }
   else {
@@ -309,4 +312,3 @@ AYATEMPLATE.MouseMoveWheelFunc
     AYATEMPLATE.strokeid[_side] = reference[4]
   }
 }
-

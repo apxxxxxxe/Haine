@@ -2,9 +2,9 @@
 
 OnWebClap
 {
-  "\![open,inputbox,WebClapMessage,,--limit=1000]/
+  '\![open,inputbox,WebClapMessage,,--limit=1000]/
   \_q拍手メッセージが作者に送信されますφ。\n/
-  バグ報告や要望φ、感想はこちらにお願いしますφ。"
+  バグ報告や要望φ、感想はこちらにお願いしますφ。'
 }
 
 WebClapMessageを入力した
@@ -19,7 +19,7 @@ WebClapMessageを空打ちされた
 
 拍手送信完了
 {
-  "\_q拍手メッセージを送信しました。"
+  '\_q拍手メッセージを送信しました。'
   WebClapMessage = ''
 }
 
@@ -42,4 +42,3 @@ OnExecuteHTTPFailure
     拍手送信失敗
   }
 }
-
