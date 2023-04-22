@@ -26,7 +26,6 @@ InitializeVariable
   InitVar('bad_touch_count', 0)
   InitVar('total_talk_count', 0)
   InitVar('uwanosora_minute', 5)
-  InitVar('hasSuicideInfo', 0)
 
   //---- 変数の初期化(起動毎に設定)
   ghostboottime = systemuptime

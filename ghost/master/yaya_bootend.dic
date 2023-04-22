@@ -31,20 +31,8 @@ OnBoot
     '\![raise,OnEvent1_1]'
     return
   }
-  if ISVAR('hasSuicideInfo') && hasSuicideInfo {
-    _text = Dead
-  }
   _text = Hello
   InsertLineFeed(_text)
-}
-
-Dead
-{
-  _c = 'φ、\_w[800]'
-  _p = 'φ。\_w[1200]'
-
-  "\0\s[1411101]……。\1ドアを開けると、ハイネが首を吊っていた%(_p)\n\0\n\n(ぶちっ)。\1縄が切れ、彼女の体が鈍い音を立てて床に落ちる%(_p)\0\n\n……げほっ、けふっ。\n……h1111104ああ、%(username)。h1111204いらっしゃい。"
-  "\0\s[1411101]……。\1ドアを開けると、ハイネが倒れていた%(_p)\nぱっくりと裂けた首元を中心に、大きな血溜まりができている%(_p)\n\0\n\n(しゅわ、しゅわ)。\1血の池は見る間に蒸発し、" + FogHighlight('霧') + "へと変わっていく%(_p)\n首の傷は、時が巻き戻るようにふさがった%(_p)\0\n\n……はぁ。\n……h1111104ああ、%(username)。h1111204いらっしゃい。"
 }
 
 Hello
@@ -52,15 +40,23 @@ Hello
   _timeslot = GetTimeSlot
   ShowTopic(_timeslot)
   --
+  'h1111204'
+  'h1111201'
+  --
+  'よく来てくれたわね、'
+  'いらっしゃい、'
+
   if _timeslot == '朝' {
+    'おはよう、'
   }
   elseif _timeslot == '昼' || _timeslot == '日中' {
+    'こんにちは、'
   }
-  elseif _timeslot == '夜' {
+  elseif _timeslot == '夜' || _timeslot == '深夜' {
+    'こんばんは、'
   }
-  else {
-  }
-  'h1111204hello'
+  --
+  username + '。\n'
 }
 
 //******************************************************************************
