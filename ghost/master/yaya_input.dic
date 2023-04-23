@@ -2,12 +2,10 @@
 
 OnUserInput
 {
-  InputMessage = reference[1]
-  --
-  EVAL("%(reference[0])を入力した")
+  "\![raise,On_%(reference[0])_Input,%(reference[1])]"
 }
 
 OnUserInputCancel
 {
-
+  "\![raise,On_%(reference[0])_InputCanceled]"
 }
