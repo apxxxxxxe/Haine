@@ -17,7 +17,7 @@ InitVar
 InitializeVariable
 {
   //---- 変数の初期化(初回起動時のみ設定)
-  InitVar('username', 'ユーザ')
+  InitVar('username', '')
   InitVar('teachusername', 0)
   InitVar('IsJihouActive', '有効')
   InitVar('circadian_rhythm', '設定しない')
