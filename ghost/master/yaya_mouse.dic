@@ -182,6 +182,10 @@ OnTouchCountReset
 
 OnMouseMove
 {
+  if IsKeyBlocked {
+    return
+  }
+
   _result = AYATEMPLATE.MouseMoveWheelFunc(0, 50, 'MouseMove')
   if _result != '' && IsTalking {
     _result = DialogTouchDisturbedSexial
@@ -191,6 +195,10 @@ OnMouseMove
 
 OnMouseDoubleClick
 {
+  if IsKeyBlocked {
+    return
+  }
+
   NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseDoubleClick')
   if NextTouchTalk != '' {
     '\![raise,OnMouseEvent]'
@@ -199,6 +207,10 @@ OnMouseDoubleClick
 
 OnMouseClickEx
 {
+  if IsKeyBlocked {
+    return
+  }
+
   if reference[5] == 'middle' {
     NextTouchTalk = AYATEMPLATE.MouseEventExec('MouseWheelClick')
     if NextTouchTalk != '' {
@@ -209,6 +221,10 @@ OnMouseClickEx
 
 OnMouseWheel
 {
+  if IsKeyBlocked {
+    return
+  }
+
   _result = ''
   if TOINT(reference[2]) > 0 {
     _result = AYATEMPLATE.MouseMoveWheelFunc(1, 4, 'MouseWheelUp')

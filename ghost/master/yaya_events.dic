@@ -12,7 +12,7 @@
 OnEvent1End
 {
   isEvent1End = 1
-  isKeyBlocked = 0
+  IsKeyBlocked = 0
 }
 
 BalloonPlain
@@ -27,9 +27,9 @@ BalloonPlain
   }
 }
 
-OneLineDialog
+EventDialog
 {
-  _result = ''
+  _result = '\t\*'
   foreach _argv; _arg {
     case _arg {
       when 1 {
@@ -41,22 +41,20 @@ OneLineDialog
         continue
       }
     }
-    _result += InsertLineFeed(_arg+'\n')
-    if SUBSTR(_result, -2, 2) != '\n' {
-      _result += '\n'
-    }
+    _result += InsertLineFeed(RE_REPLACE(_arg, '(\\n)+$', '')) + '\n\n'
   }
   _result
 }
 
 OnEvent1
 {
+  IsKeyBlocked = 1
   OnEvent1_1
 }
 
 OnEvent1_1
 {
-  OneLineDialog("/
+  EventDialog("/
   h1000000%(BalloonPlain(1))古今東西、他人に与えられる仕事とは退屈なものだ。それは楽しくないわりに責任ばかり大きく、端的に言って嫌だ。\n/
   ", /
     '/
@@ -74,7 +72,6 @@ OnEvent1_1
     "/
   %(BalloonPlain(1))「不測の事態とは？」\n/
   ", /
-    1, /
     "/
   %(BalloonPlain(0))指示書にはありません。強いて言えば、業務にない事象はすべてそれにあたるでしょう。\n/
   ", /
@@ -115,8 +112,8 @@ OnEvent1_1
 
 OnEvent1_2
 {
-  OneLineDialog("/
-  %(BalloonPlain(1))そんな始まりから、およそ半年。\n/
+  EventDialog("/
+  %(BalloonPlain(1))……そんな始まりから、およそ半年。\n/
   ", /
     1, /
     "%(BalloonPlain(1))この仕事にもずいぶん慣れ、当初の不信は少しずつ、しかし確かに薄れていた。\n/
@@ -145,12 +142,14 @@ OnEvent1_2
 
 OnEvent1_3
 {
-  OneLineDialog("/
+  EventDialog("/
   %(BalloonPlain(1))それはとにかく霧の濃い日だった。\n/
+  ", /
+    '/
   一寸先どころか今立っている場所の足元すらおぼつかず、ただでさえ瓦礫混じりの巡回ルートを進むのは至難の業だった。\n/
   注意深く歩き続け、数十分ほど経ったところで、ようやく巡回ルートの折り返しである礼拝堂跡が見えてきた。\n/
   そう、礼拝堂だ。といっても、その比較的大きな建築であることと、どことなく荘厳な雰囲気から勝手にそう呼んでいるだけだが。もちろんこの建物について、上からの情報提供はない。\n/
-  ", /
+  ', /
     1, /
     "/
   %(BalloonPlain(1))近づくにつれ、霧でぼやけていた建物の輪郭があらわになる。折り返しの安堵感に息をついたのも束の間、私は異変に気づいた。\n/
@@ -203,12 +202,13 @@ On_UserNameInput_Input
 
 On_UserNameInput_InputCanceled
 {
-  'h1111209え？よく聞こえなかったわ。\![open,inputbox,UserNameInput]'
+  'h1111209よく聞こえなかったわ。\![open,inputbox,UserNameInput]'
 }
 
 OnEvent1_5
 {
-  OneLineDialog("/
+  IsUserNameInput = 1
+  EventDialog("/
   h1111201%(BalloonPlain(1))震える声で名前を告げると、少女は笑った。\n/
   ", /
     "/
@@ -237,7 +237,6 @@ OnEvent1_5
   私とお話をしましょう。h1111204あなたのことをもっと知りたいわ。\n/
   ")
 
-  // hogefuga
   --
   '\![raise,OnEvent1End]'
 }

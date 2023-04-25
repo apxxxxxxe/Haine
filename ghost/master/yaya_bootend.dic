@@ -65,6 +65,11 @@ Hello
 
 OnClose
 {
+  if !isEvent1End {
+    '\-'
+    return
+  }
+
   SetBalloonSurfaceSakura
   --
   InsertLineFeed(Bye)

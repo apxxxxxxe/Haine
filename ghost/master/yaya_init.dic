@@ -26,6 +26,7 @@ InitializeVariable
   InitVar('bad_touch_count', 0)
   InitVar('total_talk_count', 0)
   InitVar('uwanosora_minute', 5)
+  InitVar('IsUserNameInput', 0)
 
   //---- 変数の初期化(起動毎に設定)
   ghostboottime = systemuptime
@@ -34,7 +35,7 @@ InitializeVariable
   touch_count = 0
   last_touch_part = ''
   first_touch = 0
-  isKeyBlocked = 0
+  IsKeyBlocked = 0
   wheel_inputtable_tick = 0
   conditionrecovery = 0
   user_emotions = (1, 1, 1, 1, 1)

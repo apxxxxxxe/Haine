@@ -29,7 +29,7 @@ talks : array
 
 OnKeyPress
 {
-  if isKeyBlocked {
+  if IsKeyBlocked {
     return
   }
 
