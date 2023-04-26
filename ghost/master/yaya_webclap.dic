@@ -7,12 +7,13 @@ OnWebClap
   バグ報告や要望φ、感想はこちらにお願いしますφ。'
 }
 
-WebClapMessageを入力した
+On_WebClapMessage_Input
 {
-  "\![execute,http-post,http://clap.webclap.com/clap.php?id=apxxxxxxe,--param=message_body='Haine:%(InputMessage)',--async=webclap]"
+  _msg = STRENCODE(reference[0], 1, 'url')
+  "\![execute,http-post,http://clap.webclap.com/clap.php?id=apxxxxxxe,--param=message_body=Haine:%(_msg),--async=webclap]"
 }
 
-WebClapMessageを空打ちされた
+On_WebClapMessage_InputCancel
 {
   '\_q送信を中止しました'
 }
