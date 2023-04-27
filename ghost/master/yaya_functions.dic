@@ -21,7 +21,7 @@ IsTalking
 
 PosOffset
 {
-  _offset = balloon_rows
+  _offset = balloon_rows_0
   if balloon_name == '霧の郊外にて' {
     _offset += 1
   }
@@ -407,10 +407,45 @@ CalcTension
 
 ShowUserEmotions
 {
-  _emo_labels = ('喜び', '悲しみ', '怒り', '不満', '不安')
-  _emotions = "\f[height,10]%(_emo_labels[0])\f[height,default]%(user_emotions[0])"
-  for _i=1; _i<ARRAYSIZE(user_emotions); _i++ {
-    _emotions += "     \f[height,10]%(_emo_labels[_i])\f[height,default]%(user_emotions[_i])"
+  _update_flag = 0
+  if _argv[0] == 'updated' {
+    _update_flag = 1
   }
-  "\1\_q\_l[0,%(balloon_rows)em]\f[align,center]%(_emotions)\_q"
+
+  _emo_labels = ('喜び', '悲しみ', '怒り', '不満', '不安')
+  _emotions = '  '
+  for _i=0; _i<ARRAYSIZE(_emo_labels); _i++ {
+    _emotions += "\_l[@2em,]\f[height,12]%(_emo_labels[_i])\f[height,default]"
+    if _update_flag && _i == _argv[1] {
+      _emotions += user_emotions[_i] + _argv[2]
+      if _argv[2] >= 0 {
+        _emotions += '\f[color,0,250,0]+'
+      }
+      else {
+        _emotions += '\f[color,250,0,0]'
+      }
+      _emotions += "%(_argv[2])\f[color,default]"
+    }
+    else {
+      _emotions += user_emotions[_i]
+    }
+  }
+  _emotions = ERASE(_emotions, 0, STRSTR(_emotions, '\', 2))
+  "\1\_q\_l[0,%(balloon_rows_1)em]%(_emotions)\n\_q\_l[0,0]"
+  --
+  if _update_flag {
+    "\![embed,OnUpdateUserEmotions,%(_argv[1]),%(_argv[2])]"
+  }
+}
+
+AddUserEmotions
+{
+  "\1\c[line,%(ARRAYSIZE(user_emotions)),0]" + ShowUserEmotions('updated', _argv[0], _argv[1])
+}
+
+OnUpdateUserEmotions
+{
+  // reference[0]: index
+  // reference[1]: num
+  user_emotions[reference[0]] += reference[1]
 }

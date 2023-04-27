@@ -103,7 +103,15 @@ GetGhostInfo
 
 GetBalloonInfo
 {
-  '\![get,property,OnGetBalloonInfo,currentghost.balloon.name,currentghost.balloon.scope(0).lines,currentghost.balloon.scope(0).validwidth,currentghost.balloon.scope(0).char_width]'
+  '\![get,property,OnGetBalloonInfo,/
+  currentghost.balloon.name,/
+  currentghost.balloon.scope(0).lines,/
+  currentghost.balloon.scope(0).validwidth,/
+  currentghost.balloon.scope(0).char_width,/
+  currentghost.balloon.scope(1).lines,/
+  currentghost.balloon.scope(1).validwidth,/
+  currentghost.balloon.scope(1).char_width/
+  ]'
 }
 
 GetShellInfo
@@ -123,9 +131,13 @@ OnGetBalloonInfo
   //reference[1]: currentghost.balloon.scope(0).lines
   //reference[2]: currentghost.balloon.scope(0).validwidth.initial
   //reference[3]: currentghost.balloon.scope(0).char_width
+  //reference[4]: currentghost.balloon.scope(1).lines
+  //reference[5]: currentghost.balloon.scope(1).validwidth.initial
+  //reference[6]: currentghost.balloon.scope(1).char_width
 
   balloon_name = reference[0]
-  balloon_rows = reference[1]
+  balloon_rows_0 = reference[1]
+  balloon_rows_1 = reference[4]
 
   ERASEVAR('forced_balloon_cols')
   case balloon_name {
