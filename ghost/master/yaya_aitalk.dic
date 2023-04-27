@@ -12,7 +12,7 @@ RandomTalk
   SetBalloonSurfaceSakura
   --
   lasttalk = InsertLineFeed(roulette.exec('talks'))
-  ShowUserEmotions('') + lasttalk
+  ShowUserEmotions + lasttalk
 }
 
 talks : array
@@ -53,7 +53,7 @@ talks : array
     h1111204彼、デモンストレーションのために自ら生き埋めになってみせたそうよ。\n/
     \n/
     h1211209支援者に強制でもされたのかしら。自分からそんな真似を？なんにせよ、h1211205狂気の沙汰ね。/
-    ' + AddUserEmotions(4, 1)
+    ' + AddUserEmotions(4, 1, 0, 1)
 
     '/
     h1111204霧を固めれば簡単な道具くらいは作れるわ。h1111209でも、しばらくすると解けてしまうし、h1111206何より結局は霧だから。\n/
