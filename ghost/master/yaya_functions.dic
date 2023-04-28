@@ -179,15 +179,6 @@ ICON
   ']\f[default]'
 }
 
-InsertLineFeed
-{
-  // 文字数計算のため、OnTranslate処理をこちらで先に行う
-  willTranslate = 0
-  _text = TextOnlyTranslatorFunc(SurfaceSnippet(_argv[0]))
-
-  InsertLineFeed.Exec(_text)
-}
-
 SurfaceSnippet
 {
   RE_REPLACEEX(_argv[0], 'h([0-9]{7})', '\\0\\![embed,OnSurfaceComplete,$1]')
