@@ -22,10 +22,6 @@ OnMainMenu
   \_l[0.8em,@1.3em]\![*]\q[さっきの話,Menu_LastTalk]/
   \_l[0.8em,@1.3em]\![*]\q[Web拍手,OnWebClap]'
   --
-  if ISFUNC('On_dressup.exec') {
-    '\_l[0.8em,@1.3em]\![*]\q[着せ替え,On_dressup.exec]'
-  }
-  --
   '\_l[0.7em,' + PosOffset + "]\__q[OnMenuClose]%(ICON('cross'))\__q/
   \_l[@0.7em,]\__q[OnConfigMenu]%(ICON('cog'))\__q"
   --
