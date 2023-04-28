@@ -62,13 +62,13 @@ DialogTouchDisturbedSexial : nonoverlap
 MouseMove0head : nonoverlap
 {
   good_touch_count++
-  'h1111105……あたたかいのね、あなたの手。'
-  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。'
+  'h1111105……あたたかいのね、あなたの手。' + AddUserEmotions('喜び', 1)
+  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。' + AddUserEmotions('喜び', 1)
 }
 
 MouseMove0face : nonoverlap
 {
-  'h1121207くすぐったい。'
+  'h1121207くすぐったい。' + AddUserEmotions('喜び', 1)
 }
 
 MouseMove0bust : nonoverlap
@@ -87,9 +87,11 @@ MouseMove0bust : nonoverlap
     --
     'h1111304残念だけど、それほど気は長くないの。'
     'h1111204わきまえなさい。'
+    --
+    AddUserEmotions('不安', 1)
   }
   else {
-    'h1111204\1自重しよう……。'
+    'h1111204\1自重しよう……。' + AddUserEmotions('悲しみ', 1)
   }
 }
 
@@ -172,7 +174,7 @@ OnMouseEvent
   --
   SetBalloonSurfaceSakura
   --
-  InsertLineFeed(NextTouchTalk)
+  ShowUserEmotions + InsertLineFeed(NextTouchTalk)
 }
 
 OnTouchCountReset
