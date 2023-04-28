@@ -1,0 +1,83 @@
+ShowUserEmotions
+{
+  _fontsize = 12
+
+  _x_limit = ARRAYSIZE(emo_labels)
+  _y_limit = 1
+  while _fontsize * 3 * 2 * _x_limit > balloow_width {
+    _x_limit /= 2
+    _y_limit *= 2
+  }
+
+  _update_flag = 0
+  if ARRAYSIZE(_argv) > 0 {
+    _update_flag = 1
+  }
+
+  _labels = IARRAY
+  _emo_addends = IARRAY
+  for _i=0; _i<ARRAYSIZE(_argv)/2; _i++ {
+    _labels ,= _argv[_i * 2]
+    _emo_addends ,= _argv[_i * 2 + 1]
+  }
+
+  _emotions = '  '
+  for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
+    _e = "\f[height,12]%(emo_labels[_i])"
+    _isnotchanged = 1
+    if _update_flag {
+      for _j=0; _j<ARRAYSIZE(_labels); _j++ {
+        if emo_labels[_i] == _labels[_j] {
+          _isnotchanged = 0
+          _e += (user_emotions[_i] + _emo_addends[_j])
+          if _emo_addends[_j] >= 0 {
+            _e += '\f[color,0,250,0]+'
+          }
+          else {
+            _e += '\f[color,250,0,0]'
+          }
+          _e += "%(_emo_addends[_j])\f[color,default]"
+        }
+      }
+    }
+    if _isnotchanged || !_update_flag {
+      _e += user_emotions[_i]
+    }
+
+    _l = STRLEN(SHIORI3FW.RemoveAllTags(_e))
+    _x = _i % _x_limit
+    _y = _i / _x_limit
+    _emotions += "\_l[%(balloow_width/(_x_limit+1)*(_x+1)),%(balloon_rows_1-_y_limit+_y+1)em]"
+    _emotions += "\_l[@-%(_l*12/2),]%(_e)\f[height,default]"
+  }
+  _emotions = ERASE(_emotions, 0, STRSTR(_emotions, '\', 2))
+  "\1\_q%(_emotions)\n\_q\_l[0,0]"
+  --
+  if _update_flag {
+    _references = ''
+    for _i=0; _i<ARRAYSIZE(_argv); _i++ {
+      _references += "%(_argv[_i]),"
+    }
+    _references = ERASE(_references, -1, 1)
+    "\![embed,OnUpdateUserEmotions,%(_references)]"
+  }
+}
+
+AddUserEmotions
+{
+  "\1\c[line,%(ARRAYSIZE(emo_labels)),0]" + ShowUserEmotions(_argv)
+}
+
+OnUpdateUserEmotions
+{
+  for _i=0; _i<ARRAYSIZE(reference)/2; _i++ {
+    for _j=0; _j<ARRAYSIZE(emo_labels); _j++ {
+      if emo_labels[_j] == reference[_i * 2] {
+        user_emotions[_j] += reference[_i * 2 + 1]
+        if user_emotions[_j] < 1 {
+          user_emotions[_j] = 1
+        }
+      }
+    }
+  }
+}

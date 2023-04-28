@@ -44,6 +44,7 @@ dic, yaya_dressup.dic              // 着せ替え処理辞書
 dic, yaya_init.dic
 dic, yaya_rouletteselection.dic
 dic, yaya_insertlinefeed.dic
+dic, yaya_useremotion.dic
 
 
 //------------------------------------------------------------------------------
