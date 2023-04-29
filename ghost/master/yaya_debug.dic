@@ -8,7 +8,7 @@ OnDebugKeyPress
     }
     when 'a' {
       _r = 'hogehoge\n\n\n'
-      RE_REPLACE(_r, '(\\n)+$', '') + 'fugafuga'
+      STRLENHALF(_r)
     }
     when 's' {
       _file = '../debuginfo.txt'

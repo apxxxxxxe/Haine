@@ -25,7 +25,6 @@ InsertLineFeed.Exec
 InsertLineFeed.Wakachi
 {
   InsertLineFeed.wakachi = (IARRAY, '')
-  InsertLineFeed.wordcounts = (IARRAY, 0)
 
   // _argv[0]: 改行を入れたい文字列
   _text = _argv[0]
@@ -117,12 +116,10 @@ InsertLineFeed.Wakachi
       if !_noBreak {
         // 改行処理
         InsertLineFeed.wakachi ,= ''
-        InsertLineFeed.wordcounts ,= 0
       }
 
       // 現在行に追加
       InsertLineFeed.wakachi[ARRAYSIZE(InsertLineFeed.wakachi) - 1] += _word
-      InsertLineFeed.wordcounts[ARRAYSIZE(InsertLineFeed.wordcounts) - 1] += STRLEN(_word)
 
       _afterCloseBracket = _inBrackets != _lastInBrackets && _inBrackets == 0
       _lastInBrackets = _inBrackets
@@ -131,13 +128,11 @@ InsertLineFeed.Wakachi
     }
 
     InsertLineFeed.wakachi ,= ''
-    InsertLineFeed.wordcounts ,= 0
   }
 
   for _i=0; _i<ARRAYSIZE(InsertLineFeed.wakachi); _i++ {
-    if InsertLineFeed.wakachi[_i] == '' && InsertLineFeed.wordcounts == 0 {
+    if InsertLineFeed.wakachi[_i] == '' {
       InsertLineFeed.wakachi[_i] = IARRAY
-      InsertLineFeed.wordcounts[_i] = IARRAY
     }
   }
 }
@@ -159,7 +154,7 @@ InsertLineFeed.Render
   // _wordcountはゴーストのスコープの数だけ要る とりあえず10確保
   _ary = IARRAY
   for _j=0; _j<10; _j++ {
-    _ary = (_ary, 0)
+    _ary = (_ary, 0.0)
   }
   _wordcount = _ary
 
@@ -167,7 +162,7 @@ InsertLineFeed.Render
 
   for _i=0; _i<ARRAYSIZE(InsertLineFeed.wakachi); _i++ {
     _bunsetu = InsertLineFeed.wakachi[_i]
-    _wc = InsertLineFeed.wordcounts[_i]
+    _wc = STRLENHALF(SHIORI3FW.RemoveAllTags(_bunsetu))
 
     // タグがスコープ変更(\0,\1,\p[2],...)なら、そのスコープを_scope変数に代入
     if RE_SEARCH(_bunsetu, '(\\[01][^w]?|\\p\[\d+\])') {
@@ -182,7 +177,7 @@ InsertLineFeed.Render
     // 文字数が_maxを超えたら、改行を入れる
     if _wordcount[_scope] + _wc > _max {
       _result += '\n'
-      _wordcount[_scope] = 0
+      _wordcount[_scope] = 0.0
     }
 
     _wordcount[_scope] += _wc
