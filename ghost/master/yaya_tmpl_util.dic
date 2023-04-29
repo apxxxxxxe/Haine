@@ -57,27 +57,31 @@ OnChoiceSelect
   }
 }
 
-OnAnchorSelect
+OnAnchorSelectEx
 {
-  if RE_SEARCH(reference[0], '^(http|https)://') {
+  if RE_SEARCH(reference[1], '^(http|https)://') {
     if basewarename == 'SSP' {
       '\C'
     }
     --
-    "\j[%(AYATEMPLATE.EscapeText(reference[0]))]"
+    "\j[%(AYATEMPLATE.EscapeText(reference[1]))]"
   }
   else {
-    if ISFUNC(reference[0]) {
-      if lastanchor == reference[0] {
+    if ISFUNC(reference[1]) {
+      if lastanchor == reference[1] {
         return
       }
-      lastanchor = reference[0]
+      lastanchor = reference[1]
       _lines = "%property[currentghost.balloon.scope(0).lines]" //現在バルーンの表示可能行数
       _lines = '"' + _lines + '"'
       --
-      "\C\n\_q-\w1---\w1------\w1--------------\w1-------\w1----\w1---\w1--\w1-\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@-%(balloon.lines)em]\_q"
+      '\C'
       --
-      InsertLineFeed(EVAL(reference[0]))
+      "\1\c\_q「%(reference[0])」\_q"
+      --
+      "\0\n\_q─\w1──\w1───\w1───────\w1────\w1──\w1──\w1─\w1─\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@─%(balloon.lines)em]\_q"
+      --
+      InsertLineFeed(EVAL(reference[1]))
     }
   }
 }
