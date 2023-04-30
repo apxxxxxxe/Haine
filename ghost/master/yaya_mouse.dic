@@ -119,21 +119,21 @@ MouseWheelUp0skirt : nonoverlap
   _threshold = 3
 
   if IsTalking {
-    'h2144402……\n'
+    '@h2144402……\n'
     --
     DialogTouchDisturbedSexial
   }
   elseif touch_count < _threshold {
     // 赤面
-    'h2244402……！\n'
+    '@h2244402……！\n'
     --
-    'h1241102\_w[500]'
+    '@h1241102\_w[500]'
     --
     DialogTouchSexialSurprised
   }
   else {
     // 真顔
-    'h2114104……\n'
+    '@h2114104……\n'
     --
     DialogTouchSexialAkire
   }

@@ -198,7 +198,13 @@ ICON
 
 SurfaceSnippet
 {
-  RE_REPLACEEX(_argv[0], 'h([0-9]{7})', '\\0\\![embed,OnSurfaceComplete,$1]')
+  // 'h1111204のようなものにフレーム補完を入れる'
+  _res = RE_REPLACEEX(_argv[0], '(?<!@)h([0-9]{7})', '\\0\\![embed,OnSurfaceComplete,$1]')
+
+  // 'ただし@が頭についているものは補完しない'
+  _res = RE_REPLACEEX(_res, '@h([0-9]{7})', '\\0\s[$1]')
+
+  _res
 }
 
 IsUnderLine

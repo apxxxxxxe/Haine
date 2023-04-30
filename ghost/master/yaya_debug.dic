@@ -7,8 +7,8 @@ OnDebugKeyPress
       '\![raise,OnEvent1]'
     }
     when 'a' {
-      _r = 'hogehoge\n\n\n'
-      STRLENHALF(_r)
+      _res = RE_REPLACEEX('@h1111209', '@h([0-9]{7})', '\\0\s[$1]')
+      _res
     }
     when 's' {
       _file = '../debuginfo.txt'
