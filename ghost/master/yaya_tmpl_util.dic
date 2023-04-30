@@ -79,7 +79,7 @@ OnAnchorSelectEx
       --
       "\1\c\_q「%(reference[0])」\_q"
       --
-      "\0\n\_q─\w1──\w1───\w1───────\w1────\w1──\w1──\w1─\w1─\n\_w[500]\_l[0,@%(balloon.lines)em]　\_l[0,@─%(balloon.lines)em]\_q"
+      '\0\n\_q─\w1──\w1───\w1───────\w1────\w1──\w1──\w1─\w1─\n\_w[750]\_q'
       --
       InsertLineFeed(EVAL(reference[1]))
     }
