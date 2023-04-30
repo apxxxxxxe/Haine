@@ -38,7 +38,7 @@ InitializeVariable
   IsKeyBlocked = 0
   wheel_inputtable_tick = 0
   conditionrecovery = 0
-  emo_labels = ('喜び', '興味', '悲哀', '怒り', '嫌悪', '不安')
+  emo_labels = ('喜び', '興味', '悲哀', '怒り', '不快', '不安')
   user_emotions = IARRAY
   for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
     user_emotions ,= 1
