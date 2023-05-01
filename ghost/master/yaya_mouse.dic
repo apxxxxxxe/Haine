@@ -24,12 +24,6 @@ DialogSurprised
   'なっ……'
 }
 
-DialogConfused
-{
-  '……'
-  'あの……'
-}
-
 // セクハラ反応-驚き/恥ずかしさ
 DialogTouchSexialSurprised : nonoverlap
 {
@@ -40,6 +34,7 @@ DialogTouchSexialSurprised : nonoverlap
   'h1111201……外ではこれが普通なの？h1111204違うわよね。'
   'h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。'
   'h1111205これがあなたのやりたいこと？h1111204くだらないのね。'
+  'h1111309……満足した？'
 }
 
 // セクハラ反応-呆れ気味
