@@ -9,7 +9,7 @@ InitVar
   _var_name = _argv[0]
   _value = _argv[1]
   if !ISVAR(_var_name) {
-    EVAL(_var_name+'='+_value)
+    LETTONAME(_var_name, _value)
   }
 }
 
