@@ -16,7 +16,7 @@ roulette.exec
   // 対象トークの重みと累積和を取得
   roulette.getcumsum(_name, &_cumsum, &_hashes)
   _cumsum_str = _cumsum
-  _hashes = String2Array(_hashes)
+  _hashes = String2IntArray(_hashes)
 
   // 重みを考慮してトークを選択
   _index = roulette.binsearch(_name, _cumsum_str)
@@ -88,15 +88,20 @@ Array2String
   ERASE(_str, -1, 1)
 }
 
-String2Array
+String2IntArray
 {
-  SPLIT(_argv[0], ',')
+  _str_array = SPLIT(_argv[0], ',')
+  _array = IARRAY
+  for _i=0; _i<ARRAYSIZE(_str_array); _i++ {
+    _array ,= TOINT(_str_array[_i])
+  }
+  _array
 }
 
 roulette.binsearch
 {
   _name = _argv[0]
-  _cumsum = String2Array(_argv[1])
+  _cumsum = String2IntArray(_argv[1])
   _totalweight = _cumsum[ARRAYSIZE(_cumsum) - 1]
 
   _value = RAND(_totalweight)
