@@ -15,7 +15,7 @@ roulette.exec
   _index = roulette.binsearch(_name)
 
   // 選ばれなかったトークの重みを増やす
-  LETTONAME(_name+'.weights', 10)
+  EVAL(_name+'.weights += 10')
 
   // 選ばれなかったトークの重みを1に
   EVAL(_name+'.weights['+_index+'] = 1')
