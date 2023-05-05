@@ -63,7 +63,7 @@ InitialScripts
 //\1バルーンを\0サーフェスに追従させる
 MakeKeroBalloownFollow
 {
-  '\1\![set,alignmenttodesktop,free]\![move,0,0,0,0,left.top,left.top]\![set,sticky-window,1,0]'
+  '\1\![reset,sticky-window]\![set,alignmenttodesktop,free]\![move,--X=0,--Y=0,--time=0,--base=0]\![set,sticky-window,1,0]'
 }
 
 getDate
