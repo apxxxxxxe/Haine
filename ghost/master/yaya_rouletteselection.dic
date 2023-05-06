@@ -2,6 +2,12 @@
 // arrayとして定義されたトーク群からルーレット選択する。
 // 各トークに重みづけをし、判定のたびに選ばれたトークの重みはリセット、残りは重み+1する。
 // より自然かつ万遍ないトークができたらいいな
+roulette
+{
+  _name = _argv[0]
+  EVAL(_name)[roulette.exec(_name)]
+}
+
 roulette.clean
 {
   foreach GETVARLIST('roulette.'); _vname {
@@ -40,8 +46,7 @@ roulette.exec
     return
   }
 
-  --
-  EVAL(_name+'['+_index+']')
+  _index
 }
 
 roulette.getcumsum
@@ -88,6 +93,11 @@ Array2String
   ERASE(_str, -1, 1)
 }
 
+String2StrArray
+{
+  SPLIT(_argv[0], ',')
+}
+
 String2IntArray
 {
   _str_array = SPLIT(_argv[0], ',')
@@ -106,27 +116,46 @@ roulette.binsearch
 
   _value = RAND(_totalweight)
 
-  if _value <= 0 {
-    0
-    return
-  }
-
   _low = 0
   _high = ARRAYSIZE(_cumsum) - 1
 
-  while 1 {
-    _i = TOINT((_low+_high)/2)
-
-    if _cumsum[_i] >= _value {
-      _high = _i
+  while _high - _low != 1 {
+    _mid = TOINT((_low+_high)/2)
+    if _cumsum[_mid] > _value {
+      _high = _mid
     }
     else {
-      _low = _i
-    }
-
-    if _high - _low == 1 {
-      _high - 1
-      return
+      _low = _mid
     }
   }
+  _low
+}
+
+roulette.test
+{
+  _name = _argv[0]
+
+  _result = IARRAY
+  _count = IARRAY
+  _prev = -1
+
+  for _i=0; _i<ARRAYSIZE(EVAL(_name)); _i++ {
+    _result ,= 0
+    _count ,= 0
+  }
+
+  for _k=0; _k<1000; _k++ {
+    _index = roulette.exec(_name)
+
+    _result[_index] += 1
+    if _prev == _index {
+      _count[_index] += 1
+    }
+    _prev = _index
+  }
+
+  "/
+  result: %(_result)\n/
+  count: %(_count)\n/
+  "
 }

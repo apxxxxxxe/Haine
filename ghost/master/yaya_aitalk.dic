@@ -11,7 +11,7 @@ RandomTalk
 
   SetBalloonSurfaceSakura
   --
-  lasttalk = InsertLineFeed(roulette.exec('talks'))
+  lasttalk = InsertLineFeed(roulette('talks'))
   ShowUserEmotions + lasttalk
 }
 

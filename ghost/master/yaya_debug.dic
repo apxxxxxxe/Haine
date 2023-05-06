@@ -7,7 +7,7 @@ OnDebugKeyPress
       '\![raise,OnEvent1]'
     }
     when 'a' {
-      ARRAYSIZE(talks)
+      roulette.test('talks')
     }
     when 's' {
       _file = '../debuginfo.txt'
