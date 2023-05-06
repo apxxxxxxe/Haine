@@ -65,6 +65,7 @@ InsertLineFeed.Wakachi
 
     _inBrackets = 0
     _lastInBrackets = 0
+    _afterOpenBracket = 0
     _afterCloseBracket = 0
     _afterPrePos = 0
     _afterSahenNoun = 0
@@ -93,23 +94,18 @@ InsertLineFeed.Wakachi
       _pos = SUBSTR(_posinfo, 0, _sp)
       _pos_detail = ERASE(_posinfo, 0, _sp+1)
 
-      _isBlacketChanged = 0
-      if '括弧開' _in_ _pos_detail {
-        _inBrackets = 1
-      }
-      elseif '括弧閉' _in_ _pos_detail {
-        _inBrackets = 0
-      }
-
       _noBreak = _pos !_in_ _htarget
       _noBreak = _noBreak || '接尾' _in_ _pos_detail
       _noBreak = _noBreak || (_pos == '動詞' && 'サ変接続' _in_ _pos_detail)
       _noBreak = _noBreak || '非自立' _in_ _pos_detail
       _noBreak = _noBreak || _afterPrePos
       _noBreak = _noBreak || (_afterSahenNoun && 'サ変動詞' _in_ _pos_detail)
-      _noBreak = _noBreak || _inBrackets
+      _noBreak = _noBreak || _afterOpenBracket
+      _noBreak = _noBreak || '括弧閉' _in_ _pos_detail
+      _noBreak = _noBreak || 'ナイ形容詞語幹' _in_ _pos_detail
+      _noBreak = _noBreak || '特殊・ナイ' _in_ valueex[_j][4, CHR(9)]
 
-      if _afterCloseBracket {
+      if _afterCloseBracket || '括弧開' _in_ _pos_detail {
         _noBreak = 0
       }
 
@@ -122,9 +118,9 @@ InsertLineFeed.Wakachi
       InsertLineFeed.wakachi[ARRAYSIZE(InsertLineFeed.wakachi) - 1] += _word
 
       _afterCloseBracket = _inBrackets != _lastInBrackets && _inBrackets == 0
-      _lastInBrackets = _inBrackets
       _afterPrePos = _pos == '接頭詞'
       _afterSahenNoun = 'サ変接続' _in_ _pos_detail
+      _afterOpenBracket = '括弧開' _in_ _pos_detail
     }
 
     InsertLineFeed.wakachi ,= ''
