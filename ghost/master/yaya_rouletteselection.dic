@@ -15,6 +15,12 @@ roulette.clean
   }
 }
 
+roulette.talkhash
+{
+  _talk = _argv[0]
+  STRDIGEST(SUBSTR(_talk, 0, 100))
+}
+
 roulette.exec
 {
   _name = _argv[0]
@@ -25,7 +31,16 @@ roulette.exec
   _hashes = String2IntArray(_hashes)
 
   // 重みを考慮してトークを選択
+  _prevvname = 'roulette.' + _name + '.prevhash'
+  if !ISVAR(_prevvname) {
+    LETTONAME(_prevvname, '')
+  }
+
   _index = roulette.binsearch(_name, _cumsum_str)
+  while roulette.talkhash(EVAL(_name)[_index]) == EVAL(_prevvname) {
+    // 前回と同じトークが選ばれたらやり直し
+    _index = roulette.binsearch(_name, _cumsum_str)
+  }
 
   // 各トークの重みを更新
   for _i=0; _i<ARRAYSIZE(_hashes); _i++ {
@@ -37,7 +52,11 @@ roulette.exec
     }
     else {
       // 選ばれなかったトークの重みを増やす
-      LETTONAME(_vname, TOINT(EVAL(_vname))+10)
+      _w = TOINT(EVAL(_vname)) * 4
+      if _w > 1024 {
+        _w = 1024
+      }
+      LETTONAME(_vname, _w)
     }
   }
 
@@ -45,6 +64,8 @@ roulette.exec
     'error: 異常なインデックス:' + _index
     return
   }
+
+  LETTONAME(_prevvname, roulette.talkhash(EVAL(_name)[_index]))
 
   _index
 }
@@ -144,7 +165,7 @@ roulette.test
     _count ,= 0
   }
 
-  for _k=0; _k<1000; _k++ {
+  for _k=0; _k<100; _k++ {
     _index = roulette.exec(_name)
 
     _result[_index] += 1
