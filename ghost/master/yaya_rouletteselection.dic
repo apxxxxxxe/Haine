@@ -18,7 +18,8 @@ roulette.clean
 roulette.talkhash
 {
   _talk = _argv[0]
-  STRDIGEST(SUBSTR(_talk, 0, 100))
+  _escaped_talk = SHIORI3FW.RemoveAllTags(_talk)
+  STRDIGEST(SUBSTR(_escaped_talk, 0, 24))
 }
 
 roulette.exec
