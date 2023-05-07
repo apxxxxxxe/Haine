@@ -24,17 +24,25 @@ DialogSurprised
   'なっ……'
 }
 
-// セクハラ反応-驚き/恥ずかしさ
-DialogTouchSexialSurprised : nonoverlap
+// セクハラ反応-寛容
+DialogTouchSexialTolerant : nonoverlap
+{
+  AddUserEmotions('喜び', 1)
+  --
+  "h1111309過ぎた悪戯には報いがあるのよ。\nh1111304覚えておきなさい、%(username)。"
+  'h1111201……今はこういうことが普通なの？h1111204違うわよね。'
+  'h1111309……満足した？'
+  'h1111209……だめよ。'
+}
+
+// セクハラ反応-怒り
+DialogTouchSexialScold : nonoverlap
 {
   AddUserEmotions('喜び', 1)
   --
   "h1131404このっ……。h1131109……こほん。\nh1131204やっていいことと悪いことがあるわよ、%(username)。"
-  'h1111304覚えておきなさい。\nh1111309過ぎた悪戯には報いがあることを。'
-  'h1111201……外ではこれが普通なの？h1111204違うわよね。'
   'h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。'
   'h1111205これがあなたのやりたいこと？h1111204くだらないのね。'
-  'h1111309……満足した？'
 }
 
 // セクハラ反応-呆れ気味
@@ -79,7 +87,9 @@ MouseMove0bust : nonoverlap
 
   bad_touch_count++
   if touch_count < _threshold {
-    DialogTouchSexialSurprised
+    DialogTouchSexialTolerant
+    DialogTouchSexialScold
+    'h1111205胸、か。h1111204これって、そんなに魅力的なのかしら？'
   }
   elseif touch_count == _threshold {
     'h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。'
@@ -124,7 +134,8 @@ MouseWheelUp0skirt : nonoverlap
     --
     '@h1241102\_w[500]'
     --
-    DialogTouchSexialSurprised
+    DialogTouchSexialTolerant
+    DialogTouchSexialScold
   }
   else {
     // 真顔
