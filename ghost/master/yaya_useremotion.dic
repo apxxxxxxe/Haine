@@ -1,5 +1,6 @@
 ShowUserEmotions
 {
+  _fontname = 'ＭＳ 明朝,ＭＳ ゴシック'
   _fontsize = 12
 
   _labels = IARRAY
@@ -12,26 +13,33 @@ ShowUserEmotions
   _emotions_strlen = 0
   _emotions = IARRAY
   for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
-    _e = "\f[height,12]%(emo_labels[_i])"
+    _e = "\f[name,%(_fontname)]\f[height,%(_fontsize)]%(emo_labels[_i])"
     _isnotchanged = 1
     for _j=0; _j<ARRAYSIZE(_labels); _j++ {
       if emo_labels[_i] == _labels[_j] {
         _isnotchanged = 0
-        _e += (user_emotions[_i] + _emo_addends[_j])
+
+        _addend_color = ''
         if _emo_addends[_j] >= 0 {
-          _e += '\f[color,0,250,0]+'
+          _addend_color += '\f[color,0,250,0]+'
         }
         else {
-          _e += '\f[color,250,0,0]'
+          _addend_color += '\f[color,250,0,0]'
         }
-        _e += "%(_emo_addends[_j])\f[color,default]"
+
+        if user_emotions[_i] == 1 && _emo_addends[_j] < 0 {
+          _addend_color += '-'
+          _emo_addends[_j] = 0
+        }
+
+        _e += "%(user_emotions[_i] + _emo_addends[_j])%(_addend_color)%(_emo_addends[_j])"
       }
     }
     if _isnotchanged {
       _e += user_emotions[_i]
     }
 
-    _emotions ,= "%(_e)\f[height,default]"
+    _emotions ,= "%(_e)\f[default]"
     _emotions_strlen += STRLENHALF(SHIORI3FW.RemoveAllTags(_e))
   }
 
@@ -48,7 +56,7 @@ ShowUserEmotions
     _l = TOINT(STRLENHALF(SHIORI3FW.RemoveAllTags(_emotions[_i])))
     _x = _i % _x_limit
     _y = _i / _x_limit
-    _emotions_script += "\_l[%(balloow_width/(_x_limit+1)*(_x+1)),%(balloon_rows_1-_y_limit+_y+1)em]\_l[@-%(_l*12/2),]%(_emotions[_i])"
+    _emotions_script += "\_l[%(balloow_width/(_x_limit+1)*(_x+1)),%(balloon_rows_1-_y_limit+_y+1)em]\_l[@-%(_l*_fontsize/2),]%(_emotions[_i])"
   }
 
   _emotions_script = ERASE(_emotions_script, 0, STRSTR(_emotions_script, '\', 2))
