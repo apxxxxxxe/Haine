@@ -29,10 +29,10 @@ DialogTouchSexialTolerant : nonoverlap
 {
   AddUserEmotions('喜び', 1)
   --
-  "h1111309過ぎた悪戯には報いがあるのよ。\nh1111304覚えておきなさい、%(username)。"
-  'h1111309……満足した？'
-  'h1111209……だめよ。'
+  "h1111309過ぎた行いには報いがあるのよ。\nh1111304覚えておきなさい、%(username)。"
+  'h1111205……あなたは、私をそういう対象として見ているの？'
   'h1111205……そういう気分じゃないのだけれど。'
+  'h1111205気安いのね。あまり好きではないわ。'
 }
 
 // セクハラ反応-怒り
@@ -41,7 +41,6 @@ DialogTouchSexialScold : nonoverlap
   AddUserEmotions('喜び', 1)
   --
   'h1111201……今はこういうことが普通なの？\nh1111204違うわよね、この変態。'
-  "h1131404このっ……。h1131109……。\nh1131204やっていいことと悪いことがあるわよ、%(username)。"
   'h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。'
   'h1111205これがあなたのやりたいこと？h1111204くだらないのね。'
   'h1111205スキンシップにしてはセンスが無いと思うわ。'
@@ -54,6 +53,7 @@ DialogTouchSexialAkire : nonoverlap
   'h1111304面白い顔。h1111309鏡で見せてあげたいわ。'
   'h1111104悪戯がすぎるわよ。'
   'h1111103はあ……h1111106何が楽しいんだか。'
+  'h1111206……。モラルを説こうとしたけれど、私が言えたものじゃないわね。\nh1111209だからこれは私個人の意見なのだけど、\nつまらないわよ、あなた。'
   --
   AddUserEmotions('喜び', -1)
 }
@@ -85,15 +85,18 @@ MouseMove0face : nonoverlap
 MouseMove0bust : nonoverlap
 {
   // 怒られるまでの回数
-  _threshold = 7
+  _threshold = 12
 
   bad_touch_count++
-  if touch_count < _threshold / 2 {
+  if touch_count < _threshold / 3 {
     DialogTouchSexialTolerant
-    'h1111205胸、か。h1111204これって、そんなに魅力的なのかしら？'
+    'h1111205胸、か。h1111204ずいぶん嬉しそうだけれど、そんなにいいものなの？'
+  }
+  elseif touch_count < _threshold / 3 * 2 {
+    DialogTouchSexialScold
   }
   elseif touch_count < _threshold {
-    DialogTouchSexialScold
+    DialogTouchSexialAkire
   }
   elseif touch_count == _threshold {
     'h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。'
@@ -125,22 +128,23 @@ MouseDoubleClick0
 MouseWheelUp0skirt : nonoverlap
 {
   // 呆れ/怒られるまでの回数
-  _threshold = 7
+  _threshold = 8
 
   if IsTalking {
     '@h2144402……\n'
     --
     DialogTouchDisturbedSexial
   }
-  elseif touch_count < _threshold / 2 {
+  elseif touch_count <= _threshold / 2 {
     // 赤面
     '@h2244402……！\n'
     --
     'h1241102\_w[500]'
     --
     DialogTouchSexialTolerant
+    'h1111204……いいもの見たって顔してる。h1111209屈辱だわ。'
   }
-  elseif touch_count < _threshold {
+  elseif touch_count <= _threshold {
     // 赤面
     '@h2244402……！\n'
     --
@@ -278,7 +282,7 @@ IsMouseTalkExist
 TouchCount
 {
   // 前回から30秒以上経過していたらカウントをリセット
-  if systemuptime - lasttouch > 30000 {
+  if systemuptime - lasttouch > 30 {
     touch_count = 0
     last_touch_part = ''
   }
