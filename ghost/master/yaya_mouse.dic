@@ -30,9 +30,9 @@ DialogTouchSexialTolerant : nonoverlap
   AddUserEmotions('喜び', 1)
   --
   "h1111309過ぎた悪戯には報いがあるのよ。\nh1111304覚えておきなさい、%(username)。"
-  'h1111201……今はこういうことが普通なの？h1111204違うわよね。'
   'h1111309……満足した？'
   'h1111209……だめよ。'
+  'h1111205……そういう気分じゃないのだけれど。'
 }
 
 // セクハラ反応-怒り
@@ -40,12 +40,14 @@ DialogTouchSexialScold : nonoverlap
 {
   AddUserEmotions('喜び', 1)
   --
-  "h1131404このっ……。h1131109……こほん。\nh1131204やっていいことと悪いことがあるわよ、%(username)。"
+  'h1111201……今はこういうことが普通なの？\nh1111204違うわよね、この変態。'
+  "h1131404このっ……。h1131109……。\nh1131204やっていいことと悪いことがあるわよ、%(username)。"
   'h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。'
   'h1111205これがあなたのやりたいこと？h1111204くだらないのね。'
+  'h1111205スキンシップにしてはセンスが無いと思うわ。'
 }
 
-// セクハラ反応-呆れ気味
+// セクハラ反応-呆れ
 DialogTouchSexialAkire : nonoverlap
 {
   'h1111201さっきからずいぶん必死ね。\nh1111304ばかみたいな顔してるわよ。'
@@ -86,10 +88,12 @@ MouseMove0bust : nonoverlap
   _threshold = 7
 
   bad_touch_count++
-  if touch_count < _threshold {
+  if touch_count < _threshold / 2 {
     DialogTouchSexialTolerant
-    DialogTouchSexialScold
     'h1111205胸、か。h1111204これって、そんなに魅力的なのかしら？'
+  }
+  elseif touch_count < _threshold {
+    DialogTouchSexialScold
   }
   elseif touch_count == _threshold {
     'h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。'
@@ -121,20 +125,27 @@ MouseDoubleClick0
 MouseWheelUp0skirt : nonoverlap
 {
   // 呆れ/怒られるまでの回数
-  _threshold = 3
+  _threshold = 7
 
   if IsTalking {
     '@h2144402……\n'
     --
     DialogTouchDisturbedSexial
   }
+  elseif touch_count < _threshold / 2 {
+    // 赤面
+    '@h2244402……！\n'
+    --
+    'h1241102\_w[500]'
+    --
+    DialogTouchSexialTolerant
+  }
   elseif touch_count < _threshold {
     // 赤面
     '@h2244402……！\n'
     --
-    '@h1241102\_w[500]'
+    'h1241102\_w[500]'
     --
-    DialogTouchSexialTolerant
     DialogTouchSexialScold
   }
   else {
