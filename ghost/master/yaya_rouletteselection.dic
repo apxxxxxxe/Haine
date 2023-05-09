@@ -29,7 +29,7 @@ roulette.exec
   // 対象トークの重みと累積和を取得
   roulette.getcumsum(_name, &_cumsum, &_hashes)
   _cumsum_str = _cumsum
-  _hashes = String2IntArray(_hashes)
+  _hashes = String2StrArray(_hashes)
 
   // 重みを考慮してトークを選択
   _prevvname = 'roulette.' + _name + '.prevhash'
