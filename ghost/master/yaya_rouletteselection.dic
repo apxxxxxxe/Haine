@@ -31,17 +31,22 @@ roulette.exec
   _cumsum_str = _cumsum
   _hashes = String2StrArray(_hashes)
 
-  // 重みを考慮してトークを選択
   _prevvname = 'roulette.' + _name + '.prevhash'
   if !ISVAR(_prevvname) {
     LETTONAME(_prevvname, '')
   }
 
-  _index = roulette.binsearch(_name, _cumsum_str)
+  // 重みを考慮してトークを選択
+  _rate = 0.0
+  _index = roulette.binsearch(_name, _cumsum_str, &_rate)
   while roulette.talkhash(EVAL(_name)[_index]) == EVAL(_prevvname) {
     // 前回と同じトークが選ばれたらやり直し
-    _index = roulette.binsearch(_name, _cumsum_str)
+    _index = roulette.binsearch(_name, _cumsum_str, &_rate)
   }
+
+  LETTONAME('roulette.'+_name+'.prevrate', _rate)
+
+  lasthashes = _hashes
 
   // 各トークの重みを更新
   for _i=0; _i<ARRAYSIZE(_hashes); _i++ {
@@ -101,6 +106,7 @@ roulette.getcumsum
     _cumsum ,= (_cumsum[_i] + _weights[_i])
   }
 
+  // 配列はフィードバックに対応してない？ので文字列に変換して代入
   _argv[1] = Array2String(_cumsum) // cumsum
   _argv[2] = Array2String(_hashes) // hashes
 }
@@ -150,6 +156,10 @@ roulette.binsearch
       _low = _mid
     }
   }
+
+  _rate = (_cumsum[_high] - _cumsum[_low]) * 100.0 / _totalweight
+  _argv[2] = _rate
+
   _low
 }
 

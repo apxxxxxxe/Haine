@@ -7,7 +7,7 @@ OnDebugKeyPress
       '\![raise,OnEvent1]'
     }
     when 'a' {
-      roulette.test('talks')
+      EVAL('roulette.talks.prevrate')
     }
     when 's' {
       _file = '../debuginfo.txt'
