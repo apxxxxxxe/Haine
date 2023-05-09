@@ -190,20 +190,9 @@ MouseWheelDown0hand
 // 共通処理
 OnMouseEvent
 {
-  lastresponce = systemuptime
-  first_touch = 1
-
-  '\![timerraise,30000,1,OnTouchCountReset,reset]'
-  --
   SetBalloonSurfaceSakura
   --
   ShowUserEmotions + InsertLineFeed(NextTouchTalk)
-}
-
-OnTouchCountReset
-{
-  touch_count = 0
-  last_touch_part = ''
 }
 
 OnMouseMove
@@ -288,6 +277,14 @@ IsMouseTalkExist
 
 TouchCount
 {
+  // 前回から30秒以上経過していたらカウントをリセット
+  if systemuptime - lasttouch > 30000 {
+    touch_count = 0
+    last_touch_part = ''
+  }
+  lasttouch = systemuptime
+  lastresponce = systemuptime
+
   // _argv[0]: 触り反応の部位
   if last_touch_part == _argv[0] {
     touch_count += 1

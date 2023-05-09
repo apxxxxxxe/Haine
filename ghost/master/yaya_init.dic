@@ -32,9 +32,9 @@ InitializeVariable
   ghostboottime = systemuptime
   lastbootdate = getDate
   lastresponce = systemuptime
+  lasttouch = 0
   touch_count = 0
   last_touch_part = ''
-  first_touch = 0
   IsKeyBlocked = 0
   wheel_inputtable_tick = 0
   conditionrecovery = 0
