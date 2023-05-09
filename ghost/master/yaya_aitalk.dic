@@ -11,7 +11,14 @@ RandomTalk
 
   SetBalloonSurfaceSakura
   --
-  lasttalk = InsertLineFeed(roulette('talks'))
+  _talk = roulette('talks')
+  _rate = EVAL('roulette.talks.prevrate')
+  lasttalk = InsertLineFeed(_talk)
+
+  if isdebug {
+    "\0\_q%(_rate)\_q\n"
+  }
+  --
   ShowUserEmotions + lasttalk
 }
 
