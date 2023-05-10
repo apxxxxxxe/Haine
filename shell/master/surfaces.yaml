@@ -523,6 +523,8 @@ base: |
   animation504510.pattern0,overlay,1810,0,0,0
   animation504511.interval,bind
   animation504511.pattern0,overlay,1811,0,0,0
+  animation504512.interval,bind
+  animation504512.pattern0,overlay,1818,0,0,0
 
   animation504417.interval,bind
   animation504417.pattern0,overlay,1900,0,0,0
