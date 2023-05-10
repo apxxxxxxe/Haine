@@ -201,16 +201,7 @@ OnMenuClose
 
 Menu_RandomTalk
 {
-
-  SetBalloonSurfaceSakura
-  --
-  TextOnlyTranslatorFunc(DialogMenuRandomTalk) + RandomTalk
-}
-
-DialogMenuRandomTalk
-{
-  'h1111201いいわよ。h1111205……そうね、\c'
-  'h1113309なんの話がいいかしら…………h1113205そうね、\c'
+  SetBalloonSurfaceSakura + RandomTalk
 }
 
 //---- さっきの話は
@@ -219,8 +210,6 @@ Menu_LastTalk
   lastanchor = ''
 
   SetBalloonSurfaceSakura
-  --
-  'h1111209さっきの話ね。\c'
   --
   lasttalk
 }
