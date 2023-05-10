@@ -24,6 +24,14 @@ DialogSurprised
   'なっ……'
 }
 
+// セクハラ反応-起動直後
+DialogTouchSexialFirst : nonoverlap
+{
+  AddUserEmotions('喜び', 1)
+  --
+  'h1111205……会って早々、これ？\n……なんというか、h1111204流石ね。'
+}
+
 // セクハラ反応-寛容
 DialogTouchSexialTolerant : nonoverlap
 {
@@ -88,7 +96,10 @@ MouseMove0bust : nonoverlap
   _threshold = 12
 
   bad_touch_count++
-  if touch_count < _threshold / 3 {
+  if ghostuptime < 60 {
+    DialogTouchSexialFirst
+  }
+  elseif touch_count < _threshold / 3 {
     DialogTouchSexialTolerant
     'h1111205胸、か。h1111204ずいぶん嬉しそうだけれど、そんなにいいものなの？'
   }
@@ -130,25 +141,26 @@ MouseWheelUp0skirt : nonoverlap
   // 呆れ/怒られるまでの回数
   _threshold = 8
 
-  if IsTalking {
+  if ghostuptime < 60 {
+    '@h2244402……！\nh1241102\_w[500]'
+    --
+    DialogTouchSexialFirst
+  }
+  elseif IsTalking {
     '@h2144402……\n'
     --
     DialogTouchDisturbedSexial
   }
   elseif touch_count <= _threshold / 2 {
     // 赤面
-    '@h2244402……！\n'
-    --
-    'h1241102\_w[500]'
+    '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialTolerant
     'h1111204……いいもの見たって顔してる。h1111209屈辱だわ。'
   }
   elseif touch_count <= _threshold {
     // 赤面
-    '@h2244402……！\n'
-    --
-    'h1241102\_w[500]'
+    '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialScold
   }
