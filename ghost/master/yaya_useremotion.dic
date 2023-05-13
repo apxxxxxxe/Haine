@@ -1,13 +1,13 @@
-ShowUserEmotions
+OnShowUserEmotions
 {
   _fontname = 'ＭＳ 明朝,ＭＳ ゴシック'
   _fontsize = 12
 
   _labels = IARRAY
   _emo_addends = IARRAY
-  for _i=0; _i<ARRAYSIZE(_argv)/2; _i++ {
-    _labels ,= _argv[_i * 2]
-    _emo_addends ,= _argv[_i * 2 + 1]
+  for _i=0; _i<ARRAYSIZE(reference)/2; _i++ {
+    _labels ,= reference[_i * 2]
+    _emo_addends ,= reference[_i * 2 + 1]
   }
 
   _emotions_strlen = 0
@@ -63,19 +63,28 @@ ShowUserEmotions
 
   "\1\_q%(_emotions_script)\n\_q\_l[0,0]"
   --
-  if ARRAYSIZE(_argv) {
+  if ARRAYSIZE(reference) {
     _references = ''
-    for _i=0; _i<ARRAYSIZE(_argv); _i++ {
-      _references += "%(_argv[_i]),"
+    for _i=0; _i<ARRAYSIZE(reference); _i++ {
+      _references += "%(reference[_i]),"
     }
     _references = ERASE(_references, -1, 1)
-    "\![embed,OnUpdateUserEmotions,%(_references)]"
+    "\![raise,OnUpdateUserEmotions,%(_references)]"
   }
 }
 
-AddUserEmotions
+UpdateUserEmotions
 {
-  "\1\c[line,%(ARRAYSIZE(emo_labels)),0]" + ShowUserEmotions(_argv)
+  _args = ''
+  foreach _argv; _arg {
+    _args += "%(_arg),"
+  }
+
+  // 表示している感情値を消去
+  "\1\c[line,%(ARRAYSIZE(emo_labels)),0]"
+  --
+  // 新たに現在の感情値を表示
+  "\![embed,OnShowUserEmotions,%(_args)]"
 }
 
 OnUpdateUserEmotions

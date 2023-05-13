@@ -27,27 +27,12 @@ DialogSurprised
 // セクハラ反応-起動直後
 DialogTouchSexialFirst : nonoverlap
 {
-  AddUserEmotions('喜び', 1)
-  --
-  'h1111205……会って早々、これ？\n……なんというか、h1111204流石ね。'
-}
-
-// セクハラ反応-寛容
-DialogTouchSexialTolerant : nonoverlap
-{
-  AddUserEmotions('喜び', 1)
-  --
-  "h1111309過ぎた行いには報いがあるのよ。\nh1111304覚えておきなさい、%(username)。"
-  'h1111205……あなたは、私をそういう対象として見ているの？'
-  'h1111205……そういう気分じゃないのだけれど。'
-  'h1111205気安いのね。あまり好きではないわ。'
+  'h1111205……会って早々、これ？\nなんというか、h1111204流石ね。'
 }
 
 // セクハラ反応-怒り
 DialogTouchSexialScold : nonoverlap
 {
-  AddUserEmotions('喜び', 1)
-  --
   'h1111201……今はこういうことが普通なの？\nh1111204違うわよね、この変態。'
   'h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。'
   'h1111205これがあなたのやりたいこと？h1111204くだらないのね。'
@@ -62,16 +47,12 @@ DialogTouchSexialAkire : nonoverlap
   'h1111104悪戯がすぎるわよ。'
   'h1111103はあ……h1111106何が楽しいんだか。'
   'h1111206……。モラルを説こうとしたけれど、私が言えたものじゃないわね。\nh1111209だからこれは私個人の意見なのだけど、\nつまらないわよ、あなた。'
-  --
-  AddUserEmotions('喜び', -1)
 }
 
 DialogTouchDisturbedSexial : nonoverlap
 {
   'h1111104……話していたのだけど？'
   'h1111304……呆れた。相手の話を聞いていられないの？\nh1111309発情期の獣のほうがいくらかましね。'
-  --
-  AddUserEmotions('喜び', -1, '悲哀', 1)
 }
 
 //******************************************************************************
@@ -81,13 +62,13 @@ DialogTouchDisturbedSexial : nonoverlap
 MouseMove0head : nonoverlap
 {
   good_touch_count++
-  'h1111105……あたたかいのね、あなたの手。' + AddUserEmotions('喜び', 1)
-  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。' + AddUserEmotions('喜び', 1)
+  'h1111105……あたたかいのね、あなたの手。' + UpdateUserEmotions('喜び', 1)
+  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。' + UpdateUserEmotions('喜び', 1)
 }
 
 MouseMove0face : nonoverlap
 {
-  'h1121207くすぐったい。' + AddUserEmotions('喜び', 1)
+  'h1121207くすぐったい。' + UpdateUserEmotions('喜び', 1)
 }
 
 MouseMove0bust : nonoverlap
@@ -97,17 +78,27 @@ MouseMove0bust : nonoverlap
 
   bad_touch_count++
   if ghostuptime < 60 {
+    UpdateUserEmotions('喜び', 1)
+    --
     DialogTouchSexialFirst
   }
   elseif touch_count < _threshold / 3 {
-    DialogTouchSexialTolerant
+    UpdateUserEmotions('喜び', 1)
+    --
     'h1111205胸、か。h1111204ずいぶん嬉しそうだけれど、そんなにいいものなの？'
+    'h1111205……あなたは、私をそういう対象として見ているの？'
+    'h1111205……そういう気分じゃないのだけれど。'
+    'h1111205気安いのね。あまり好きではないわ。'
   }
   elseif touch_count < _threshold / 3 * 2 {
+    UpdateUserEmotions('喜び', 1)
+    --
     DialogTouchSexialScold
   }
   elseif touch_count < _threshold {
     DialogTouchSexialAkire
+    --
+    UpdateUserEmotions('喜び', -1)
   }
   elseif touch_count == _threshold {
     'h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。'
@@ -117,10 +108,10 @@ MouseMove0bust : nonoverlap
     'h1111304残念だけど、それほど気は長くないの。'
     'h1111204わきまえなさい。'
     --
-    AddUserEmotions('不安', 1)
+    UpdateUserEmotions('不安', 1)
   }
   else {
-    'h1111204\1自重しよう……。' + AddUserEmotions('悲しみ', 1)
+    'h1111204\1自重しよう……。' + UpdateUserEmotions('悲しみ', 1)
   }
 }
 
@@ -142,6 +133,8 @@ MouseWheelUp0skirt : nonoverlap
   _threshold = 8
 
   if ghostuptime < 60 {
+    UpdateUserEmotions('喜び', 1)
+    --
     '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialFirst
@@ -150,16 +143,23 @@ MouseWheelUp0skirt : nonoverlap
     '@h2144402……\n'
     --
     DialogTouchDisturbedSexial
+    --
+    UpdateUserEmotions('喜び', -1, '悲哀', 1)
   }
   elseif touch_count <= _threshold / 2 {
     // 赤面
     '@h2244402……！\nh1241102\_w[500]'
     --
-    DialogTouchSexialTolerant
+    UpdateUserEmotions('喜び', 1)
+    --
+    "h1111309過ぎた行いには報いがあるのよ。\nh1111304覚えておきなさい、%(username)。"
     'h1111204……いいもの見たって顔してる。h1111209屈辱だわ。'
+    'h1111205……ああ、ひどい人。h1111209泣いてしまいそうだわ。'
   }
   elseif touch_count <= _threshold {
     // 赤面
+    UpdateUserEmotions('喜び', 1)
+    --
     '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialScold
@@ -169,6 +169,8 @@ MouseWheelUp0skirt : nonoverlap
     '@h2114104……\n'
     --
     DialogTouchSexialAkire
+    --
+    UpdateUserEmotions('喜び', -1)
   }
 }
 
@@ -220,6 +222,8 @@ OnMouseMove
   _result = AYATEMPLATE.MouseMoveWheelFunc(0, 50, 'MouseMove')
   if _result != '' && IsTalking {
     _result = DialogTouchDisturbedSexial
+    --
+    UpdateUserEmotions('喜び', -1, '悲哀', 1)
   }
   _result
 }
