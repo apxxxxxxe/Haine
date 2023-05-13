@@ -52,7 +52,7 @@ DialogTouchSexialAkire : nonoverlap
 DialogTouchDisturbedSexial : nonoverlap
 {
   'h1111104……話していたのだけど？'
-  'h1111304……呆れた。相手の話を聞いていられないの？\nh1111309発情期の獣のほうがいくらかましね。'
+  'h1111304……話を聞くよりも、\n私の体を触っているほうがいいって？'
 }
 
 //******************************************************************************
@@ -221,9 +221,7 @@ OnMouseMove
 
   _result = AYATEMPLATE.MouseMoveWheelFunc(0, 50, 'MouseMove')
   if _result != '' && IsTalking {
-    _result = DialogTouchDisturbedSexial
-    --
-    UpdateUserEmotions('喜び', -1, '悲哀', 1)
+    _result = DialogTouchDisturbedSexial + UpdateUserEmotions('喜び', -1, '悲哀', 1)
   }
   _result
 }
