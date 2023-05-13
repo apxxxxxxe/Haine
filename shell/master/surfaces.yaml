@@ -34,6 +34,9 @@ parts:
           animation504374.pattern0,overlay,1304,0,0,0
           animation504375.interval,bind
           animation504375.pattern0,overlay,1305,0,0,0
+          animation504376.interval,bind
+          animation504376.pattern0,overlay,1308,0,0,0
+          animation504376.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
       
       - name: めくれスカート
         text: |
@@ -41,6 +44,8 @@ parts:
           animation508000.pattern0,overlay,1350,0,0,0
           animation508001.interval,bind
           animation508001.pattern0,overlay,1351,0,0,0
+          animation508002.interval,bind
+          animation508002.pattern0,overlay,1352,0,0,0
 
   - group: 顔色
     details:
@@ -420,6 +425,8 @@ base: |
   animation500354.pattern0,overlay,754,0,0,0
   animation500355.interval,bind
   animation500355.pattern0,overlay,755,0,0,0
+  animation500356.interval,bind
+  animation500356.pattern0,overlay,756,0,0,0
   
   //口400,401
   
@@ -584,6 +591,8 @@ base: |
   animation506704.pattern0,overlay,704,0,0,0
   animation506705.interval,bind
   animation506705.pattern0,overlay,705,0,0,0
+  animation506706.interval,bind
+  animation506706.pattern0,overlay,706,0,0,0
   
   // メッシュ
   animation506698.interval,bind
