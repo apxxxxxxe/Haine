@@ -46,8 +46,8 @@ talks : array
   }
   elseif user_emotions[0] > 1 {
     '/
-    h1111207なんだか嬉しそうね。いいことでもあったのかしら。/
-    '
+    h1111205\1穏やかな時間が流れている。/
+    ' + UpdateUserEmotions('喜び', 1)
   }
 
   {
