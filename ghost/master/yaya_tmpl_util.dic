@@ -72,9 +72,6 @@ OnAnchorSelectEx
         return
       }
       lastanchor = reference[1]
-      _lines = "%property[currentghost.balloon.scope(0).lines]" //現在バルーンの表示可能行数
-      _lines = '"' + _lines + '"'
-      --
       '\C'
       --
       "\1\c\_q「%(reference[0])」\_q"
