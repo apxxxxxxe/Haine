@@ -37,7 +37,7 @@ parts:
           animation504376.interval,bind
           animation504376.pattern0,overlay,1308,0,0,0
           animation504376.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
-      
+
       - name: めくれスカート
         text: |
           animation508000.interval,bind
@@ -71,7 +71,7 @@ parts:
         text: |
           animation510000.interval,runonce
           animation510000.pattern0,overlayfast,1,0,0,0
-        
+
       - name: 血+照れ
         text: |
           animation500550.interval,runonce
@@ -85,17 +85,17 @@ parts:
         text: |
           animation500500.interval,runonce
           animation500500.pattern0,overlay,408,0,0,0
-  
+
       - name: 困り眉
         text: |
           animation500500.interval,runonce
           animation500500.pattern0,overlay,404,0,0,0
-  
+
       - name: 怒り眉
         text: |
           animation500500.interval,runonce
           animation500500.pattern0,overlay,400,0,0,0
-  
+
       - name: 驚き眉
         text: |
           animation500500.interval,runonce
@@ -180,10 +180,10 @@ parts:
 
           animation504000.interval,runonce
           animation504000.pattern0,overlay,502,0,0,0
-          
+
           animation590000.interval,runonce
           animation590000.pattern0,overlay,602,0,0,0
-          
+
           animation505310.interval,bind
           animation505310.pattern0,overlay,1400,0,0,0
           animation505311.interval,bind
@@ -216,6 +216,9 @@ parts:
 
       - name: 後ろ手
         text: |
+          animation500149.interval,runonce
+          animation500149.pattern0,overlay,1002,0,0,0
+
           animation500150.interval,runonce
           animation500150.pattern0,overlay,503,0,0,0
 
@@ -275,7 +278,7 @@ parts:
           animation500401.pattern7,overlay,303,80,0,0
           animation500401.pattern8,overlay,-1,80,0,0
           animation500401.pattern9,start,500399
-          
+
       - name: 微笑口
         text: |
           animation500399.interval,runonce
@@ -292,7 +295,7 @@ parts:
           animation500401.pattern7,overlay,303,80,0,0
           animation500401.pattern8,overlay,-1,80,0,0
           animation500401.pattern9,start,500399
-          
+
       - name: ぽかん口
         text: |
           animation500399.interval,runonce
@@ -319,7 +322,7 @@ parts:
           animation500300.pattern1,overlay,209,4000,0,0
           animation500300.pattern2,overlay,204,100,0,0
           animation500300.pattern3,overlay,201,100,0,0
-  
+
       - name: 上の空
         text: |
           animation500300.interval,runonce+rarely
@@ -327,7 +330,7 @@ parts:
           animation500300.pattern1,overlay,209,4000,0,0
           animation500300.pattern2,overlay,205,100,0,0
           animation500300.pattern3,overlay,202,100,0,0
-          
+
       - name: あっち目
         text: |
           animation500300.interval,runonce+rarely
@@ -335,32 +338,32 @@ parts:
           animation500300.pattern1,overlay,209,4000,0,0
           animation500300.pattern2,overlay,206,100,0,0
           animation500300.pattern3,overlay,203,100,0,0
-  
+
       - name: こっち半目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,204,0,0,0
-  
+
       - name: 上の空半目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,205,0,0,0
-  
+
       - name: あっち半目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,206,0,0,0
-  
+
       - name: にこ目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,207,0,0,0
-  
+
       - name: 驚き目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,208,0,0,0
-  
+
       - name: 閉じ目
         text: |
           animation500300.interval,runonce
@@ -377,7 +380,7 @@ base: |
   collisionex8,head,polygon,292,134,319,151,340,176,339,192,292,190,240,192,201,187,213,158,230,140,259,127
   collisionex6,face,polygon,270,285,239,267,227,246,220,214,222,189,227,173,315,170,320,189,321,210,315,245,305,268
   //collision1,152,114,384,326,hair
-  
+
   //後髪
   animation500100.interval,bind
   animation500100.pattern0,overlay,1100,0,0,0
@@ -401,7 +404,7 @@ base: |
   animation500200.pattern0,overlay,1000,0,0,0
 
   //後ろ手151
-  
+
   //頭
   animation500202.interval,runonce
   animation500202.pattern0,overlay,1001,0,0,0
@@ -413,7 +416,7 @@ base: |
   animation500251.pattern0,overlay,1051,0,0,0
 
   //目300
-  
+
   //髪の影
   animation500351.interval,bind
   animation500351.pattern0,overlay,751,0,0,0
@@ -427,11 +430,11 @@ base: |
   animation500355.pattern0,overlay,755,0,0,0
   animation500356.interval,bind
   animation500356.pattern0,overlay,756,0,0,0
-  
+
   //口400,401
-  
+
   //眉500
-  
+
   //照れ顔600
 
   //靴下
@@ -467,7 +470,7 @@ base: |
   animation501403.pattern0,overlay,1553,0,0,0
   animation501404.interval,bind
   animation501404.pattern0,overlay,1554,0,0,0
-  
+
   //トップス
   animation502360.interval,bind
   animation502360.pattern0,overlay,1200,0,0,0
@@ -494,7 +497,7 @@ base: |
 
   animation502368.interval,bind
   animation502368.pattern0,overlay,1208,0,0,0
-  
+
   //トップス+
   animation506300.interval,bind
   animation506300.pattern0,overlay,1800,0,0,0
@@ -524,7 +527,7 @@ base: |
   animation506316.pattern0,overlay,1817,0,0,0
   animation506298.interval,bind
   animation506298.pattern0,overlay,1815,0,0,0
-  
+
   //コルセットのみ腕より下に
   animation504510.interval,bind
   animation504510.pattern0,overlay,1810,0,0,0
@@ -537,7 +540,7 @@ base: |
   animation504417.pattern0,overlay,1900,0,0,0
   animation504418.interval,bind
   animation504418.pattern0,overlay,1901,0,0,0
-  
+
   //手back4000
 
   //帽子
@@ -567,9 +570,9 @@ base: |
   animation506510.pattern0,overlay,1711,0,0,0
   animation506511.interval,bind
   animation506511.pattern0,overlay,1712,0,0,0
-  
+
   //袖 507000
-  
+
   //髪+
   animation506150.interval,bind
   animation506150.pattern0,overlay,1150,0,0,0
@@ -579,7 +582,7 @@ base: |
   animation506791.pattern0,overlay,1152,0,0,0
   animation506792.interval,bind
   animation506792.pattern0,overlay,1153,0,0,0
-  
+
   //前髪
   animation506701.interval,bind
   animation506701.pattern0,overlay,701,0,0,0
@@ -593,7 +596,7 @@ base: |
   animation506705.pattern0,overlay,705,0,0,0
   animation506706.interval,bind
   animation506706.pattern0,overlay,706,0,0,0
-  
+
   // メッシュ
   animation506698.interval,bind
   animation506698.pattern0,overlay,798,0,0,0
