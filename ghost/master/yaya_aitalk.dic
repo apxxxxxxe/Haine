@@ -273,6 +273,7 @@ OnKeyPress
       OnBoot
     }
     when 'd' {
+      isdebug = !isdebug
       if isdebug {
         'ONにしました。再度dキーでOFF'
       }
