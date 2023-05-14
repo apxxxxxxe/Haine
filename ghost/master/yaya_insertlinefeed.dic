@@ -104,6 +104,7 @@ InsertLineFeed.Wakachi
       _noBreak = _noBreak || '括弧閉' _in_ _pos_detail
       _noBreak = _noBreak || 'ナイ形容詞語幹' _in_ _pos_detail
       _noBreak = _noBreak || '特殊・ナイ' _in_ valueex[_j][4, CHR(9)]
+      _noBreak = _noBreak || '特殊・タ' _in_ valueex[_j][4, CHR(9)]
 
       if _afterCloseBracket || '括弧開' _in_ _pos_detail {
         _noBreak = 0
