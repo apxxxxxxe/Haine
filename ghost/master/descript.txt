@@ -20,3 +20,6 @@ icon,icon.ico
 icon.minimize,icon_minimize.ico
 
 shiori,yaya.dll
+
+sakura.seriko.defaultsurface,1111101
+kero.seriko.defaultsurface,1000000
