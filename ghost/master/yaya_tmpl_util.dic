@@ -74,7 +74,9 @@ OnAnchorSelectEx
       lastanchor = reference[1]
       '\C'
       --
-      "\1\c\_q「%(reference[0])」\_q"
+      if reference[2] != '' {
+        "\1\c\_q「%(reference[2])」\_q"
+      }
       --
       '\0\n\_q─\w1──\w1───\w1───────\w1────\w1──\w1──\w1─\w1─\n\_w[750]\_q'
       --
