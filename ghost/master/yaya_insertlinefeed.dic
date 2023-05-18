@@ -9,7 +9,7 @@ InsertLineFeed
 {
   // 文字数計算のため、OnTranslate処理をこちらで先に行う
   willTranslate = 0
-  _text = TextOnlyTranslatorFunc(SurfaceSnippet(_argv[0]))
+  _text = TextOnlyTranslator(_argv[0], 'TextOnlyTranslatorFunc')
 
   InsertLineFeed.Exec(_text)
 }
