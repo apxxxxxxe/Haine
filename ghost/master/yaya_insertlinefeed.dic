@@ -180,23 +180,30 @@ InsertLineFeed.Render
     _wordcount[_scope] += _wc
     _result += _bunsetu
 
-    // 句読点後の文章が1行に収まるなら、一気に出力して終了
+    // 句読点後の文章が1行に収まるなら、一気に出力して次へ
     if RE_SEARCH(_bunsetu, '[、。！？]') {
-      _remaining_words = ''
-      for _j=_i+1; _j<ARRAYSIZE(InsertLineFeed.wakachi); _j++ {
-        _remaining_words += InsertLineFeed.wakachi[_j]
-      }
-
-      if '\n' !_in_ _remaining_words {
-        _remaining_wordcount = STRLENHALF(SHIORI3FW.RemoveAllTags(_remaining_words))
-        if _remaining_wordcount <= _max {
-          // 句読点の後に改行を入れるのは、句読点の後の文章が1行に収まらない場合のみ
-          if _max - _wordcount[_scope] < _remaining_wordcount {
-            _result += '\n'
-          }
-          _result += "%(_remaining_words)"
+      _nextline_words = ''
+      _j = _i + 1
+      while _j < ARRAYSIZE(InsertLineFeed.wakachi) {
+        _b = InsertLineFeed.wakachi[_j]
+        if RE_SEARCH(_b, '(\\n|\\_l\[0|\\x|\\c|\\[01]|\\p\[\d+\])') {
+          _j--
           break
         }
+        _nextline_words += _b
+        _j++
+      }
+
+      _nextline_wordcount = STRLENHALF(SHIORI3FW.RemoveAllTags(_nextline_words))
+      if _nextline_wordcount <= _max {
+        // 句読点の後に改行を入れるのは、句読点の後の文章が1行に収まらない場合のみ
+        if _max - _wordcount[_scope] < _nextline_wordcount {
+          _result += '\n'
+          _wordcount[_scope] = 0
+        }
+        _result += _nextline_words
+        _wordcount[_scope] += _nextline_wordcount
+        _i = _j
       }
     }
   }
