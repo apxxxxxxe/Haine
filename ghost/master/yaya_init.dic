@@ -39,10 +39,14 @@ InitializeVariable
   wheel_inputtable_tick = 0
   conditionrecovery = 0
   emo_labels = ('喜び', '興味', '悲哀', '怒り', '不快', '不安')
-  user_emotions = IARRAY
   for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
-    user_emotions ,= 1
+    LETTONAME("emo_index.%(emo_labels[_i])", _i)
   }
+  emo_addends.index = IARRAY
+  emo_addends.addend = IARRAY
+  emo_addends.fromtime = IARRAY
+  OnUpdateUserEmotions
+  lastemo_size = 0
 
   getSuntimes
 

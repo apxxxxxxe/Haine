@@ -7,7 +7,7 @@ OnDebugKeyPress
       '\![raise,OnEvent1]'
     }
     when 'a' {
-      EVAL('roulette.talks.prevrate')
+      UpdateUserEmotions('喜び', 1, '不安', -1)
     }
     when 's' {
       _file = '../debuginfo.txt'

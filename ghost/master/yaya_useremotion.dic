@@ -1,76 +1,55 @@
-OnShowUserEmotions
+ShowUserEmotions
 {
   _fontname = 'ＭＳ 明朝,ＭＳ ゴシック'
   _fontsize = 12
 
-  _labels = IARRAY
-  _emo_addends = IARRAY
-  for _i=0; _i<ARRAYSIZE(reference)/2; _i++ {
-    _labels ,= reference[_i * 2]
-    _emo_addends ,= reference[_i * 2 + 1]
+  _emoemoemo = IARRAY
+  for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
+    _emoemoemo ,= 0.0
   }
 
-  _emotions_strlen = 0
+  for _i=lastemo_size; _i<ARRAYSIZE(emo_addends.index); _i++ {
+    _index = emo_addends.index[_i]
+    _addend = emo_addends.addend[_i]
+    _emoemoemo[_index] += TOREAL(_addend)
+  }
+
   _emotions = IARRAY
   for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
     _e = "\f[name,%(_fontname)]\f[height,%(_fontsize)]%(emo_labels[_i])"
-    _isnotchanged = 1
-    for _j=0; _j<ARRAYSIZE(_labels); _j++ {
-      if emo_labels[_i] == _labels[_j] {
-        _isnotchanged = 0
 
-        _addend_color = ''
-        if _emo_addends[_j] >= 0 {
-          _addend_color += '\f[color,0,250,0]+'
-        }
-        else {
-          _addend_color += '\f[color,250,0,0]'
-        }
-
-        if user_emotions[_i] == 1 && _emo_addends[_j] < 0 {
-          _addend_color += '-'
-          _emo_addends[_j] = 0
-        }
-
-        _e += "%(user_emotions[_i] + _emo_addends[_j])%(_addend_color)%(_emo_addends[_j])"
-      }
+    _addend_color = ''
+    if _emoemoemo[_i] > 0 {
+      _addend_color += '\f[color,0,250,0]+'
     }
-    if _isnotchanged {
-      _e += user_emotions[_i]
+    elseif _emoemoemo[_i] < 0 {
+      _addend_color += '\f[color,250,0,0]'
+    }
+
+    if user_emotions[_i] == 1 && _emoemoemo[_i] < 0 {
+      _addend_color += '-'
+      _emoemoemo[_i] = 0
+    }
+
+    if _emoemoemo[_i] == 0 {
+      _e += STRFORM('$.1f', user_emotions[_i])
+    }
+    else {
+      _user_emotion = STRFORM('$.1f', user_emotions[_i]+_emoemoemo[_i])
+      _e += "%(_user_emotion)%(_addend_color)%(TOINT(_emoemoemo[_i]))"
     }
 
     _emotions ,= "%(_e)\f[default]"
-    _emotions_strlen += STRLENHALF(SHIORI3FW.RemoveAllTags(_e))
   }
+  lastemo_size = ARRAYSIZE(emo_addends.index)
 
-  _x_limit = ARRAYSIZE(_emotions)
-  _y_limit = 1
-  _perline_strlen = _emotions_strlen / _x_limit
-  while _fontsize * _perline_strlen * _x_limit > balloow_width {
-    _x_limit /= 2
-    _y_limit *= 2
+  _emotions_script = "\_l[0,%(balloon_rows_1)em]\f[align,center]"
+  foreach _emotions; _e {
+    _emotions_script += "%(_e) "
   }
+  _emotions_script = CUTSPACE(_emotions_script)
 
-  _emotions_script = '  '
-  for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
-    _l = TOINT(STRLENHALF(SHIORI3FW.RemoveAllTags(_emotions[_i])))
-    _x = _i % _x_limit
-    _y = _i / _x_limit
-    _emotions_script += "\_l[%(balloow_width/(_x_limit+1)*(_x+1)),%(balloon_rows_1-_y_limit+_y+1)em]\_l[@-%(_l*_fontsize/2),]%(_emotions[_i])"
-  }
-
-  _emotions_script = ERASE(_emotions_script, 0, STRSTR(_emotions_script, '\', 2))
-
-  "\1\_q%(_emotions_script)\n\_q\_l[0,0]"
-  --
-  if ARRAYSIZE(reference) {
-    _references = ''
-    for _i=0; _i<ARRAYSIZE(reference); _i++ {
-      _references += "%(reference[_i]),"
-    }
-    _references = ERASE(_references, -1, 1)
-    "\![raise,OnUpdateUserEmotions,%(_references)]"
-  }
+  "\1\_q%(_emotions_script)\n\_q\_l[0,0]\![raise,OnUpdateUserEmotions]"
 }
 
 UpdateUserEmotions
@@ -79,24 +58,60 @@ UpdateUserEmotions
   foreach _argv; _arg {
     _args += "%(_arg),"
   }
+  _args = ERASE(_args, -1, 1)
+
+  "\![embed,OnQueueUpdateUserEmotions,%(_args)]"
+}
+
+OnQueueUpdateUserEmotions
+{
+  // 影響力を失った加算値を配列から削除
+  _rho = 60 * 15
+  for _i=0; _i<ARRAYSIZE(emo_addends.index); _i++ {
+    if _now - emo_addends.index[_i] > _rho {
+      emo_addends.index[_i] = IARRAY
+      emo_addends.addend[_i] = IARRAY
+      emo_addends.fromtime[_i] = IARRAY
+      _i--
+    }
+  }
+
+  _now = systemuptime
+  for _i=0; _i<ARRAYSIZE(reference); _i += 2 {
+    _index = TOINT(EVAL("emo_index.%(reference[_i])"))
+    _addend = reference[_i + 1]
+    emo_addends.index ,= _index
+    emo_addends.addend ,= _addend
+    emo_addends.fromtime ,= _now
+  }
 
   // 表示している感情値を消去
-  "\1\c[line,%(ARRAYSIZE(emo_labels)),0]"
+  '\1\c[line,1,0]'
   --
   // 新たに現在の感情値を表示
-  "\![embed,OnShowUserEmotions,%(_args)]"
+  ShowUserEmotions
 }
 
 OnUpdateUserEmotions
 {
-  for _i=0; _i<ARRAYSIZE(reference)/2; _i++ {
-    for _j=0; _j<ARRAYSIZE(emo_labels); _j++ {
-      if emo_labels[_j] == reference[_i * 2] {
-        user_emotions[_j] += reference[_i * 2 + 1]
-        if user_emotions[_j] < 1 {
-          user_emotions[_j] = 1
-        }
-      }
+  // 感情増減の影響は15分で消える
+  _rho = 60 * 15
+
+  user_emotions = IARRAY
+  for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
+    user_emotions ,= 0.0
+  }
+
+  _now = systemuptime
+  for _i=0; _i<ARRAYSIZE(emo_addends); _i++ {
+    _index = emo_addends.index[_i]
+    _addend = emo_addends.addend[_i]
+    _fromtime = emo_addends.fromtime[_i]
+
+    // 少しずつ減っていき、15分で0になる
+    if _now - _fromtime < _rho {
+      _pi = 3.141592
+      user_emotions[_index] += _addend * COS(2*_pi*0.25*(_now-_fromtime)/_rho)
     }
   }
 }

@@ -13,8 +13,6 @@ OnOpenMenu
 
 OnMainMenu
 {
-  ShowUserEmotions
-  --
   SetBalloonSurfaceSakura
   --
   '\![set,autoscroll,disable]\_q\*\0/
