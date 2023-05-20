@@ -15,6 +15,7 @@ ShowUserEmotions
   }
 
   _emotions = IARRAY
+  _emotions_strlen = 0
   for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
     _e = "\f[name,%(_fontname)]\f[height,%(_fontsize)]%(emo_labels[_i])"
 
@@ -40,13 +41,37 @@ ShowUserEmotions
     }
 
     _emotions ,= "%(_e)\f[default]"
+    _emotions_strlen += STRLENHALF(SHIORI3FW.RemoveAllTags(_e))
   }
   lastemo_size = ARRAYSIZE(emo_addends.index)
 
-  _emotions_script = "\_l[0,%(balloon_rows_1)em]\f[align,center]"
-  foreach _emotions; _e {
-    _emotions_script += "%(_e) "
+  _x_limit = TOREAL(ARRAYSIZE(emo_labels))
+  _y_limit = 1
+  _perline_strlen = _emotions_strlen / _x_limit
+  while _fontsize * _perline_strlen * _x_limit > balloon_width {
+    _x_limit /= 2
+    _y_limit *= 2
   }
+
+  _left_margin_x = balloon_width / (_x_limit + 1) * 1 - /
+    TOINT(STRLENHALF(SHIORI3FW.RemoveAllTags(_emotions[0]))) * _fontsize / 2
+  _right_margin_x = balloon_width - /
+    balloon_width / (_x_limit + 1) * _x_limit - /
+    TOINT(STRLENHALF(SHIORI3FW.RemoveAllTags(_emotions[ARRAYSIZE(emo_labels)-1]))) * _fontsize / 2
+  _margin_x = (_right_margin_x + _left_margin_x) / 2 - _fontsize / 2
+
+  _emotions_script = ''
+  for _i=0; _i<ARRAYSIZE(emo_labels); _i++ {
+    _len = TOINT(STRLENHALF(SHIORI3FW.RemoveAllTags(_emotions[_i])))
+    _x = _i % _x_limit
+    _y = _i / TOINT(_x_limit)
+    _current_x = balloon_width / (_x_limit + 1) * (_x + 1) - (_len * _fontsize / 2)
+    _current_x += _margin_x * (_x / (_x_limit - 1) * 2 - 1)
+
+    _current_y_em = balloon_rows_1 - _y_limit + _y + 1
+    _emotions_script += "\_l[%(_current_x),%(_current_y_em)em]%(_emotions[_i])"
+  }
+
   _emotions_script = CUTSPACE(_emotions_script)
 
   "\1\_q%(_emotions_script)\n\_q\_l[0,0]\![raise,OnUpdateUserEmotions]"
@@ -86,7 +111,7 @@ OnQueueUpdateUserEmotions
   }
 
   // 表示している感情値を消去
-  '\1\c[line,1,0]'
+  "\1\c[line,%(ARRAYSIZE(emo_labels)),0]"
   --
   // 新たに現在の感情値を表示
   ShowUserEmotions
