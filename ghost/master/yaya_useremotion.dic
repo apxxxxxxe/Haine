@@ -103,11 +103,13 @@ OnQueueUpdateUserEmotions
 
   _now = systemuptime
   for _i=0; _i<ARRAYSIZE(reference); _i += 2 {
-    _index = TOINT(EVAL("emo_index.%(reference[_i])"))
-    _addend = reference[_i + 1]
-    emo_addends.index ,= _index
-    emo_addends.addend ,= _addend
-    emo_addends.fromtime ,= _now
+    if ISVAR("emo_index.%(reference[_i])") {
+      _index = TOINT(EVAL("emo_index.%(reference[_i])"))
+      _addend = reference[_i + 1]
+      emo_addends.index ,= _index
+      emo_addends.addend ,= _addend
+      emo_addends.fromtime ,= _now
+    }
   }
 
   // 表示している感情値を消去
