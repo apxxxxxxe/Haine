@@ -57,7 +57,7 @@ InitializeVariable
 // スクリプトによる初期化処理
 InitialScripts
 {
-  MakeKeroBalloownFollow
+  MakeKeroBalloonFollow
   --
   _underwear = ('A', 'B')
   _u = _underwear[RAND(ARRAYSIZE(_underwear))]
@@ -65,7 +65,7 @@ InitialScripts
 }
 
 //\1バルーンを\0サーフェスに追従させる
-MakeKeroBalloownFollow
+MakeKeroBalloonFollow
 {
   '\1\![reset,sticky-window]\![set,alignmenttodesktop,free]\![move,--X=0,--Y=0,--time=0,--base=0]\![set,sticky-window,1,0]'
 }
@@ -141,7 +141,7 @@ OnGetBalloonInfo
 
   balloon_name = reference[0]
   balloon_rows_0 = reference[1]
-  balloow_width = reference[2]
+  balloon_width = reference[2]
   char_width = reference[3]
   balloon_rows_1 = reference[4]
 
