@@ -1,3 +1,17 @@
+useremotion.clean
+{
+  _vars = IARRAY
+  _vars ,= GETVARLIST('emo_addends.')
+  _vars ,= GETVARLIST('emo_index.')
+  _vars ,= 'user_emotions'
+  _vars ,= 'lastemo_size'
+  _vars ,= 'emo_addends'
+
+  foreach _vars; _vname {
+    ERASEVAR(_vname)
+  }
+}
+
 ShowUserEmotions
 {
   _fontname = 'ＭＳ 明朝,ＭＳ ゴシック'

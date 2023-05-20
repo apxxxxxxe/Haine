@@ -18,6 +18,7 @@ OnGhostLoad
 OnGhostUnload
 {
   roulette.clean
+  useremotion.clean
 }
 
 //******************************************************************************
