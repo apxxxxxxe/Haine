@@ -130,7 +130,7 @@ talks : array
       ' + UpdateUserEmotions('不快', 1, '不安', 1)
       --
       '\_w[1000]\1\c\_q/
-      \![*]\_a[EmbalmingTool1,本気で言っているの？]本気で言っているの？\_a\n/
+      \![*]\_a[EmbalmingTool1,ほ、本気で言っているの……？]ほ、本気で言っているの……？\_a\n/
       \![*]\_a[EmbalmingTool2,その道具、どうするの？]その道具、どうするの？\_a\n/
       '
     }
