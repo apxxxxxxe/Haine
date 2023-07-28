@@ -320,8 +320,14 @@ OnKeyPress
 }
 
 //------------------------------------------------------------------------------
-//OnMinuteChangeイベント
+//時間イベント
 //------------------------------------------------------------------------------
+OnSecondChange
+{
+  now = (hour, minute, second)
+  ghostuptime = systemuptime - ghostboottime
+  systemidletime = reference[4]
+}
 
 OnMinuteChange
 {
@@ -338,17 +344,6 @@ OnHourTimeSignal
   if IsJihouActive == '有効' {
     "\1%(hour)時だ"
   }
-}
-
-//------------------------------------------------------------------------------
-//OnSecondChangeイベント
-//1 秒毎に実行される。ここではあまり重い処理を行わないこと
-//このテンプレートでは、見切れ処理のみ行っている
-//---------------------------------------------------------------------------
-OnSecondChange
-{
-  now = (hour, minute, second)
-  ghostuptime = systemuptime - ghostboottime
 }
 
 //------------------------------------------------------------------------------
