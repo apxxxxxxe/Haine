@@ -32,6 +32,7 @@ InitializeVariable
   ghostboottime = systemuptime
   lastbootdate = getDate
   lastresponce = systemuptime
+  firstsexialtouch = 0
   lasttouch = 0
   touch_count = 0
   last_touch_part = ''
