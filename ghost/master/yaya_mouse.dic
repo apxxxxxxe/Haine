@@ -78,7 +78,7 @@ MouseMove0bust : nonoverlap
   _threshold = 12
 
   bad_touch_count++
-  if ghostuptime < 60 {
+  if ghostuptime < 60 && firstsexialtouch == 0 {
     UpdateUserEmotions('喜び', 1)
     --
     DialogTouchSexialFirst
@@ -114,6 +114,7 @@ MouseMove0bust : nonoverlap
   else {
     'h1111204\1自重しよう……。' + UpdateUserEmotions('悲しみ', 1)
   }
+  firstsexialtouch = 1
 }
 
 //******************************************************************************
@@ -133,7 +134,7 @@ MouseWheelUp0skirt : nonoverlap
   // 呆れ/怒られるまでの回数
   _threshold = 8
 
-  if ghostuptime < 60 {
+  if ghostuptime < 60 && firstskirttouch == 0 {
     UpdateUserEmotions('喜び', 1)
     --
     '@h2244402……！\nh1241102\_w[500]'
@@ -172,6 +173,7 @@ MouseWheelUp0skirt : nonoverlap
     --
     UpdateUserEmotions('喜び', -1)
   }
+  firstsexialtouch = 1
 }
 
 //******************************************************************************
@@ -204,7 +206,6 @@ MouseWheelDown0hand
 //1番目の数字（0か1）は、MoveかWheelかを判別するためのもので、
 //変更の必要はありません。
 //******************************************************************************
-
 // 共通処理
 OnMouseEvent
 {
