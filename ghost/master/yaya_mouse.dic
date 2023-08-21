@@ -27,6 +27,7 @@ DialogSurprised
 // セクハラ反応-起動直後
 DialogTouchSexialFirst : nonoverlap
 {
+  firstsexialtouch = 1
   'h1111205……会って早々、これ？\nなんというか、h1111204流石ね。'
 }
 
