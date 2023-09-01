@@ -74,11 +74,15 @@ OnAnchorSelectEx
       lastanchor = reference[1]
       '\C'
       --
+      _dialog = ''
       if reference[2] != '' {
-        "\1\c\_q「%(reference[2])」\_q"
+        _dialog = UserTalk(reference[2])
       }
       --
-      '\0\n\_q─\w1──\w1───\w1───────\w1────\w1──\w1──\w1─\w1─\n\_w[750]\_q'
+      "/
+      \0\n\_q─\w1──\w1───\w1───────\w1────\w1──\w1──\w1─\w1─\n\_w[750]\_q/
+      %(_dialog)/
+      "
       --
       InsertLineFeed(EVAL(reference[1]))
     }

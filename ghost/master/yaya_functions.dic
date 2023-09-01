@@ -418,3 +418,36 @@ CalcTension
 
   TOINT(ROUND(((-1*COS(_rad)+1)/2)*_max))
 }
+
+AddWait
+{
+  // _argv[0]: 対象文字列
+  // _argv[1]: ウェイト[ms]
+  // メッセージスピードの標準は50ms これに加算すると考えて調整
+
+  _text = _argv[0]
+  _wait = '\_w[' + _argv[1] + ']'
+
+  // 適当な制御文字 YAYAは0x0を扱えないので0x1で
+  _tagmark = CHR(0x1)
+  // さくらスクリプトは_tagmarkに置き換えて退避
+  //(さくらスクリプト中にウェイト記述が挟まって破綻するのを防ぐ)
+  // 置換したさくらスクリプトは配列に保持しておいて適宜取り出す
+  _t = RE_REPLACE(_text, '\\_{0,2}[a-zA-Z0-9*!&\-+](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?', _tagmark)
+  _tags = RE_GETSTR
+
+  _tagcount = 0
+  _textlen = STRLEN(_argv[0])
+  _result = ''
+  for _i=0; _i<_textlen; _i++ {
+    _c = SUBSTR(_t, _i, 1)
+    if _c == _tagmark {
+      _result += _tags[_tagcount]
+      _tagcount += 1
+    }
+    else {
+      _result += _c + _wait // #1
+    }
+  }
+  _result
+}
