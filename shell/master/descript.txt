@@ -1,0 +1,13 @@
+charset,Shift_JIS
+craftman,sakusha_no_namae
+craftmanw,çÏé“ÇÃÇ»Ç‹Ç¶
+craftmanurl,http://www.xxxxxxxxxxxxxxxx.co.jp/
+id,master
+name,master
+type,shell
+seriko.use_self_alpha,1
+
+sakura.balloon.offsetx,0
+sakura.balloon.offsety,170
+kero.balloon.offsetx,0
+kero.balloon.offsety,340

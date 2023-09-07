@@ -1,0 +1,11 @@
+○触り判定ガイド表示\n\n[half]φ
+  \![*]\q[あり,触り判定あり]  \![*]\q[なし,触り判定なし]  [現在 （when,（部位表示有効）,あり,なし）]\n\n[half]φ
+
+＠一体化	（SSPシェル倍率変更）
+\![reset,sticky-window]φ
+\0\![set,scaling,100]φ
+\1（10000）\![set,scaling,100]φ
+（10000）\![set,alignmenttodesktop,free]φ
+（set,一時変数,169*(100-（シェル倍率設定）)/100）φ
+\![move,0,（一時変数）,0,0,right.top,right.top]φ
+\![set,sticky-window,1,0]

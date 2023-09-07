@@ -1,0 +1,15 @@
+charset,Shift_JIS
+
+craftman,apxxxxxxe
+craftmanw,apxxxxxxe
+craftmanurl,http://sgmh.sakura.ne.jp/tcg/kit/
+
+name,郊外通りのハイネ
+type,ghost
+
+sakura.name,ハイネ
+kero.name,なし
+
+shiori,satori.dll
+sakura.seriko.defaultsurface,11111
+kero.seriko.defaultsurface,10000

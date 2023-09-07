@@ -1,0 +1,1244 @@
+charset, Shift_JIS
+
+descript
+{
+Version,1
+collision-sort,descend
+}
+
+--------------------------------------------------------------------------
+
+sakura.cursor
+{
+	mouseup0,head,system:hand
+	mousedown0,head,system:hand
+}
+
+surface0-99
+{
+	
+	collisionex1,head,polygon,183,151,189,134,201,119,210,107,218,104,237,98,263,95,306,102,340,143,346,160
+	collisionex3,bust,polygon,155,387,212,403,242,401,253,399,258,394,262,382,265,358,204,342,173,336,164,342,152,358,150,366,150,374
+	collisionex4,belly,polygon,151,411,151,399,221,418,218,474,228,513,163,526,140,515
+	collisionex6,face,polygon,197,234,225,264,233,265,276,248,283,225,282,201,280,192,244,168,212,164,197,203,
+	collisionex7,mouse,ellipse,210,233,250,250
+	collisionex12,waist,polygon,221,418,218,474,228,513,284,501,265,464,284,421
+	
+	element0,overlay,surface00500.png,0,0
+
+}
+
+surface,0-99,!6-11,!18-26,!36-41,!48-53
+{
+	element3,overlay,surface01000.png,0,0		collisionex10,shoulder,polygon,323,294,337,297,343,309,350,321,347,354,348,394,350,403,304,402,290,391,294,354,304,315
+	collisionex10,shoulder,polygon,328,294,340,304,346,327,348,346,294,365,292,350,306,315,320,292
+	collisionex11,shoulder,polygon,201,282,182,287,174,299,171,318,169,331
+	collisionex13,hand,polygon,300,617,304,655,303,679,327,707,336,708,350,692,361,656,333,616
+}
+
+surface6-11,18-24,36-41,48-53
+{
+	element1,overlay,surface01004.png,0,0
+	collisionex10,shoulder,polygon,324,294,337,302,350,326,342,389,331,401,293,394,286,380,291,350,308,317
+	collisionex11,shoulder,polygon,201,282,182,287,174,299,171,318,169,331
+	collisionex13,hand,polygon,235,310,212,308,181,327,168,350,169,355,196,365,207,358,216,372,225,362,235,332,238,318
+}
+
+surface26
+{
+	element1,overlay,surface01008.png,0,0
+	collisionex10,shoulder,polygon,323,294,337,297,343,309,350,321,347,354,348,394,350,403,304,402,290,391,294,354,304,315
+	collisionex11,shoulder,polygon,201,282,182,287,174,299,171,318,169,331
+	collisionex13,hand,polygon,195,313,176,263,174,254,181,232,194,234,206,241,221,253,226,254,233,266,220,275,227,297,226,309,212,328
+	collisionex14,hand,polygon,181,439,142,420,132,409,112,415,98,429,118,458,172,472,170,455
+}
+
+surface25
+{
+	element1,overlay,surface01010.png,0,0
+}
+
+--------------------------------------------------------------------------
+
+surface0	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface1	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface2	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface3	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface4	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+
+surface5	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface6	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface7	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface8	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface9	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface10	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface11	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface12	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface13	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface14	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface15	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface16	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface17	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface18	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface19	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface20	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface21	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface22	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface23	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface24	{
+	
+	element4,overlay,surface00101.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,400,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface25	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface26	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00207.png,0,0
+		
+	animation2.interval,runonce
+	animation2.pattern0,overlay,408,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface30	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface31	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface32	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface33	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface34	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface35	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface36	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface37	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface38	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface39	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface40	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface41	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface42	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface43	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface44	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface45	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface46	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface47	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface48	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,202,0,0,0
+	animation0.pattern1,overlay,208,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,208,100,0,0
+	animation0.pattern4,overlay,202,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface49	{
+	
+	element4,overlay,surface00100.png,0,0
+	
+	
+	animation0.interval,runonce+rarely
+	animation0.pattern0,overlay,205,0,0,0
+	animation0.pattern1,overlay,210,500,0,0
+	animation0.pattern2,overlay,212,100,0,0
+	animation0.pattern3,overlay,210,100,0,0
+	animation0.pattern4,overlay,205,100,0,0
+	
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface50	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00208.png,0,0
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface51	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+surface52	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00215.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface53	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00212.png,0,0		
+	
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,322,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,303,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+
+}
+
+surface54	{
+	
+	element4,overlay,surface00100.png,0,0
+	element6,overlay,surface00210.png,0,0		
+	element8,overlay,surface00349.png,0,0	
+
+	animation2.interval,runonce
+	animation2.pattern0,overlay,404,0,0,0
+
+	
+	animation3.interval,runonce
+	animation3.pattern0,overlay,350,0,0,0
+
+	
+	animation4.interval,talk,3
+	animation4.pattern0,stop,3
+	animation4.pattern1,overlay,304,0,0,0
+	animation4.pattern2,overlay,-1,100,0,0
+	animation4.pattern3,start,3
+}
+
+surface10000	{
+	element0,overlay,surface10000.png,0,0
+}
+--------------------------------------------------------------------------
+surface.append0-100
+{
+	animation1.interval,runonce
+	animation1.pattern0,overlay,501,0,0,0
+}
+
+surface26
+{
+	element7,overlay,surface00605.png,0,0	
+}
+surface25
+{
+	animation5.interval,runonce
+	animation5.pattern0,overlay,604,0,0,0
+}

@@ -1,0 +1,22 @@
+ネットワーク更新用
+
+
+＃ほぼ必須、ないとユーザーさんに不親切
+＃Ready/Complete/Failure時の（Ｒ０）リストは以下
+＃none/changed/timeout/md5 miss/404,403等ステータスコード
+＃SSPでは上記に加えfileio/readonly
+
+＠homeurl
+http://更新元url
+
+＊OnUpdateBegin
+\1（10000）\_qネットワーク更新開始\_q\0（11119）…霧が濃い。
+
+＊OnUpdateReady
+\1（10000）\_q更新ファイル確認\_q
+
+＊OnUpdateComplete
+\1（10000）\_q更新成功、完了\_q\0（11116）…晴れてきたわね。（11111）なにか、\n変わったところはないかしら？
+
+＊OnUpdateFailure
+\1（10000）\_q更新失敗\_q\0（11116）…晴れてきたわね。
