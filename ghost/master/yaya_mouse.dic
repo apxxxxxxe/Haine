@@ -70,13 +70,13 @@ DialogTouchSexialNoUse : nonoverlap
 MouseMove0head : nonoverlap
 {
   good_touch_count++
-  'h1111105……あたたかいのね、あなたの手。' + UpdateUserEmotions('喜び', 1)
-  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。' + UpdateUserEmotions('喜び', 1)
+  'h1111105……あたたかいのね、あなたの手。'
+  'h1111205……軽んじられているような気もするわ。h1111209まあ、いいけれど。'
 }
 
 MouseMove0face : nonoverlap
 {
-  'h1121207くすぐったい。' + UpdateUserEmotions('喜び', 1)
+  'h1121207くすぐったい。'
 }
 
 MouseMove0bust : nonoverlap
@@ -119,7 +119,7 @@ MouseMove0bust : nonoverlap
     UpdateUserEmotions('不安', 1)
   }
   else {
-    'h1111204\1自重しよう……。' + UpdateUserEmotions('悲しみ', 1)
+    'h1111204\1自重しよう……。'
   }
   firstsexialtouch = 1
 }
@@ -229,7 +229,7 @@ OnMouseMove
 
   _result = AYATEMPLATE.MouseMoveWheelFunc(0, 50, 'MouseMove')
   if _result != '' && IsTalking {
-    _result = DialogTouchDisturbedSexial + UpdateUserEmotions('喜び', -1, '悲哀', 1)
+    _result = DialogTouchDisturbedSexial
   }
   _result
 }
