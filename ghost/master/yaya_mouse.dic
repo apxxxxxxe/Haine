@@ -85,7 +85,7 @@ MouseMove0bust : nonoverlap
   _threshold = 12
 
   bad_touch_count++
-  if ghostuptime < 60 && firstsexialtouch == 0 {
+  if ghostuptime < 30 && firstsexialtouch == 0 {
     DialogTouchSexialFirst
   }
   elseif touch_count < _threshold / 3 {
@@ -131,7 +131,7 @@ MouseWheelUp0skirt : nonoverlap
   // 呆れ/怒られるまでの回数
   _threshold = 8
 
-  if ghostuptime < 60 && firstskirttouch == 0 {
+  if ghostuptime < 30 && firstsexialtouch == 0 {
     '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialFirst
