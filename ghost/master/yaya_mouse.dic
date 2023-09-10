@@ -28,7 +28,7 @@ DialogSurprised
 DialogTouchSexialFirst : nonoverlap
 {
   firstsexialtouch = 1
-  'h1111205……会って早々、これ？\nなんというか、h1111204流石ね。'
+  'h1111205……会って早々、これ？\nなんというか……h1111204流石ね。'
 }
 
 // セクハラ反応-怒り
@@ -86,27 +86,19 @@ MouseMove0bust : nonoverlap
 
   bad_touch_count++
   if ghostuptime < 60 && firstsexialtouch == 0 {
-    UpdateUserEmotions('喜び', 1)
-    --
     DialogTouchSexialFirst
   }
   elseif touch_count < _threshold / 3 {
-    UpdateUserEmotions('喜び', 1)
-    --
     'h1111205胸、か。h1111204ずいぶん嬉しそうだけれど、そんなにいいものなのかしら？'
     'h1111205……あなたは、私をそういう対象として見ているの？'
     'h1111205……そういう気分じゃないのだけれど。'
     'h1111205気安いのね。あまり好きではないわ。'
   }
   elseif touch_count < _threshold / 3 * 2 {
-    UpdateUserEmotions('喜び', 1)
-    --
     DialogTouchSexialScold
   }
   elseif touch_count < _threshold {
     DialogTouchSexialAkire
-    --
-    UpdateUserEmotions('喜び', -1)
   }
   elseif touch_count == _threshold {
     'h1111205\1触れようとした手先が、霧に溶けた。\n慌てて引っ込めると、手は元通りになった。'
@@ -115,8 +107,6 @@ MouseMove0bust : nonoverlap
     --
     'h1111304残念だけど、それほど気は長くないの。'
     'h1111204わきまえなさい。'
-    --
-    UpdateUserEmotions('不安', 1)
   }
   else {
     'h1111204\1自重しよう……。'
@@ -142,8 +132,6 @@ MouseWheelUp0skirt : nonoverlap
   _threshold = 8
 
   if ghostuptime < 60 && firstskirttouch == 0 {
-    UpdateUserEmotions('喜び', 1)
-    --
     '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialFirst
@@ -152,22 +140,16 @@ MouseWheelUp0skirt : nonoverlap
     '@h2144402……\n'
     --
     DialogTouchDisturbedSexial
-    --
-    UpdateUserEmotions('喜び', -1, '悲哀', 1)
   }
   elseif touch_count <= _threshold / 2 {
     // 赤面
     '@h2244402……！\nh1241102\_w[500]'
-    --
-    UpdateUserEmotions('喜び', 1)
     --
     'h1111204……いいもの見たって顔してる。h1111209屈辱だわ。'
     'h1111205……ああ、ひどい人。h1111209泣いてしまいそうだわ。'
   }
   elseif touch_count <= _threshold {
     // 赤面
-    UpdateUserEmotions('喜び', 1)
-    --
     '@h2244402……！\nh1241102\_w[500]'
     --
     DialogTouchSexialScold
@@ -177,8 +159,6 @@ MouseWheelUp0skirt : nonoverlap
     '@h2114104……\n'
     --
     DialogTouchSexialAkire
-    --
-    UpdateUserEmotions('喜び', -1)
   }
   firstsexialtouch = 1
 }
@@ -218,7 +198,7 @@ OnMouseEvent
 {
   SetBalloonSurfaceSakura
   --
-  ShowUserEmotions + InsertLineFeed(NextTouchTalk)
+  InsertLineFeed(NextTouchTalk)
 }
 
 OnMouseMove
