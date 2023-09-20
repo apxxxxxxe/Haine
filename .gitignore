@@ -21,3 +21,6 @@ yaya_variable.cfg
 
 debuginfo.txt
 ghost_bak/
+
+ghost/master/target/
+vars.json
