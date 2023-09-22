@@ -1,11 +1,12 @@
 use crate::events::common::*;
-use shiorust::message::{Response, Request};
+use crate::events::GlobalVariables;
+use shiorust::message::{Request, Response};
 
-pub fn version(_req: &Request) -> Response {
+pub fn version(_req: &Request, _vars: &mut GlobalVariables) -> Response {
     new_response_with_value(&String::from(env!("CARGO_PKG_VERSION")))
 }
 
-pub fn on_ai_talk(_req: &Request) -> Response {
+pub fn on_ai_talk(_req: &Request, _vars: &mut GlobalVariables) -> Response {
     let talks = [
         "\\0\\s[1111201]おはようございます",
         "\\0\\s[1111207]こんにちは",

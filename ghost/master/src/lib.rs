@@ -88,7 +88,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
 
     debug!("load");
 
-    unsafe{GLOBALVARS.load()};
+    unsafe { GLOBALVARS.load() };
 
     return TRUE;
 }
@@ -97,7 +97,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
 pub extern "cdecl" fn unload() -> BOOL {
     debug!("unload");
 
-    unsafe{GLOBALVARS.save()};
+    unsafe { GLOBALVARS.save() };
 
     return TRUE;
 }
@@ -112,7 +112,8 @@ pub extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
 
     let r = Request::parse(&s).unwrap();
 
-    let response = events::handle_request(&r);
+    let response;
+    unsafe { response = events::handle_request(&r, &mut GLOBALVARS) };
 
     let response_bytes = to_encoded_bytes(response).unwrap_or_else(|e| {
         debug!("error: {:?}", e);
