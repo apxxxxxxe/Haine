@@ -12,8 +12,8 @@ use crate::events::menu::*;
 use crate::events::mouse::*;
 use crate::events::periodic::*;
 
-use shiorust::message::{parts::*, traits::*, Request, Response};
 use serde::{Deserialize, Serialize};
+use shiorust::message::{parts::*, traits::*, Request, Response};
 
 const VAR_PATH: &str = "vars.json";
 
@@ -25,6 +25,9 @@ pub struct GlobalVariables {
     // ゴーストが起動してからの秒数
     #[serde(skip)]
     pub ghost_up_time: u64,
+
+    // ランダムトークの間隔(秒数)
+    pub random_talk_interval: u64,
 }
 
 impl GlobalVariables {
@@ -32,6 +35,7 @@ impl GlobalVariables {
         Self {
             ghost_up_time: 0,
             total_time: 0,
+            random_talk_interval: 180,
         }
     }
 
@@ -47,6 +51,7 @@ impl GlobalVariables {
 
         // TODO: 変数追加時はここに追加することを忘れない
         self.total_time = vars.total_time;
+        self.random_talk_interval = vars.random_talk_interval;
     }
 
     pub fn save(&self) {
