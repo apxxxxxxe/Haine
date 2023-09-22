@@ -1,3 +1,5 @@
+use crate::events::translate::on_translate;
+
 use rand::Rng;
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
@@ -20,10 +22,15 @@ pub fn new_response_nocontent() -> Response {
     r
 }
 
-pub fn new_response_with_value(value: &str) -> Response {
+pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
+    let v;
+    if use_translate {
+        v = on_translate(value);
+    } else {
+        v = value;
+    }
     let mut r = new_response();
-    r.headers
-        .insert(HeaderName::from("Value"), value.to_string());
+    r.headers.insert(HeaderName::from("Value"), v);
     r
 }
 

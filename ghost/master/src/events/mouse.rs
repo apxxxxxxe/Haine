@@ -8,6 +8,6 @@ pub fn on_mouse_double_click(req: &Request, vars: &mut GlobalVariables) -> Respo
     if refs[4] == "" {
         on_menu_exec(req, vars)
     } else {
-        new_response_with_value(refs[4])
+        new_response_with_value(refs[4].to_string(), true)
     }
 }

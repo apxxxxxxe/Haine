@@ -4,6 +4,7 @@ mod common;
 mod menu;
 mod mouse;
 mod periodic;
+mod translate;
 
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
@@ -42,11 +43,17 @@ impl GlobalVariables {
     pub fn load(&mut self) {
         let json_str = match std::fs::read_to_string(VAR_PATH) {
             Ok(s) => s,
-            Err(_) => return,
+            Err(_) => {
+                error!("Failed to load variables.");
+                return;
+            }
         };
         let vars: GlobalVariables = match serde_json::from_str(&json_str) {
             Ok(v) => v,
-            Err(_) => return,
+            Err(_) => {
+                error!("Failed to parse variables.");
+                return;
+            }
         };
 
         // TODO: 変数追加時はここに追加することを忘れない
@@ -57,11 +64,17 @@ impl GlobalVariables {
     pub fn save(&self) {
         let json_str = match serde_json::to_string(self) {
             Ok(s) => s,
-            Err(_) => return,
+            Err(_) => {
+                error!("Failed to serialize variables");
+                return;
+            }
         };
         match std::fs::write(VAR_PATH, json_str) {
             Ok(_) => (),
-            Err(_) => return,
+            Err(_) => {
+                error!("Failed to save variables");
+                return;
+            }
         };
     }
 }
@@ -80,9 +93,7 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
         None => return new_response_nocontent(),
     };
 
-    if event_id != "OnSecondChange" {
-        debug!("event: {}", event_id);
-    }
+    debug!("event: {}", event_id);
 
     let event = match event_id.as_str() {
         "version" => version,
@@ -95,8 +106,6 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
     };
 
     let res = event(req, vars);
-    if event_id != "OnSecondChange" {
-        debug!("response: {:?}", res);
-    }
+    debug!("response: {:?}", res);
     res
 }
