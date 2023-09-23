@@ -77,10 +77,28 @@ impl GlobalVariables {
     }
 }
 
+#[derive(PartialEq)]
+pub enum Direction {
+    Up,
+    Down,
+}
+
+impl Direction {
+    pub fn to_str(&self) -> &str {
+        match self {
+            Direction::Up => "up",
+            Direction::Down => "down",
+        }
+    }
+}
+
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)なもの
 pub struct VolatilityVariables {
     // ゴーストが起動してからの秒数
     pub ghost_up_time: u64,
+
+    // ゴーストの起動日時
+    pub ghost_boot_time: SystemTime,
 
     pub nade_counter: i32,
 
@@ -88,18 +106,27 @@ pub struct VolatilityVariables {
 
     pub last_nade_part: String,
 
-    pub ghost_boot_time: SystemTime,
+    pub wheel_direction: Direction,
+
+    pub wheel_counter: i32,
+
+    pub last_wheel_count_unixtime: SystemTime,
+
+    pub last_wheel_part: String,
 }
 
 impl Default for VolatilityVariables {
     fn default() -> Self {
         Self {
             ghost_up_time: 0,
+            ghost_boot_time: SystemTime::now(),
             nade_counter: 0,
             last_nade_count_unixtime: UNIX_EPOCH,
             last_nade_part: "".to_string(),
-            ghost_boot_time: SystemTime::now(),
+            wheel_direction: Direction::Up,
+            wheel_counter: 0,
+            last_wheel_count_unixtime: UNIX_EPOCH,
+            last_wheel_part: "".to_string(),
         }
     }
 }
-

@@ -3,16 +3,17 @@ mod bootend;
 mod common;
 mod menu;
 mod mouse;
+mod mouse_core;
 mod periodic;
 mod translate;
 
-use crate::variables::GlobalVariables;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
 use crate::events::common::*;
 use crate::events::menu::*;
-use crate::events::mouse::*;
+use crate::events::mouse_core::*;
 use crate::events::periodic::*;
+use crate::variables::GlobalVariables;
 
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
@@ -38,8 +39,10 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
         "OnAiTalk" => on_ai_talk,
         "OnSecondChange" => on_second_change,
         "OnMenuExec" => on_menu_exec,
+        "OnMouseClickEx" => on_mouse_click_ex,
         "OnMouseDoubleClick" => on_mouse_double_click,
         "OnMouseMove" => on_mouse_move,
+        "OnMouseWheel" => on_mouse_wheel,
         _ => return new_response_nocontent(),
     };
 

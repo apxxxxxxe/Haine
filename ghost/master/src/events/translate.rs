@@ -12,6 +12,8 @@ pub fn on_translate(text: String) -> String {
 
     translated = translated.replace("、", "、\\_w[600]");
     translated = translated.replace("。", "。\\_w[1200]");
+    translated = translated.replace("！", "！\\_w[1200]");
+    translated = translated.replace("？", "？\\_w[1200]");
     translated = translated.replace("…", "…\\_w[600]");
 
     translated

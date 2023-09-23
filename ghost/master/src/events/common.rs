@@ -1,3 +1,4 @@
+use crate::events::mouse::MouseDialogs;
 use crate::events::translate::on_translate;
 
 use rand::Rng;
@@ -34,7 +35,21 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
     r
 }
 
-pub fn choose_one(values: Vec<String>) -> Option<String> {
+pub fn new_response_from_mouse_dialogs(
+    dialogs: &MouseDialogs,
+    info: String,
+    use_translate: bool,
+) -> Response {
+    match dialogs.get(&info) {
+        Some(dialog) => match choose_one(dialog) {
+            Some(s) => new_response_with_value(s, use_translate),
+            None => new_response_nocontent(),
+        },
+        None => new_response_nocontent(),
+    }
+}
+
+pub fn choose_one(values: &Vec<String>) -> Option<String> {
     if values.len() == 0 {
         return None;
     }
@@ -59,4 +74,16 @@ pub fn get_references(req: &Request) -> Vec<&str> {
         }
     }
     references
+}
+
+pub fn user_talk(dialog: &str, text: &str) -> String {
+    let mut result = String::new();
+    if dialog != "" {
+        result.push_str(&format!("『{}』\\n", dialog));
+    }
+    if text != "" {
+        result.push_str(&format!("{}\\n", text));
+    }
+
+    format!("\\1\\n{}\\n", result)
 }
