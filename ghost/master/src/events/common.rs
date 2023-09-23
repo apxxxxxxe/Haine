@@ -58,6 +58,32 @@ pub fn choose_one(values: &Vec<String>) -> Option<String> {
     Some(values[i].to_string())
 }
 
+// return all combinations of values
+// e.g. [a, b], [c, d], [e, f] => "ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"
+pub fn all_combo(values: &Vec<Vec<String>>) -> Vec<String> {
+    let mut result = Vec::new();
+    let mut current = Vec::new();
+    all_combo_inner(values, &mut result, &mut current, 0);
+    result.iter().map(|v| v.join("")).collect()
+}
+
+fn all_combo_inner(
+    values: &Vec<Vec<String>>,
+    result: &mut Vec<Vec<String>>,
+    current: &mut Vec<String>,
+    index: usize,
+) {
+    if index == values.len() {
+        result.push(current.clone());
+        return;
+    }
+    for v in values[index].iter() {
+        current.push(v.to_string());
+        all_combo_inner(values, result, current, index + 1);
+        current.pop();
+    }
+}
+
 pub fn get_references(req: &Request) -> Vec<&str> {
     let mut references: Vec<&str> = Vec::new();
     let mut i = 0;
@@ -86,4 +112,20 @@ pub fn user_talk(dialog: &str, text: &str) -> String {
     }
 
     format!("\\1\\n{}\\n", result)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_all_combo() {
+        let values = vec![
+            vec!["a".to_string(), "b".to_string()],
+            vec!["c".to_string(), "d".to_string()],
+            vec!["e".to_string(), "f".to_string()],
+        ];
+        let result = all_combo(&values);
+        println!("{:?}", result);
+    }
 }
