@@ -34,7 +34,7 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
     r
 }
 
-pub fn choose_one(values: &[&str]) -> Option<String> {
+pub fn choose_one(values: Vec<String>) -> Option<String> {
     if values.len() == 0 {
         return None;
     }

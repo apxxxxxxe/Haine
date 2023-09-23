@@ -1,6 +1,7 @@
+mod variables;
 mod events;
 
-use crate::events::GlobalVariables;
+use crate::variables::GlobalVariables;
 
 use std::fs::File;
 use std::path::Path;
