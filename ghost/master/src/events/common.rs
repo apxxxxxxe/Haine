@@ -1,5 +1,6 @@
 use crate::events::mouse::MouseDialogs;
 use crate::events::translate::on_translate;
+use crate::variables::GlobalVariables;
 
 use rand::Rng;
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
@@ -23,10 +24,14 @@ pub fn new_response_nocontent() -> Response {
     r
 }
 
-pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
+pub fn new_response_with_value(
+    value: String,
+    vars: &mut GlobalVariables,
+    use_translate: bool,
+) -> Response {
     let v;
     if use_translate {
-        v = on_translate(value);
+        v = on_translate(value, vars);
     } else {
         v = value;
     }
@@ -38,11 +43,12 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
 pub fn new_response_from_mouse_dialogs(
     dialogs: &MouseDialogs,
     info: String,
+    vars: &mut GlobalVariables,
     use_translate: bool,
 ) -> Response {
     match dialogs.get(&info) {
         Some(dialog) => match choose_one(dialog) {
-            Some(s) => new_response_with_value(s, use_translate),
+            Some(s) => new_response_with_value(s, vars, use_translate),
             None => new_response_nocontent(),
         },
         None => new_response_nocontent(),

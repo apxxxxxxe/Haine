@@ -1,6 +1,7 @@
+use crate::variables::GlobalVariables;
 use regex::Regex;
 
-pub fn on_translate(text: String) -> String {
+pub fn on_translate(text: String, vars: &mut GlobalVariables) -> String {
     if text.is_empty() {
         return text;
     }
@@ -8,13 +9,17 @@ pub fn on_translate(text: String) -> String {
     let mut translated = text.clone();
 
     let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
-    translated = surface_snippet.replace_all(&translated, "\\0\\s[$1]").to_string();
+    translated = surface_snippet
+        .replace_all(&translated, "\\0\\s[$1]")
+        .to_string();
 
     translated = translated.replace("、", "、\\_w[600]");
     translated = translated.replace("。", "。\\_w[1200]");
     translated = translated.replace("！", "！\\_w[1200]");
     translated = translated.replace("？", "？\\_w[1200]");
     translated = translated.replace("…", "…\\_w[600]");
+
+    translated = translated.replace("{user_name}", &vars.user_name.clone().unwrap());
 
     translated
 }

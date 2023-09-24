@@ -53,7 +53,7 @@ pub fn on_mouse_wheel(req: &Request, vars: &mut GlobalVariables) -> Response {
         if vars.volatility.wheel_counter >= WHEEL_THRESHOLD {
             vars.volatility.wheel_counter = 0;
             let info = format!("{}{}{}", refs[3], refs[4], d.to_str());
-            new_response_from_mouse_dialogs(&wheel_dialogs(vars), info, true)
+            new_response_from_mouse_dialogs(&wheel_dialogs(vars), info, vars, true)
         } else {
             vars.volatility.last_wheel_count_unixtime = now;
             vars.volatility.last_wheel_part = refs[4].to_string();
@@ -68,14 +68,14 @@ pub fn on_mouse_double_click(req: &Request, vars: &mut GlobalVariables) -> Respo
     if refs[4] == "" {
         on_menu_exec(req, vars)
     } else {
-        new_response_with_value(refs[4].to_string(), true)
+        new_response_with_value(refs[4].to_string(), vars, true)
     }
 }
 
-pub fn on_mouse_click_ex(req: &Request, _vars: &mut GlobalVariables) -> Response {
+pub fn on_mouse_click_ex(req: &Request, vars: &mut GlobalVariables) -> Response {
     let refs = get_references(req);
     if refs[5] == "middle" {
-        new_response_with_value(format!("{}中クリック", refs[4]), false)
+        new_response_with_value(format!("{}中クリック", refs[4]), vars, false)
     } else {
         new_response_nocontent()
     }
@@ -106,7 +106,7 @@ pub fn on_mouse_move(req: &Request, vars: &mut GlobalVariables) -> Response {
         vars.volatility.last_nade_part = refs[4].to_string();
         if vars.volatility.nade_counter > NADE_THRESHOLD {
             vars.volatility.nade_counter = 0;
-            new_response_with_value(refs[4].to_string() + "なで", true)
+            new_response_with_value(refs[4].to_string() + "なで", vars, true)
         } else {
             new_response_nocontent()
         }
