@@ -9,7 +9,8 @@ pub fn wheel_dialogs(vars: &mut GlobalVariables) -> MouseDialogs {
 
     // 0skirtup
     let mut zero_skirt_up = Vec::new();
-    if vars.volatility.ghost_up_time < 30 {
+    if !vars.volatility.first_sexial_touch && vars.volatility.ghost_up_time < 30 {
+        vars.volatility.first_sexial_touch = true;
         zero_skirt_up.extend(all_combo(&vec![
             vec!["h2244402……！\\nh1241102\\_w[500]".to_string()],
             vec!["h1111205……会って早々、これ？\nなんというか……h1111204流石ね。".to_string()],
