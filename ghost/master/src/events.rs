@@ -6,6 +6,7 @@ mod mouse;
 mod mouse_core;
 mod periodic;
 mod translate;
+pub mod autolinefeed;
 
 use crate::events::aitalk::*;
 use crate::events::bootend::*;

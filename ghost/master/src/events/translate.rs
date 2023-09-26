@@ -21,5 +21,5 @@ pub fn on_translate(text: String, vars: &mut GlobalVariables) -> String {
 
     translated = translated.replace("{user_name}", &vars.user_name.clone().unwrap());
 
-    translated
+    vars.volatility.inserter.run(translated)
 }
