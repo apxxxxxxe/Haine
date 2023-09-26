@@ -134,7 +134,7 @@ impl Default for VolatilityVariables {
             last_wheel_count_unixtime: UNIX_EPOCH,
             last_wheel_part: "".to_string(),
             first_sexial_touch: false,
-            inserter: Inserter::default(),
+            inserter: Inserter::default(), // これのせいで起動に時間がかかる 仕方ないけど
         }
     }
 }

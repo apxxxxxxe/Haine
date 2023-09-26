@@ -1,5 +1,4 @@
 use regex::Regex;
-use std::fs::File;
 use vibrato::{Dictionary, Tokenizer};
 
 pub struct Inserter {
@@ -7,11 +6,10 @@ pub struct Inserter {
     tokenizer: Tokenizer,
 }
 
-const DEFAULT_DICT_PATH: &str = "ipadic-mecab-2_7_0/system.dic.zst";
-
 impl Inserter {
-    pub fn new(dict_path: String, cols_num: f32) -> Self {
-        let reader = zstd::Decoder::new(File::open(dict_path).unwrap()).unwrap();
+    pub fn new(cols_num: f32) -> Self {
+        let bytes = include_bytes!("../../ipadic-mecab-2_7_0/system.dic.zst");
+        let reader = zstd::Decoder::with_buffer(&bytes[..]).unwrap();
         let dict = Dictionary::read(reader).unwrap();
         Inserter {
             cols_num,
@@ -23,7 +21,7 @@ impl Inserter {
     }
 
     pub fn default() -> Self {
-        Self::new(DEFAULT_DICT_PATH.to_string(), 24.0)
+        Self::new(24.0)
     }
 
     pub fn run(&mut self, src: String) -> String {
