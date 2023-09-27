@@ -1,18 +1,16 @@
-use crate::autolinefeed::Inserter;
 use crate::events::common::*;
 use crate::events::GlobalVariables;
 use shiorust::message::{Request, Response};
 
-pub fn version(_req: &Request, vars: &mut GlobalVariables, inserter: &mut Inserter) -> Response {
+pub fn version(_req: &Request, vars: &mut GlobalVariables) -> Response {
     new_response_with_value(
         String::from(env!("CARGO_PKG_VERSION")),
         vars,
-        inserter,
         false,
     )
 }
 
-pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables, inserter: &mut Inserter) -> Response {
+pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables) -> Response {
     let talks = vec![
             format!("\
             h1111203\\1いつの間にか、ハイネの隣に扉ができていた。\\n\
@@ -132,5 +130,5 @@ pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables, inserter: &mut Ins
 
     let talk = choose_one(&talks).unwrap();
 
-    new_response_with_value(talk, vars, inserter, true)
+    new_response_with_value(talk, vars, true)
 }

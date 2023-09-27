@@ -1,8 +1,7 @@
-use crate::autolinefeed::Inserter;
 use crate::variables::GlobalVariables;
 use regex::Regex;
 
-pub fn on_translate(text: String, vars: &mut GlobalVariables, inserter: &mut Inserter) -> String {
+pub fn on_translate(text: String, vars: &mut GlobalVariables) -> String {
     if text.is_empty() {
         return text;
     }
@@ -11,8 +10,8 @@ pub fn on_translate(text: String, vars: &mut GlobalVariables, inserter: &mut Ins
 
     translated = text_only_translater(translated, vars);
 
-    if inserter.is_ready() {
-        translated = inserter.run(translated);
+    if vars.volatility.inserter.is_ready() {
+        translated = format!("*{}", vars.volatility.inserter.run(translated));
     }
     translated
 }

@@ -1,4 +1,3 @@
-use crate::autolinefeed::Inserter;
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::events::mouse::*;
@@ -25,7 +24,6 @@ const WHEEL_LIFETIME: u128 = 3000;
 pub fn on_mouse_wheel(
     req: &Request,
     vars: &mut GlobalVariables,
-    inserter: &mut Inserter,
 ) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
@@ -60,7 +58,6 @@ pub fn on_mouse_wheel(
             new_mouse_response(
                 format!("{}{}{}", refs[3], refs[4], d.to_str()),
                 vars,
-                inserter,
             )
         } else {
             vars.volatility.last_wheel_count_unixtime = now;
@@ -74,24 +71,22 @@ pub fn on_mouse_wheel(
 pub fn on_mouse_double_click(
     req: &Request,
     vars: &mut GlobalVariables,
-    inserter: &mut Inserter,
 ) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
-        on_menu_exec(req, vars, inserter)
+        on_menu_exec(req, vars)
     } else {
-        new_response_with_value(refs[4].to_string(), vars, inserter, true)
+        new_response_with_value(refs[4].to_string(), vars, true)
     }
 }
 
 pub fn on_mouse_click_ex(
     req: &Request,
     vars: &mut GlobalVariables,
-    inserter: &mut Inserter,
 ) -> Response {
     let refs = get_references(req);
     if refs[5] == "middle" {
-        new_response_with_value(format!("{}中クリック", refs[4]), vars, inserter, false)
+        new_response_with_value(format!("{}中クリック", refs[4]), vars, false)
     } else {
         new_response_nocontent()
     }
@@ -100,7 +95,6 @@ pub fn on_mouse_click_ex(
 pub fn on_mouse_move(
     req: &Request,
     vars: &mut GlobalVariables,
-    inserter: &mut Inserter,
 ) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
@@ -126,7 +120,7 @@ pub fn on_mouse_move(
         vars.volatility.last_nade_part = refs[4].to_string();
         if vars.volatility.nade_counter > NADE_THRESHOLD {
             vars.volatility.nade_counter = 0;
-            new_mouse_response(format!("{}{}nade", refs[3], refs[4]), vars, inserter)
+            new_mouse_response(format!("{}{}nade", refs[3], refs[4]), vars)
         } else {
             new_response_nocontent()
         }
@@ -136,7 +130,6 @@ pub fn on_mouse_move(
 fn new_mouse_response(
     info: String,
     vars: &mut GlobalVariables,
-    inserter: &mut Inserter,
 ) -> Response {
     if info != vars.volatility.last_touch_info {
         vars.volatility.touch_count = 0;
@@ -146,7 +139,7 @@ fn new_mouse_response(
 
     match mouse_dialogs(info, vars) {
         Some(dialogs) => {
-            new_response_with_value(choose_one(&dialogs).unwrap(), vars, inserter, true)
+            new_response_with_value(choose_one(&dialogs).unwrap(), vars, true)
         }
         None => new_response_nocontent(),
     }

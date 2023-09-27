@@ -1,6 +1,6 @@
-use std::time::{SystemTime, UNIX_EPOCH};
-
+use crate::autolinefeed::Inserter;
 use serde::{Deserialize, Serialize};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 const VAR_PATH: &str = "vars.json";
 
@@ -119,6 +119,8 @@ pub struct VolatilityVariables {
     pub touch_count: i32,
 
     pub last_touch_info: String,
+
+    pub inserter: Inserter,
 }
 
 impl Default for VolatilityVariables {
@@ -136,6 +138,7 @@ impl Default for VolatilityVariables {
             first_sexial_touch: false,
             touch_count: 0,
             last_touch_info: "".to_string(),
+            inserter: Inserter::default(),
         }
     }
 }

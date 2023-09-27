@@ -1,4 +1,3 @@
-use crate::autolinefeed::Inserter;
 use crate::events::translate::on_translate;
 use crate::variables::GlobalVariables;
 
@@ -27,12 +26,11 @@ pub fn new_response_nocontent() -> Response {
 pub fn new_response_with_value(
     value: String,
     vars: &mut GlobalVariables,
-    inserter: &mut Inserter,
     use_translate: bool,
 ) -> Response {
     let v;
     if use_translate {
-        v = on_translate(value, vars, inserter);
+        v = on_translate(value, vars);
     } else {
         v = value;
     }

@@ -2,7 +2,6 @@ mod autolinefeed;
 mod events;
 mod variables;
 
-use crate::autolinefeed::Inserter;
 use crate::variables::GlobalVariables;
 
 use std::fs::File;
@@ -30,8 +29,6 @@ use simplelog::*;
 
 static mut DLL_PATH: String = String::new();
 static mut GLOBALVARS: Lazy<GlobalVariables> = Lazy::new(|| GlobalVariables::new());
-
-static mut INSERTER: Lazy<Inserter> = Lazy::new(|| Inserter::default());
 
 #[derive(Debug)]
 pub enum ResponseError {
@@ -93,8 +90,10 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
 
     debug!("load");
 
-    unsafe { GLOBALVARS.load() };
-    unsafe { INSERTER.start_init() };
+    unsafe {
+        GLOBALVARS.load();
+        GLOBALVARS.volatility.inserter.start_init();
+    };
 
     return TRUE;
 }
@@ -119,7 +118,7 @@ pub extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
     let r = Request::parse(&s).unwrap();
 
     let response;
-    unsafe { response = events::handle_request(&r, &mut GLOBALVARS, &mut INSERTER) };
+    unsafe { response = events::handle_request(&r, &mut GLOBALVARS) };
 
     let response_bytes = to_encoded_bytes(response).unwrap_or_else(|e| {
         debug!("error: {:?}", e);
