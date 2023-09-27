@@ -11,9 +11,10 @@ pub fn on_translate(text: String, vars: &mut GlobalVariables) -> String {
     translated = text_only_translater(translated, vars);
 
     if vars.volatility.inserter.is_ready() {
-        translated = format!("*{}", vars.volatility.inserter.run(translated));
+        vars.volatility.inserter.run(translated)
+    } else {
+        translated
     }
-    translated
 }
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate

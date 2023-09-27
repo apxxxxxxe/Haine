@@ -90,10 +90,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
 
     debug!("load");
 
-    unsafe {
-        GLOBALVARS.load();
-        GLOBALVARS.volatility.inserter.start_init();
-    };
+    unsafe { GLOBALVARS.load() };
 
     return TRUE;
 }

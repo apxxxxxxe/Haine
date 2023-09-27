@@ -22,12 +22,17 @@ pub struct GlobalVariables {
 
 impl GlobalVariables {
     pub fn new() -> Self {
-        Self {
+        let mut s = Self {
             total_time: Some(0),
             random_talk_interval: Some(180),
             user_name: Some("ユーザ".to_string()),
             volatility: VolatilityVariables::default(),
-        }
+        };
+
+        // 形態素解析器は時間がかかるので非同期的に初期化
+        s.volatility.inserter.start_init();
+
+        s
     }
 
     pub fn load(&mut self) {
