@@ -1,10 +1,12 @@
 use regex::Regex;
 use std::sync::{Arc, Mutex};
-use vibrato::Tokenizer;
+use std::thread::JoinHandle;
+use vibrato::{Dictionary, Tokenizer};
 
 pub struct Inserter {
     cols_num: f32,
-    pub tokenizer: Arc<Mutex<Option<Tokenizer>>>,
+    tokenizer: Arc<Mutex<Option<Tokenizer>>>,
+    join_handle: Option<JoinHandle<()>>,
 }
 
 impl Inserter {
@@ -12,6 +14,7 @@ impl Inserter {
         Inserter {
             cols_num,
             tokenizer: Arc::new(Mutex::new(None)),
+            join_handle: None,
         }
     }
 
@@ -21,9 +24,15 @@ impl Inserter {
         tokenizer.is_some()
     }
 
-    pub fn set_tokenizer(&mut self, tokenizer: Tokenizer) {
-        let t = Arc::new(Mutex::new(Some(tokenizer)));
-        self.tokenizer = t;
+    pub fn start_init(&mut self) {
+        self.tokenizer = Arc::new(Mutex::new(None));
+        let tokenizer_clone = self.tokenizer.clone();
+        self.join_handle = Some(std::thread::spawn(move || {
+            let bytes = include_bytes!("../ipadic-mecab-2_7_0/system.dic.zst").to_vec();
+            let reader = zstd::Decoder::with_buffer(&bytes[..]).unwrap();
+            let dict = Dictionary::read(reader).unwrap();
+            *tokenizer_clone.lock().unwrap() = Some(Tokenizer::new(dict));
+        }));
     }
 
     pub fn default() -> Self {

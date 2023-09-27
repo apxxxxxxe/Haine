@@ -4,13 +4,10 @@ mod variables;
 
 use crate::autolinefeed::Inserter;
 use crate::variables::GlobalVariables;
-use vibrato::{Dictionary, Tokenizer};
 
 use std::fs::File;
 use std::path::Path;
 use std::slice;
-use std::sync::{Arc, Mutex};
-use std::thread::JoinHandle;
 
 use shiorust::message::*;
 
@@ -35,8 +32,6 @@ static mut DLL_PATH: String = String::new();
 static mut GLOBALVARS: Lazy<GlobalVariables> = Lazy::new(|| GlobalVariables::new());
 
 static mut INSERTER: Lazy<Inserter> = Lazy::new(|| Inserter::default());
-static mut JOIN_HANDLE: Lazy<Arc<Mutex<Option<JoinHandle<()>>>>> =
-    Lazy::new(|| Arc::new(Mutex::new(None)));
 
 #[derive(Debug)]
 pub enum ResponseError {
@@ -99,16 +94,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
     debug!("load");
 
     unsafe { GLOBALVARS.load() };
-    unsafe {
-        let join_handle_clone: Arc<Mutex<Option<JoinHandle<()>>>> = JOIN_HANDLE.clone();
-        *join_handle_clone.lock().unwrap() = Some(std::thread::spawn(move || {
-            let bytes = include_bytes!("../ipadic-mecab-2_7_0/system.dic.zst").to_vec();
-            let reader = zstd::Decoder::with_buffer(&bytes[..]).unwrap();
-            let dict = Dictionary::read(reader).unwrap();
-            let tokenizer = Tokenizer::new(dict);
-            INSERTER.set_tokenizer(tokenizer);
-        }));
-    };
+    unsafe { INSERTER.start_init() };
 
     return TRUE;
 }
