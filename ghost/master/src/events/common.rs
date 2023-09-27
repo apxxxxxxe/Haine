@@ -1,4 +1,4 @@
-use crate::events::mouse::MouseDialogs;
+use crate::autolinefeed::Inserter;
 use crate::events::translate::on_translate;
 use crate::variables::GlobalVariables;
 
@@ -27,32 +27,18 @@ pub fn new_response_nocontent() -> Response {
 pub fn new_response_with_value(
     value: String,
     vars: &mut GlobalVariables,
+    inserter: &mut Inserter,
     use_translate: bool,
 ) -> Response {
     let v;
     if use_translate {
-        v = on_translate(value, vars);
+        v = on_translate(value, vars, inserter);
     } else {
         v = value;
     }
     let mut r = new_response();
     r.headers.insert(HeaderName::from("Value"), v);
     r
-}
-
-pub fn new_response_from_mouse_dialogs(
-    dialogs: &MouseDialogs,
-    info: String,
-    vars: &mut GlobalVariables,
-    use_translate: bool,
-) -> Response {
-    match dialogs.get(&info) {
-        Some(dialog) => match choose_one(dialog) {
-            Some(s) => new_response_with_value(s, vars, use_translate),
-            None => new_response_nocontent(),
-        },
-        None => new_response_nocontent(),
-    }
 }
 
 pub fn choose_one(values: &Vec<String>) -> Option<String> {

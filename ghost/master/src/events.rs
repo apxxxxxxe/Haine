@@ -6,8 +6,8 @@ mod mouse;
 mod mouse_core;
 mod periodic;
 mod translate;
-pub mod autolinefeed;
 
+use crate::autolinefeed::Inserter;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
 use crate::events::common::*;
@@ -18,7 +18,11 @@ use crate::variables::GlobalVariables;
 
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
-pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn handle_request(
+    req: &Request,
+    vars: &mut GlobalVariables,
+    inserter: &mut Inserter,
+) -> Response {
     match req.method {
         Method::GET => (),
         _ => return new_response_nocontent(),
@@ -47,7 +51,7 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
         _ => return new_response_nocontent(),
     };
 
-    let res = event(req, vars);
+    let res = event(req, vars, inserter);
     debug!("response: {:?}", res);
     res
 }

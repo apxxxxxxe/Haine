@@ -1,23 +1,29 @@
 use regex::Regex;
-use vibrato::{Dictionary, Tokenizer};
+use std::sync::{Arc, Mutex};
+use vibrato::Tokenizer;
 
 pub struct Inserter {
     cols_num: f32,
-    tokenizer: Tokenizer,
+    pub tokenizer: Arc<Mutex<Option<Tokenizer>>>,
 }
 
 impl Inserter {
     pub fn new(cols_num: f32) -> Self {
-        let bytes = include_bytes!("../../ipadic-mecab-2_7_0/system.dic.zst");
-        let reader = zstd::Decoder::with_buffer(&bytes[..]).unwrap();
-        let dict = Dictionary::read(reader).unwrap();
         Inserter {
             cols_num,
-            tokenizer: Tokenizer::new(dict)
-                .ignore_space(true)
-                .unwrap()
-                .max_grouping_len(24),
+            tokenizer: Arc::new(Mutex::new(None)),
         }
+    }
+
+    pub fn is_ready(&mut self) -> bool {
+        let tokenizer_clone = self.tokenizer.clone();
+        let tokenizer = tokenizer_clone.lock().unwrap();
+        tokenizer.is_some()
+    }
+
+    pub fn set_tokenizer(&mut self, tokenizer: Tokenizer) {
+        let t = Arc::new(Mutex::new(Some(tokenizer)));
+        self.tokenizer = t;
     }
 
     pub fn default() -> Self {
@@ -31,7 +37,10 @@ impl Inserter {
 
     fn wakachi(&mut self, src: String) -> Vec<String> {
         println!("wakachi");
-        let mut worker = self.tokenizer.new_worker();
+        let tokenizer_clone = self.tokenizer.clone();
+        let tokenizer = tokenizer_clone.lock().unwrap();
+        let t = tokenizer.as_ref().unwrap();
+        let mut worker = t.new_worker();
         let mut text = src.clone();
         let mut _word_counts = vec![0, 0];
         let hinshi_target = vec![
@@ -75,7 +84,7 @@ impl Inserter {
             for pieces in ss_splitted {
                 worker.reset_sentence(pieces);
                 worker.tokenize();
-                for (j, token) in worker.token_iter().enumerate() {
+                for token in worker.token_iter() {
                     let info: Vec<&str> = token.feature().split(',').collect();
                     let pos = info[0];
                     let pos_detail = info[1];
@@ -150,6 +159,12 @@ impl Inserter {
                 "count: {}, c: {}, cols_num: {}",
                 counts[scope], c, self.cols_num
             );
+            if c > self.cols_num {
+                result.push_str(part);
+                counts[scope] += c % self.cols_num;
+                counts[scope] %= self.cols_num;
+                continue;
+            }
             if counts[scope] + c > self.cols_num {
                 result.push_str("\\n");
                 counts[scope] = 0.0;

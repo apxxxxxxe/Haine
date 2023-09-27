@@ -1,5 +1,3 @@
-use crate::events::autolinefeed::Inserter;
-
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::{Deserialize, Serialize};
@@ -118,7 +116,9 @@ pub struct VolatilityVariables {
 
     pub first_sexial_touch: bool,
 
-    pub inserter: Inserter,
+    pub touch_count: i32,
+
+    pub last_touch_info: String,
 }
 
 impl Default for VolatilityVariables {
@@ -134,7 +134,8 @@ impl Default for VolatilityVariables {
             last_wheel_count_unixtime: UNIX_EPOCH,
             last_wheel_part: "".to_string(),
             first_sexial_touch: false,
-            inserter: Inserter::default(), // これのせいで起動に時間がかかる 仕方ないけど
+            touch_count: 0,
+            last_touch_info: "".to_string(),
         }
     }
 }
