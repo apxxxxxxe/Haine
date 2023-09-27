@@ -19,7 +19,7 @@ sstp.allowunspecifiedsend,1
 icon,icon.ico
 icon.minimize,icon_minimize.ico
 
-shiori,ukaing_test.dll
+shiori,haine.dll
 
 sakura.seriko.defaultsurface,1111101
 kero.seriko.defaultsurface,1000000

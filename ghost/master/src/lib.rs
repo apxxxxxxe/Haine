@@ -49,7 +49,7 @@ pub extern "system" fn DllMain(
                 path = Path::new(&DLL_PATH.clone())
                     .parent()
                     .unwrap()
-                    .join("ukaing.log");
+                    .join("haine.log");
             };
             WriteLogger::init(
                 LevelFilter::Debug,
