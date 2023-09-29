@@ -3,11 +3,7 @@ use crate::events::GlobalVariables;
 use shiorust::message::{Request, Response};
 
 pub fn version(_req: &Request, vars: &mut GlobalVariables) -> Response {
-    new_response_with_value(
-        String::from(env!("CARGO_PKG_VERSION")),
-        vars,
-        false,
-    )
+    new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), vars, false)
 }
 
 pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables) -> Response {
@@ -34,7 +30,8 @@ pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables) -> Response {
 
             "\
             h1111105人生に変化は付きもの……けれど、h1111109停滞はそれ以上。\\n\
-            一度立ち止まってしまうと、空気は一瞬で淀んで、身動きがとれなくなってしまうのよ。あなたも経験したこと、あるんじゃないかしら。\\n\
+            一度立ち止まってしまうと、空気は一瞬で淀んで、身動きがとれなくなってしまうのよ。\
+            倦怠とも違う、鈍い痛み。あなたも経験したこと、あるんじゃないかしら。\\n\
             h1111206そうなったときは、多少無理にでも変化を取り入れるほうがいい。\\n\
             ……h1111209たとえなにかを破壊することになるとしても、何も出来ないよりはずっとましよ。\
             ".to_string(),
@@ -128,7 +125,7 @@ pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables) -> Response {
             user_talk("あなたに出会えたから。それだけでどんな不都合も構わない","")),
         ];
 
-    let talk = choose_one(&talks).unwrap();
+    let talk = choose_one(&talks, &mut vars.volatility.talk_bias).unwrap();
 
     new_response_with_value(talk, vars, true)
 }

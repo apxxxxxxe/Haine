@@ -3,10 +3,7 @@ use crate::events::common::*;
 use crate::events::GlobalVariables;
 use shiorust::message::{Request, Response};
 
-pub fn on_second_change(
-    req: &Request,
-    vars: &mut GlobalVariables,
-) -> Response {
+pub fn on_second_change(req: &Request, vars: &mut GlobalVariables) -> Response {
     let total_time = vars.total_time.unwrap();
     vars.total_time = Some(total_time + 1);
     vars.volatility.ghost_up_time += 1;

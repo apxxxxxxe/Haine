@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 shiorust = { git = "https://github.com/Narazaka/shiorust", version = "0.1.0" }
-discord-rich-presence = "0.2.3"
 serenity = "0.11"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -21,6 +20,7 @@ rand = "0.8.5"
 regex = "1.9.5"
 vibrato = "0.5.1"
 zstd = "0.12.4"
+md5 = "0.7.0"
 
 [target.'cfg(windows)'.dependencies]
 winapi = {version = "0.3.9", features = ["winbase", "libloaderapi", "stringapiset"]}

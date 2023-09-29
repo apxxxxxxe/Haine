@@ -21,10 +21,7 @@ const WHEEL_THRESHOLD: i32 = 3;
 // ホイールの蓄積値がリセットされるまでの時間(ms)
 const WHEEL_LIFETIME: u128 = 3000;
 
-pub fn on_mouse_wheel(
-    req: &Request,
-    vars: &mut GlobalVariables,
-) -> Response {
+pub fn on_mouse_wheel(req: &Request, vars: &mut GlobalVariables) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
         new_response_nocontent()
@@ -55,10 +52,7 @@ pub fn on_mouse_wheel(
 
         if vars.volatility.wheel_counter >= WHEEL_THRESHOLD {
             vars.volatility.wheel_counter = 0;
-            new_mouse_response(
-                format!("{}{}{}", refs[3], refs[4], d.to_str()),
-                vars,
-            )
+            new_mouse_response(format!("{}{}{}", refs[3], refs[4], d.to_str()), vars)
         } else {
             vars.volatility.last_wheel_count_unixtime = now;
             vars.volatility.last_wheel_part = refs[4].to_string();
@@ -68,10 +62,7 @@ pub fn on_mouse_wheel(
     }
 }
 
-pub fn on_mouse_double_click(
-    req: &Request,
-    vars: &mut GlobalVariables,
-) -> Response {
+pub fn on_mouse_double_click(req: &Request, vars: &mut GlobalVariables) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
         on_menu_exec(req, vars)
@@ -80,10 +71,7 @@ pub fn on_mouse_double_click(
     }
 }
 
-pub fn on_mouse_click_ex(
-    req: &Request,
-    vars: &mut GlobalVariables,
-) -> Response {
+pub fn on_mouse_click_ex(req: &Request, vars: &mut GlobalVariables) -> Response {
     let refs = get_references(req);
     if refs[5] == "middle" {
         new_response_with_value(format!("{}中クリック", refs[4]), vars, false)
@@ -92,10 +80,7 @@ pub fn on_mouse_click_ex(
     }
 }
 
-pub fn on_mouse_move(
-    req: &Request,
-    vars: &mut GlobalVariables,
-) -> Response {
+pub fn on_mouse_move(req: &Request, vars: &mut GlobalVariables) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
         new_response_nocontent()
@@ -127,10 +112,7 @@ pub fn on_mouse_move(
     }
 }
 
-fn new_mouse_response(
-    info: String,
-    vars: &mut GlobalVariables,
-) -> Response {
+fn new_mouse_response(info: String, vars: &mut GlobalVariables) -> Response {
     if info != vars.volatility.last_touch_info {
         vars.volatility.touch_count = 0;
     }
@@ -138,9 +120,11 @@ fn new_mouse_response(
     vars.volatility.touch_count += 1;
 
     match mouse_dialogs(info, vars) {
-        Some(dialogs) => {
-            new_response_with_value(choose_one(&dialogs).unwrap(), vars, true)
-        }
+        Some(dialogs) => new_response_with_value(
+            choose_one(&dialogs, &mut vars.volatility.talk_bias).unwrap(),
+            vars,
+            true,
+        ),
         None => new_response_nocontent(),
     }
 }

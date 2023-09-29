@@ -1,7 +1,7 @@
 use crate::events::translate::on_translate;
+use crate::roulette::TalkBias;
 use crate::variables::GlobalVariables;
 
-use rand::Rng;
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
 pub fn new_response() -> Response {
@@ -39,13 +39,12 @@ pub fn new_response_with_value(
     r
 }
 
-pub fn choose_one(values: &Vec<String>) -> Option<String> {
+pub fn choose_one(values: &Vec<String>, talk_bias: &mut TalkBias) -> Option<String> {
     if values.len() == 0 {
         return None;
     }
-    let mut rng = rand::thread_rng();
-    let i = rng.gen_range(0..values.len());
-    Some(values[i].to_string())
+    let u = talk_bias.roulette(values);
+    Some(values.get(u).unwrap().to_owned())
 }
 
 // return all combinations of values

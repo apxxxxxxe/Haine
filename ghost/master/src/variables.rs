@@ -1,4 +1,5 @@
 use crate::autolinefeed::Inserter;
+use crate::roulette::TalkBias;
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -126,6 +127,8 @@ pub struct VolatilityVariables {
     pub last_touch_info: String,
 
     pub inserter: Inserter,
+
+    pub talk_bias: TalkBias,
 }
 
 impl Default for VolatilityVariables {
@@ -144,6 +147,7 @@ impl Default for VolatilityVariables {
             touch_count: 0,
             last_touch_info: "".to_string(),
             inserter: Inserter::default(),
+            talk_bias: TalkBias::new(),
         }
     }
 }
