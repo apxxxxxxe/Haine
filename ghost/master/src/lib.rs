@@ -1,6 +1,7 @@
 mod autolinefeed;
 mod events;
 mod roulette;
+mod status;
 mod variables;
 
 use crate::variables::GlobalVariables;

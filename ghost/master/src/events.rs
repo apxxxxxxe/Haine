@@ -35,6 +35,10 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
 
     debug!("event: {}", event_id);
 
+    if let Some(v) = req.headers.get("Status") {
+        vars.volatility.status.set(v.to_string());
+    }
+
     let event = match event_id.as_str() {
         "version" => version,
         "OnBoot" => on_boot,
