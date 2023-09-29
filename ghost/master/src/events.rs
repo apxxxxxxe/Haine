@@ -39,21 +39,37 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
         vars.volatility.status.set(v.to_string());
     }
 
-    let event = match event_id.as_str() {
-        "version" => version,
-        "OnBoot" => on_boot,
-        "OnAiTalk" => on_ai_talk,
-        "OnSecondChange" => on_second_change,
-        "OnMenuExec" => on_menu_exec,
-        "OnMouseClickEx" => on_mouse_click_ex,
-        "OnMouseDoubleClick" => on_mouse_double_click,
-        "OnMouseMove" => on_mouse_move,
-        "OnMouseWheel" => on_mouse_wheel,
-        "OnKeyPress" => on_key_press,
-        _ => return new_response_nocontent(),
+    let event = match get_event(event_id.as_str()) {
+        Some(e) => e,
+        None => {
+            let base_id = match req.headers.get("BaseID") {
+                Some(id) => id,
+                None => return new_response_nocontent(),
+            };
+            match get_event(base_id.as_str()) {
+                Some(e) => e,
+                None => return new_response_nocontent(),
+            }
+        }
     };
 
     let res = event(req, vars);
     debug!("response: {:?}", res);
     res
+}
+
+fn get_event(id: &str) -> Option<fn(&Request, &mut GlobalVariables) -> Response> {
+    match id {
+        "version" => Some(version),
+        "OnBoot" => Some(on_boot),
+        "OnAiTalk" => Some(on_ai_talk),
+        "OnSecondChange" => Some(on_second_change),
+        "OnMenuExec" => Some(on_menu_exec),
+        "OnMouseClickEx" => Some(on_mouse_click_ex),
+        "OnMouseDoubleClick" => Some(on_mouse_double_click),
+        "OnMouseMove" => Some(on_mouse_move),
+        "OnMouseWheel" => Some(on_mouse_wheel),
+        "OnKeyPress" => Some(on_key_press),
+        _ => None,
+    }
 }
