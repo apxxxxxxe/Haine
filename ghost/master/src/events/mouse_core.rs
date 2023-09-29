@@ -82,7 +82,7 @@ pub fn on_mouse_click_ex(req: &Request, vars: &mut GlobalVariables) -> Response 
 
 pub fn on_mouse_move(req: &Request, vars: &mut GlobalVariables) -> Response {
     let refs = get_references(req);
-    if refs[4] == "" {
+    if refs[4] == "" || vars.volatility.status.get("talking").unwrap() {
         new_response_nocontent()
     } else {
         let now = SystemTime::now();
