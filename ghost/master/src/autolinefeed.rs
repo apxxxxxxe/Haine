@@ -239,6 +239,10 @@ mod tests {
             あなたも経験したこと、あるんじゃないかしら。"
             .to_string();
         let mut ins = Inserter::default();
+        ins.start_init();
+        while !ins.is_ready() {
+            std::thread::sleep(std::time::Duration::from_millis(100));
+        }
         println!("{}", ins.run(text));
     }
 }
