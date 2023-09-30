@@ -35,6 +35,7 @@ fn text_only_translater(text: String, vars: &mut GlobalVariables) -> String {
 
 fn translate(text: String, vars: &mut GlobalVariables) -> String {
     let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
+    let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
 
     let mut translated = text.clone();
 
@@ -50,5 +51,5 @@ fn translate(text: String, vars: &mut GlobalVariables) -> String {
 
     translated = translated.replace("{user_name}", &vars.user_name.clone().unwrap());
 
-    translated
+    last_wait.replace(&translated, "").to_string()
 }
