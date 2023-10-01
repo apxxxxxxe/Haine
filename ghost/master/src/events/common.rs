@@ -22,10 +22,7 @@ pub fn new_response_nocontent() -> Response {
     r
 }
 
-pub fn new_response_with_value(
-    value: String,
-    use_translate: bool,
-) -> Response {
+pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
     let v;
     if use_translate {
         v = on_translate(value);
@@ -90,16 +87,29 @@ pub fn get_references(req: &Request) -> Vec<&str> {
     references
 }
 
-pub fn user_talk(dialog: &str, text: &str) -> String {
-    let mut result = String::new();
+pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
+    let mut d = String::new();
     if dialog != "" {
-        result.push_str(&format!("『{}』\\n", dialog));
+        d = format!("『{}』", dialog);
     }
+    let mut t = String::new();
     if text != "" {
-        result.push_str(&format!("{}\\n", text));
+        t = format!("{}", text);
     }
 
-    format!("\\1\\n{}\\n", result)
+    let mut v: Vec<String>;
+    if text_first {
+        v = vec![t, d];
+    } else {
+        v = vec![d, t];
+    }
+    v = v
+        .iter()
+        .filter(|s| s != &&"")
+        .map(|s| s.to_string())
+        .collect();
+
+    format!("\\1{}\\n", v.join("\\n"))
 }
 
 #[cfg(test)]
