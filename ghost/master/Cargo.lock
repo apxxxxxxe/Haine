@@ -518,6 +518,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serenity",
+ "shiori_hglobal",
  "shiorust",
  "simplelog",
  "tokio",
@@ -1263,6 +1264,15 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "shiori_hglobal"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a2496ceb0abcbb21981c36e80fdf41fd3fd56716d5ccd10395f819b67800f03a"
+dependencies = [
+ "winapi",
 ]
 
 [[package]]
