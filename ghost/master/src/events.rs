@@ -15,11 +15,11 @@ use crate::events::key::*;
 use crate::events::menu::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
-use crate::variables::GlobalVariables;
+use crate::variables::get_global_vars;
 
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
-pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn handle_request(req: &Request) -> Response {
     match req.method {
         Method::GET => (),
         _ => return new_response_nocontent(),
@@ -34,6 +34,8 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
     };
 
     debug!("event: {}", event_id);
+
+    let vars = get_global_vars();
 
     if let Some(v) = req.headers.get("Status") {
         vars.volatility.status.set(v.to_string());
@@ -53,12 +55,12 @@ pub fn handle_request(req: &Request, vars: &mut GlobalVariables) -> Response {
         }
     };
 
-    let res = event(req, vars);
+    let res = event(req);
     debug!("response: {:?}", res);
     res
 }
 
-fn get_event(id: &str) -> Option<fn(&Request, &mut GlobalVariables) -> Response> {
+fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     match id {
         "version" => Some(version),
         "OnBoot" => Some(on_boot),

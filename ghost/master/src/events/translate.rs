@@ -1,15 +1,16 @@
-use crate::variables::GlobalVariables;
+use crate::variables::get_global_vars;
 use regex::Regex;
 
-pub fn on_translate(text: String, vars: &mut GlobalVariables) -> String {
+pub fn on_translate(text: String) -> String {
     if text.is_empty() {
         return text;
     }
 
     let mut translated = text.clone();
 
-    translated = text_only_translater(translated, vars);
+    translated = text_only_translater(translated);
 
+    let vars = get_global_vars();
     if vars.volatility.inserter.is_ready() {
         vars.volatility.inserter.run(translated)
     } else {
@@ -18,22 +19,22 @@ pub fn on_translate(text: String, vars: &mut GlobalVariables) -> String {
 }
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-fn text_only_translater(text: String, vars: &mut GlobalVariables) -> String {
+fn text_only_translater(text: String) -> String {
     let re_tags = Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap();
     let tags = re_tags.find_iter(&text);
     let splitted = re_tags.split(&text).collect::<Vec<&str>>();
     let mut result = String::new();
 
     for (i, tag) in tags.enumerate() {
-        result.push_str(translate(splitted[i].to_string(), vars).as_str());
+        result.push_str(translate(splitted[i].to_string()).as_str());
         result.push_str(&tag.as_str());
     }
-    result.push_str(translate(splitted[splitted.len() - 1].to_string(), vars).as_str());
+    result.push_str(translate(splitted[splitted.len() - 1].to_string()).as_str());
 
     result
 }
 
-fn translate(text: String, vars: &mut GlobalVariables) -> String {
+fn translate(text: String) -> String {
     let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
     let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
 
@@ -49,6 +50,7 @@ fn translate(text: String, vars: &mut GlobalVariables) -> String {
     translated = translated.replace("？", "？\\_w[1200]");
     translated = translated.replace("…", "…\\_w[600]");
 
+    let vars = get_global_vars();
     translated = translated.replace("{user_name}", &vars.user_name.clone().unwrap());
 
     last_wait.replace(&translated, "").to_string()

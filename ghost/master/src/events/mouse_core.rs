@@ -1,7 +1,7 @@
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::events::mouse::*;
-use crate::variables::{Direction, GlobalVariables};
+use crate::variables::{Direction, get_global_vars};
 
 use shiorust::message::{Response, *};
 use std::time::SystemTime;
@@ -21,7 +21,8 @@ const WHEEL_THRESHOLD: i32 = 3;
 // ホイールの蓄積値がリセットされるまでの時間(ms)
 const WHEEL_LIFETIME: u128 = 3000;
 
-pub fn on_mouse_wheel(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn on_mouse_wheel(req: &Request) -> Response {
+    let vars = get_global_vars();
     let refs = get_references(req);
     if refs[4] == "" {
         new_response_nocontent()
@@ -52,7 +53,7 @@ pub fn on_mouse_wheel(req: &Request, vars: &mut GlobalVariables) -> Response {
 
         if vars.volatility.wheel_counter >= WHEEL_THRESHOLD {
             vars.volatility.wheel_counter = 0;
-            new_mouse_response(format!("{}{}{}", refs[3], refs[4], d.to_str()), vars)
+            new_mouse_response(format!("{}{}{}", refs[3], refs[4], d.to_str()))
         } else {
             vars.volatility.last_wheel_count_unixtime = now;
             vars.volatility.last_wheel_part = refs[4].to_string();
@@ -62,25 +63,26 @@ pub fn on_mouse_wheel(req: &Request, vars: &mut GlobalVariables) -> Response {
     }
 }
 
-pub fn on_mouse_double_click(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn on_mouse_double_click(req: &Request) -> Response {
     let refs = get_references(req);
     if refs[4] == "" {
-        on_menu_exec(req, vars)
+        on_menu_exec(req)
     } else {
-        new_response_with_value(refs[4].to_string(), vars, true)
+        new_response_with_value(refs[4].to_string(), true)
     }
 }
 
-pub fn on_mouse_click_ex(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn on_mouse_click_ex(req: &Request) -> Response {
     let refs = get_references(req);
     if refs[5] == "middle" {
-        new_response_with_value(format!("{}中クリック", refs[4]), vars, false)
+        new_response_with_value(format!("{}中クリック", refs[4]), false)
     } else {
         new_response_nocontent()
     }
 }
 
-pub fn on_mouse_move(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn on_mouse_move(req: &Request) -> Response {
+    let vars = get_global_vars();
     let refs = get_references(req);
     if refs[4] == "" || vars.volatility.status.get("talking").unwrap() {
         new_response_nocontent()
@@ -105,14 +107,15 @@ pub fn on_mouse_move(req: &Request, vars: &mut GlobalVariables) -> Response {
         vars.volatility.last_nade_part = refs[4].to_string();
         if vars.volatility.nade_counter > NADE_THRESHOLD {
             vars.volatility.nade_counter = 0;
-            new_mouse_response(format!("{}{}nade", refs[3], refs[4]), vars)
+            new_mouse_response(format!("{}{}nade", refs[3], refs[4]))
         } else {
             new_response_nocontent()
         }
     }
 }
 
-fn new_mouse_response(info: String, vars: &mut GlobalVariables) -> Response {
+fn new_mouse_response(info: String) -> Response {
+    let vars = get_global_vars();
     if info != vars.volatility.last_touch_info {
         vars.volatility.touch_count = 0;
     }
@@ -121,8 +124,7 @@ fn new_mouse_response(info: String, vars: &mut GlobalVariables) -> Response {
 
     match mouse_dialogs(info, vars) {
         Some(dialogs) => new_response_with_value(
-            choose_one(&dialogs, &mut vars.volatility.talk_bias).unwrap(),
-            vars,
+            choose_one(&dialogs).unwrap(),
             true,
         ),
         None => new_response_nocontent(),

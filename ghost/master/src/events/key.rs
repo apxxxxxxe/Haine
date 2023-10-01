@@ -1,12 +1,11 @@
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
-use crate::events::GlobalVariables;
 use shiorust::message::{Request, Response};
 
-pub fn on_key_press(req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn on_key_press(req: &Request) -> Response {
     let refs = get_references(req);
     match refs[0] {
-        "t" => on_ai_talk(req, vars),
+        "t" => on_ai_talk(req),
         _ => new_response_nocontent(),
     }
 }

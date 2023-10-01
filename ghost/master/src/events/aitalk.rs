@@ -1,12 +1,11 @@
 use crate::events::common::*;
-use crate::events::GlobalVariables;
 use shiorust::message::{Request, Response};
 
-pub fn version(_req: &Request, vars: &mut GlobalVariables) -> Response {
-    new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), vars, false)
+pub fn version(_req: &Request) -> Response {
+    new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), false)
 }
 
-pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables) -> Response {
+pub fn on_ai_talk(_req: &Request) -> Response {
     let talks = vec![
             format!("\
             h1111203\\1いつの間にか、ハイネの隣に扉ができていた。\\n\
@@ -125,7 +124,7 @@ pub fn on_ai_talk(_req: &Request, vars: &mut GlobalVariables) -> Response {
             user_talk("あなたに出会えたから。それだけでどんな不都合も構わない","")),
         ];
 
-    let talk = choose_one(&talks, &mut vars.volatility.talk_bias).unwrap();
+    let talk = choose_one(&talks).unwrap();
 
-    new_response_with_value(talk, vars, true)
+    new_response_with_value(talk, true)
 }

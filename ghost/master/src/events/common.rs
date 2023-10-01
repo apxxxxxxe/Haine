@@ -1,6 +1,5 @@
 use crate::events::translate::on_translate;
-use crate::roulette::TalkBias;
-use crate::variables::GlobalVariables;
+use crate::variables::get_global_vars;
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
@@ -25,12 +24,11 @@ pub fn new_response_nocontent() -> Response {
 
 pub fn new_response_with_value(
     value: String,
-    vars: &mut GlobalVariables,
     use_translate: bool,
 ) -> Response {
     let v;
     if use_translate {
-        v = on_translate(value, vars);
+        v = on_translate(value);
     } else {
         v = value;
     }
@@ -39,11 +37,12 @@ pub fn new_response_with_value(
     r
 }
 
-pub fn choose_one(values: &Vec<String>, talk_bias: &mut TalkBias) -> Option<String> {
+pub fn choose_one(values: &Vec<String>) -> Option<String> {
     if values.len() == 0 {
         return None;
     }
-    let u = talk_bias.roulette(values);
+    let vars = get_global_vars();
+    let u = vars.volatility.talk_bias.roulette(values);
     Some(values.get(u).unwrap().to_owned())
 }
 

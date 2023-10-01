@@ -4,7 +4,7 @@ mod roulette;
 mod status;
 mod variables;
 
-use crate::variables::GlobalVariables;
+use crate::variables::get_global_vars;
 
 use std::fs::File;
 use std::path::Path;
@@ -26,11 +26,9 @@ use winapi::um::winnt::{
 extern crate log;
 extern crate simplelog;
 
-use once_cell::sync::Lazy;
 use simplelog::*;
 
 static mut DLL_PATH: String = String::new();
-static mut GLOBALVARS: Lazy<GlobalVariables> = Lazy::new(|| GlobalVariables::new());
 
 #[derive(Debug)]
 pub enum ResponseError {
@@ -92,7 +90,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
 
     debug!("load");
 
-    unsafe { GLOBALVARS.load() };
+    get_global_vars().load();
 
     return TRUE;
 }
@@ -101,7 +99,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
 pub extern "cdecl" fn unload() -> BOOL {
     debug!("unload");
 
-    unsafe { GLOBALVARS.save() };
+    get_global_vars().save();
 
     return TRUE;
 }
@@ -116,8 +114,7 @@ pub extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
 
     let r = Request::parse(&s).unwrap();
 
-    let response;
-    unsafe { response = events::handle_request(&r, &mut GLOBALVARS) };
+    let response = events::handle_request(&r);
 
     let response_bytes = to_encoded_bytes(response).unwrap_or_else(|e| {
         debug!("error: {:?}", e);

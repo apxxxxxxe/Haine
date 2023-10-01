@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 const VAR_PATH: &str = "vars.json";
+static mut GLOBALVARS: Option<GlobalVariables> = None;
 
 #[derive(Serialize, Deserialize)]
 pub struct GlobalVariables {
@@ -81,6 +82,15 @@ impl GlobalVariables {
                 return;
             }
         };
+    }
+}
+
+pub fn get_global_vars() -> &'static mut GlobalVariables {
+    unsafe {
+        if GLOBALVARS.is_none() {
+            GLOBALVARS = Some(GlobalVariables::new());
+        }
+        GLOBALVARS.as_mut().unwrap()
     }
 }
 
