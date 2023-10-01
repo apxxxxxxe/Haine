@@ -2,6 +2,7 @@ use regex::Regex;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use vibrato::{Dictionary, Tokenizer};
+use core::cmp::Ord;
 
 pub struct Inserter {
     cols_num: f32,
@@ -81,10 +82,6 @@ impl Inserter {
             )
             .unwrap();
 
-            let mut in_brackets = false;
-            let mut last_in_brackets = false;
-            let mut after_open_bracket = false;
-            let mut after_close_bracket = false;
             let mut after_pre_pos = false;
             let mut after_sahen_noun = false;
 
@@ -99,21 +96,16 @@ impl Inserter {
                     let pos_detail = info[1];
                     let pos_katsuyou = info[4];
 
-                    let mut no_break = hinshi_target.iter().find(|&&p| p == pos) == None
+                    let no_break = hinshi_target.iter().find(|&&p| p == pos) == None
                         || pos_detail.find("接尾") != None
                         || (pos == "動詞" && pos_detail.find("サ変接続") != None)
                         || pos_detail.find("非自立") != None
                         || after_pre_pos
                         || (after_sahen_noun && pos_detail.find("サ変動詞") != None)
-                        || after_open_bracket
                         || pos_detail.find("括弧閉") != None
                         || pos_detail.find("ナイ形容詞語幹") != None
                         || pos_katsuyou.find("特殊・ナイ") != None
                         || pos_katsuyou.find("特殊・タ") != None;
-
-                    if after_close_bracket || pos_detail.find("括弧開") != None {
-                        no_break = false;
-                    }
 
                     if !no_break {
                         results.push(result);
@@ -122,10 +114,8 @@ impl Inserter {
 
                     result += token.surface();
 
-                    after_close_bracket = in_brackets != last_in_brackets && !in_brackets;
                     after_pre_pos = pos == "接頭詞";
                     after_sahen_noun = pos_detail.find("サ変接続") != None;
-                    after_open_bracket = pos_detail.find("括弧開") != None;
                 }
                 if let Some(s) = sakura_scripts.nth(0) {
                     println!("sakura_script: {}", s.as_str());
@@ -140,6 +130,8 @@ impl Inserter {
 
     fn render(&mut self, parts: Vec<String>) -> String {
         println!("rendering");
+        let re_open_bracket = Regex::new(r"[「『（【]").unwrap();
+        let re_close_bracket = Regex::new(r"[」』）】]").unwrap();
         let re_periods = Regex::new(r"[、。！？]").unwrap();
         let re_change_scope = Regex::new(r"(\\[01][^w]?|\\p\[\d+\])").unwrap();
         let re_not_number = Regex::new(r"[^\d]").unwrap();
@@ -148,12 +140,15 @@ impl Inserter {
         let mut counts = vec![0.0, 0.0];
         let mut i = 0;
         let mut scope: usize = 0;
+        let mut brackets_depth: i32 = 0;
         loop {
             if i >= parts.len() {
                 break;
             }
             let part = &parts[i];
             let c = self.count(part.to_string());
+            brackets_depth += re_open_bracket.find_iter(part).count() as i32;
+            brackets_depth -= (re_close_bracket.find_iter(part).count() as i32).max(0);
 
             if re_change_scope.is_match(part) {
                 let c = re_change_scope.captures(part).unwrap()[0].to_string();
@@ -172,6 +167,7 @@ impl Inserter {
                 result.push_str(part);
                 counts[scope] += c % self.cols_num;
                 counts[scope] %= self.cols_num;
+                i += 1;
                 continue;
             }
             if counts[scope] + c > self.cols_num {
@@ -185,7 +181,8 @@ impl Inserter {
             result.push_str(part);
 
             // 句読点後の文章が1行に収まるなら、一気に出力して次へ
-            if re_periods.is_match(part) {
+            // ただし括弧内では実行しない ぶつ切りの引用文とか台詞はなんか変な感じがするので
+            if re_periods.is_match(part) && brackets_depth == 0 {
                 let mut j = i + 1;
                 let mut next_line = String::new();
                 while j < parts.len() {
@@ -236,13 +233,15 @@ mod tests {
         let text = "\
             \\s[1111105]人生に変化は付きもの……けれど、\\s[1111109]停滞はそれ以上。\\n\
             一度立ち止まってしまうと、空気は一瞬で淀んで、身動きがとれなくなってしまうのよ。\
-            あなたも経験したこと、あるんじゃないかしら。"
+            あなたも経験したこと、あるんじゃないかしら。\\n\
+            h1111205ある詩人が言っていたのよ。「死は必ずしも最悪の運命ではない。h1111209もっと恐ろしい運命がある」と。\
+            "
             .to_string();
         let mut ins = Inserter::default();
         ins.start_init();
         while !ins.is_ready() {
             std::thread::sleep(std::time::Duration::from_millis(100));
         }
-        println!("{}", ins.run(text));
+        println!("{}", ins.run(text).replace("\\n", "\n"));
     }
 }
