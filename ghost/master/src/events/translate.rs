@@ -26,17 +26,16 @@ fn text_only_translater(text: String) -> String {
     let mut result = String::new();
 
     for (i, tag) in tags.enumerate() {
-        result.push_str(translate(splitted[i].to_string()).as_str());
+        result.push_str(translate_part(splitted[i].to_string()).as_str());
         result.push_str(&tag.as_str());
     }
-    result.push_str(translate(splitted[splitted.len() - 1].to_string()).as_str());
+    result.push_str(translate_part(splitted[splitted.len() - 1].to_string()).as_str());
 
-    result
+    translate_whole(result)
 }
 
-fn translate(text: String) -> String {
+fn translate_part(text: String) -> String {
     let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
-    let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
 
     let mut translated = text.clone();
 
@@ -53,5 +52,21 @@ fn translate(text: String) -> String {
     let vars = get_global_vars();
     translated = translated.replace("{user_name}", &vars.user_name.clone().unwrap());
 
-    last_wait.replace(&translated, "").to_string()
+    translated
+}
+
+fn translate_whole(text: String) -> String {
+    let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
+    let mut translated = text.clone();
+
+    translated = last_wait.replace(&translated, "").to_string();
+
+    translated
+}
+
+#[test]
+fn test_translate() {
+    let text = "こんにちは、\\n{user_name}さん。\\nお元気ですか。\\1ええ、私は元気です。\\nあなたはどうですか、ゴースト。".to_string();
+    let translated = text_only_translater(text);
+    println!("{}", translated);
 }
