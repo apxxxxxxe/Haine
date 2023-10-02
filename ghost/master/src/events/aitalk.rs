@@ -1,12 +1,9 @@
 use crate::events::common::*;
+use once_cell::sync::Lazy;
 use shiorust::message::{Request, Response};
 
-pub fn version(_req: &Request) -> Response {
-    new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), false)
-}
-
-pub fn on_ai_talk(_req: &Request) -> Response {
-    let talks = vec![
+static TALKS: Lazy<Vec<String>> = Lazy::new(|| {
+    vec![
             format!("\
             h1111203\\1いつの間にか、ハイネの隣に扉ができていた。\\n\
             h1000000\\1彼女は無造作に扉を開け、奥へと消える。\\n\
@@ -123,9 +120,13 @@ pub fn on_ai_talk(_req: &Request) -> Response {
             ",
             user_talk("最初はただ高給に釣られただけだった","事実だ。嘘をついても仕方がない。だが……", false),
             user_talk("あなたに出会えたから。それだけでどんな不都合も構わない","", false)),
-        ];
+        ]
+});
 
-    let talk = choose_one(&talks).unwrap();
+pub fn version(_req: &Request) -> Response {
+    new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), false)
+}
 
-    new_response_with_value(talk, true)
+pub fn on_ai_talk(_req: &Request) -> Response {
+    new_response_with_value(choose_one(&TALKS).unwrap(), true)
 }
