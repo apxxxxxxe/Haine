@@ -30,11 +30,10 @@ jobs:
         shell: pwsh
       - name: disable auto crlf
         uses: steve02081504/disable-autocrlf@v1
-      - name: checkout
-        uses: actions/checkout@v2
       - name: updates build
         uses: Taromati2/ukagaka-mirror-md5-CI-build@v1
         with:
+          no-push: true
           build-mode: other
       - name: git push
         # commit and push all changes at once to avoid error
