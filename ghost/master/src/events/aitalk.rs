@@ -1,4 +1,5 @@
 use crate::events::common::*;
+use crate::variables::get_global_vars;
 use once_cell::sync::Lazy;
 use shiorust::message::{Request, Response};
 
@@ -120,6 +121,11 @@ static TALKS: Lazy<Vec<String>> = Lazy::new(|| {
             ",
             user_talk("最初はただ高給に釣られただけだった","事実だ。嘘をついても仕方がない。だが……", false),
             user_talk("あなたに出会えたから。それだけでどんな不都合も構わない","", false)),
+
+            "\
+            h1111201苦しみが染み込んだぼろきれを絞り上げて、そうして得られるのが、それ。\\n\
+            h1111205無いほうがよいのはそうだけれど、だって、そうしなければ耐えられないもの。\
+            ".to_string(),
         ]
 });
 
@@ -128,5 +134,13 @@ pub fn version(_req: &Request) -> Response {
 }
 
 pub fn on_ai_talk(_req: &Request) -> Response {
-    new_response_with_value(choose_one(&TALKS).unwrap(), true)
+    let vars = get_global_vars();
+    new_response_with_value(
+        choose_one(
+            &TALKS,
+            vars.volatility.idle_seconds > vars.volatility.idle_threshold,
+        )
+        .unwrap(),
+        true,
+    )
 }

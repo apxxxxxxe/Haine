@@ -1,7 +1,7 @@
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::events::mouse::*;
-use crate::variables::{Direction, get_global_vars};
+use crate::variables::{get_global_vars, Direction};
 
 use shiorust::message::{Response, *};
 use std::time::SystemTime;
@@ -123,10 +123,7 @@ fn new_mouse_response(info: String) -> Response {
     vars.volatility.touch_count += 1;
 
     match mouse_dialogs(info, vars) {
-        Some(dialogs) => new_response_with_value(
-            choose_one(&dialogs).unwrap(),
-            true,
-        ),
+        Some(dialogs) => new_response_with_value(choose_one(&dialogs, true).unwrap(), true),
         None => new_response_nocontent(),
     }
 }

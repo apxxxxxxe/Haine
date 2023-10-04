@@ -26,7 +26,7 @@ impl TalkBias {
         self.add(*digest, bias);
     }
 
-    pub fn roulette(&mut self, talks: &Vec<String>) -> usize {
+    pub fn roulette(&mut self, talks: &Vec<String>, is_consume: bool) -> usize {
         let bias_vec: Vec<i32> = talks.iter().map(|s| self.get(&md5(s))).collect();
 
         let cumulative_sum: Vec<i32> = bias_vec
@@ -45,11 +45,13 @@ impl TalkBias {
         let selected_index = cumulative_sum.binary_search(&r).unwrap_or_else(|i| i);
 
         // increment bias without selection
-        for i in 0..talks.len() {
-            if i == selected_index {
-                self.add(md5(&talks[i]), 1);
-            } else {
-                self.increment(&md5(&talks[i]));
+        if is_consume {
+            for i in 0..talks.len() {
+                if i == selected_index {
+                    self.add(md5(&talks[i]), 1);
+                } else {
+                    self.increment(&md5(&talks[i]));
+                }
             }
         }
 
@@ -87,7 +89,7 @@ mod test {
 
         for _ in 0..100 {
             println!("bias: {:?}", bias.0);
-            let selected_index = bias.roulette(&talks);
+            let selected_index = bias.roulette(&talks, true);
             indexes.push(selected_index);
             select_count[selected_index] += 1;
             assert!(selected_index < talks.len());

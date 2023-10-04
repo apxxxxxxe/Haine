@@ -34,12 +34,12 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
     r
 }
 
-pub fn choose_one(values: &Vec<String>) -> Option<String> {
+pub fn choose_one(values: &Vec<String>, update_weight: bool) -> Option<String> {
     if values.len() == 0 {
         return None;
     }
     let vars = get_global_vars();
-    let u = vars.volatility.talk_bias.roulette(values);
+    let u = vars.volatility.talk_bias.roulette(values, update_weight);
     Some(values.get(u).unwrap().to_owned())
 }
 

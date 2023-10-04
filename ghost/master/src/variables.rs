@@ -142,6 +142,10 @@ pub struct VolatilityVariables {
     pub talk_bias: TalkBias,
 
     pub status: Status,
+
+    pub idle_seconds: i32,
+
+    pub idle_threshold: i32,
 }
 
 impl Default for VolatilityVariables {
@@ -162,6 +166,8 @@ impl Default for VolatilityVariables {
             inserter: Inserter::default(),
             talk_bias: TalkBias::new(),
             status: Status::new(),
+            idle_seconds: 0,
+            idle_threshold: 60 * 5,
         }
     }
 }
