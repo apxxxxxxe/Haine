@@ -64,6 +64,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     match id {
         "version" => Some(version),
         "OnBoot" => Some(on_boot),
+        "OnClose" => Some(on_close),
         "OnAiTalk" => Some(on_ai_talk),
         "OnSecondChange" => Some(on_second_change),
         "OnMenuExec" => Some(on_menu_exec),
