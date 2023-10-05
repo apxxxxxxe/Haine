@@ -18,5 +18,5 @@ pub fn on_close(_req: &Request) -> Response {
         ],
         vec!["がありますように。\\nh1111204またね、{user_name}。\\_w[1200]".to_string()],
     ]);
-    new_response_with_value(choose_one(&talks, true).unwrap(), true)
+    new_response_with_value(choose_one(&talks, true).unwrap() + "\\-", true)
 }
