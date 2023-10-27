@@ -1,0 +1,9 @@
+*.rs text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+*.exe binary
+*.dll binary
+*.png binary
+*.jpg binary
+*.jpeg binary
