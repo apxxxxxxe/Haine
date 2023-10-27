@@ -5,18 +5,18 @@ on:
     tags:
       - 'v*'
 
+env:
+  NAR_NAME: Haine
+
 jobs:
   release-with-tag:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        submodules: true
+      uses: actions/checkout@v4
     - name: Zip output
       run: |
-        zip -r release.zip * -x \*/.git \*/.git/\* \*/.github/\*
+        zip -r release.zip * -x .git/\* -x .github/\* -x release.zip -x Cargo\* -x src/\* -x md5buildignore.txt
     - name: Create release
       id: create_release
       uses: actions/create-release@v1.0.0
@@ -35,5 +35,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./release.zip
-        asset_name: Haine.nar
+        asset_name: ${{ env.NAR_NAME }}.nar
         asset_content_type: application/zip
