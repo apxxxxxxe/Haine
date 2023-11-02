@@ -68,6 +68,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
         "OnAiTalk" => Some(on_ai_talk),
         "OnAnchorSelectEx" => Some(on_anchor_select_ex),
         "OnSecondChange" => Some(on_second_change),
+        "OnHourTimeSignal" => Some(on_hour_time_signal),
         "OnMenuExec" => Some(on_menu_exec),
         "OnMouseClickEx" => Some(on_mouse_click_ex),
         "OnMouseDoubleClick" => Some(on_mouse_double_click),
