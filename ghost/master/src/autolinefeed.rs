@@ -1,8 +1,8 @@
+use core::cmp::Ord;
 use regex::Regex;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use vibrato::{Dictionary, Tokenizer};
-use core::cmp::Ord;
 
 pub struct Inserter {
     cols_num: f32,
