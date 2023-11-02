@@ -20,61 +20,62 @@ use crate::variables::get_global_vars;
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
 pub fn handle_request(req: &Request) -> Response {
-    match req.method {
-        Method::GET => (),
-        _ => return new_response_nocontent(),
-    };
+  match req.method {
+    Method::GET => (),
+    _ => return new_response_nocontent(),
+  };
 
-    let event_id;
-    match req.headers.get("ID") {
-        Some(id) => {
-            event_id = id;
-        }
-        None => return new_response_nocontent(),
-    };
-
-    debug!("event: {}", event_id);
-
-    let vars = get_global_vars();
-
-    if let Some(v) = req.headers.get("Status") {
-        vars.volatility.status.set(v.to_string());
+  let event_id;
+  match req.headers.get("ID") {
+    Some(id) => {
+      event_id = id;
     }
+    None => return new_response_nocontent(),
+  };
 
-    let event = match get_event(event_id.as_str()) {
+  debug!("event: {}", event_id);
+
+  let vars = get_global_vars();
+
+  if let Some(v) = req.headers.get("Status") {
+    vars.volatility.status.set(v.to_string());
+  }
+
+  let event = match get_event(event_id.as_str()) {
+    Some(e) => e,
+    None => {
+      let base_id = match req.headers.get("BaseID") {
+        Some(id) => id,
+        None => return new_response_nocontent(),
+      };
+      match get_event(base_id.as_str()) {
         Some(e) => e,
-        None => {
-            let base_id = match req.headers.get("BaseID") {
-                Some(id) => id,
-                None => return new_response_nocontent(),
-            };
-            match get_event(base_id.as_str()) {
-                Some(e) => e,
-                None => return new_response_nocontent(),
-            }
-        }
-    };
+        None => return new_response_nocontent(),
+      }
+    }
+  };
 
-    let res = event(req);
-    debug!("response: {:?}", res);
-    res
+  let res = event(req);
+  debug!("response: {:?}", res);
+  res
 }
 
 fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
-    match id {
-        "version" => Some(version),
-        "OnBoot" => Some(on_boot),
-        "OnClose" => Some(on_close),
-        "OnAiTalk" => Some(on_ai_talk),
-        "OnAnchorSelectEx" => Some(on_anchor_select_ex),
-        "OnSecondChange" => Some(on_second_change),
-        "OnHourTimeSignal" => Some(on_hour_time_signal),
-        "OnMenuExec" => Some(on_menu_exec),
-        "OnMouseClickEx" => Some(on_mouse_click_ex),
-        "OnMouseDoubleClick" => Some(on_mouse_double_click),
-        "OnMouseMove" => Some(on_mouse_move),
-        "OnMouseWheel" => Some(on_mouse_wheel),
-        "OnKeyPress" => Some(on_key_press),
-        _ => None,
-    }
+  match id {
+    "version" => Some(version),
+    "OnFirstBoot" => Some(on_first_boot),
+    "OnBoot" => Some(on_boot),
+    "OnClose" => Some(on_close),
+    "OnAiTalk" => Some(on_ai_talk),
+    "OnAnchorSelectEx" => Some(on_anchor_select_ex),
+    "OnSecondChange" => Some(on_second_change),
+    "OnHourTimeSignal" => Some(on_hour_time_signal),
+    "OnMenuExec" => Some(on_menu_exec),
+    "OnMouseClickEx" => Some(on_mouse_click_ex),
+    "OnMouseDoubleClick" => Some(on_mouse_double_click),
+    "OnMouseMove" => Some(on_mouse_move),
+    "OnMouseWheel" => Some(on_mouse_wheel),
+    "OnKeyPress" => Some(on_key_press),
+    _ => None,
+  }
 }

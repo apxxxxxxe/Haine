@@ -5,33 +5,33 @@ use rand::Rng;
 use shiorust::message::{Request, Response};
 
 pub fn on_second_change(req: &Request) -> Response {
-    let vars = get_global_vars();
-    let total_time = vars.total_time.unwrap();
-    vars.total_time = Some(total_time + 1);
-    vars.volatility.ghost_up_time += 1;
+  let vars = get_global_vars();
+  let total_time = vars.total_time.unwrap();
+  vars.total_time = Some(total_time + 1);
+  vars.volatility.ghost_up_time += 1;
 
-    let refs = get_references(req);
-    let idle_secs = refs[4].parse::<i32>().unwrap();
-    vars.volatility.idle_seconds = idle_secs;
+  let refs = get_references(req);
+  let idle_secs = refs[4].parse::<i32>().unwrap();
+  vars.volatility.idle_seconds = idle_secs;
 
-    if vars.volatility.ghost_up_time % vars.random_talk_interval.unwrap() == 0 {
-        on_ai_talk(req)
-    } else {
-        new_response_nocontent()
-    }
+  if vars.volatility.ghost_up_time % vars.random_talk_interval.unwrap() == 0 {
+    on_ai_talk(req)
+  } else {
+    new_response_nocontent()
+  }
 }
 
 pub fn on_hour_time_signal(_req: &Request) -> Response {
-    let now = chrono::Local::now();
-    let hour = now.format("%H").to_string();
-    let minute = now.format("%M").to_string();
-    let mut m = format!("\\1\\_q{}時", hour);
-    if minute != "00" {
-        m += &format!("{}分", minute);
-    }
-    m += "\\n\\n";
+  let now = chrono::Local::now();
+  let hour = now.format("%H").to_string();
+  let minute = now.format("%M").to_string();
+  let mut m = format!("\\1\\_q{}時", hour);
+  if minute != "00" {
+    m += &format!("{}分", minute);
+  }
+  m += "\\n\\n";
 
-    let tanka_list = [
+  let tanka_list = [
       "もう二度と死ななくてよい安らぎに\\n見つめてゐたり祖母の寝顔を\\n\\f[align,right](梶原さい子)",
       "眼のまはり真紅(まあか)くなして泣きやめぬ\\n妻のうしろに吾子死にてあり\\n\\f[align,right](木下利玄)",
       "我が母よ死にたまひゆく我が母よ\\n我(わ)を生まし乳足(ちた)らひし母よ\\n\\f[align,right](斎藤茂吉)",
@@ -46,8 +46,8 @@ pub fn on_hour_time_signal(_req: &Request) -> Response {
       "生まれてはつひに死ぬてふことのみぞ\\n定めなき世に定めありける\\n\\f[align,right](平維盛)",
     ];
 
-    let mut rng = rand::thread_rng();
-    let index = rng.gen_range(0..tanka_list.len());
+  let mut rng = rand::thread_rng();
+  let index = rng.gen_range(0..tanka_list.len());
 
-    new_response_with_value(m + tanka_list[index], true)
+  new_response_with_value(m + tanka_list[index], true)
 }
