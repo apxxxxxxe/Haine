@@ -144,3 +144,33 @@ pub fn on_ai_talk(_req: &Request) -> Response {
         true,
     )
 }
+
+pub fn on_anchor_select_ex(req: &Request) -> Response {
+    let refs = get_references(req);
+    let id = refs[1].to_string();
+    let user_dialog = refs.get(2).unwrap_or(&"").to_string();
+
+    let mut m = String::from("\\C");
+    m += "\\0\\n\\_q─\\w1──\\w1───\\w1───────\\w1────\\w1──\\w1──\\w1─\\w1─\\n\\_w[750]\\_q";
+    if !user_dialog.is_empty() {
+        m += &format!("\\1『{}』\\_w[500]", user_dialog);
+    }
+    match id.as_str() {
+        "Fastened" => {
+            m += "\
+              h1111205文字通りの意味よ。\n\
+              私はこの街から出られない。物理的にね。\n\
+              h1111209この身体は霧とともにあり、霧はこの街にのみ留まる。\n\
+              h1111205この霧との因果を断たないかぎり、私はずっとこの街に閉じこめられたままよ。\
+              ";
+        }
+        "Nolonger" => {
+            m += "\
+              h1111205何一つ変わらない日々。\\n\
+              分かりきった明日は、今日とどう違うの？\\n\
+            ";
+        }
+        _ => return new_response_nocontent(),
+    }
+    return new_response_with_value(m, true);
+}

@@ -66,6 +66,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
         "OnBoot" => Some(on_boot),
         "OnClose" => Some(on_close),
         "OnAiTalk" => Some(on_ai_talk),
+        "OnAnchorSelectEx" => Some(on_anchor_select_ex),
         "OnSecondChange" => Some(on_second_change),
         "OnMenuExec" => Some(on_menu_exec),
         "OnMouseClickEx" => Some(on_mouse_click_ex),
