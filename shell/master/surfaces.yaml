@@ -72,6 +72,11 @@ parts:
           animation510000.interval,runonce
           animation510000.pattern0,overlayfast,1,0,0,0
 
+      - name: シルエット化+顔
+        text: |
+          animation510000.interval,runonce
+          animation510000.pattern0,overlayfast,2,0,0,0
+
       - name: 血+照れ
         text: |
           animation500550.interval,runonce
