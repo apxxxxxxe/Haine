@@ -37,21 +37,56 @@ fn text_only_translater(text: String) -> String {
 fn translate_part(text: String) -> String {
   let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
 
-  let mut translated = text.clone();
+  let surface_replaced = surface_snippet.replace_all(&text, "\\0\\s[$1]").to_string();
 
-  translated = surface_snippet
-    .replace_all(&translated, "\\0\\s[$1]")
-    .to_string();
+  let replaces = vec![
+    (str_to_char("、"), "、\\_w[600]", "", ""),
+    (str_to_char("。"), "。\\_w[1200]", "", "」』"),
+    (str_to_char("！"), "！\\_w[1200]", "", "」』"),
+    (str_to_char("？"), "？\\_w[1200]", "", "」』"),
+    (str_to_char("…"), "…\\_w[600]", "", ""),
+    (str_to_char("」"), "」\\_w[600]", "", ""),
+    (str_to_char("』"), "』\\_w[600]", "", ""),
+  ];
+  let wait_replaced = replace_with_check(surface_replaced, replaces);
 
-  translated = translated.replace("、", "、\\_w[600]");
-  translated = translated.replace("。", "。\\_w[1200]");
-  translated = translated.replace("！", "！\\_w[1200]");
-  translated = translated.replace("？", "？\\_w[1200]");
-  translated = translated.replace("…", "…\\_w[600]");
 
   let vars = get_global_vars();
-  translated = translated.replace("{user_name}", &vars.user_name.clone().unwrap());
+  let vars_replaced = wait_replaced.replace("{user_name}", &vars.user_name.clone().unwrap());
 
+  vars_replaced
+}
+
+fn str_to_char(s: &str) -> char {
+  s.chars().next().unwrap()
+}
+
+fn replace_with_check(text: String, replaces: Vec<(char, &str, &str, &str)>) -> String {
+  let mut translated = String::new();
+  for (i, c) in text.chars().enumerate() {
+    if let Some(p) = replaces.iter().position(|(old, _, _, _)| old == &c) {
+      let (_, new, prefix, suffix) = replaces[p];
+      let mut has_suffix = false;
+      if let Some(next) = text.chars().nth(i + 1) {
+        if suffix.contains(next) {
+          has_suffix = true;
+        }
+      }
+      let mut has_prefix = false;
+      if let Some(prev) = text.chars().nth(i - 1) {
+        if prefix.contains(prev) {
+          has_prefix = true;
+        }
+      }
+      if !has_prefix && !has_suffix {
+        translated.push_str(new);
+      } else {
+        translated.push(c);
+      }
+    } else {
+      translated.push(c);
+    }
+  }
   translated
 }
 
@@ -63,6 +98,7 @@ fn translate_whole(text: String) -> String {
 
   translated
 }
+
 
 #[test]
 fn test_translate() {
