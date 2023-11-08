@@ -174,13 +174,13 @@ sakura.bindgroup500251.name,下着,B
 sakura.bindgroup500250.default,1
 
 sakura.bindoption.group,シルエット
-sakura.bindgroup510000.name,シルエット,黒塗り0
 sakura.bindgroup510001.name,シルエット,黒塗り1
 sakura.bindgroup510002.name,シルエット,黒塗り2
 sakura.bindgroup510003.name,シルエット,黒塗り3
 sakura.bindgroup510004.name,シルエット,黒塗り4
 
 sakura.bindoption.group,ex,multiple
+sakura.bindgroup511000.name,ex,こわいかお
 sakura.bindgroup650000.name,ex,半透明
 sakura.bindgroup700000.name,ex,霧消え
 sakura.bindgroup750000.name,ex,霧覆い

@@ -625,8 +625,6 @@ base: |
   animation503361.pattern0,overlay,1609,0,0,0
   //手animation5099999
 
-  animation510000.interval,bind
-  animation510000.pattern0,overlayfast,2,0,0
   animation510001.interval,bind
   animation510001.pattern0,overlayfast,1,0,0
   animation510002.interval,bind
@@ -635,6 +633,8 @@ base: |
   animation510003.pattern0,overlayfast,60002,0,0
   animation510004.interval,bind
   animation510004.pattern0,overlayfast,3,0,0
+  animation511000.interval,bind
+  animation511000.pattern0,overlayfast,2,0,0
 
   animation650000.interval,bind
   animation650000.pattern0,reduce,90000,0,0,0
