@@ -8,6 +8,7 @@ use crate::variables::get_global_vars;
 
 use std::fs::File;
 use std::path::Path;
+use std::panic;
 
 use shiori_hglobal::*;
 use shiorust::message::*;
@@ -85,6 +86,10 @@ fn register_dll_path(h_module: HINSTANCE) {
 #[no_mangle]
 pub extern "cdecl" fn load(h: HGLOBAL, _len: c_long) -> BOOL {
   unsafe { GlobalFree(h) };
+
+  panic::set_hook(Box::new(|panic_info| {
+    debug!("{}", panic_info);
+  }));
 
   debug!("load");
 
