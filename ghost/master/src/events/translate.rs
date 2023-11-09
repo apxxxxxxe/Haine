@@ -40,13 +40,14 @@ fn translate_part(text: String) -> String {
   let surface_replaced = surface_snippet.replace_all(&text, "\\0\\s[$1]").to_string();
 
   let replaces = vec![
-    ('、', "、\\_w[600]", "φ", ""),
-    ('。', "。\\_w[1200]", "φ", "」』"),
-    ('！', "！\\_w[1200]", "φ", "」』"),
-    ('？', "？\\_w[1200]", "φ", "」』"),
-    ('…', "…\\_w[600]", "φ", ""),
-    ('」', "」\\_w[600]", "φ", ""),
-    ('』', "』\\_w[600]", "φ", ""),
+    ("、", "、\\_w[600]", "φ", ""),
+    ("。", "。\\_w[1200]", "φ", "」』"),
+    ("！", "！\\_w[1200]", "φ", "」』"),
+    ("？", "？\\_w[1200]", "φ", "」』"),
+    ("…", "…\\_w[600]", "φ", ""),
+    ("」", "」\\_w[600]", "φ", ""),
+    ("』", "』\\_w[600]", "φ", ""),
+    ("\\n\\n", "\\n\\n\\_w[700]", "φ", ""),
   ];
   let wait_replaced = replace_with_check(surface_replaced, replaces);
   let phi_replaced = wait_replaced.replace("φ", "");
@@ -57,13 +58,27 @@ fn translate_part(text: String) -> String {
   vars_replaced
 }
 
-fn replace_with_check(text: String, replaces: Vec<(char, &str, &str, &str)>) -> String {
+fn replace_with_check(text: String, replaces: Vec<(&str, &str, &str, &str)>) -> String {
   let mut translated = String::new();
-  for (i, c) in text.chars().enumerate() {
-    if let Some(p) = replaces.iter().position(|(old, _, _, _)| old == &c) {
-      let (_, new, prefix, suffix) = replaces[p];
+  let text_chars_vec = text.char_indices().collect::<Vec<(usize, char)>>();
+  debug!("iter: {:?}", text_chars_vec);
+  let mut i = 0;
+  loop {
+    let (j, c) = match text_chars_vec.get(i) {
+      Some((j, c)) => {
+        debug!("{}: {}: {}", i, j, c);
+        (j, c)
+      }
+      None => break,
+    };
+    if let Some(p) = replaces
+      .iter()
+      .position(|&(old, _, _, _)| text[*j..].starts_with(old))
+    {
+      let (old, new, prefix, suffix) = replaces[p];
       let mut has_suffix = false;
-      if let Some(next) = text.chars().nth(i + 1) {
+      if let Some(next) = text.chars().nth(i + old.chars().count()) {
+        debug!("next: {}", next);
         if suffix.contains(next) {
           has_suffix = true;
         }
@@ -77,10 +92,12 @@ fn replace_with_check(text: String, replaces: Vec<(char, &str, &str, &str)>) -> 
       if !has_prefix && !has_suffix {
         translated.push_str(new);
       } else {
-        translated.push(c);
+        translated.push_str(old);
       }
+      i += old.chars().count();
     } else {
-      translated.push(c);
+      translated.push(*c);
+      i += 1;
     }
   }
   translated
