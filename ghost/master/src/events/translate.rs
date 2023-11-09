@@ -40,25 +40,21 @@ fn translate_part(text: String) -> String {
   let surface_replaced = surface_snippet.replace_all(&text, "\\0\\s[$1]").to_string();
 
   let replaces = vec![
-    (str_to_char("、"), "、\\_w[600]", "", ""),
-    (str_to_char("。"), "。\\_w[1200]", "", "」』"),
-    (str_to_char("！"), "！\\_w[1200]", "", "」』"),
-    (str_to_char("？"), "？\\_w[1200]", "", "」』"),
-    (str_to_char("…"), "…\\_w[600]", "", ""),
-    (str_to_char("」"), "」\\_w[600]", "", ""),
-    (str_to_char("』"), "』\\_w[600]", "", ""),
+    ('、', "、\\_w[600]", "φ", ""),
+    ('。', "。\\_w[1200]", "φ", "」』"),
+    ('！', "！\\_w[1200]", "φ", "」』"),
+    ('？', "？\\_w[1200]", "φ", "」』"),
+    ('…', "…\\_w[600]", "φ", ""),
+    ('」', "」\\_w[600]", "φ", ""),
+    ('』', "』\\_w[600]", "φ", ""),
   ];
   let wait_replaced = replace_with_check(surface_replaced, replaces);
-
+  let phi_replaced = wait_replaced.replace("φ", "");
 
   let vars = get_global_vars();
-  let vars_replaced = wait_replaced.replace("{user_name}", &vars.user_name.clone().unwrap());
+  let vars_replaced = phi_replaced.replace("{user_name}", &vars.user_name.clone().unwrap());
 
   vars_replaced
-}
-
-fn str_to_char(s: &str) -> char {
-  s.chars().next().unwrap()
 }
 
 fn replace_with_check(text: String, replaces: Vec<(char, &str, &str, &str)>) -> String {
@@ -98,7 +94,6 @@ fn translate_whole(text: String) -> String {
 
   translated
 }
-
 
 #[test]
 fn test_translate() {
