@@ -143,6 +143,8 @@ pub struct VolatilityVariables {
 
   pub status: Status,
 
+  pub current_surface: i32,
+
   pub idle_seconds: i32,
 
   pub idle_threshold: i32,
@@ -165,6 +167,7 @@ impl Default for VolatilityVariables {
       last_touch_info: "".to_string(),
       inserter: Inserter::default(),
       talk_bias: TalkBias::new(),
+      current_surface: 0,
       status: Status::new(),
       idle_seconds: 0,
       idle_threshold: 60 * 5,

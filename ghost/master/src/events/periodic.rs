@@ -51,3 +51,12 @@ pub fn on_hour_time_signal(_req: &Request) -> Response {
 
   new_response_with_value(m + tanka_list[index], true)
 }
+
+pub fn on_surface_change(req: &Request) -> Response {
+  let refs = get_references(req);
+  let surface = refs[0].parse::<i32>().unwrap();
+
+  get_global_vars().volatility.current_surface = surface;
+
+  new_response_nocontent()
+}

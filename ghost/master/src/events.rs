@@ -22,6 +22,7 @@ use shiorust::message::{parts::*, traits::*, Request, Response};
 pub fn handle_request(req: &Request) -> Response {
   match req.method {
     Method::GET => (),
+    Method::NOTIFY => (),
     _ => return new_response_nocontent(),
   };
 
@@ -69,6 +70,8 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnAiTalk" => Some(on_ai_talk),
     "OnAnchorSelectEx" => Some(on_anchor_select_ex),
     "OnSecondChange" => Some(on_second_change),
+    "OnSurfaceChange" => Some(on_surface_change),
+    "OnSmoothBlink" => Some(on_smooth_blink),
     "OnHourTimeSignal" => Some(on_hour_time_signal),
     "OnMenuExec" => Some(on_menu_exec),
     "OnMouseClickEx" => Some(on_mouse_click_ex),

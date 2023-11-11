@@ -112,6 +112,66 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   format!("\\1{}\\n", v.join("\\n"))
 }
 
+// サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
+pub fn on_smooth_blink(req: &Request) -> Response {
+  const DELAY: i32 = 100;
+
+  let refs = get_references(req);
+
+  let dest_surface = refs[0].parse::<i32>().unwrap();
+  let dest_eyes = dest_surface % 100;
+  let dest_remain = dest_surface - dest_eyes;
+  let from_surface = get_global_vars().volatility.current_surface;
+  let from_eyes = from_surface % 100;
+
+  if from_surface == 0 {
+    return new_response_with_value(format!("\\s[{}]", dest_surface), false);
+  } else if from_surface == dest_surface {
+    return new_response_nocontent();
+  }
+
+  let mut cuts = vec![from_surface];
+  if (from_eyes == 7 || from_eyes == 9) && (dest_eyes >= 1 && dest_eyes <= 3) {
+    //直前が目閉じかつ目標が全目の場合
+    cuts.push(dest_surface + 3);
+  } else if (dest_eyes == 7 || dest_eyes == 9) && (from_eyes >= 1 && from_eyes <= 3) {
+    // 直前が全目かつ目標が目閉じの場合
+    cuts.push(dest_remain + from_eyes + 3);
+  } else if (dest_eyes >= 1 && dest_eyes <= 3)
+    && (from_eyes >= 1 && from_eyes <= 3)
+    && (from_eyes != dest_eyes)
+  {
+    // 直前が全目かつ目標が全目の場合（直前と目標が同じ場合を除く）
+    cuts.push(dest_surface + 3);
+    cuts.push(dest_remain + 9);
+    cuts.push(dest_surface + 3);
+  } else if (dest_eyes >= 4 && dest_eyes <= 6)
+    && (from_eyes >= 1 && from_eyes <= 3)
+    && ((from_eyes + 3) != dest_eyes)
+  {
+    // 直前が全目かつ目標が半目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
+    cuts.push(dest_surface + 3);
+    cuts.push(dest_remain + 9);
+  } else if (dest_eyes >= 1 && dest_eyes <= 3)
+    && (from_eyes >= 4 && from_eyes <= 6)
+    && ((from_eyes - 3) != dest_eyes)
+  {
+    // 直前が半目かつ目標が全目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
+    cuts.push(dest_remain + 9);
+    cuts.push(dest_surface + 3);
+  }
+  cuts.push(dest_surface);
+
+  let delay = format!("\\_w[{}]", DELAY);
+  let animation = cuts
+    .iter()
+    .map(|s| format!("\\s[{}]", s))
+    .collect::<Vec<String>>()
+    .join(delay.as_str());
+
+  new_response_with_value(animation, false)
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;
