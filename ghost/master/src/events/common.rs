@@ -150,7 +150,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     && ((from_eyes + 3) != dest_eyes)
   {
     // 直前が全目かつ目標が半目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
-    cuts.push(dest_surface + 3);
+    cuts.push(from_surface + 3);
     cuts.push(dest_remain + 9);
   } else if (dest_eyes >= 1 && dest_eyes <= 3)
     && (from_eyes >= 4 && from_eyes <= 6)
