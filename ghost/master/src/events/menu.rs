@@ -9,7 +9,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     if current_talk_interval == *i * 60 {
       selections.push(format!("\\f[underline,1]{}分\\f[underline,0]", i,));
     } else {
-      selections.push(format!("\\q[{}分,OnTalkIntervalChanged,{}]", i, i * 60,));
+      selections.push(format!("\\q[{},OnTalkIntervalChanged,{}]", i, i * 60,));
     };
   }
   let talk_interval_selector = format!(
