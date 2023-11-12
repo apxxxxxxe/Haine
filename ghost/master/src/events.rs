@@ -74,6 +74,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnSmoothBlink" => Some(on_smooth_blink),
     "OnHourTimeSignal" => Some(on_hour_time_signal),
     "OnMenuExec" => Some(on_menu_exec),
+    "OnTalkIntervalChanged" => Some(on_talk_interval_changed),
     "OnMouseClickEx" => Some(on_mouse_click_ex),
     "OnMouseDoubleClick" => Some(on_mouse_double_click),
     "OnMouseMove" => Some(on_mouse_move),
