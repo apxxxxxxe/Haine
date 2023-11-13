@@ -2,7 +2,13 @@ use crate::events::common::*;
 use shiorust::message::{Response, *};
 
 pub fn on_boot(_req: &Request) -> Response {
-  new_response_with_value("h1111201Hello".to_string(), true)
+  let talks = all_combo(&vec![
+    vec!["h1000000\\1今日も、霧が濃い。".to_string()],
+    vec![
+      "h1113105……h1113101\\_w[300]h1113201あら、h1111204いらっしゃい、{user_name}。".to_string(),
+    ],
+  ]);
+  new_response_with_value(choose_one(&talks, true).unwrap(), true)
 }
 
 pub fn on_close(_req: &Request) -> Response {
@@ -35,6 +41,13 @@ pub fn on_first_boot(_req: &Request) -> Response {
         それは呪いによるものなのか、それともただの偶然か。\\n\
         何にせよ、じつに興味を惹かれた。\\n\
         そしてついに今日、私はそこを訪れている。\\x\
+        \
+        \\1霧の濃い日だ。カンテルベリオではままあることらしい。\\n\
+        数メートル先も見通せないほどの霧だが、不思議と濡れた感じがしない。\\n\
+        むしろ乾ききっているような気がして、どことなく不安な気分になる。\\n\
+        ……廃墟を目の前にして萎縮しているのだろうか。\\n\
+        いや、ここまで来たのだから、引き返すわけにはいかない。\\n\
+        私は歩き出した。\\x\
         \
         \\1玄関から入って、廊下を進む。\\n\
         埃っぽさは無いが、しかし生活感もない。\\n\
@@ -163,7 +176,10 @@ fn shake(text: &str) -> String {
   let shakes = vec![(10, 10), (-14, -14), (4, 4)];
   for (i, c) in text.chars().enumerate() {
     if i < shakes.len() {
-      s.push_str(&format!("\\![moveasync,--X={},--Y={},--base=me]{}", shakes[i].0, shakes[i].1, c));
+      s.push_str(&format!(
+        "\\![moveasync,--X={},--Y={},--base=me]{}",
+        shakes[i].0, shakes[i].1, c
+      ));
     } else {
       s.push(c);
     }
