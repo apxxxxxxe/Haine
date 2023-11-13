@@ -159,6 +159,12 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     // 直前が半目かつ目標が全目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
     cuts.push(dest_remain + 9);
     cuts.push(dest_surface + 3);
+  } else if (dest_eyes >= 4 && dest_eyes <= 6)
+    && (from_eyes >= 4 && from_eyes <= 6)
+    && (from_eyes != dest_eyes)
+  {
+    // 直前と目標が半目の場合（直前と目標が同じ場合を除く）
+    cuts.push(dest_remain + 9);
   }
   cuts.push(dest_surface);
 
