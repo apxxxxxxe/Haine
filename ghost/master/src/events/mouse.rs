@@ -27,37 +27,8 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
   match info.as_str() {
-    "0bustnade" => {
-      let zero_bust_nade_threshold = 12;
-      let mut zero_bust_nade = Vec::new();
-      if !vars.volatility.first_sexial_touch && vars.volatility.ghost_up_time < 30 {
-        vars.volatility.first_sexial_touch = true;
-        zero_bust_nade.extend(DIALOG_SEXIAL_FIRST.clone());
-      } else if vars.volatility.touch_count < zero_bust_nade_threshold / 3 {
-        zero_bust_nade.extend(vec![
-          "h1111205胸、か。h1111204ずいぶん嬉しそうだけれど、そんなにいいものなのかしら？"
-            .to_string(),
-          "h1111209気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
-          "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
-          "h1111205気安いのね。あまり好きではないわ。".to_string(),
-        ]);
-      } else if vars.volatility.touch_count < zero_bust_nade_threshold / 3 * 2 {
-        zero_bust_nade.extend(DIALOG_SEXIAL_SCOLD.clone());
-      } else if vars.volatility.touch_count < zero_bust_nade_threshold {
-        zero_bust_nade.extend(DIALOG_SEXIAL_AKIRE.clone());
-      } else if vars.volatility.touch_count == zero_bust_nade_threshold {
-        zero_bust_nade.extend(all_combo(&vec![
-            vec!["h1111205\\1触れようとした手先が、霧に溶けた。\\n慌てて引っ込めると、手は元通りになった。h1111201許されていると思ったの？\\n".to_string()],
-            vec![
-                "h1111304残念だけど、それほど気は長くないの。".to_string(),
-                "h1111204わきまえなさい。".to_string(),
-            ],
-        ]));
-      } else {
-        zero_bust_nade.extend(vec!["h1111204\\1自重しよう……。".to_string()]);
-      }
-      return Some(zero_bust_nade);
-    }
+    "0bustnade" => Some(bust_touch(vars)),
+    "0bustdoubleclick" => Some(bust_touch(vars)),
     "0skirtup" => {
       let mut conbo_parts: Vec<Vec<String>> =
         vec![vec!["h2244402……！\\nh1241102\\_w[500]".to_string()]];
@@ -68,15 +39,50 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
         conbo_parts.push(vec![
           "h1111204……いいもの見たって顔してる。h1111209屈辱だわ。".to_string(),
           "h1111205……ああ、ひどい人。h1111209泣いてしまいそうだわ。".to_string(),
-          "h1111204……悪餓鬼。".to_string(),
+          "h1111304……悪餓鬼。".to_string(),
         ]);
       }
       let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
       return Some(zero_skirt_up);
     }
     "0shoulderdown" => {
-      return Some(vec!["抱き寄せる".to_string()]);
+      return Some(vec!["\
+          h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\\n\
+          h1111101……h1111204私はあなたのものじゃないのよ。\\n\
+          "
+      .to_string()]);
     }
     _ => None,
   }
+}
+
+fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
+  let zero_bust_touch_threshold = 12;
+  let mut zero_bust_touch = Vec::new();
+  if !vars.volatility.first_sexial_touch && vars.volatility.ghost_up_time < 30 {
+    vars.volatility.first_sexial_touch = true;
+    zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
+  } else if vars.volatility.touch_count < zero_bust_touch_threshold / 3 {
+    zero_bust_touch.extend(vec![
+      "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
+      "h1111209気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
+      "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
+      "h1111205気安いのね。あまり好きではないわ。".to_string(),
+    ]);
+  } else if vars.volatility.touch_count < zero_bust_touch_threshold / 3 * 2 {
+    zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
+  } else if vars.volatility.touch_count < zero_bust_touch_threshold {
+    zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
+  } else if vars.volatility.touch_count == zero_bust_touch_threshold {
+    zero_bust_touch.extend(all_combo(&vec![
+            vec!["h1111205\\1触れようとした手先が、霧に溶けた。\\n慌てて引っ込めると、手は元通りになった。h1111201許されていると思ったの？\\n".to_string()],
+            vec![
+                "h1111304残念だけど、それほど気は長くないの。".to_string(),
+                "h1111204わきまえなさい。".to_string(),
+            ],
+        ]));
+  } else {
+    zero_bust_touch.extend(vec!["h1111204\\1自重しよう……。".to_string()]);
+  }
+  zero_bust_touch
 }

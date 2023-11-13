@@ -68,14 +68,14 @@ pub fn on_mouse_double_click(req: &Request) -> Response {
   if refs[4] == "" {
     on_menu_exec(req)
   } else {
-    new_response_with_value(refs[4].to_string(), true)
+    new_mouse_response(format!("{}{}doubleclick", refs[3], refs[4]))
   }
 }
 
 pub fn on_mouse_click_ex(req: &Request) -> Response {
   let refs = get_references(req);
   if refs[5] == "middle" {
-    new_response_with_value(format!("{}中クリック", refs[4]), false)
+    new_mouse_response(format!("{}{}middleclick", refs[3], refs[4]))
   } else {
     new_response_nocontent()
   }
