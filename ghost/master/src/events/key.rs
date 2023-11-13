@@ -1,4 +1,4 @@
-use crate::events::aitalk::on_ai_talk;
+use crate::events::aitalk::{on_ai_talk, TALKS};
 use crate::events::bootend::on_first_boot;
 use crate::events::common::*;
 use crate::events::periodic::on_hour_time_signal;
@@ -14,6 +14,7 @@ pub fn on_key_press(req: &Request) -> Response {
     "t" => on_ai_talk(req),
     "a" => on_hour_time_signal(req),
     "b" => on_first_boot(req),
+    "c" => new_response_with_value(format!("ランダムトーク数: {}", TALKS.len()), true),
     _ => new_response_nocontent(),
   }
 }
