@@ -1,6 +1,7 @@
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::variables::get_global_vars;
+use chrono::Timelike;
 use rand::Rng;
 use shiorust::message::{Request, Response};
 
@@ -14,7 +15,9 @@ pub fn on_second_change(req: &Request) -> Response {
   let idle_secs = refs[4].parse::<i32>().unwrap();
   vars.volatility.idle_seconds = idle_secs;
 
-  if vars.volatility.ghost_up_time % vars.random_talk_interval.unwrap() == 0 {
+  if (vars.volatility.ghost_up_time - vars.volatility.last_random_talk_time)
+    > vars.random_talk_interval.unwrap()
+  {
     on_ai_talk(req)
   } else {
     new_response_nocontent()
@@ -23,10 +26,9 @@ pub fn on_second_change(req: &Request) -> Response {
 
 pub fn on_hour_time_signal(_req: &Request) -> Response {
   let now = chrono::Local::now();
-  let hour = now.format("%H").to_string();
-  let minute = now.format("%M").to_string();
-  let mut m = format!("\\1\\_q{}時", hour);
-  if minute != "00" {
+  let mut m = format!("\\1\\_q{}時", now.hour());
+  let minute = now.minute();
+  if minute != 0 {
     m += &format!("{}分", minute);
   }
   m += "\\n\\n";

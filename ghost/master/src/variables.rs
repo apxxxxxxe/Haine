@@ -114,6 +114,8 @@ pub struct VolatilityVariables {
   // ゴーストが起動してからの秒数
   pub ghost_up_time: u64,
 
+  pub last_random_talk_time: u64,
+
   // ゴーストの起動日時
   pub ghost_boot_time: SystemTime,
 
@@ -154,6 +156,7 @@ impl Default for VolatilityVariables {
   fn default() -> Self {
     Self {
       ghost_up_time: 0,
+      last_random_talk_time: 0,
       ghost_boot_time: SystemTime::now(),
       nade_counter: 0,
       last_nade_count_unixtime: UNIX_EPOCH,

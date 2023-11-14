@@ -167,6 +167,7 @@ pub fn version(_req: &Request) -> Response {
 
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
+  vars.volatility.last_random_talk_time = vars.volatility.ghost_up_time;
   new_response_with_value(
     choose_one(
       &TALKS,
