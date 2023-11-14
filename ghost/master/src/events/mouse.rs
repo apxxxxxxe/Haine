@@ -74,15 +74,17 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   } else if vars.volatility.touch_count < zero_bust_touch_threshold {
     zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
   } else if vars.volatility.touch_count == zero_bust_touch_threshold {
-    zero_bust_touch.extend(all_combo(&vec![
-            vec!["h1111205\\1触れようとした手先が、霧に溶けた。\\n慌てて引っ込めると、手は元通りになった。h1111201許されていると思ったの？\\n".to_string()],
-            vec![
-                "h1111304残念だけど、それほど気は長くないの。".to_string(),
-                "h1111204わきまえなさい。".to_string(),
-            ],
-        ]));
+    zero_bust_touch.push(
+      "\
+      h1111205\\1触れようとした手先が、霧に溶けた。\\n\
+      慌てて引っ込めると、手は元通りになった。\
+      h1111201許されていると思ったの？\\n\
+      h1111304残念だけど、それほど気は長くないの。\\n\
+      h1111204わきまえなさい。"
+        .to_string(),
+    );
   } else {
-    zero_bust_touch.extend(vec!["h1111204\\1自重しよう……。".to_string()]);
+    zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
   }
   zero_bust_touch
 }
