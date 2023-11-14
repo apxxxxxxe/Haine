@@ -48,8 +48,8 @@ impl TalkBias {
     let selected_index: usize;
     let mut rng = rand::thread_rng();
     let sum = *cumulative_sum.last().unwrap();
-    let first_non_zero = cumulative_sum.iter().find(|&&x| x != 0).unwrap();
-    if sum == 0 || first_non_zero == &sum {
+    let first_non_zero = cumulative_sum.iter().find(|&&x| x != 0).unwrap_or(&-1);
+    if sum == 0 || *first_non_zero == -1 || first_non_zero == &sum {
       debug!("talkslen: {}", talks.len());
       selected_index = rng.gen_range(0..talks.len());
     } else {
