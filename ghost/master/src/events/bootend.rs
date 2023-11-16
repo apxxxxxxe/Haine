@@ -173,6 +173,10 @@ pub fn on_first_boot(_req: &Request) -> Response {
   new_response_with_value(m, true)
 }
 
+pub fn on_vanish_selected(req: &Request) -> Response {
+    new_response_nocontent()
+}
+
 fn shake(text: &str) -> String {
   let mut s = String::new();
   let shakes = vec![(10, 10), (-14, -14), (4, 4)];
