@@ -173,8 +173,8 @@ pub fn on_first_boot(_req: &Request) -> Response {
   new_response_with_value(m, true)
 }
 
-pub fn on_vanish_selected(req: &Request) -> Response {
-    new_response_nocontent()
+pub fn on_vanish_selected(_req: &Request) -> Response {
+  new_response_nocontent()
 }
 
 fn shake(text: &str) -> String {
