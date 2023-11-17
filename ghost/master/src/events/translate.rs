@@ -37,7 +37,9 @@ fn text_only_translater(text: String) -> String {
 fn translate_part(text: String) -> String {
   let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
 
-  let surface_replaced = surface_snippet.replace_all(&text, "\\0\\![embed,OnSmoothBlink,$1]").to_string();
+  let surface_replaced = surface_snippet
+    .replace_all(&text, "\\0\\![embed,OnSmoothBlink,$1]")
+    .to_string();
 
   let replaces = vec![
     ("、", "、\\_w[600]", "φ", ""),
