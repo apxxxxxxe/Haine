@@ -1,62 +1,81 @@
+use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
 
-pub struct TalkBias(HashMap<String, i32>);
+pub struct TalkBias(HashMap<String, u32>);
 
 impl TalkBias {
   pub fn new() -> TalkBias {
     TalkBias(HashMap::new())
   }
 
-  pub fn add(&mut self, digest: String, bias: i32) {
-    self.0.insert(digest, bias);
-  }
-
   pub fn reset(&mut self, digest: String) {
     self.0.insert(digest, 0);
   }
 
-  pub fn get(&self, digest: &String) -> i32 {
+  pub fn get(&self, digest: &String) -> u32 {
     *self.0.get(digest).unwrap_or(&1)
   }
 
   fn increment(&mut self, digest: String) {
-    let max = 2 ^ 32 - 1;
-    let mut bias = self.get(&digest);
-    if bias == 0 {
-      bias = 1;
+    let count = self.get(&digest);
+    self.0.insert(digest, count + 1);
+  }
+
+  fn calc_bias(&mut self, count: u32) -> i32 {
+    if count == 0 {
+      0
     } else {
-      bias <<= 1;
-      if bias > max {
-        bias = max;
+      match (2 as i32).checked_pow(count) {
+        Some(x) => x,
+        None => self.max_bias(),
       }
     }
-    self.add(digest, bias);
+  }
+
+  fn max_bias(&self) -> i32 {
+    let key_count = self.0.len();
+    i32::MAX / key_count as i32
   }
 
   pub fn roulette(&mut self, talks: &Vec<String>, is_consume: bool) -> usize {
-    let bias_vec: Vec<i32> = talks.iter().map(|s| self.get(s)).collect();
+    let mut rng = rand::thread_rng();
+
+    let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(s)).collect();
+    println!("counts: {:?}", counts_vec);
+    let mut bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
+    println!("before_bias: {:?}", bias_vec);
+
+    if bias_vec.iter().sum::<i32>() == 0 {
+      let mut indexes = (0..talks.len()).map(|x| x as i32).collect::<Vec<i32>>();
+      indexes.shuffle(&mut rng);
+      bias_vec = indexes;
+    }
 
     let cumulative_sum: Vec<i32> = bias_vec
       .iter()
       .scan(0, |acc, &x| {
-        *acc += x;
+        *acc = (*acc as i32).saturating_add(x);
         Some(*acc)
       })
       .collect();
-
-    let selected_index: usize;
-    let mut rng = rand::thread_rng();
     let sum = *cumulative_sum.last().unwrap();
     let first_non_zero = cumulative_sum.iter().find(|&&x| x != 0).unwrap_or(&-1);
+
+    println!("talkslen: {}", talks.len());
+    println!("sum: {}", sum);
+    let selected_index: usize;
     if sum == 0 || *first_non_zero == -1 || first_non_zero == &sum {
-      debug!("talkslen: {}", talks.len());
+      println!("random");
       selected_index = rng.gen_range(0..talks.len());
     } else {
       // binsearch
+      println!("binsearch");
       let r = rng.gen_range(*first_non_zero..sum);
       selected_index = binsearch_min(&cumulative_sum, r);
     }
+
+    println!("selected_index: {}", selected_index);
 
     // increment bias without selection
     if is_consume {
@@ -64,7 +83,7 @@ impl TalkBias {
         if i == selected_index {
           // 選ばれたトークの重みを0に
           self.reset(talks[i].clone());
-        } else if bias_vec.iter().filter(|b| b == &&0).count() > talks.len() / 2 {
+        } else {
           // 全体の1/2が消費されるまで、それまでのトークが再び選ばれる可能性は生まれない
           self.increment(talks[i].clone());
         }
@@ -121,15 +140,15 @@ mod test {
     let mut indexes: Vec<usize> = vec![];
     let mut select_count: Vec<i32> = vec![0; talks.len()];
 
-    for _ in 0..10000 {
+    for _ in 0..100 {
       let selected_index = bias.roulette(&talks, true);
       if let Some(last) = indexes.last() {
         if last == &selected_index {
           println!("duplication: {}", selected_index);
-          let biases: Vec<i32> = talks.iter().map(|s| bias.get(&s)).collect();
-          println!("biases: {:?}", biases);
         }
       };
+      let biases: Vec<i32> = talks.iter().map(|s| bias.calc_bias(bias.get(&s))).collect();
+      println!("biases: {:?}", biases);
       indexes.push(selected_index);
       select_count[selected_index] += 1;
     }

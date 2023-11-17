@@ -232,3 +232,38 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
   }
   return new_response_with_value(m, true);
 }
+
+#[cfg(test)]
+mod test {
+  use super::*;
+  use crate::variables::get_global_vars;
+  use shiorust::message::parts::*;
+  use shiorust::message::Request;
+  use std::collections::HashMap;
+
+  #[test]
+  fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
+    let mut vars = get_global_vars();
+    vars.load();
+    vars.volatility.idle_seconds = 2;
+    vars.volatility.idle_threshold = 1;
+
+    let req = Request {
+      method: Method::GET,
+      version: Version::V20,
+      headers: Headers::new(),
+    };
+    let mut results = HashMap::new();
+    for _i in 0..100 {
+      let res = on_ai_talk(&req);
+      let value = res.headers.get(&HeaderName::from("Value")).unwrap();
+      let md5 = format!("{:x}", md5::compute(value.as_bytes()));
+      let n = results.get(&md5).unwrap_or(&0);
+      results.insert(md5, n + 1);
+    }
+    for (k, v) in results.iter() {
+      println!("{}: {}", k, v);
+    }
+    Ok(())
+  }
+}
