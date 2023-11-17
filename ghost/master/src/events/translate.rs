@@ -84,9 +84,11 @@ fn replace_with_check(text: String, replaces: Vec<(&str, &str, &str, &str)>) -> 
         }
       }
       let mut has_prefix = false;
-      if let Some(prev) = text.chars().nth(i - 1) {
-        if prefix.contains(prev) {
-          has_prefix = true;
+      if i > 0 {
+        if let Some(prev) = text.chars().nth(i - 1) {
+          if prefix.contains(prev) {
+            has_prefix = true;
+          }
         }
       }
       if !has_prefix && !has_suffix {
