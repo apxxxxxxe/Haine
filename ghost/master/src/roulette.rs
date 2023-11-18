@@ -1,4 +1,3 @@
-use rand::seq::SliceRandom;
 use rand::Rng;
 use std::collections::HashMap;
 
@@ -43,14 +42,8 @@ impl TalkBias {
 
     let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(s)).collect();
     println!("counts: {:?}", counts_vec);
-    let mut bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
+    let bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
     println!("before_bias: {:?}", bias_vec);
-
-    if bias_vec.iter().sum::<i32>() == 0 {
-      let mut indexes = (0..talks.len()).map(|x| x as i32).collect::<Vec<i32>>();
-      indexes.shuffle(&mut rng);
-      bias_vec = indexes;
-    }
 
     let cumulative_sum: Vec<i32> = bias_vec
       .iter()
