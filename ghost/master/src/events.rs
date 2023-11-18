@@ -1,4 +1,4 @@
-mod aitalk;
+pub mod aitalk;
 mod bootend;
 mod common;
 mod key;
