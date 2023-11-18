@@ -6,8 +6,7 @@ use vibrato::{Dictionary, Tokenizer};
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Debug)]
 pub enum Rank {
-  First,
-  Second,
+  Break,
   Manual,
   Normal,
 }
@@ -79,9 +78,8 @@ impl Inserter {
     let mut text = src.clone();
     let mut _word_counts = vec![0, 0];
 
-    // 候補
-    // first: これが含まれていたら改行
-    let first = vec![
+    // 候補: これが含まれていたら改行
+    let pos = vec![
       "動詞,自立",
       "動詞,接尾",
       "形容詞,自立",
@@ -96,10 +94,6 @@ impl Inserter {
       "記号,句点",
       "記号,読点",
       "記号,一般",
-    ];
-
-    // second: これが含まれており、かつ行の後半なら改行
-    let second = vec![
       "名詞,副詞可能",
       "助詞,格助詞",
       "助詞,接続助詞",
@@ -150,10 +144,8 @@ impl Inserter {
         for token in worker.token_iter() {
           let rank = if forbid.iter().find(|&&p| token.feature().find(p).is_some()) != None {
             Rank::Normal
-          } else if first.iter().find(|&&p| token.feature().find(p).is_some()) != None {
-            Rank::First
-          } else if second.iter().find(|&&p| token.feature().find(p).is_some()) != None {
-            Rank::Second
+          } else if pos.iter().find(|&&p| token.feature().find(p).is_some()) != None {
+            Rank::Break
           } else {
             Rank::Normal
           };
@@ -241,13 +233,8 @@ impl Inserter {
         continue;
       }
       let after_counts = counts[scope] + c;
-      if after_counts > self.cols_num && *rank == Rank::First {
+      if after_counts > self.cols_num && *rank == Rank::Break {
         // result.push_str(&format!("f{}\\n", counts[scope]));
-        result.push_str("\\n");
-        counts[scope] = 0.0;
-        continue;
-      } else if after_counts > self.cols_num && *rank == Rank::Second {
-        // result.push_str(&format!("s{}\\n", counts[scope]));
         result.push_str("\\n");
         counts[scope] = 0.0;
         continue;
