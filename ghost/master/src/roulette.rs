@@ -42,8 +42,12 @@ impl TalkBias {
 
     let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(s)).collect();
     println!("counts: {:?}", counts_vec);
-    let bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
+    let mut bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
     println!("before_bias: {:?}", bias_vec);
+
+    if bias_vec.iter().sum::<i32>() == 0 {
+      bias_vec = vec![1; talks.len()];
+    }
 
     let cumulative_sum: Vec<i32> = bias_vec
       .iter()
