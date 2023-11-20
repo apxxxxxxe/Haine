@@ -1,4 +1,4 @@
-use crate::autolinefeed::Inserter;
+use crate::autobreakline::Inserter;
 use crate::roulette::TalkBias;
 use crate::status::Status;
 use serde::{Deserialize, Serialize};

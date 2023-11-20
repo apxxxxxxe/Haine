@@ -1,4 +1,4 @@
-mod autolinefeed;
+mod autobreakline;
 mod events;
 mod roulette;
 mod status;
