@@ -6,7 +6,7 @@ mod menu;
 mod mouse;
 mod mouse_core;
 mod periodic;
-mod translate;
+pub mod translate;
 
 use crate::events::aitalk::*;
 use crate::events::bootend::*;

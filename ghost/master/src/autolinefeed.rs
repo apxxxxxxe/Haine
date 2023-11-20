@@ -1,19 +1,19 @@
 use core::cmp::Ord;
+use once_cell::sync::Lazy;
 use regex::Regex;
 use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use vibrato::{Dictionary, Tokenizer};
 
+static SAKURA_SCRIPT_RE: Lazy<Regex> = Lazy::new(|| {
+  Regex::new(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###).unwrap()
+});
+
 #[derive(PartialEq, PartialOrd, Eq, Ord, Debug)]
 pub enum Rank {
   Break,
-  Manual,
+  Append,
   Normal,
-}
-
-pub struct Block {
-  pub rank: Rank,
-  pub text: String,
 }
 
 pub struct Inserter {
@@ -70,7 +70,7 @@ impl Inserter {
     }
   }
 
-  fn wakachi(&mut self, src: String) -> Vec<Block> {
+  fn wakachi(&mut self, src: String) -> Vec<String> {
     let tokenizer_clone = self.tokenizer.clone();
     let tokenizer = tokenizer_clone.lock().unwrap();
     let t = tokenizer.as_ref().unwrap();
@@ -79,9 +79,9 @@ impl Inserter {
     let mut _word_counts = vec![0, 0];
 
     // 候補: これが含まれていたら改行
-    let pos = vec![
-      "動詞,自立",
-      "動詞,接尾",
+    let pos_to_break = vec![
+      // "動詞,自立",
+      // "動詞,接尾",
       "形容詞,自立",
       "形容詞,接尾",
       "形容詞,非自立",
@@ -93,7 +93,6 @@ impl Inserter {
       "助詞,副詞化",
       "記号,句点",
       "記号,読点",
-      "記号,一般",
       "名詞,副詞可能",
       "助詞,格助詞",
       "助詞,接続助詞",
@@ -106,21 +105,24 @@ impl Inserter {
     ];
 
     // forbid: ただし、これが含まれていたら改行しない
-    let forbid = ["未然形,"];
+    let pos_forbidden_to_break = ["記号,一般,", "未然形,"];
 
     // add_before: これが含まれていたら、前の行に追加
-    let add_before = vec![
+    let pos_to_append = vec![
       "非自立,",
       "接続助詞,",
-      "終助詞,",
-      "格助詞,",
+      "助詞,",
       "句点,",
       "読点,",
+      "特殊・タ",
+      "特殊・デス",
+      "体言接続,",
+      "特殊・ダ,仮定形,",
     ];
 
-    // "助詞,格助詞,一般,*,*,*,を"
+    let pos_combinations = vec![("動詞,自立", "動詞,自立"), ("助詞,格助詞", "助詞,係助詞")];
 
-    let mut results: Vec<Block> = Vec::new();
+    let mut results: Vec<String> = Vec::new();
     let mut result = "".to_string();
     let delim_re = "\x1f$1";
     let delim = "\x1f";
@@ -132,69 +134,87 @@ impl Inserter {
       .collect::<Vec<String>>();
 
     for line in lines {
-      let sakura_script_re =
-        Regex::new(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###)
-          .unwrap();
-
-      let mut sakura_scripts = sakura_script_re.find_iter(&line);
-      let ss_splitted = sakura_script_re.split(&line).collect::<Vec<&str>>();
+      let mut sakura_scripts = SAKURA_SCRIPT_RE.find_iter(&line);
+      let ss_splitted = SAKURA_SCRIPT_RE.split(&line).collect::<Vec<&str>>();
+      let mut last_token_feature: Option<String> = None;
       for pieces in ss_splitted {
         worker.reset_sentence(pieces);
         worker.tokenize();
         for token in worker.token_iter() {
-          let rank = if forbid.iter().find(|&&p| token.feature().find(p).is_some()) != None {
+          let contains_forbidden_pos = pos_forbidden_to_break
+            .iter()
+            .find(|&&p| token.feature().find(p).is_some())
+            .is_some();
+          let contains_pos_to_append = pos_to_append
+            .iter()
+            .find(|&&p| token.feature().find(p).is_some())
+            .is_some();
+          let contains_pos_combos = last_token_feature.is_some()
+            && pos_combinations
+              .iter()
+              .find(|&&(a, b)| {
+                last_token_feature.as_ref().unwrap().find(a).is_some()
+                  && token.feature().find(b).is_some()
+              })
+              .is_some();
+          let contains_pos_to_break = pos_to_break
+            .iter()
+            .find(|&&p| token.feature().find(p).is_some())
+            .is_some();
+
+          let rank = if contains_forbidden_pos {
             Rank::Normal
-          } else if pos.iter().find(|&&p| token.feature().find(p).is_some()) != None {
+          } else if contains_pos_to_append || contains_pos_combos {
+            if !SAKURA_SCRIPT_RE.replace(&result, "").is_empty() {
+              Rank::Break
+            } else {
+              Rank::Append
+            }
+          } else if contains_pos_to_break {
             Rank::Break
           } else {
             Rank::Normal
           };
 
-          if add_before
-            .iter()
-            .find(|&&p| token.feature().find(p).is_some())
-            != None
-            && result.is_empty()
-          {
-            if results.len() > 0 {
-              let last = results.len() - 1;
-              // results[last].text += "#";
-              results[last].text += token.surface();
-            }
-          } else {
-            result += token.surface();
-            if rank != Rank::Normal {
-              if result.chars().count() == 1 {
-                // TODO: 1文字でいいのか検討
-                let last = results.len() - 1;
-                results[last].text += &result;
-                results[last].rank = rank;
+          result += token.surface();
+          match rank {
+            Rank::Append => {
+              if results.len() > 0 {
+                let last = results.iter().rposition(|r| !r.is_empty()).unwrap();
+                // results[last].text += &format!("#({})", token.surface());
+                println!("append: {}", &result);
+                results[last] += &result;
+                result = "".to_string();
               } else {
-                results.push(Block { rank, text: result });
+                panic!("results is empty");
               }
+            }
+            Rank::Break => {
+              println!("push: {}", &result);
+              results.push(result);
               result = "".to_string();
             }
+            Rank::Normal => {
+              println!("normal: ({})", &result);
+            }
           }
+          last_token_feature = Some(token.feature().to_string());
         }
         if let Some(s) = sakura_scripts.next() {
           result += s.as_str();
         }
       }
-      results.push(Block {
-        rank: Rank::Manual,
-        text: result,
-      });
-      result = "".to_string();
     }
 
-    for r in results.iter() {
-      println!("{:?}: {}", r.rank, r.text);
+    println!("results: {}", results.len());
+    for (i, r) in results.iter().enumerate() {
+      println!("{}: {}", i, r);
     }
 
     results
   }
 
-  fn render(&mut self, parts: Vec<Block>) -> String {
+  fn render(&mut self, parts: Vec<String>) -> String {
     let re_open_bracket = Regex::new(r"[「『（【]").unwrap();
     let re_close_bracket = Regex::new(r"[」』）】]").unwrap();
     let re_periods = Regex::new(r"[、。！？]").unwrap();
@@ -210,8 +230,7 @@ impl Inserter {
       if i >= parts.len() {
         break;
       }
-      let rank = &parts[i].rank;
-      let part = parts[i].text.clone();
+      let part = parts[i].clone();
       let c = self.count(part.to_string());
       brackets_depth += re_open_bracket.find_iter(&part).count() as i32;
       brackets_depth -= (re_close_bracket.find_iter(&part).count() as i32).max(0);
@@ -233,7 +252,7 @@ impl Inserter {
         continue;
       }
       let after_counts = counts[scope] + c;
-      if after_counts > self.cols_num && *rank == Rank::Break {
+      if after_counts > self.cols_num {
         // result.push_str(&format!("f{}\\n", counts[scope]));
         result.push_str("\\n");
         counts[scope] = 0.0;
@@ -248,7 +267,7 @@ impl Inserter {
         let mut j = i + 1;
         let mut next_line = String::new();
         while j < parts.len() {
-          let next = parts[j].text.clone();
+          let next = parts[j].clone();
           if re_change_scope.is_match(&next) || re_change_line.is_match(&next) {
             j -= 1;
             break;
@@ -278,10 +297,7 @@ impl Inserter {
   }
 
   fn count(&self, text: String) -> f32 {
-    let sakura_script_re =
-      Regex::new(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###)
-        .unwrap();
-    let removed = sakura_script_re.replace_all(&text, "");
+    let removed = SAKURA_SCRIPT_RE.replace_all(&text, "");
     let mut count = 0.0;
     count += removed.chars().filter(|c| c.is_ascii()).count() as f32 * 0.5;
     count += removed.chars().filter(|c| !c.is_ascii()).count() as f32;
@@ -293,18 +309,25 @@ impl Inserter {
 mod tests {
   use super::*;
   use crate::events::aitalk::TALKS;
+  use crate::events::translate::on_translate;
+  use rand::seq::SliceRandom;
 
   #[test]
   fn inserter() {
-    for t in TALKS.iter() {
-      let text = t.to_string();
-      let mut ins = Inserter::default();
-      ins.start_init();
-      while !ins.is_ready() {
-        std::thread::sleep(std::time::Duration::from_millis(100));
-      }
+    let mut talks = TALKS.clone();
+    talks.shuffle(&mut rand::thread_rng());
+    let mut ins = Inserter::default();
+    ins.start_init();
+    while !ins.is_ready() {
+      std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+    for (i, t) in talks.iter().enumerate() {
+      println!("talk: {}", i);
+      let text = on_translate(t.to_string());
       ins.tokenize(text.clone());
-      println!("\n{}\n", ins.run(text).replace("\\n", "\n"));
+      let breaked = ins.run(text).replace("\\n", "\n");
+      let result = SAKURA_SCRIPT_RE.replace_all(&breaked, "");
+      println!("\n{}\n", result);
     }
   }
 }
