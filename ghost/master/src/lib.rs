@@ -32,7 +32,9 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
   let v = GStr::capture(h, len as usize);
   let s = v.to_utf8_str().unwrap();
 
-  get_global_vars().load();
+  if let Err(e) = get_global_vars().load() {
+    error!("{}", e);
+  }
 
   let log_path = Path::new(&s.to_string()).join("haine.log");
   WriteLogger::init(
@@ -55,7 +57,9 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
 pub extern "cdecl" fn unload() -> BOOL {
   debug!("unload");
 
-  get_global_vars().save();
+  if let Err(e) = get_global_vars().save() {
+    error!("{}", e);
+  }
 
   return TRUE;
 }

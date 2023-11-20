@@ -3,6 +3,7 @@ use crate::roulette::TalkBias;
 use crate::status::Status;
 use serde::{Deserialize, Serialize};
 use std::time::{SystemTime, UNIX_EPOCH};
+use std::error::Error;
 
 const VAR_PATH: &str = "vars.json";
 static mut GLOBALVARS: Option<GlobalVariables> = None;
@@ -38,22 +39,9 @@ impl GlobalVariables {
     s
   }
 
-  pub fn load(&mut self) {
-    let json_str = match std::fs::read_to_string(VAR_PATH) {
-      Ok(s) => s,
-      Err(_) => {
-        error!("Failed to load variables.");
-        return;
-      }
-    };
-
-    let vars: GlobalVariables = match serde_json::from_str(&json_str) {
-      Ok(v) => v,
-      Err(_) => {
-        error!("Failed to parse variables.");
-        return;
-      }
-    };
+  pub fn load(&mut self) -> Result<(), Box<dyn Error>> {
+    let json_str = std::fs::read_to_string(VAR_PATH)?;
+    let vars: GlobalVariables = serde_json::from_str(&json_str)?;
 
     // TODO: 変数追加時はここに追加することを忘れない
     if let Some(t) = vars.total_time {
@@ -65,23 +53,14 @@ impl GlobalVariables {
     if let Some(t) = vars.user_name {
       self.user_name = Some(t);
     }
+
+    Ok(())
   }
 
-  pub fn save(&self) {
-    let json_str = match serde_json::to_string(self) {
-      Ok(s) => s,
-      Err(_) => {
-        error!("Failed to serialize variables");
-        return;
-      }
-    };
-    match std::fs::write(VAR_PATH, json_str) {
-      Ok(_) => (),
-      Err(_) => {
-        error!("Failed to save variables");
-        return;
-      }
-    };
+  pub fn save(&self) -> Result<(), Box<dyn Error>> {
+    let json_str = serde_json::to_string(self)?;
+    std::fs::write(VAR_PATH, json_str)?;
+    Ok(())
   }
 }
 
