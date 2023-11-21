@@ -21,12 +21,29 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
     "h1111104悪戯がすぎるわよ。".to_string(),
     "h1111103はあ……h1111106何が楽しいんだか。".to_string(),
     "h1111204その熱意は買うけれど。……h1111209虚しくないの？".to_string(),
-    "h1111204……………………退屈。".to_string(),
+    "h1111204…………退屈。".to_string(),
   ]
 });
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
   match info.as_str() {
+    "0handnade" => Some(vec![
+      "\
+        h1111205\\1触れた手の感触はゼリーを掴むような頼りなさ、冷たさだった。\
+        ……手が冷えるわよ。h1111204ほどほどにね。\
+        "
+      .to_string(),
+      "\
+      h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+      ……それは不毛というものよ。\
+      "
+      .to_string(),
+      "\
+      h1111205\\1彼女の指は長い。
+      h1111209……うん。\\n\
+      "
+      .to_string(),
+    ]),
     "0bustnade" => Some(bust_touch(vars)),
     "0bustdoubleclick" => Some(bust_touch(vars)),
     "0skirtup" => {
@@ -43,15 +60,13 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
         ]);
       }
       let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
-      return Some(zero_skirt_up);
+      Some(zero_skirt_up)
     }
-    "0shoulderdown" => {
-      return Some(vec!["\
+    "0shoulderdown" => Some(vec!["\
           h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\\n\
           h1111101……h1111204私はあなたのものじゃないのよ。\\n\
           "
-      .to_string()]);
-    }
+    .to_string()]),
     _ => None,
   }
 }
@@ -80,7 +95,7 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
       慌てて引っ込めると、手は元通りになった。\
       h1111201許されていると思ったの？\\n\
       h1111304残念だけど、それほど気は長くないの。\\n\
-      h1111204わきまえなさい。"
+      h1111309わきまえなさい。"
         .to_string(),
     );
   } else {
