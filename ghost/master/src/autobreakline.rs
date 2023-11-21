@@ -245,8 +245,8 @@ impl Inserter {
       brackets_depth += re_open_bracket.find_iter(&part).count() as i32;
       brackets_depth -= (re_close_bracket.find_iter(&part).count() as i32).max(0);
 
-      if re_change_scope.is_match(&part) {
-        let c = re_change_scope.captures(&part).unwrap()[0].to_string();
+      if let Some(captures) = re_change_scope.captures(&part) {
+        let c = captures[0].to_string();
         scope = re_not_number.replace_all(&c, "").parse::<usize>().unwrap();
       }
 
