@@ -206,8 +206,14 @@ impl Inserter {
       }
     }
     if !result.is_empty() {
-      let last = results.iter().rposition(|r| !r.is_empty()).unwrap();
-      results[last] += &result;
+      match results.iter().rposition(|r| !r.is_empty()) {
+        Some(last) => {
+          results[last] += &result;
+        }
+        None => {
+          results.push(result);
+        }
+      }
     }
 
     println!("results: {}", results.len());
