@@ -249,7 +249,7 @@ mod test {
   #[test]
   fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
     let mut vars = get_global_vars();
-    vars.load();
+    vars.load()?;
     vars.volatility.idle_seconds = 2;
     vars.volatility.idle_threshold = 1;
 
