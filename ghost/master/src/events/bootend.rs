@@ -3,7 +3,7 @@ use shiorust::message::{Response, *};
 
 pub fn on_boot(_req: &Request) -> Response {
   let talks = all_combo(&vec![
-    vec!["h1000000\\1今日も、霧が濃い。".to_string()],
+    vec!["h1113105\\1今日も、霧が濃い。".to_string()],
     vec![
       "h1113105……h1113101\\_w[300]h1113201あら、h1111204いらっしゃい、{user_name}。".to_string(),
     ],
