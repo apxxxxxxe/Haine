@@ -205,6 +205,10 @@ impl Inserter {
         }
       }
     }
+    if !result.is_empty() {
+      let last = results.iter().rposition(|r| !r.is_empty()).unwrap();
+      results[last] += &result;
+    }
 
     println!("results: {}", results.len());
     for (i, r) in results.iter().enumerate() {
