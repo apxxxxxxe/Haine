@@ -178,6 +178,22 @@ pub static TALKS: Lazy<Vec<String>> = Lazy::new(|| {
     理解できなくても見ていてほしかったの。\\n\
     ……h1121205わがままかしら。\
     ".to_string(),
+
+    "\
+    h1111109\\1床を、極彩色の虫が這っている。\\n\
+    どこから入ったのだろうか。\\n\
+    h1111106……h1111105。\\n\\n\
+    \\1ハイネはそれを一瞥して、すぐに視線を戻した。\\n\
+    気にならないのだろうか。\\n\\n\
+    ……そういえば、本で読んだことがある。\\n\
+    命を落とした際に衛生観念やその他の生存本能が失われるため、\\n\
+    幽霊にとって毒虫や汚物に対する嫌悪感はほとんど無いらしい。\\n\
+    フィクションの怪物の多くが不潔な外見をしているのは、あながち間違いでもないという。\\n\
+    彼女も、そうなのだろうか。\\n\\n\
+    h1111109……。\\n\
+    h1111104ねえ、あなた。虫を捕まえるのは得意？\\n\
+    \\1……。\
+    ".to_string(),
   ]
 });
 
@@ -204,10 +220,16 @@ pub fn version(_req: &Request) -> Response {
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
   vars.volatility.last_random_talk_time = vars.volatility.ghost_up_time;
+  debug!(
+    "{} < {}: {}",
+    vars.volatility.idle_seconds,
+    vars.volatility.idle_threshold,
+    vars.volatility.idle_seconds < vars.volatility.idle_threshold,
+  );
   new_response_with_value(
     choose_one(
       &TALKS,
-      vars.volatility.idle_seconds > vars.volatility.idle_threshold,
+      vars.volatility.idle_seconds < vars.volatility.idle_threshold,
     )
     .unwrap(),
     true,
