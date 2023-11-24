@@ -24,7 +24,7 @@ const WHEEL_LIFETIME: u128 = 3000;
 pub fn on_mouse_wheel(req: &Request) -> Response {
   let vars = get_global_vars();
   let refs = get_references(req);
-  if refs[4] == "" {
+  if refs[4].is_empty() {
     new_response_nocontent()
   } else {
     let now = SystemTime::now();
@@ -33,14 +33,11 @@ pub fn on_mouse_wheel(req: &Request) -> Response {
       .unwrap()
       .as_millis();
 
-    let d: Direction;
-    if refs[2].parse::<i32>().unwrap() > 0 {
-      // up
-      d = Direction::Up;
+    let d: Direction = if refs[2].parse::<i32>().unwrap() > 0 {
+      Direction::Up
     } else {
-      // down
-      d = Direction::Down;
-    }
+      Direction::Down
+    };
 
     if vars.volatility.last_wheel_part != refs[4]
       || vars.volatility.wheel_direction != d
@@ -65,7 +62,7 @@ pub fn on_mouse_wheel(req: &Request) -> Response {
 
 pub fn on_mouse_double_click(req: &Request) -> Response {
   let refs = get_references(req);
-  if refs[4] == "" {
+  if refs[4].is_empty() {
     on_menu_exec(req)
   } else {
     new_mouse_response(format!("{}{}doubleclick", refs[3], refs[4]))
@@ -84,7 +81,7 @@ pub fn on_mouse_click_ex(req: &Request) -> Response {
 pub fn on_mouse_move(req: &Request) -> Response {
   let vars = get_global_vars();
   let refs = get_references(req);
-  if refs[4] == "" || vars.volatility.status.get("talking").unwrap() {
+  if refs[4].is_empty() || vars.volatility.status.get("talking").unwrap() {
     new_response_nocontent()
   } else {
     let now = SystemTime::now();

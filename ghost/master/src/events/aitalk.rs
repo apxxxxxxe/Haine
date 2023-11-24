@@ -282,7 +282,7 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
     }
     _ => return new_response_nocontent(),
   }
-  return new_response_with_value(m, true);
+  new_response_with_value(m, true)
 }
 
 #[cfg(test)]
@@ -295,7 +295,7 @@ mod test {
 
   #[test]
   fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
-    let mut vars = get_global_vars();
+    let vars = get_global_vars();
     vars.load()?;
     vars.volatility.idle_seconds = 2;
     vars.volatility.idle_threshold = 1;
