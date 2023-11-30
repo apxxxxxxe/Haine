@@ -15,8 +15,9 @@ pub fn on_second_change(req: &Request) -> Response {
   let idle_secs = refs[4].parse::<i32>().unwrap();
   vars.volatility.idle_seconds = idle_secs;
 
-  if (vars.volatility.ghost_up_time - vars.volatility.last_random_talk_time)
-    > vars.random_talk_interval.unwrap()
+  if vars.random_talk_interval.unwrap() > 0
+    && (vars.volatility.ghost_up_time - vars.volatility.last_random_talk_time)
+      > vars.random_talk_interval.unwrap()
   {
     on_ai_talk(req)
   } else {
