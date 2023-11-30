@@ -62,11 +62,18 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
       let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
       Some(zero_skirt_up)
     }
-    "0shoulderdown" => Some(vec!["\
-          h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\\n\
-          h1111101……h1111204私はあなたのものじゃないのよ。\\n\
-          "
-    .to_string()]),
+    "0shoulderdown" => Some(vec![
+      "\
+      h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
+      h1111101……h1111204私はあなたのものじゃないのよ。\\n\
+      "
+      .to_string(),
+      "\
+      h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
+      h1111204……それで？h1111209あなたは私をどうしたいのかしら。\
+      "
+      .to_string(),
+    ]),
     _ => None,
   }
 }
