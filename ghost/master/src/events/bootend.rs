@@ -2,13 +2,21 @@ use crate::events::common::*;
 use shiorust::message::{Response, *};
 
 pub fn on_boot(_req: &Request) -> Response {
+  // \1のサーフェスを\0に重ねて固定する
+  let init_tag = "\
+    \\1\\![reset,sticky-window]\
+    \\![set,alignmenttodesktop,free]\
+    \\![move,--X=0,--Y=0,--time=0,--base=0]\
+    \\![set,sticky-window,1,0]";
+
   let talks = all_combo(&vec![
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
     vec![
       "h1113105……h1113101\\_w[300]h1113201あら、h1111204いらっしゃい、{user_name}。".to_string(),
     ],
   ]);
-  new_response_with_value(choose_one(&talks, false).unwrap(), true)
+  let v = format!("{}{}", init_tag, choose_one(&talks, false).unwrap(),);
+  new_response_with_value(v, true)
 }
 
 pub fn on_close(_req: &Request) -> Response {

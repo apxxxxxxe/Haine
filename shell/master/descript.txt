@@ -7,8 +7,6 @@ craftmanurl,https://apxxxxxxe.github.io/Haine
 sakura.seriko.alignmenttodesktop,free
 kero.seriko.alignmenttodesktop,free
 
-seriko.sticky-window,1,0
-
 seriko.use_self_alpha,1
 sakura.balloon.offsetx,150
 sakura.balloon.offsety,150
