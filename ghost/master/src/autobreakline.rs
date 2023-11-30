@@ -204,6 +204,10 @@ impl Inserter {
           result += s.as_str();
         }
       }
+      if !result.is_empty() {
+        results.push(result);
+        result = "".to_string();
+      }
     }
     if !result.is_empty() {
       match results.iter().rposition(|r| !r.is_empty()) {
