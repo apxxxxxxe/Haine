@@ -337,8 +337,8 @@ mod test {
   fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
     let vars = get_global_vars();
     vars.load()?;
-    vars.volatility.idle_seconds = 2;
-    vars.volatility.idle_threshold = 1;
+    vars.volatility.idle_seconds = 1;
+    vars.volatility.idle_threshold = 2;
 
     let req = Request {
       method: Method::GET,
