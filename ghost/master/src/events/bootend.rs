@@ -1,4 +1,5 @@
 use crate::events::common::*;
+use rand::seq::SliceRandom;
 use shiorust::message::{Response, *};
 
 pub fn on_boot(_req: &Request) -> Response {
@@ -15,7 +16,12 @@ pub fn on_boot(_req: &Request) -> Response {
       "h1113105……h1113101\\_w[300]h1113201あら、h1111204いらっしゃい、{user_name}。".to_string(),
     ],
   ]);
-  let v = format!("{}{}", init_tag, choose_one(&talks, false).unwrap(),);
+  let v = format!(
+    "{}{}{}",
+    init_tag,
+    random_underwear(),
+    choose_one(&talks, false).unwrap(),
+  );
   new_response_with_value(v, true)
 }
 
@@ -199,4 +205,10 @@ fn shake(text: &str) -> String {
     }
   }
   s
+}
+
+fn random_underwear() -> String {
+  let mut rng = rand::thread_rng();
+  let candidates = vec!["A", "B"];
+  format!("\\0\\![bind,下着,{},1]", candidates.choose(&mut rng).unwrap())
 }
