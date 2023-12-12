@@ -16,7 +16,7 @@ impl TalkBias {
     *self.0.get(digest).unwrap_or(&1)
   }
 
-  fn increment(&mut self, digest: String) {
+  pub fn increment(&mut self, digest: String) {
     let count = self.get(&digest);
     self.0.insert(digest, count + 1);
   }

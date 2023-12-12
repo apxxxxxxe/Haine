@@ -1,4 +1,5 @@
 use crate::events::common::*;
+use crate::roulette::TalkBias;
 use crate::variables::get_global_vars;
 use once_cell::sync::Lazy;
 use shiorust::message::{Request, Response};
@@ -12,6 +13,27 @@ pub enum TalkType {
 }
 
 impl TalkType {
+  fn to_string(&self) -> String {
+    match self {
+      Self::SelfIntroduce => "SelfIntroduce".to_string(),
+      Self::Lore => "Lore".to_string(),
+      Self::Past => "Past".to_string(),
+      Self::Abstract => "Abstract".to_string(),
+      Self::WithYou => "WithYou".to_string(),
+    }
+  }
+
+  fn from(s: &str) -> Option<Self> {
+    match s {
+      "SelfIntroduce" => Some(Self::SelfIntroduce),
+      "Lore" => Some(Self::Lore),
+      "Past" => Some(Self::Past),
+      "Abstract" => Some(Self::Abstract),
+      "WithYou" => Some(Self::WithYou),
+      _ => None,
+    }
+  }
+
   fn all() -> Vec<Self> {
     vec![
       Self::SelfIntroduce,
@@ -349,8 +371,9 @@ impl TalkType {
 
         "\
         h1111206私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
+        h1111204あなたは目の前にいるのに、\\n\
+        あなたが見る世界を私が知ることはできないの。\\n\
         h1112209ときどき、酷くもどかしくなるわ。\\n\
-        h1112204目の前にいるあなたが見る世界を、私は知ることができないの。\\n\
         ".to_string(),
       ],
     }
@@ -414,9 +437,35 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.idle_threshold,
     vars.volatility.idle_seconds < vars.volatility.idle_threshold,
   );
+
+  let mut talk_bias = TalkBias::new();
+  let dark = "dark".to_string();
+  let others = "others".to_string();
+  talk_bias.reset(dark.clone());
+  talk_bias.reset(others.clone());
+  for _ in 0..4 {
+    talk_bias.increment(others.clone());
+  }
+  let is_abstract = talk_bias.roulette(&vec![dark.clone(), others.clone()], false) == 0;
+  let talks = if is_abstract {
+    let mut v = vec![];
+    v.extend(TalkType::Abstract.talks());
+    v.extend(TalkType::Past.talks());
+    all_combo(&vec![
+      v,
+      vec!["\\p[2]\\_q\\q[同意する,OnAgreeWithHer]\\n\\q[否定する,OnDisagreeWithHer]".to_string()],
+    ])
+  } else {
+    let mut v = vec![];
+    v.extend(TalkType::SelfIntroduce.talks());
+    v.extend(TalkType::Lore.talks());
+    v.extend(TalkType::WithYou.talks());
+    v
+  };
+
   new_response_with_value(
     choose_one(
-      &TalkType::all_talks(),
+      &talks,
       vars.volatility.idle_seconds < vars.volatility.idle_threshold,
     )
     .unwrap(),
