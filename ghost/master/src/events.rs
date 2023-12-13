@@ -39,7 +39,7 @@ pub fn handle_request(req: &Request) -> Response {
   let vars = get_global_vars();
 
   if let Some(v) = req.headers.get("Status") {
-    vars.volatility.status.set(v.to_string());
+    vars.volatility.status_mut().set(v.to_string());
   }
 
   let event = match get_event(event_id.as_str()) {

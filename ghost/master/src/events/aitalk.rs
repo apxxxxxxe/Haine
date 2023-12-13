@@ -430,12 +430,14 @@ pub fn version(_req: &Request) -> Response {
 
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
-  vars.volatility.last_random_talk_time = vars.volatility.ghost_up_time;
+  vars
+    .volatility
+    .set_last_random_talk_time(vars.volatility.ghost_up_time().clone());
   debug!(
     "{} < {}: {}",
-    vars.volatility.idle_seconds,
-    vars.volatility.idle_threshold,
-    vars.volatility.idle_seconds < vars.volatility.idle_threshold,
+    vars.volatility.idle_seconds(),
+    vars.volatility.idle_threshold(),
+    vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
   );
 
   let mut talk_bias = TalkBias::new();
@@ -466,7 +468,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   new_response_with_value(
     choose_one(
       &talks,
-      vars.volatility.idle_seconds < vars.volatility.idle_threshold,
+      vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
     )
     .unwrap(),
     true,
@@ -509,8 +511,8 @@ mod test {
   fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
     let vars = get_global_vars();
     vars.load()?;
-    vars.volatility.idle_seconds = 1;
-    vars.volatility.idle_threshold = 2;
+    vars.volatility.set_idle_seconds(1);
+    vars.volatility.set_idle_threshold(2);
 
     let req = Request {
       method: Method::GET,

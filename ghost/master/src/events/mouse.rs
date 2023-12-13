@@ -49,8 +49,8 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
     "0skirtup" => {
       let mut conbo_parts: Vec<Vec<String>> =
         vec![vec!["h2244402……！\\nh1241102\\_w[500]".to_string()]];
-      if !vars.volatility.first_sexial_touch && vars.volatility.ghost_up_time < 30 {
-        vars.volatility.first_sexial_touch = true;
+      if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
+        vars.volatility.set_first_sexial_touch(true);
         conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
       } else {
         conbo_parts.push(vec![
@@ -81,21 +81,21 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
 fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   let zero_bust_touch_threshold = 12;
   let mut zero_bust_touch = Vec::new();
-  if !vars.volatility.first_sexial_touch && vars.volatility.ghost_up_time < 30 {
-    vars.volatility.first_sexial_touch = true;
+  if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
+    vars.volatility.set_first_sexial_touch(true);
     zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
-  } else if vars.volatility.touch_count < zero_bust_touch_threshold / 3 {
+  } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 {
     zero_bust_touch.extend(vec![
       "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
       "h1111209気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
       "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
       "h1111205気安いのね。あまり好きではないわ。".to_string(),
     ]);
-  } else if vars.volatility.touch_count < zero_bust_touch_threshold / 3 * 2 {
+  } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 * 2 {
     zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
-  } else if vars.volatility.touch_count < zero_bust_touch_threshold {
+  } else if vars.volatility.touch_count() < zero_bust_touch_threshold {
     zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
-  } else if vars.volatility.touch_count == zero_bust_touch_threshold {
+  } else if vars.volatility.touch_count() == zero_bust_touch_threshold {
     zero_bust_touch.push(
       "\
       h1111205\\1触れようとした手先が、霧に溶けた。\\n\

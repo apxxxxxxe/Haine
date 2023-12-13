@@ -39,7 +39,7 @@ pub fn choose_one(values: &Vec<String>, update_weight: bool) -> Option<String> {
     return None;
   }
   let vars = get_global_vars();
-  let u = vars.volatility.talk_bias.roulette(values, update_weight);
+  let u = vars.volatility.talk_bias_mut().roulette(values, update_weight);
   Some(values.get(u).unwrap().to_owned())
 }
 
@@ -121,7 +121,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let dest_surface = refs[0].parse::<i32>().unwrap();
   let dest_eyes = dest_surface % 100;
   let dest_remain = dest_surface - dest_eyes;
-  let from_surface = get_global_vars().volatility.current_surface;
+  let from_surface = get_global_vars().volatility.current_surface();
   let from_eyes = from_surface % 100;
 
   if from_surface == 0 {

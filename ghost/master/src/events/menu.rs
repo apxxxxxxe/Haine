@@ -10,7 +10,7 @@ fn show_minute(m: &u64) -> String {
 }
 
 pub fn on_menu_exec(_req: &Request) -> Response {
-  let current_talk_interval = get_global_vars().random_talk_interval.unwrap_or(180);
+  let current_talk_interval = get_global_vars().random_talk_interval().unwrap_or(180);
   let mut selections = Vec::new();
 
   for i in [1, 3, 5, 7, 10, 0].iter() {
@@ -50,7 +50,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
 pub fn on_talk_interval_changed(req: &Request) -> Response {
   let refs = get_references(req);
   let v = refs[0].parse::<u64>().unwrap();
-  get_global_vars().random_talk_interval = Some(v);
+  get_global_vars().set_random_talk_interval(Some(v));
 
   on_menu_exec(req)
 }

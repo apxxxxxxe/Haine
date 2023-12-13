@@ -11,8 +11,8 @@ pub fn on_translate(text: String) -> String {
   translated = text_only_translater(translated);
 
   let vars = get_global_vars();
-  if vars.volatility.inserter.is_ready() {
-    vars.volatility.inserter.run(translated)
+  if vars.volatility.inserter_mut().is_ready() {
+    vars.volatility.inserter_mut().run(translated)
   } else {
     translated
   }
@@ -55,7 +55,7 @@ fn translate_part(text: String) -> String {
   let phi_replaced = wait_replaced.replace("φ", "");
 
   let vars = get_global_vars();
-  let vars_replaced = phi_replaced.replace("{user_name}", &vars.user_name.clone().unwrap());
+  let vars_replaced = phi_replaced.replace("{user_name}", &vars.user_name().clone().unwrap());
 
   vars_replaced
 }

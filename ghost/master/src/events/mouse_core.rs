@@ -29,7 +29,7 @@ pub fn on_mouse_wheel(req: &Request) -> Response {
   } else {
     let now = SystemTime::now();
     let dur = now
-      .duration_since(vars.volatility.last_wheel_count_unixtime)
+      .duration_since(vars.volatility.last_wheel_count_unixtime())
       .unwrap()
       .as_millis();
 
@@ -39,22 +39,24 @@ pub fn on_mouse_wheel(req: &Request) -> Response {
       Direction::Down
     };
 
-    if vars.volatility.last_wheel_part != refs[4]
-      || vars.volatility.wheel_direction != d
+    if vars.volatility.last_wheel_part() != refs[4]
+      || vars.volatility.wheel_direction() != d
       || dur > WHEEL_LIFETIME
     {
-      vars.volatility.wheel_counter = 1;
+      vars.volatility.set_wheel_counter(1);
     } else {
-      vars.volatility.wheel_counter += 1;
+      vars
+        .volatility
+        .set_wheel_counter(vars.volatility.wheel_counter() + 1);
     }
 
-    if vars.volatility.wheel_counter >= WHEEL_THRESHOLD {
-      vars.volatility.wheel_counter = 0;
+    if vars.volatility.wheel_counter() >= WHEEL_THRESHOLD {
+      vars.volatility.set_wheel_counter(0);
       new_mouse_response(format!("{}{}{}", refs[3], refs[4], d.to_str()))
     } else {
-      vars.volatility.last_wheel_count_unixtime = now;
-      vars.volatility.last_wheel_part = refs[4].to_string();
-      vars.volatility.wheel_direction = d;
+      vars.volatility.set_last_wheel_count_unixtime(now);
+      vars.volatility.set_last_wheel_part(refs[4].to_string());
+      vars.volatility.set_wheel_direction(d);
       new_response_nocontent()
     }
   }
@@ -81,29 +83,31 @@ pub fn on_mouse_click_ex(req: &Request) -> Response {
 pub fn on_mouse_move(req: &Request) -> Response {
   let vars = get_global_vars();
   let refs = get_references(req);
-  if refs[4].is_empty() || vars.volatility.status.get("talking").unwrap() {
+  if refs[4].is_empty() || vars.volatility.status_mut().get("talking").unwrap() {
     new_response_nocontent()
   } else {
     let now = SystemTime::now();
-    if vars.volatility.last_nade_part == refs[4] {
+    if vars.volatility.last_nade_part() == refs[4] {
       let dur = now
-        .duration_since(vars.volatility.last_nade_count_unixtime)
+        .duration_since(vars.volatility.last_nade_count_unixtime())
         .unwrap()
         .as_millis();
       if dur > NADE_LIFETIME {
-        vars.volatility.nade_counter = 1;
-        vars.volatility.last_nade_count_unixtime = now;
+        vars.volatility.set_nade_counter(1);
+        vars.volatility.set_last_nade_count_unixtime(now);
       } else if dur >= NADE_DURATION {
-        vars.volatility.nade_counter += 1;
-        vars.volatility.last_nade_count_unixtime = now;
+        vars
+          .volatility
+          .set_nade_counter(vars.volatility.nade_counter() + 1);
+        vars.volatility.set_last_nade_count_unixtime(now);
       }
-      debug!("{} {} {}", refs[4], dur, vars.volatility.nade_counter);
+      debug!("{} {} {}", refs[4], dur, vars.volatility.nade_counter());
     } else {
-      vars.volatility.nade_counter = 1;
+      vars.volatility.set_nade_counter(1);
     }
-    vars.volatility.last_nade_part = refs[4].to_string();
-    if vars.volatility.nade_counter > NADE_THRESHOLD {
-      vars.volatility.nade_counter = 0;
+    vars.volatility.set_last_nade_part(refs[4].to_string());
+    if vars.volatility.nade_counter() > NADE_THRESHOLD {
+      vars.volatility.set_nade_counter(0);
       new_mouse_response(format!("{}{}nade", refs[3], refs[4]))
     } else {
       new_response_nocontent()
@@ -113,11 +117,13 @@ pub fn on_mouse_move(req: &Request) -> Response {
 
 fn new_mouse_response(info: String) -> Response {
   let vars = get_global_vars();
-  if info != vars.volatility.last_touch_info {
-    vars.volatility.touch_count = 0;
+  if info != *vars.volatility.last_touch_info() {
+    vars.volatility.set_touch_count(0);
   }
-  vars.volatility.last_touch_info = info.clone();
-  vars.volatility.touch_count += 1;
+  vars.volatility.set_last_touch_info(info.clone());
+  vars
+    .volatility
+    .set_touch_count(vars.volatility.touch_count() + 1);
 
   match mouse_dialogs(info, vars) {
     Some(dialogs) => new_response_with_value(choose_one(&dialogs, true).unwrap(), true),

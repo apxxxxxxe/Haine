@@ -7,17 +7,19 @@ use shiorust::message::{Request, Response};
 
 pub fn on_second_change(req: &Request) -> Response {
   let vars = get_global_vars();
-  let total_time = vars.total_time.unwrap();
-  vars.total_time = Some(total_time + 1);
-  vars.volatility.ghost_up_time += 1;
+  let total_time = vars.total_time().unwrap();
+  vars.set_total_time(Some(total_time + 1));
+  vars
+    .volatility
+    .set_ghost_up_time(vars.volatility.ghost_up_time() + 1);
 
   let refs = get_references(req);
   let idle_secs = refs[4].parse::<i32>().unwrap();
-  vars.volatility.idle_seconds = idle_secs;
+  vars.volatility.set_idle_seconds(idle_secs);
 
-  if vars.random_talk_interval.unwrap() > 0
-    && (vars.volatility.ghost_up_time - vars.volatility.last_random_talk_time)
-      > vars.random_talk_interval.unwrap()
+  if vars.random_talk_interval().unwrap() > 0
+    && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time())
+      > vars.random_talk_interval().unwrap()
   {
     on_ai_talk(req)
   } else {
@@ -59,7 +61,7 @@ pub fn on_surface_change(req: &Request) -> Response {
   let refs = get_references(req);
   let surface = refs[0].parse::<i32>().unwrap();
 
-  get_global_vars().volatility.current_surface = surface;
+  get_global_vars().volatility.set_current_surface(surface);
 
   new_response_nocontent()
 }
