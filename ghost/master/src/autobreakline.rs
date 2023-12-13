@@ -236,7 +236,7 @@ impl Inserter {
     let re_not_number = Regex::new(r"[^\d]").unwrap();
     let re_change_line = Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap();
     let mut result = String::new();
-    let mut counts = vec![0.0, 0.0];
+    let mut counts = vec![0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく
     let mut i = 0;
     let mut scope: usize = 0;
     let mut brackets_depth: i32 = 0;
