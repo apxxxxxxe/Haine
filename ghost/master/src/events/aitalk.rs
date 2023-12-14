@@ -1,5 +1,4 @@
 use crate::events::common::*;
-use crate::roulette::TalkBias;
 use crate::variables::get_global_vars;
 use once_cell::sync::Lazy;
 use shiorust::message::{Request, Response};
@@ -13,27 +12,6 @@ pub enum TalkType {
 }
 
 impl TalkType {
-  fn to_string(&self) -> String {
-    match self {
-      Self::SelfIntroduce => "SelfIntroduce".to_string(),
-      Self::Lore => "Lore".to_string(),
-      Self::Past => "Past".to_string(),
-      Self::Abstract => "Abstract".to_string(),
-      Self::WithYou => "WithYou".to_string(),
-    }
-  }
-
-  fn from(s: &str) -> Option<Self> {
-    match s {
-      "SelfIntroduce" => Some(Self::SelfIntroduce),
-      "Lore" => Some(Self::Lore),
-      "Past" => Some(Self::Past),
-      "Abstract" => Some(Self::Abstract),
-      "WithYou" => Some(Self::WithYou),
-      _ => None,
-    }
-  }
-
   fn all() -> Vec<Self> {
     vec![
       Self::SelfIntroduce,
@@ -432,7 +410,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
   vars
     .volatility
-    .set_last_random_talk_time(vars.volatility.ghost_up_time().clone());
+    .set_last_random_talk_time(vars.volatility.ghost_up_time());
   debug!(
     "{} < {}: {}",
     vars.volatility.idle_seconds(),
@@ -440,22 +418,19 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
   );
 
-  let mut talk_bias = TalkBias::new();
-  let dark = "dark".to_string();
-  let others = "others".to_string();
-  talk_bias.reset(dark.clone());
-  talk_bias.reset(others.clone());
-  for _ in 0..4 {
-    talk_bias.increment(others.clone());
-  }
-  let is_abstract = talk_bias.roulette(&vec![dark.clone(), others.clone()], false) == 0;
+  let rnd = rand::random::<u8>() % 5;
+  let is_abstract = rnd == 0;
   let talks = if is_abstract {
     let mut v = vec![];
     v.extend(TalkType::Abstract.talks());
     v.extend(TalkType::Past.talks());
     all_combo(&vec![
       v,
-      vec!["\\p[2]\\_q\\q[同意する,OnAgreeWithHer]\\n\\q[否定する,OnDisagreeWithHer]".to_string()],
+      vec!["\\p[2]\
+      \\![*]\\_q\\_a[OnAgreeWithHer]共感を示す\\_a\\n\
+      \\![*]\\_a[OnDisagreeWithHer]否定する\\_a\
+      "
+      .to_string()],
     ])
   } else {
     let mut v = vec![];

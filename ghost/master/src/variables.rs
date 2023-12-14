@@ -103,7 +103,7 @@ impl GlobalVariables {
       self.set_random_talk_interval(Some(t));
     }
     if let Some(t) = vars.user_name() {
-      self.set_user_name(Some(t.clone()));
+      self.set_user_name(Some(t));
     }
 
     Ok(())
