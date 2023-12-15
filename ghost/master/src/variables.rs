@@ -1,4 +1,5 @@
 use crate::autobreakline::Inserter;
+use crate::events::mouse_core::Direction;
 use crate::roulette::TalkBias;
 use crate::status::Status;
 use serde::{Deserialize, Serialize};
@@ -126,21 +127,6 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
       GLOBALVARS = Some(GlobalVariables::new());
     }
     GLOBALVARS.as_mut().unwrap()
-  }
-}
-
-#[derive(PartialEq, Clone)]
-pub enum Direction {
-  Up,
-  Down,
-}
-
-impl Direction {
-  pub fn to_str(&self) -> &str {
-    match self {
-      Direction::Up => "up",
-      Direction::Down => "down",
-    }
   }
 }
 

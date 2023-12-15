@@ -1,7 +1,7 @@
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::events::mouse::*;
-use crate::variables::{get_global_vars, Direction};
+use crate::variables::get_global_vars;
 
 use shiorust::message::{Response, *};
 use std::time::SystemTime;
@@ -20,6 +20,21 @@ const WHEEL_THRESHOLD: i32 = 3;
 
 // ホイールの蓄積値がリセットされるまでの時間(ms)
 const WHEEL_LIFETIME: u128 = 3000;
+
+#[derive(PartialEq, Clone)]
+pub enum Direction {
+  Up,
+  Down,
+}
+
+impl Direction {
+  pub fn to_str(&self) -> &str {
+    match self {
+      Direction::Up => "up",
+      Direction::Down => "down",
+    }
+  }
+}
 
 pub fn on_mouse_wheel(req: &Request) -> Response {
   let vars = get_global_vars();

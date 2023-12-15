@@ -4,7 +4,7 @@ mod common;
 mod key;
 mod menu;
 mod mouse;
-mod mouse_core;
+pub mod mouse_core;
 mod periodic;
 pub mod translate;
 
@@ -26,11 +26,8 @@ pub fn handle_request(req: &Request) -> Response {
     _ => return new_response_nocontent(),
   };
 
-  let event_id;
-  match req.headers.get("ID") {
-    Some(id) => {
-      event_id = id;
-    }
+  let event_id = match req.headers.get("ID") {
+    Some(id) => id,
     None => return new_response_nocontent(),
   };
 
