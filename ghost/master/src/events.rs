@@ -78,6 +78,8 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnMouseMove" => Some(on_mouse_move),
     "OnMouseWheel" => Some(on_mouse_wheel),
     "OnKeyPress" => Some(on_key_press),
+    "OnTalk" => Some(on_talk),
+    "OnTalkAnswer" => Some(on_talk_answer),
     _ => None,
   }
 }
