@@ -22,7 +22,7 @@ impl TalkType {
     ]
   }
 
-  fn all_talks() -> Vec<String> {
+  pub fn all_talks() -> Vec<String> {
     let mut v = Vec::new();
     for t in Self::all() {
       v.extend(t.talks());
