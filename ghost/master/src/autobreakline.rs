@@ -76,12 +76,10 @@ impl Inserter {
     let t = tokenizer.as_ref().unwrap();
     let mut worker = t.new_worker();
     let mut text = src.clone();
-    let mut _word_counts = vec![0, 0];
+    let mut _word_counts = [0, 0];
 
     // 候補: これが含まれていたら改行
-    let pos_to_break = vec![
-      // "動詞,自立",
-      // "動詞,接尾",
+    let pos_to_break = [
       "形容詞,自立",
       "形容詞,接尾",
       "形容詞,非自立",
@@ -108,7 +106,7 @@ impl Inserter {
     let pos_forbidden_to_break = ["記号,一般,", "未然形,"];
 
     // add_before: これが含まれていたら、前の行に追加
-    let pos_to_append = vec![
+    let pos_to_append = [
       "非自立,",
       "接続助詞,",
       "助詞,",
@@ -120,7 +118,7 @@ impl Inserter {
       "特殊・ダ,仮定形,",
     ];
 
-    let pos_combinations = vec![("動詞,自立", "動詞,自立"), ("助詞,格助詞", "助詞,係助詞")];
+    let pos_combinations = [("動詞,自立", "動詞,自立"), ("助詞,格助詞", "助詞,係助詞")];
 
     let mut results: Vec<String> = Vec::new();
     let mut result = "".to_string();
@@ -143,24 +141,16 @@ impl Inserter {
         for token in worker.token_iter() {
           let contains_forbidden_pos = pos_forbidden_to_break
             .iter()
-            .find(|&&p| token.feature().find(p).is_some())
-            .is_some();
-          let contains_pos_to_append = pos_to_append
-            .iter()
-            .find(|&&p| token.feature().find(p).is_some())
-            .is_some();
+            .any(|&p| token.feature().contains(p));
+          let contains_pos_to_append = pos_to_append.iter().any(|&p| token.feature().contains(p));
           let contains_pos_combos = last_token_feature.is_some()
             && pos_combinations
               .iter()
               .find(|&&(a, b)| {
-                last_token_feature.as_ref().unwrap().find(a).is_some()
-                  && token.feature().find(b).is_some()
+                last_token_feature.as_ref().unwrap().contains(a) && token.feature().contains(b)
               })
               .is_some();
-          let contains_pos_to_break = pos_to_break
-            .iter()
-            .find(|&&p| token.feature().find(p).is_some())
-            .is_some();
+          let contains_pos_to_break = pos_to_break.iter().any(|&p| token.feature().contains(p));
 
           let rank = if contains_forbidden_pos {
             Rank::Normal
@@ -179,7 +169,7 @@ impl Inserter {
           result += token.surface();
           match rank {
             Rank::Append => {
-              if results.len() > 0 {
+              if !results.is_empty() {
                 let last = results.iter().rposition(|r| !r.is_empty()).unwrap();
                 // results[last].text += &format!("#({})", token.surface());
                 println!("append: {}", &result);
@@ -236,7 +226,7 @@ impl Inserter {
     let re_not_number = Regex::new(r"[^\d]").unwrap();
     let re_change_line = Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap();
     let mut result = String::new();
-    let mut counts = vec![0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく
+    let mut counts = [0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく
     let mut i = 0;
     let mut scope: usize = 0;
     let mut brackets_depth: i32 = 0;

@@ -35,11 +35,14 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
 }
 
 pub fn choose_one(values: &Vec<String>, update_weight: bool) -> Option<String> {
-  if values.len() == 0 {
+  if values.is_empty() {
     return None;
   }
   let vars = get_global_vars();
-  let u = vars.volatility.talk_bias_mut().roulette(values, update_weight);
+  let u = vars
+    .volatility
+    .talk_bias_mut()
+    .roulette(values, update_weight);
   Some(values.get(u).unwrap().to_owned())
 }
 
@@ -89,12 +92,12 @@ pub fn get_references(req: &Request) -> Vec<&str> {
 
 pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   let mut d = String::new();
-  if dialog != "" {
+  if !dialog.is_empty() {
     d = format!("『{}』", dialog);
   }
   let mut t = String::new();
-  if text != "" {
-    t = format!("{}", text);
+  if !text.is_empty() {
+    t = text.to_string();
   }
 
   let mut v: Vec<String>;
@@ -131,37 +134,33 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   }
 
   let mut cuts = vec![from_surface];
-  if (from_eyes == 7 || from_eyes == 9) && (dest_eyes >= 1 && dest_eyes <= 3) {
+  if (from_eyes == 7 || from_eyes == 9) && (1..=3).contains(&dest_eyes) {
     //直前が目閉じかつ目標が全目の場合
     cuts.push(dest_surface + 3);
-  } else if (dest_eyes == 7 || dest_eyes == 9) && (from_eyes >= 1 && from_eyes <= 3) {
+  } else if (dest_eyes == 7 || dest_eyes == 9) && (1..=3).contains(&from_eyes) {
     // 直前が全目かつ目標が目閉じの場合
     cuts.push(dest_remain + from_eyes + 3);
-  } else if (dest_eyes >= 1 && dest_eyes <= 3)
-    && (from_eyes >= 1 && from_eyes <= 3)
-    && (from_eyes != dest_eyes)
+  } else if (1..=3).contains(&dest_eyes) && (1..=3).contains(&from_eyes) && (from_eyes != dest_eyes)
   {
     // 直前が全目かつ目標が全目の場合（直前と目標が同じ場合を除く）
     cuts.push(dest_surface + 3);
     cuts.push(dest_remain + 9);
     cuts.push(dest_surface + 3);
-  } else if (dest_eyes >= 4 && dest_eyes <= 6)
-    && (from_eyes >= 1 && from_eyes <= 3)
+  } else if (4..=6).contains(&dest_eyes)
+    && (1..=3).contains(&from_eyes)
     && ((from_eyes + 3) != dest_eyes)
   {
     // 直前が全目かつ目標が半目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
     cuts.push(from_surface + 3);
     cuts.push(dest_remain + 9);
-  } else if (dest_eyes >= 1 && dest_eyes <= 3)
-    && (from_eyes >= 4 && from_eyes <= 6)
+  } else if (1..=3).contains(&dest_eyes)
+    && (4..=6).contains(&from_eyes)
     && ((from_eyes - 3) != dest_eyes)
   {
     // 直前が半目かつ目標が全目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
     cuts.push(dest_remain + 9);
     cuts.push(dest_surface + 3);
-  } else if (dest_eyes >= 4 && dest_eyes <= 6)
-    && (from_eyes >= 4 && from_eyes <= 6)
-    && (from_eyes != dest_eyes)
+  } else if (4..=6).contains(&dest_eyes) && (4..=6).contains(&from_eyes) && (from_eyes != dest_eyes)
   {
     // 直前と目標が半目の場合（直前と目標が同じ場合を除く）
     cuts.push(dest_remain + 9);

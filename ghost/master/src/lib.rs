@@ -50,7 +50,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
 
   debug!("load");
 
-  return TRUE;
+  TRUE
 }
 
 #[no_mangle]
@@ -61,7 +61,7 @@ pub extern "cdecl" fn unload() -> BOOL {
     error!("{}", e);
   }
 
-  return TRUE;
+  TRUE
 }
 
 #[no_mangle]
@@ -71,7 +71,7 @@ pub extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
 
   let s = v.to_utf8_str().unwrap();
 
-  let r = Request::parse(&s).unwrap();
+  let r = Request::parse(s).unwrap();
 
   let response = events::handle_request(&r);
 

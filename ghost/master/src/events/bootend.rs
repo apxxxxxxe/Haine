@@ -207,7 +207,7 @@ pub fn on_vanish_selected(_req: &Request) -> Response {
 
 fn shake(text: &str) -> String {
   let mut s = String::new();
-  let shakes = vec![(10, 10), (-14, -14), (4, 4)];
+  let shakes = [(10, 10), (-14, -14), (4, 4)];
   for (i, c) in text.chars().enumerate() {
     if i < shakes.len() {
       s.push_str(&format!(
@@ -223,7 +223,7 @@ fn shake(text: &str) -> String {
 
 fn random_underwear() -> String {
   let mut rng = rand::thread_rng();
-  let candidates = vec!["A", "B"];
+  let candidates = ["A", "B"];
   format!(
     "\\0\\![bind,下着,{},1]",
     candidates.choose(&mut rng).unwrap()

@@ -27,7 +27,7 @@ fn text_only_translater(text: String) -> String {
 
   for (i, tag) in tags.enumerate() {
     result.push_str(translate_part(splitted[i].to_string()).as_str());
-    result.push_str(&tag.as_str());
+    result.push_str(tag.as_str());
   }
   result.push_str(translate_part(splitted[splitted.len() - 1].to_string()).as_str());
 
@@ -52,12 +52,11 @@ fn translate_part(text: String) -> String {
     ("\\n\\n", "\\n\\n\\_w[700]", "φ", ""),
   ];
   let wait_replaced = replace_with_check(surface_replaced, replaces);
-  let phi_replaced = wait_replaced.replace("φ", "");
+  let phi_replaced = wait_replaced.replace('φ', "");
 
   let vars = get_global_vars();
-  let vars_replaced = phi_replaced.replace("{user_name}", &vars.user_name().clone().unwrap());
 
-  vars_replaced
+  phi_replaced.replace("{user_name}", &vars.user_name().clone().unwrap())
 }
 
 fn replace_with_check(text: String, replaces: Vec<(&str, &str, &str, &str)>) -> String {

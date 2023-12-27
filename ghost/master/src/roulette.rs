@@ -25,7 +25,7 @@ impl TalkBias {
     if count == 0 {
       0
     } else {
-      match (2 as i32).checked_pow(count) {
+      match 2_i32.checked_pow(count) {
         Some(x) => x,
         None => self.max_bias(),
       }
