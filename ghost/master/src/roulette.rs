@@ -45,21 +45,17 @@ impl TalkBias {
     let mut bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
     println!("before_bias: {:?}", bias_vec);
 
-    if bias_vec
-      .iter()
-      .fold(0, |acc, &x| (acc as i32).saturating_add(x))
-      == 0
-    {
+    if !bias_vec.iter().any(|x| x != &0) {
       bias_vec = vec![1; talks.len()];
     }
 
-    let cumulative_sum: Vec<i32> = bias_vec
-      .iter()
-      .scan(0, |acc, &x| {
-        *acc = (*acc as i32).saturating_add(x);
-        Some(*acc)
-      })
-      .collect();
+    let mut cumulative_sum: Vec<i32> = vec![];
+    let mut sum: i32 = 0;
+    for x in bias_vec.iter() {
+      sum = sum.saturating_add(*x);
+      cumulative_sum.push(sum);
+    }
+
     let sum = *cumulative_sum.last().unwrap();
     let first_non_zero = cumulative_sum.iter().find(|&&x| x != 0).unwrap_or(&-1);
 
