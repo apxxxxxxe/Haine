@@ -37,7 +37,7 @@ impl TalkBias {
     i32::MAX / key_count as i32
   }
 
-  pub fn roulette(&mut self, talks: &Vec<String>, is_consume: bool) -> usize {
+  pub fn roulette(&mut self, talks: &[String], is_consume: bool) -> usize {
     let mut rng = rand::thread_rng();
 
     let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(s)).collect();
@@ -61,28 +61,27 @@ impl TalkBias {
 
     println!("talkslen: {}", talks.len());
     println!("sum: {}", sum);
-    let selected_index: usize;
-    if sum == 0 || *first_non_zero == -1 || first_non_zero == &sum {
+    let selected_index = if sum == 0 || *first_non_zero == -1 || first_non_zero == &sum {
       println!("random");
-      selected_index = rng.gen_range(0..talks.len());
+      rng.gen_range(0..talks.len())
     } else {
       // binsearch
       println!("binsearch");
       let r = rng.gen_range(*first_non_zero..sum);
-      selected_index = binsearch_min(&cumulative_sum, r);
-    }
+      binsearch_min(&cumulative_sum, r)
+    };
 
     println!("selected_index: {}", selected_index);
 
     // increment bias without selection
     if is_consume {
-      for i in 0..talks.len() {
+      for (i, talk) in talks.iter().enumerate() {
         if i == selected_index {
           // 選ばれたトークの重みを0に
-          self.reset(talks[i].clone());
+          self.reset(talk.clone());
         } else {
           // 全体の1/2が消費されるまで、それまでのトークが再び選ばれる可能性は生まれない
-          self.increment(talks[i].clone());
+          self.increment(talk.clone());
         }
       }
     }
@@ -92,7 +91,7 @@ impl TalkBias {
 }
 
 // 二分探索をするが、同値がある場合は最小のインデックスを返す
-fn binsearch_min(v: &Vec<i32>, r: i32) -> usize {
+fn binsearch_min(v: &[i32], r: i32) -> usize {
   let mut left = 0;
   let mut right = v.len() - 1;
   let mut mid = (left + right) / 2;
@@ -129,7 +128,7 @@ mod test {
     bias.reset("g".to_string());
     bias.reset("h".to_string());
 
-    let talks: Vec<String> = vec!["a", "b", "c", "d", "e", "f", "g", "h"]
+    let talks: Vec<String> = ["a", "b", "c", "d", "e", "f", "g", "h"]
       .iter()
       .map(|s| s.to_string())
       .collect();
@@ -144,7 +143,7 @@ mod test {
           println!("duplication: {}", selected_index);
         }
       };
-      let biases: Vec<i32> = talks.iter().map(|s| bias.calc_bias(bias.get(&s))).collect();
+      let biases: Vec<i32> = talks.iter().map(|s| bias.calc_bias(bias.get(s))).collect();
       println!("biases: {:?}", biases);
       indexes.push(selected_index);
       select_count[selected_index] += 1;

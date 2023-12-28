@@ -23,18 +23,17 @@ pub fn new_response_nocontent() -> Response {
 }
 
 pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
-  let v;
-  if use_translate {
-    v = on_translate(value);
+  let v = if use_translate {
+    on_translate(value)
   } else {
-    v = value;
-  }
+    value
+  };
   let mut r = new_response();
   r.headers.insert(HeaderName::from("Value"), v);
   r
 }
 
-pub fn choose_one(values: &Vec<String>, update_weight: bool) -> Option<String> {
+pub fn choose_one(values: &[String], update_weight: bool) -> Option<String> {
   if values.is_empty() {
     return None;
   }
@@ -75,17 +74,12 @@ fn all_combo_inner(
 pub fn get_references(req: &Request) -> Vec<&str> {
   let mut references: Vec<&str> = Vec::new();
   let mut i = 0;
-  loop {
-    match req
-      .headers
-      .get(&HeaderName::from(&format!("Reference{}", i)))
-    {
-      Some(value) => {
-        references.push(value);
-        i += 1;
-      }
-      None => break,
-    }
+  while let Some(value) = req
+    .headers
+    .get(&HeaderName::from(&format!("Reference{}", i)))
+  {
+    references.push(value);
+    i += 1;
   }
   references
 }
@@ -108,7 +102,7 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   }
   v = v
     .iter()
-    .filter(|s| s != &&"")
+    .filter(|s| !s.is_empty())
     .map(|s| s.to_string())
     .collect();
 

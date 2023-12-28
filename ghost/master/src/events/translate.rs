@@ -64,14 +64,8 @@ fn replace_with_check(text: String, replaces: Vec<(&str, &str, &str, &str)>) -> 
   let text_chars_vec = text.char_indices().collect::<Vec<(usize, char)>>();
   debug!("iter: {:?}", text_chars_vec);
   let mut i = 0;
-  loop {
-    let (j, c) = match text_chars_vec.get(i) {
-      Some((j, c)) => {
-        debug!("{}: {}: {}", i, j, c);
-        (j, c)
-      }
-      None => break,
-    };
+  while let Some((j, c)) = text_chars_vec.get(i) {
+    debug!("{}: {}: {}", i, j, c);
     if let Some(p) = replaces
       .iter()
       .position(|&(old, _, _, _)| text[*j..].starts_with(old))

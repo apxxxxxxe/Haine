@@ -9,6 +9,9 @@ static SAKURA_SCRIPT_RE: Lazy<Regex> = Lazy::new(|| {
   Regex::new(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###).unwrap()
 });
 
+pub static CHANGE_SCOPE_RE: Lazy<Regex> =
+  Lazy::new(|| Regex::new(r"(\\[01][^w]?|\\p\[\d+\])").unwrap());
+
 #[derive(PartialEq, PartialOrd, Eq, Ord, Debug)]
 pub enum Rank {
   Break,
@@ -144,12 +147,9 @@ impl Inserter {
             .any(|&p| token.feature().contains(p));
           let contains_pos_to_append = pos_to_append.iter().any(|&p| token.feature().contains(p));
           let contains_pos_combos = last_token_feature.is_some()
-            && pos_combinations
-              .iter()
-              .find(|&&(a, b)| {
-                last_token_feature.as_ref().unwrap().contains(a) && token.feature().contains(b)
-              })
-              .is_some();
+            && pos_combinations.iter().any(|&(a, b)| {
+              last_token_feature.as_ref().unwrap().contains(a) && token.feature().contains(b)
+            });
           let contains_pos_to_break = pos_to_break.iter().any(|&p| token.feature().contains(p));
 
           let rank = if contains_forbidden_pos {
@@ -222,7 +222,6 @@ impl Inserter {
     let re_open_bracket = Regex::new(r"[「『（【]").unwrap();
     let re_close_bracket = Regex::new(r"[」』）】]").unwrap();
     let re_periods = Regex::new(r"[、。！？]").unwrap();
-    let re_change_scope = Regex::new(r"(\\[01][^w]?|\\p\[\d+\])").unwrap();
     let re_not_number = Regex::new(r"[^\d]").unwrap();
     let re_change_line = Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap();
     let mut result = String::new();
@@ -239,7 +238,7 @@ impl Inserter {
       brackets_depth += re_open_bracket.find_iter(&part).count() as i32;
       brackets_depth -= (re_close_bracket.find_iter(&part).count() as i32).max(0);
 
-      if let Some(captures) = re_change_scope.captures(&part) {
+      if let Some(captures) = CHANGE_SCOPE_RE.captures(&part) {
         let c = captures[0].to_string();
         scope = re_not_number.replace_all(&c, "").parse::<usize>().unwrap();
       }
@@ -272,7 +271,7 @@ impl Inserter {
         let mut next_line = String::new();
         while j < parts.len() {
           let next = parts[j].clone();
-          if re_change_scope.is_match(&next) || re_change_line.is_match(&next) {
+          if CHANGE_SCOPE_RE.is_match(&next) || re_change_line.is_match(&next) {
             j -= 1;
             break;
           }

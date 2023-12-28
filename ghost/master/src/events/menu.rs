@@ -84,8 +84,8 @@ impl Question {
     }
   }
 
-  fn to_script(&self) -> String {
-    format!("\\![*]\\q[{},OnTalkAnswer,{}]", self.theme(), *self as u32)
+  fn to_script(self) -> String {
+    format!("\\![*]\\q[{},OnTalkAnswer,{}]", self.theme(), self as u32)
   }
 
   fn talk(&self) -> String {
@@ -117,14 +117,14 @@ impl Question {
 }
 
 pub fn on_talk(_req: &Request) -> Response {
-  let questions = [
+  let mut questions = [
     Question::AreYouMaster,
     Question::FeelingOfDeath,
     Question::FatigueOfLife,
   ];
 
   let mut m = "".to_string();
-  for q in questions.iter() {
+  for q in questions.iter_mut() {
     m.push_str(&q.to_script());
     m.push_str("\\n");
   }

@@ -64,8 +64,9 @@ pub extern "cdecl" fn unload() -> BOOL {
   TRUE
 }
 
+#[allow(clippy::missing_safety_doc)]
 #[no_mangle]
-pub extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
+pub unsafe extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
   // リクエストの取得
   let v = unsafe { GStr::capture(h, *len as usize) };
 
