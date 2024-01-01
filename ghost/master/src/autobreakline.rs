@@ -1,4 +1,5 @@
 use core::cmp::Ord;
+use fancy_regex::Regex as FancyRegex;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::sync::{Arc, Mutex};
@@ -9,8 +10,32 @@ static SAKURA_SCRIPT_RE: Lazy<Regex> = Lazy::new(|| {
   Regex::new(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###).unwrap()
 });
 
-pub static CHANGE_SCOPE_RE: Lazy<Regex> =
-  Lazy::new(|| Regex::new(r"(\\[01][^w]?|\\p\[\d+\])").unwrap());
+pub static CHANGE_SCOPE_RE: Lazy<FancyRegex> =
+  Lazy::new(|| FancyRegex::new(r"(\\[01])(?!w)|(\\p\[\d+\])").unwrap());
+
+fn find_change_scope(text: &str) -> Option<String> {
+  if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {
+    println!("captures: {:?}", captures);
+    if let Some(scope) = captures.get(1) {
+      return Some(scope.as_str().to_string());
+    } else if let Some(scope) = captures.get(2) {
+      return Some(scope.as_str().to_string());
+    }
+  }
+  None
+}
+
+pub fn extract_scope(text: &str) -> Option<usize> {
+  let re_not_number = Regex::new(r"[^\d]").unwrap();
+  if let Some(scope_tag) = find_change_scope(text) {
+    debug!("scope_tag: {}", scope_tag);
+    if let Ok(s) = re_not_number.replace_all(&scope_tag, "").parse::<usize>() {
+      debug!("scope: {}", s);
+      return Some(s);
+    }
+  }
+  None
+}
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Debug)]
 pub enum Rank {
@@ -222,7 +247,6 @@ impl Inserter {
     let re_open_bracket = Regex::new(r"[「『（【]").unwrap();
     let re_close_bracket = Regex::new(r"[」』）】]").unwrap();
     let re_periods = Regex::new(r"[、。！？]").unwrap();
-    let re_not_number = Regex::new(r"[^\d]").unwrap();
     let re_change_line = Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap();
     let mut result = String::new();
     let mut counts = [0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく
@@ -238,9 +262,8 @@ impl Inserter {
       brackets_depth += re_open_bracket.find_iter(&part).count() as i32;
       brackets_depth -= (re_close_bracket.find_iter(&part).count() as i32).max(0);
 
-      if let Some(captures) = CHANGE_SCOPE_RE.captures(&part) {
-        let c = captures[0].to_string();
-        scope = re_not_number.replace_all(&c, "").parse::<usize>().unwrap();
+      if let Some(s) = extract_scope(&part) {
+        scope = s;
       }
 
       if re_change_line.is_match(&part) {
@@ -271,7 +294,7 @@ impl Inserter {
         let mut next_line = String::new();
         while j < parts.len() {
           let next = parts[j].clone();
-          if CHANGE_SCOPE_RE.is_match(&next) || re_change_line.is_match(&next) {
+          if CHANGE_SCOPE_RE.is_match(&next).is_ok_and(|r| r) || re_change_line.is_match(&next) {
             j -= 1;
             break;
           }
