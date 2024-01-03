@@ -1,6 +1,7 @@
 pub mod aitalk;
 mod bootend;
 mod common;
+mod input;
 mod key;
 mod menu;
 mod mouse;
@@ -11,6 +12,7 @@ pub mod translate;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
 use crate::events::common::*;
+use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
 use crate::events::mouse_core::*;
@@ -80,6 +82,10 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnKeyPress" => Some(on_key_press),
     "OnTalk" => Some(on_talk),
     "OnTalkAnswer" => Some(on_talk_answer),
+    "OnWebClapOpen" => Some(on_web_clap_open),
+    "OnWebClapInput" => Some(on_web_clap_input),
+    "OnExecuteHTTPComplete" => Some(on_execute_http_complete),
+    "OnExecuteHTTPFailure" => Some(on_execute_http_failure),
     _ => None,
   }
 }

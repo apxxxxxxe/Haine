@@ -40,14 +40,24 @@ pub fn on_menu_exec(_req: &Request) -> Response {
   let m = format!(
     "\\_q\
     \\_l[0,1em]\
-    \\![*]\\q[なにか話して,OnAiTalk]\\n\\n\
+    \\![*]\\q[なにか話して,OnAiTalk]\\n\
     \\![*]\\q[話しかける,OnTalk]\\n\\n\
+    \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\\n\
     {}
     \\_l[0,12em]\\q[×,]\
     ",
     talk_interval_selector
   );
 
+  new_response_with_value(m, true)
+}
+
+pub fn on_web_clap_open(_req: &Request) -> Response {
+  let m = "\
+             \\1\\![open,inputbox,OnWebClapInput,0]Web拍手を送ります。\\n\
+             感想やバグ報告、要望などをお送り下さい。\
+             "
+  .to_string();
   new_response_with_value(m, true)
 }
 
