@@ -3,6 +3,73 @@ use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
 use regex::Regex;
 
+pub fn on_translate(text: String) -> String {
+  if text.is_empty() {
+    return text;
+  }
+
+  let mut translated = text.clone();
+
+  translated = text_only_translater(translated);
+
+  let vars = get_global_vars();
+  if vars.volatility.inserter_mut().is_ready() {
+    vars.volatility.inserter_mut().run(translated)
+  } else {
+    translated
+  }
+}
+
+// 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
+fn text_only_translater(text: String) -> String {
+  let re_tags = Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap();
+  let tags = re_tags.find_iter(&text);
+  let splitted = re_tags.split(&text).collect::<Vec<&str>>();
+  let mut result = String::new();
+
+  for (i, tag) in tags.enumerate() {
+    result.push_str(translate_part(splitted[i].to_string()).as_str());
+    result.push_str(tag.as_str());
+  }
+  result.push_str(translate_part(splitted[splitted.len() - 1].to_string()).as_str());
+
+  translate_whole(result)
+}
+
+// さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
+fn translate_part(text: String) -> String {
+  let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
+
+  let surface_replaced = surface_snippet.replace_all(&text, "\\0\\s[$1]").to_string();
+
+  let vars = get_global_vars();
+  surface_replaced.replace("{user_name}", &vars.user_name().clone().unwrap())
+}
+
+fn translate_whole(text: String) -> String {
+  let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
+  let mut translated = text.clone();
+
+  let phi = "φ";
+  let replaces = vec![
+    Replacee::new("、", "、\\_w[600]", phi, "", None),
+    Replacee::new("。", " \\_w[1200]", phi, ")）」』", Some(vec![0])),
+    Replacee::new("。", "。\\_w[1200]", phi, ")）」』", Some(vec![1])),
+    Replacee::new("！", "！\\_w[1200]", phi, ")）」』", None),
+    Replacee::new("？", "？\\_w[1200]", phi, ")）」』", None),
+    Replacee::new("…", "…\\_w[600]", phi, ")）」』", None),
+    Replacee::new("」", "」\\_w[600]", phi, ")）", None),
+    Replacee::new("』", "』\\_w[600]", phi, ")）」", None),
+    // Replacee::new("\\n\\n", "\\n\\n\\_w[700]", phi, "", None),
+  ];
+  translated = replace_with_check(&translated, replaces);
+  translated = translated.replace(phi, "");
+
+  translated = last_wait.replace(&translated, "").to_string();
+
+  translated
+}
+
 #[derive(Debug, Clone)]
 pub struct Dialog {
   text: String,
@@ -45,39 +112,6 @@ impl Dialog {
   }
 }
 
-pub fn on_translate(text: String) -> String {
-  if text.is_empty() {
-    return text;
-  }
-
-  let mut translated = text.clone();
-
-  translated = text_only_translater(translated);
-
-  let vars = get_global_vars();
-  if vars.volatility.inserter_mut().is_ready() {
-    vars.volatility.inserter_mut().run(translated)
-  } else {
-    translated
-  }
-}
-
-// 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-fn text_only_translater(text: String) -> String {
-  let re_tags = Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap();
-  let tags = re_tags.find_iter(&text);
-  let splitted = re_tags.split(&text).collect::<Vec<&str>>();
-  let mut result = String::new();
-
-  for (i, tag) in tags.enumerate() {
-    result.push_str(translate_part(splitted[i].to_string()).as_str());
-    result.push_str(tag.as_str());
-  }
-  result.push_str(translate_part(splitted[splitted.len() - 1].to_string()).as_str());
-
-  translate_whole(result)
-}
-
 struct Replacee {
   old: &'static str,
   new: &'static str,
@@ -110,16 +144,6 @@ impl Replacee {
       true
     }
   }
-}
-
-// さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
-fn translate_part(text: String) -> String {
-  let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
-
-  let surface_replaced = surface_snippet.replace_all(&text, "\\0\\s[$1]").to_string();
-
-  let vars = get_global_vars();
-  surface_replaced.replace("{user_name}", &vars.user_name().clone().unwrap())
 }
 
 fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
@@ -170,30 +194,6 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
       }
     }
   }
-  translated
-}
-
-fn translate_whole(text: String) -> String {
-  let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
-  let mut translated = text.clone();
-
-  let phi = "φ";
-  let replaces = vec![
-    Replacee::new("、", "、\\_w[600]", phi, "", None),
-    Replacee::new("。", " \\_w[1200]", phi, ")）」』", Some(vec![0])),
-    Replacee::new("。", "。\\_w[1200]", phi, ")）」』", Some(vec![1])),
-    Replacee::new("！", "！\\_w[1200]", phi, ")）」』", None),
-    Replacee::new("？", "？\\_w[1200]", phi, ")）」』", None),
-    Replacee::new("…", "…\\_w[600]", phi, ")）」』", None),
-    Replacee::new("」", "」\\_w[600]", phi, ")）", None),
-    Replacee::new("』", "』\\_w[600]", phi, ")）」", None),
-    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", phi, "", None),
-  ];
-  translated = replace_with_check(&translated, replaces);
-  translated = translated.replace(phi, "");
-
-  translated = last_wait.replace(&translated, "").to_string();
-
   translated
 }
 
