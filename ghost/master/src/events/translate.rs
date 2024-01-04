@@ -144,6 +144,26 @@ impl Replacee {
       true
     }
   }
+
+  fn has_prefix(&self, text: &str, cursor: usize) -> bool {
+    if cursor > 0 {
+      if let Some(prev) = text.chars().nth(cursor - 1) {
+        self.exclude_prefix.contains(prev)
+      } else {
+        false
+      }
+    } else {
+      false
+    }
+  }
+
+  fn has_suffix(&self, text: &str, cursor: usize) -> bool {
+    if let Some(next) = text.chars().nth(cursor + self.old.chars().count()) {
+      self.exclude_suffix.contains(next)
+    } else {
+      false
+    }
+  }
 }
 
 fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
@@ -156,41 +176,26 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
       .to_string()
       .char_indices()
       .collect::<Vec<(usize, char)>>();
-    let mut i = 0;
-    while let Some((j, c)) = text_chars_vec.get(i) {
-      if let Some(p) = replaces
-        .iter()
-        .position(|r: &Replacee| line.to_string()[*j..].starts_with(r.old))
-      {
-        let r = &replaces[p];
-        if !r.is_in_scope(line.scope) {
-          translated.push(*c);
-          i += 1;
-          continue;
+    let mut checking_cursor = 0;
+    while let Some((j, c)) = text_chars_vec.get(checking_cursor) {
+      let mut matched_replacee: Option<&Replacee> = None;
+      for r in replaces.iter() {
+        if line.to_string()[*j..].starts_with(r.old)
+          && r.is_in_scope(line.scope)
+          && !r.has_prefix(&line.text, checking_cursor)
+          && !r.has_suffix(&line.text, checking_cursor)
+        {
+          matched_replacee = Some(r);
+          break;
         }
-        let mut has_suffix = false;
-        if let Some(next) = line.to_string().chars().nth(i + r.old.chars().count()) {
-          if r.exclude_suffix.contains(next) {
-            has_suffix = true;
-          }
-        }
-        let mut has_prefix = false;
-        if i > 0 {
-          if let Some(prev) = line.to_string().chars().nth(i - 1) {
-            if r.exclude_prefix.contains(prev) {
-              has_prefix = true;
-            }
-          }
-        }
-        if !has_prefix && !has_suffix {
-          translated.push_str(r.new);
-        } else {
-          translated.push_str(r.old);
-        }
-        i += r.old.chars().count();
+      }
+      if matched_replacee.is_some() {
+        let r = matched_replacee.unwrap();
+        translated.push_str(r.new);
+        checking_cursor += r.old.chars().count();
       } else {
         translated.push(*c);
-        i += 1;
+        checking_cursor += 1;
       }
     }
   }
