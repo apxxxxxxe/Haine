@@ -1,6 +1,7 @@
 use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
+use once_cell::sync::Lazy;
 use regex::Regex;
 
 pub fn on_translate(text: String) -> String {
@@ -60,7 +61,7 @@ fn translate_whole(text: String) -> String {
     Replacee::new("…", "…\\_w[600]", phi, ")）」』", None),
     Replacee::new("」", "」\\_w[600]", phi, ")）", None),
     Replacee::new("』", "』\\_w[600]", phi, ")）」", None),
-    // Replacee::new("\\n\\n", "\\n\\n\\_w[700]", phi, "", None),
+    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", phi, "", None),
   ];
   translated = replace_with_check(&translated, replaces);
   translated = translated.replace(phi, "");
@@ -166,24 +167,43 @@ impl Replacee {
   }
 }
 
+static QUICK_SECTION_START: Lazy<Regex> =
+  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
+static QUICK_SECTION_END: Lazy<Regex> =
+  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
+static WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\\_w\[[0-9]+\]|\\w[1-9])").unwrap());
+
 fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
   let mut translated = String::new();
 
   let lines = Dialog::from_text(src);
 
   for line in lines {
+    let mut in_quicksection = false;
     let text_chars_vec = line
       .to_string()
       .char_indices()
       .collect::<Vec<(usize, char)>>();
     let mut checking_cursor = 0;
     while let Some((j, c)) = text_chars_vec.get(checking_cursor) {
+      let text_slice = &line.to_string()[*j..];
+      if QUICK_SECTION_START.is_match(text_slice) {
+        println!("in quicksection");
+        in_quicksection = true;
+      } else if QUICK_SECTION_END.is_match(text_slice) {
+        println!("out quicksection");
+        in_quicksection = false;
+      } else if text_slice.starts_with("\\_q") {
+        println!("toggle quicksection");
+        in_quicksection = !in_quicksection;
+      }
+
       let mut matched_replacee: Option<&Replacee> = None;
       for r in replaces.iter() {
         if line.to_string()[*j..].starts_with(r.old)
           && r.is_in_scope(line.scope)
-          && !r.has_prefix(&line.text, checking_cursor)
-          && !r.has_suffix(&line.text, checking_cursor)
+          && !r.has_prefix(&line.to_string(), checking_cursor)
+          && !r.has_suffix(&line.to_string(), checking_cursor)
         {
           matched_replacee = Some(r);
           break;
@@ -191,7 +211,12 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
       }
       if matched_replacee.is_some() {
         let r = matched_replacee.unwrap();
-        translated.push_str(r.new);
+        if in_quicksection {
+          println!("removing wait");
+          translated.push_str(&WAIT.replace(r.new, ""));
+        } else {
+          translated.push_str(r.new);
+        }
         checking_cursor += r.old.chars().count();
       } else {
         translated.push(*c);
@@ -204,7 +229,7 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
 
 #[test]
 fn test_translate() {
-  let text = "こんにちは、\\n{user_name}さん。\\nお元気ですか。\\1ええ、私は元気です。\\nあなたはどうですか、ゴースト。".to_string();
+  let text = "こんにちは、\\n{user_name}さん。\\nお元気ですか。\\1ええ、私は元気です。\\nあなたはどうですか、ゴースト。\\0\\_q私はほげ。\\n\\nふがふが。".to_string();
   let translated = text_only_translater(text);
   println!("{}", translated);
 }
