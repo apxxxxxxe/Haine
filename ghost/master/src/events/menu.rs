@@ -9,6 +9,45 @@ fn show_minute(m: &u64) -> String {
   }
 }
 
+fn make_bar_chips(length: u32) -> Vec<String> {
+  let mut v = Vec::new();
+  if length == 0 {
+    return v;
+  }
+  v.push("●".to_string());
+  for _i in 1..length - 1 {
+    v.push("■".to_string());
+  }
+  v.push("●".to_string());
+  v
+}
+
+fn show_bar(max: u32, current: u32, label: &str) -> String {
+  const SPEED: u32 = 10; // 何文字分の表示時間でバーを描画するか
+  const BAR_WIDTH: u32 = 16; // バーの長さを何文字分で描画するか
+  const BAR_HEIGHT: u32 = 10;
+  let rate = ((current * 100) as f32 / max as f32) as u32;
+  let bar_width = BAR_WIDTH * 2; // 重ねながら描画するので2倍
+  let bar_chip_wait = (50.0 * ((SPEED as f32) / (BAR_WIDTH as f32))) as u32; // 1文字分の表示時間
+
+  format!(
+    "\
+    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}%\
+    \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
+    \\f[height,{}]\\_l[0,]\\f[color,120,0,0]{}\
+    \\![quicksection,false]\\f[color,default]\\f[height,default]\
+    ",
+    BAR_HEIGHT,
+    BAR_WIDTH + 1,
+    label,
+    rate,
+    BAR_HEIGHT,
+    make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
+    BAR_HEIGHT,
+    make_bar_chips(bar_width * rate / 100).join(&format!("\\_w[{}]\\_l[@-0.5em,]", bar_chip_wait)),
+  )
+}
+
 pub fn on_menu_exec(_req: &Request) -> Response {
   let current_talk_interval = get_global_vars().random_talk_interval().unwrap_or(180);
   let mut selections = Vec::new();
@@ -39,17 +78,69 @@ pub fn on_menu_exec(_req: &Request) -> Response {
 
   let m = format!(
     "\\_q\
-    \\_l[0,1em]\
+    \\_l[0,3em]\
     \\![*]\\q[なにか話して,OnAiTalk]\\n\
-    \\![*]\\q[話しかける,OnTalk]\\n\\n\
+    \\![*]\\q[話しかける,OnTalk]\\n\
+    \\![*]\\q[ひと息つく,OnBreakTime]\\n\
+    \\n\
     \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\\n\
     {}
     \\_l[0,12em]\\q[×,]\
+    \\_l[0,1em]{}{}\
     ",
-    talk_interval_selector
+    talk_interval_selector,
+    show_bar(
+      100,
+      get_global_vars().volatility.immersive_degrees(),
+      "没入度"
+    ),
+    show_tooltip("WhatIsImersiveDegree"),
   );
 
   new_response_with_value(m, true)
+}
+
+pub fn on_break_time(_req: &Request) -> Response {
+  // 没入度を下げる
+  let vars = get_global_vars();
+  let current_immersive_degrees = vars.volatility.immersive_degrees();
+  vars
+    .volatility
+    .set_immersive_degrees((current_immersive_degrees / 2).saturating_sub(1));
+
+  let m = "\
+      h1111101\\1……少し話に集中しすぎていたようだ。\\n\
+      h1111204\\1カップを傾け、一息つく。\\n\
+      h1000000\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
+      h1111209\\1\\n(没入度が下がった)\
+      "
+  .to_string();
+
+  new_response_with_value(m, true)
+}
+
+pub fn show_tooltip(id: &str) -> String {
+  format!("\\q[?,OnBalloonTooltip,{}]", id)
+}
+
+pub fn on_balloon_tooltip(_req: &Request) -> Response {
+  new_response_with_value("\\C\\_l[0,0] ".to_string(), false)
+}
+
+pub fn balloon_tooltip(req: &Request) -> Response {
+  let refs = get_references(req);
+  if refs[1] != "OnBalloonTooltip" {
+    return new_response_nocontent();
+  }
+  match refs[2] {
+    "WhatIsImersiveDegree" => new_response_with_value(
+      "没入度は、ハイネとあなたがどれだけ深い内容の会話をしているかを表します。\\n\
+                                  没入度が高いほど、より抽象的でクリティカルな話題を扱います。"
+        .to_string(),
+      false,
+    ),
+    _ => new_response_nocontent(),
+  }
 }
 
 pub fn on_web_clap_open(_req: &Request) -> Response {
@@ -74,6 +165,7 @@ enum Question {
   AreYouMaster,
   FeelingOfDeath,
   FatigueOfLife,
+  HowTallAreYou,
 }
 
 impl Question {
@@ -82,15 +174,17 @@ impl Question {
       0 => Some(Question::AreYouMaster),
       1 => Some(Question::FeelingOfDeath),
       2 => Some(Question::FatigueOfLife),
+      3 => Some(Question::HowTallAreYou),
       _ => None,
     }
   }
 
   fn theme(&self) -> String {
     match self {
-      Question::AreYouMaster => "あなたはここの主なの？".to_string(),
-      Question::FeelingOfDeath => "死んだ感想は？".to_string(),
+      Question::AreYouMaster => "あなたはここの主なのφ？".to_string(),
+      Question::FeelingOfDeath => "死んだ感想はφ？".to_string(),
       Question::FatigueOfLife => "生きるのって苦しいね".to_string(),
+      Question::HowTallAreYou => "身長はどれくらい？".to_string(),
     }
   }
 
@@ -119,6 +213,14 @@ impl Question {
       h1111205そう、そうね。\\n\
       …………1111205悪いけれど、私はその答えを持っていない。\\n\
       h1111204あなたが満足できるまで話を聞くわ。それから、どうするかを決めなさい。\
+      "
+      .to_string(),
+      Question::HowTallAreYou => "\
+      \\1身長はどれくらい？\\n\
+      h1111204まず前提として、霊は身体を自由に変化させることができるわ。\\n\
+      h1111209子供になることも、老人になることも、\\n\
+      h1111206人でない姿になることすら不可能ではないの。\\n\
+      ……h1111204それを踏まえて。今の姿の身長は、おおよそ1.75mね。\
       "
       .to_string(),
     };

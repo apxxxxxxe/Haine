@@ -1,6 +1,7 @@
 use crate::events::common::*;
 use crate::variables::get_global_vars;
 use once_cell::sync::Lazy;
+use rand::prelude::*;
 use shiorust::message::{Request, Response};
 
 pub enum TalkType {
@@ -58,14 +59,37 @@ impl TalkType {
         h1111304……なに、その顔は。h1111309あいにく、私は生きていた頃から恋愛とは無縁よ。\\n\
         "
         .to_string(),
+
+        "\
+        h1111206\\1ポットがひとりでに浮き、空になっていたカップにもう一杯が注がれる。\\n\
+        私の元へ集うのは弱い人たち。\\n\
+        自分だけでは溶けゆく自我を押し留められず、さりとてそれを受け入れることもできない霊。\\n\
+        h1111209役割を与えてあげるの。一種の契約ね。\\n\
+        h1111205使命に縛られはするけれど、自分を保てるわ。\\n\
+        ".to_string(),
+
+        "\
+        h1111203カンテルベリオには、霊が集まりやすい土壌があるの。\\n\
+        h1111206精確には、死の意識が。\\n\
+        ……h1111209あなたがここに来たのも偶然ではないのかもね。\\n\
+        ".to_string(),
+
+        "\
+        h1111209ここは私の生家なの。実際は別荘なのだけど。\\n\
+        h1111205そして、ここで死んだ。\\n\
+        h1111209だから私はここの主となった。\\n\
+        ……h1121304静かに眠りたかったのに、ね？\\n\
+        h1121305貧乏くじだわ。\
+        ".to_string(),
       ],
       Self::Lore => vec![
         "\
         h1111205食事の時間になっても部屋から出てこない家族。\\n\
         扉を開けてみると、彼女は足の一部を残して焼死していた。\\n\
         ……h1111206人体発火現象は、世界中で見られるわ。\\n\
-        h1111209火気はなく、原理は未だ不明。\\n\
-        h1111204さて、あなたはどう思う？\
+        h1111209多くの場合、火気はなく原理は不明。\\n\
+        h1111206さらに、いくらかの延焼はあれど、周囲には被害が及ばないの。\\n\
+        h1111209まったく不思議な話よね。h1111209さて、あなたはどう思う？\
         "
         .to_string(),
         "\
@@ -157,7 +181,8 @@ impl TalkType {
         "\
         h1111109未練もなく、しかし現世に留まっている魂。\\n\
         h1111105あるべきでないものはやがて消滅する。\\n\
-        h1111205私は、それを望んでいるの。
+        h1111206多少の不純物が含まれようと、そのルールは変わらない。\\n\
+        h1111205私は、それを待ち望んでいるの。
         ".to_string(),
       ],
       Self::Abstract => vec![
@@ -418,6 +443,13 @@ pub fn version(_req: &Request) -> Response {
 
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
+
+  // 没入度を上げる
+  let current_immersive_degrees = vars.volatility.immersive_degrees();
+  vars
+    .volatility
+    .set_immersive_degrees(std::cmp::min(current_immersive_degrees + 2, 100));
+
   vars
     .volatility
     .set_last_random_talk_time(vars.volatility.ghost_up_time());
@@ -428,9 +460,9 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
   );
 
-  let rnd = rand::random::<u8>() % 5;
-  let is_abstract = rnd == 0;
-  let talks = if is_abstract {
+  let rnd = rand::thread_rng().gen_range(0..=100);
+  let talks = if rnd < vars.volatility.immersive_degrees() {
+    // 没入度が高いときのトーク
     let mut v = vec![];
     v.extend(TalkType::Abstract.talks());
     v.extend(TalkType::Past.talks());
@@ -443,6 +475,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
       .to_string()],
     ])
   } else {
+    // 没入度が低いときのトーク
     let mut v = vec![];
     v.extend(TalkType::SelfIntroduce.talks());
     v.extend(TalkType::Lore.talks());

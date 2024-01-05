@@ -74,6 +74,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnSmoothBlink" => Some(on_smooth_blink),
     "OnHourTimeSignal" => Some(on_hour_time_signal),
     "OnMenuExec" => Some(on_menu_exec),
+    "OnBreakTime" => Some(on_break_time),
     "OnTalkIntervalChanged" => Some(on_talk_interval_changed),
     "OnMouseClickEx" => Some(on_mouse_click_ex),
     "OnMouseDoubleClick" => Some(on_mouse_double_click),
@@ -86,6 +87,8 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnWebClapInput" => Some(on_web_clap_input),
     "OnExecuteHTTPComplete" => Some(on_execute_http_complete),
     "OnExecuteHTTPFailure" => Some(on_execute_http_failure),
+    "balloon_tooltip" => Some(balloon_tooltip),
+    "OnBalloonTooltip" => Some(on_balloon_tooltip),
     _ => None,
   }
 }

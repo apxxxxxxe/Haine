@@ -130,7 +130,7 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
   }
 }
 
-// ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)なもの
+// ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
 pub struct VolatilityVariables {
   // ゴーストが起動してからの秒数
   pub ghost_up_time: Mutex<u64>,
@@ -171,6 +171,8 @@ pub struct VolatilityVariables {
   pub idle_seconds: Mutex<i32>,
 
   pub idle_threshold: Mutex<i32>,
+
+  pub immersive_degrees: Mutex<u32>,
 }
 
 #[allow(dead_code)]
@@ -197,6 +199,7 @@ impl VolatilityVariables {
   generate_getter_setter!(current_surface, i32, cloneable);
   generate_getter_setter!(idle_seconds, i32, cloneable);
   generate_getter_setter!(idle_threshold, i32, cloneable);
+  generate_getter_setter!(immersive_degrees, u32, cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -221,6 +224,7 @@ impl Default for VolatilityVariables {
       status: Mutex::new(Status::new()),
       idle_seconds: Mutex::new(0),
       idle_threshold: Mutex::new(60 * 5),
+      immersive_degrees: Mutex::new(0),
     }
   }
 }
