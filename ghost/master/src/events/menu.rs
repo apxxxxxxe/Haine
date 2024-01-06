@@ -22,7 +22,7 @@ fn make_bar_chips(length: u32) -> Vec<String> {
   v
 }
 
-fn show_bar(max: u32, current: u32, label: &str) -> String {
+fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
   const SPEED: u32 = 10; // 何文字分の表示時間でバーを描画するか
   const BAR_WIDTH: u32 = 16; // バーの長さを何文字分で描画するか
   const BAR_HEIGHT: u32 = 10;
@@ -32,7 +32,7 @@ fn show_bar(max: u32, current: u32, label: &str) -> String {
 
   format!(
     "\
-    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}%\
+    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}%\\_l[@5,]{}\
     \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
     \\f[height,{}]\\_l[0,]\\f[color,120,0,0]{}\
     \\![quicksection,false]\\f[color,default]\\f[height,default]\
@@ -41,6 +41,7 @@ fn show_bar(max: u32, current: u32, label: &str) -> String {
     BAR_WIDTH + 1,
     label,
     rate,
+    show_tooltip(tooltip_id),
     BAR_HEIGHT,
     make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
     BAR_HEIGHT,
@@ -85,16 +86,17 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     \\n\
     \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\\n\
     {}
-    \\_l[0,12em]\\q[×,]\
-    \\_l[0,1em]{}{}\
+    \\_l[0,13em]\\__q[script:\\e]{}\\__q\
+    \\_l[0,1em]{}\
     ",
     talk_interval_selector,
+    Icon::Cross,
     show_bar(
       100,
       get_global_vars().volatility.immersive_degrees(),
-      "没入度"
+      "没入度",
+      "WhatIsImersiveDegree",
     ),
-    show_tooltip("WhatIsImersiveDegree"),
   );
 
   new_response_with_value(m, true)
@@ -112,7 +114,7 @@ pub fn on_break_time(_req: &Request) -> Response {
       h1111101\\1……少し話に集中しすぎていたようだ。\\n\
       h1111204\\1カップを傾け、一息つく。\\n\
       h1000000\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
-      h1111209\\1\\n(没入度が下がった)\
+      h1111209\\1\\n(没入度が下がった)\\x\\![raise,OnMenuExec]\
       "
   .to_string();
 
@@ -120,7 +122,13 @@ pub fn on_break_time(_req: &Request) -> Response {
 }
 
 pub fn show_tooltip(id: &str) -> String {
-  format!("\\q[?,OnBalloonTooltip,{}]", id)
+  format!(
+    "\\__q[OnBalloonTooltip,{}]\
+    {}
+    \\__q",
+    id,
+    Icon::Info,
+  )
 }
 
 pub fn on_balloon_tooltip(_req: &Request) -> Response {

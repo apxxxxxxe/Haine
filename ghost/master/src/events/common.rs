@@ -1,5 +1,6 @@
 use crate::events::translate::on_translate;
 use crate::variables::get_global_vars;
+use core::fmt::{Display, Formatter};
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
@@ -169,6 +170,34 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     .join(delay.as_str());
 
   new_response_with_value(animation, false)
+}
+
+pub enum Icon {
+  Info,
+  Cross,
+}
+
+impl Display for Icon {
+  fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    write!(
+      f,
+      "\
+    \\f[height,14]\\f[name,icomoon.ttf]\\_l[,@-1]\
+    \\_u[0xE{}]\
+    \\f[name,default]\\f[height,default]\\_l[,@1]\
+    ",
+      self.to_code()
+    )
+  }
+}
+
+impl Icon {
+  fn to_code(&self) -> u32 {
+    match self {
+      Icon::Info => 900,
+      Icon::Cross => 901,
+    }
+  }
 }
 
 #[cfg(test)]
