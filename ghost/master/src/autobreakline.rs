@@ -76,8 +76,9 @@ impl Inserter {
     }));
   }
 
+  #[allow(dead_code)]
   pub fn default() -> Self {
-    Self::new(24.0)
+    Self::new(24.0) // 24文字で改行: SSPデフォルト+に合わせた値
   }
 
   pub fn run(&mut self, src: String) -> String {

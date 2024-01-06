@@ -218,7 +218,7 @@ impl Default for VolatilityVariables {
       first_sexial_touch: Mutex::new(false),
       touch_count: Mutex::new(0),
       last_touch_info: Mutex::new("".to_string()),
-      inserter: Mutex::new(Inserter::default()),
+      inserter: Mutex::new(Inserter::new(23.0)), // "霧の郊外にて"に合わせた値
       talk_bias: Mutex::new(TalkBias::new()),
       current_surface: Mutex::new(0),
       status: Mutex::new(Status::new()),

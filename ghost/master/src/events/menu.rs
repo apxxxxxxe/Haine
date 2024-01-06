@@ -33,15 +33,15 @@ pub fn on_menu_exec(_req: &Request) -> Response {
 
   let m = format!(
     "\\_q\
-    \\_l[0,3em]\
+    \\_l[0,2em]\
     \\![*]\\q[なにか話して,OnAiTalk]\\n\
     \\![*]\\q[話しかける,OnTalk]\\n\
     \\![*]\\q[ひと息つく,OnBreakTime]\\n\
     \\n\
     \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\\n\
     {}
-    \\_l[0,13em]\\__q[script:\\e]{}\\__q\
-    \\_l[0,1em]{}\
+    \\_l[0,12em]\\__q[script:\\e]{}\\__q\
+    \\_l[0,0]{}\
     ",
     talk_interval_selector,
     Icon::Cross,
@@ -115,7 +115,7 @@ pub fn on_break_time(_req: &Request) -> Response {
       h1111101\\1……少し話に集中しすぎていたようだ。\\n\
       h1111204\\1カップを傾け、一息つく。\\n\
       h1000000\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
-      h1111209\\1\\n(没入度が下がった)\\x\\![raise,OnMenuExec]\
+      h1111209\\1\\n(没入度が半減した)\\x\\![raise,OnMenuExec]\
       "
   .to_string();
 
