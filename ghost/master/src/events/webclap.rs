@@ -1,5 +1,14 @@
 use crate::events::common::*;
-use shiorust::message::{Response, *};
+use shiorust::message::{Request, Response};
+
+pub fn on_web_clap_open(_req: &Request) -> Response {
+  let m = "\
+             \\1\\![open,inputbox,OnWebClapInput,0]Web拍手を送ります。\\n\
+             感想やバグ報告、要望などをお送り下さい。\
+             "
+  .to_string();
+  new_response_with_value(m, true)
+}
 
 pub fn on_web_clap_input(req: &Request) -> Response {
   let refs = get_references(req);

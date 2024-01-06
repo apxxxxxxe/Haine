@@ -167,13 +167,13 @@ impl Replacee {
   }
 }
 
-static QUICK_SECTION_START: Lazy<Regex> =
-  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
-static QUICK_SECTION_END: Lazy<Regex> =
-  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
-static WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\\_w\[[0-9]+\]|\\w[1-9])").unwrap());
-
 fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
+  static QUICK_SECTION_START: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
+  static QUICK_SECTION_END: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
+  static WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\\_w\[[0-9]+\]|\\w[1-9])").unwrap());
+
   let mut translated = String::new();
 
   let lines = Dialog::from_text(src);

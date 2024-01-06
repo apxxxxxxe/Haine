@@ -1,22 +1,24 @@
 pub mod aitalk;
 mod bootend;
 mod common;
-mod input;
 mod key;
 mod menu;
 mod mouse;
 pub mod mouse_core;
 mod periodic;
+mod tooltip;
 pub mod translate;
+mod webclap;
 
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
 use crate::events::common::*;
-use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
+use crate::events::tooltip::*;
+use crate::events::webclap::*;
 use crate::variables::get_global_vars;
 
 use shiorust::message::{parts::*, traits::*, Request, Response};
