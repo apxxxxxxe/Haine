@@ -2,7 +2,7 @@ use crate::events::common::*;
 use crate::variables::get_global_vars;
 use once_cell::sync::Lazy;
 use rand::prelude::*;
-use shiorust::message::{Request, Response};
+use shiorust::message::{parts::HeaderName, Request, Response};
 
 pub enum TalkType {
   SelfIntroduce,
@@ -460,15 +460,18 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
   );
 
+  let talk_desc: &str;
   let rnd = rand::thread_rng().gen_range(0..=100);
   let talks = if rnd < vars.volatility.immersive_degrees() {
     // 没入度が高いときのトーク
+    talk_desc = "トーク没入度: 高";
     let mut v = vec![];
     v.extend(TalkType::Abstract.talks());
     v.extend(TalkType::Past.talks());
     v
   } else {
     // 没入度が低いときのトーク
+    talk_desc = "トーク没入度: 低";
     let mut v = vec![];
     v.extend(TalkType::SelfIntroduce.talks());
     v.extend(TalkType::Lore.talks());
@@ -476,14 +479,18 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     v
   };
 
-  new_response_with_value(
+  let mut res = new_response_with_value(
     choose_one(
       &talks,
       vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
     )
     .unwrap(),
     true,
-  )
+  );
+  res
+    .headers
+    .insert_by_header_name(HeaderName::from("Marker"), talk_desc.to_string());
+  res
 }
 
 pub fn on_anchor_select_ex(req: &Request) -> Response {
