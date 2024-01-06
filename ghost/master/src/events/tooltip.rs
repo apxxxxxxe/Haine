@@ -2,13 +2,7 @@ use crate::events::common::*;
 use shiorust::message::{Request, Response};
 
 pub fn show_tooltip(id: &str) -> String {
-  format!(
-    "\\__q[OnBalloonTooltip,{}]\
-    {}
-    \\__q",
-    id,
-    Icon::Info,
-  )
+  format!("\\__q[OnBalloonTooltip,{}]{}\\__q", id, Icon::Info)
 }
 
 pub fn on_balloon_tooltip(_req: &Request) -> Response {
