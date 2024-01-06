@@ -1,3 +1,4 @@
+use crate::events::aitalk::Talk;
 use crate::events::common::*;
 use crate::variables::GlobalVariables;
 use once_cell::sync::Lazy;
@@ -25,9 +26,9 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
-pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
+pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Talk>> {
   match info.as_str() {
-    "0handnade" => Some(vec![
+    "0handnade" => Some(Talk::from_vec(vec![
       "\
         h1111205\\1触れた手の感触はゼリーを掴むような頼りなさ、冷たさだった。\
         ……手が冷えるわよ。h1111204ほどほどにね。\
@@ -43,7 +44,7 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
       h1111209……うん。\\n\
       "
       .to_string(),
-    ]),
+    ])),
     "0bustnade" => Some(bust_touch(vars)),
     "0bustdoubleclick" => Some(bust_touch(vars)),
     "0skirtup" => {
@@ -59,10 +60,10 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
           "h1111304……悪餓鬼。".to_string(),
         ]);
       }
-      let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
+      let zero_skirt_up: Vec<Talk> = Talk::from_vec(all_combo(&conbo_parts));
       Some(zero_skirt_up)
     }
-    "0shoulderdown" => Some(vec![
+    "0shoulderdown" => Some(Talk::from_vec(vec![
       "\
       h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
       h1111101……h1111204私はあなたのものじゃないのよ。\\n\
@@ -73,12 +74,12 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
       h1111204……それで？h1111209あなたは私をどうしたいのかしら。\
       "
       .to_string(),
-    ]),
+    ])),
     _ => None,
   }
 }
 
-fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
+fn bust_touch(vars: &mut GlobalVariables) -> Vec<Talk> {
   let zero_bust_touch_threshold = 12;
   let mut zero_bust_touch = Vec::new();
   if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
@@ -108,5 +109,5 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   } else {
     zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
   }
-  zero_bust_touch
+  Talk::from_vec(zero_bust_touch)
 }

@@ -1,3 +1,4 @@
+use crate::events::aitalk::Talk;
 use rand::Rng;
 use std::collections::HashMap;
 
@@ -37,10 +38,10 @@ impl TalkBias {
     i32::MAX / key_count as i32
   }
 
-  pub fn roulette(&mut self, talks: &[String], is_consume: bool) -> usize {
+  pub fn roulette(&mut self, talks: &[Talk], is_consume: bool) -> usize {
     let mut rng = rand::thread_rng();
 
-    let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(s)).collect();
+    let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(&s.text)).collect();
     println!("counts: {:?}", counts_vec);
     let mut bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
     println!("before_bias: {:?}", bias_vec);
@@ -78,10 +79,10 @@ impl TalkBias {
       for (i, talk) in talks.iter().enumerate() {
         if i == selected_index {
           // 選ばれたトークの重みを0に
-          self.reset(talk.clone());
+          self.reset(talk.text.clone());
         } else {
           // 全体の1/2が消費されるまで、それまでのトークが再び選ばれる可能性は生まれない
-          self.increment(talk.clone());
+          self.increment(talk.text.clone());
         }
       }
     }
@@ -128,9 +129,9 @@ mod test {
     bias.reset("g".to_string());
     bias.reset("h".to_string());
 
-    let talks: Vec<String> = ["a", "b", "c", "d", "e", "f", "g", "h"]
+    let talks: Vec<Talk> = ["a", "b", "c", "d", "e", "f", "g", "h"]
       .iter()
-      .map(|s| s.to_string())
+      .map(|s| Talk::new(None, s.to_string()))
       .collect();
 
     let mut indexes: Vec<usize> = vec![];
@@ -143,7 +144,10 @@ mod test {
           println!("duplication: {}", selected_index);
         }
       };
-      let biases: Vec<i32> = talks.iter().map(|s| bias.calc_bias(bias.get(s))).collect();
+      let biases: Vec<i32> = talks
+        .iter()
+        .map(|s| bias.calc_bias(bias.get(&s.text)))
+        .collect();
       println!("biases: {:?}", biases);
       indexes.push(selected_index);
       select_count[selected_index] += 1;

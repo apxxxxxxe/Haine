@@ -1,15 +1,52 @@
 use crate::events::common::*;
 use crate::variables::get_global_vars;
+use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
 use shiorust::message::{parts::HeaderName, Request, Response};
 
+#[derive(Clone)]
+pub struct Talk {
+  pub talk_type: Option<TalkType>,
+  pub text: String,
+}
+
+impl Display for Talk {
+  fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    write!(f, "{}", self.text)
+  }
+}
+
+impl Talk {
+  pub fn new(talk_type: Option<TalkType>, text: String) -> Self {
+    Self { talk_type, text }
+  }
+
+  pub fn from_vec(texts: Vec<String>) -> Vec<Self> {
+    texts.into_iter().map(|t| Self::new(None, t)).collect()
+  }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum TalkType {
   SelfIntroduce,
   Lore,
   Past,
   Abstract,
   WithYou,
+}
+
+impl Display for TalkType {
+  fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    let s = match self {
+      Self::SelfIntroduce => "ハイネ自身の話題",
+      Self::Lore => "ロアの話題",
+      Self::Past => "ハイネの過去についての話題",
+      Self::Abstract => "抽象的な話題",
+      Self::WithYou => "あなたについての話題",
+    };
+    write!(f, "{}", s)
+  }
 }
 
 impl TalkType {
@@ -23,7 +60,7 @@ impl TalkType {
     ]
   }
 
-  pub fn all_talks() -> Vec<String> {
+  pub fn all_talks() -> Vec<Talk> {
     let mut v = Vec::new();
     for t in Self::all() {
       v.extend(t.talks());
@@ -31,8 +68,8 @@ impl TalkType {
     v
   }
 
-  fn talks(&self) -> Vec<String> {
-    match self {
+  fn talks(&self) -> Vec<Talk> {
+    let strings = match self {
       Self::SelfIntroduce => vec![
         "\
         h1111205ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
@@ -378,7 +415,11 @@ impl TalkType {
         h1112209それって、この上なく残酷なことだわ。\
         ".to_string(),
       ],
-    }
+    };
+    strings
+      .iter()
+      .map(|s| Talk::new(Some(*self), s.clone()))
+      .collect()
   }
 }
 
@@ -459,18 +500,18 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
   );
 
-  let talk_desc: &str;
   let rnd = rand::thread_rng().gen_range(0..=100);
+  let immersive: &str;
   let talks = if rnd < vars.volatility.immersive_degrees() {
     // 没入度が高いときのトーク
-    talk_desc = "トーク没入度: 高";
+    immersive = "高";
     let mut v = vec![];
     v.extend(TalkType::Abstract.talks());
     v.extend(TalkType::Past.talks());
     v
   } else {
     // 没入度が低いときのトーク
-    talk_desc = "トーク没入度: 低";
+    immersive = "低";
     let mut v = vec![];
     v.extend(TalkType::SelfIntroduce.talks());
     v.extend(TalkType::Lore.talks());
@@ -478,17 +519,21 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     v
   };
 
-  let mut res = new_response_with_value(
-    choose_one(
-      &talks,
-      vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
-    )
-    .unwrap(),
-    true,
+  let choosed_talk = choose_one(
+    &talks,
+    vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
+  )
+  .unwrap();
+
+  let mut res = new_response_with_value(choosed_talk.text, true);
+  res.headers.insert_by_header_name(
+    HeaderName::from("Marker"),
+    format!(
+      "{}(没入度:{})",
+      choosed_talk.talk_type.unwrap(),
+      immersive,
+    ),
   );
-  res
-    .headers
-    .insert_by_header_name(HeaderName::from("Marker"), talk_desc.to_string());
   res
 }
 

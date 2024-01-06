@@ -1,3 +1,4 @@
+use crate::events::aitalk::Talk;
 use crate::events::translate::on_translate;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
@@ -34,7 +35,7 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
   r
 }
 
-pub fn choose_one(values: &[String], update_weight: bool) -> Option<String> {
+pub fn choose_one(values: &[Talk], update_weight: bool) -> Option<Talk> {
   if values.is_empty() {
     return None;
   }
@@ -43,7 +44,7 @@ pub fn choose_one(values: &[String], update_weight: bool) -> Option<String> {
     .volatility
     .talk_bias_mut()
     .roulette(values, update_weight);
-  Some(values.get(u).unwrap().to_owned())
+  Some(values.get(u).unwrap().clone())
 }
 
 // return all combinations of values
