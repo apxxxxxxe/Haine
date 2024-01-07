@@ -4,13 +4,6 @@ use rand::seq::SliceRandom;
 use shiorust::message::{Response, *};
 
 pub fn on_boot(_req: &Request) -> Response {
-  // \1のサーフェスを\0に重ねて固定する
-  let init_tag = "\
-    \\1\\![reset,sticky-window]\
-    \\![set,alignmenttodesktop,free]\
-    \\![move,--X=0,--Y=0,--time=0,--base=0]\
-    \\![set,sticky-window,1,0]";
-
   let talks = Talk::from_vec(all_combo(&vec![
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
     vec![
@@ -19,7 +12,7 @@ pub fn on_boot(_req: &Request) -> Response {
   ]));
   let v = format!(
     "{}{}{}",
-    init_tag,
+    STICK_SURFACES,
     randomize_underwear(),
     choose_one(&talks, false).unwrap(),
   );

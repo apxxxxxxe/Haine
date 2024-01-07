@@ -531,7 +531,9 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   )
   .unwrap();
 
-  let mut res = new_response_with_value(choosed_talk.text, true);
+  let m = format!("{}{}", STICK_SURFACES, choosed_talk.text);
+
+  let mut res = new_response_with_value(m, true);
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{} (没入度{})", choosed_talk.talk_type.unwrap(), immersive,),
