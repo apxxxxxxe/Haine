@@ -7,6 +7,8 @@ use shiorust::message::{Request, Response};
 
 pub fn on_second_change(req: &Request) -> Response {
   let vars = get_global_vars();
+
+  // 最小化中かどうかに関わらず実行する処理
   let total_time = vars.total_time().unwrap();
   vars.set_total_time(Some(total_time + 1));
   vars
@@ -20,6 +22,11 @@ pub fn on_second_change(req: &Request) -> Response {
   if vars.random_talk_interval().unwrap() > 0
     && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time())
       > vars.random_talk_interval().unwrap()
+    && !vars
+      .volatility
+      .status()
+      .get("minimizing")
+      .is_some_and(|v| v)
   {
     on_ai_talk(req)
   } else {
