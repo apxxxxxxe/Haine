@@ -20,7 +20,7 @@ pub fn on_boot(_req: &Request) -> Response {
   let v = format!(
     "{}{}{}",
     init_tag,
-    random_underwear(),
+    randomize_underwear(),
     choose_one(&talks, false).unwrap(),
   );
   new_response_with_value(v, true)
@@ -247,7 +247,7 @@ fn shake(text: &str) -> String {
   s
 }
 
-fn random_underwear() -> String {
+fn randomize_underwear() -> String {
   let mut rng = rand::thread_rng();
   let candidates = ["A", "B"];
   format!(
