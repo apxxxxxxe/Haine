@@ -134,21 +134,23 @@ pub fn on_talk_interval_changed(req: &Request) -> Response {
 struct Question(u32);
 
 impl Question {
-  const ARE_YOU_MASTER: Self = Self(0);
-  const FEELING_OF_DEATH: Self = Self(1);
-  const FATIGUE_OF_LIFE: Self = Self(2);
-  const HOW_TALL_ARE_YOU: Self = Self(3);
-  const HOW_WEIGHT_ARE_YOU: Self = Self(4);
-  const HOW_MUCH_IS_YOUR_BWH: Self = Self(5);
+  const HOW_OLD_ARE_YOU: Self = Self(0);
+  const HOW_TALL_ARE_YOU: Self = Self(1);
+  const HOW_WEIGHT_ARE_YOU: Self = Self(2);
+  const HOW_MUCH_IS_YOUR_BWH: Self = Self(3);
+  const ARE_YOU_MASTER: Self = Self(4);
+  const FEELING_OF_DEATH: Self = Self(5);
+  const FATIGUE_OF_LIFE: Self = Self(6);
 
   fn theme(&self) -> String {
     match *self {
-      Question::ARE_YOU_MASTER => "あなたはここの主なの？".to_string(),
-      Question::FEELING_OF_DEATH => "死んだ感想は？".to_string(),
-      Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
+      Question::HOW_OLD_ARE_YOU => "何歳？".to_string(),
       Question::HOW_TALL_ARE_YOU => "身長はどれくらい？".to_string(),
       Question::HOW_WEIGHT_ARE_YOU => "体重は？".to_string(),
       Question::HOW_MUCH_IS_YOUR_BWH => "スリーサイズを教えて".to_string(),
+      Question::ARE_YOU_MASTER => "あなたはここの主なの？".to_string(),
+      Question::FEELING_OF_DEATH => "死んだ感想は？".to_string(),
+      Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
       _ => unreachable!(),
     }
   }
@@ -182,10 +184,12 @@ impl Question {
       .to_string(),
       Question::HOW_TALL_ARE_YOU => "\
       \\1身長はどれくらい？\\n\
-      h1111204まず前提として、霊は身体を自由に変化させることができるわ。\\n\
-      h1111209子供になることも、老人になることも、\\n\
+      h1111204今の姿ならおおよそ175cmね。\\n\
+      ……h1111209今の、と言ったのは、\\n\
+      私たち霊は身体を自由に変化させることができるから。\\n\
+      子供になることも、老人になることも、\\n\
       h1111206人でない姿になることすら不可能ではないの。\\n\
-      ……h1111204それを踏まえて。今の姿の身長はおおよそ175cmね。\
+      h1111204……まあ、生前はそのくらいだったと思ってくれていいわ。\
       "
       .to_string(),
       Question::HOW_WEIGHT_ARE_YOU => "\
@@ -200,8 +204,15 @@ impl Question {
       \\1スリーサイズを教えて。\\n\
       h1111201…………さっきから随分と果断ね。\\n\
       h1111204怒られるかもとか考えないのかしら。\\n\
-      h1111205……79, 56, 81。\\n\
+      h1111205……79・56・81。\\n\
       ……h1111209何に使うか知らないけれど。\
+      "
+      .to_string(),
+      Question::HOW_OLD_ARE_YOU => "\
+      \\1何歳？\\n\
+      h1111204……女性に聞くことかしら。\\n\
+      ……h1111209まあ、いいわ。\\n\
+      h1111205死んだ時は26、死んでからは……数えていないわ。\
       "
       .to_string(),
       _ => unreachable!(),
@@ -218,7 +229,9 @@ pub fn on_talk(_req: &Request) -> Response {
     Question::HOW_TALL_ARE_YOU,
     Question::HOW_WEIGHT_ARE_YOU,
     Question::HOW_MUCH_IS_YOUR_BWH,
+    Question::HOW_OLD_ARE_YOU,
   ];
+  questions.sort_by(|a, b| a.0.cmp(&b.0));
 
   let mut m = "\\_q".to_string();
   for q in questions.iter_mut() {
