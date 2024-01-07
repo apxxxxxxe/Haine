@@ -17,6 +17,7 @@ impl Display for Talk {
   }
 }
 
+#[allow(dead_code)]
 impl Talk {
   pub fn new(talk_type: Option<TalkType>, text: String) -> Self {
     Self { talk_type, text }
@@ -24,6 +25,13 @@ impl Talk {
 
   pub fn from_vec(texts: Vec<String>) -> Vec<Self> {
     texts.into_iter().map(|t| Self::new(None, t)).collect()
+  }
+
+  pub fn from_vec_with_type(talk_type: TalkType, texts: Vec<String>) -> Vec<Self> {
+    texts
+      .into_iter()
+      .map(|t| Self::new(Some(talk_type), t))
+      .collect()
   }
 }
 
@@ -40,7 +48,7 @@ impl Display for TalkType {
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     let s = match self {
       Self::SelfIntroduce => "ハイネ自身の話題",
-      Self::Lore => "ロアの話題",
+      Self::Lore => "ロア/オカルト",
       Self::Past => "ハイネの過去についての話題",
       Self::Abstract => "抽象的な話題",
       Self::WithYou => "あなたについての話題",
@@ -318,6 +326,12 @@ impl TalkType {
         不明な道程(みちのり)を手で探るよりも、\\n\
         h1112305目先の手首を切り裂くほうがはるかに明瞭なのだ！\
         ".to_string(),
+        "\
+        h1111206私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
+        h1111204あなたは目の前にいるのに、\\n\
+        あなたが見る世界を私が知ることはできないの。\\n\
+        h1112209それって、この上なく残酷なことだわ。\
+        ".to_string(),
       ],
       Self::WithYou => vec![
         "\
@@ -405,13 +419,6 @@ impl TalkType {
         "\
         h1111204あなた、口数が少ないのね。\\n\
         h1111201いえ、いいのよ。h1111205そう、どちらでもいい。\\n\
-        ".to_string(),
-
-        "\
-        h1111206私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
-        h1111204あなたは目の前にいるのに、\\n\
-        あなたが見る世界を私が知ることはできないの。\\n\
-        h1112209それって、この上なく残酷なことだわ。\
         ".to_string(),
       ],
     };
@@ -527,11 +534,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   let mut res = new_response_with_value(choosed_talk.text, true);
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
-    format!(
-      "{} (没入度{})",
-      choosed_talk.talk_type.unwrap(),
-      immersive,
-    ),
+    format!("{} (没入度{})", choosed_talk.talk_type.unwrap(), immersive,),
   );
   res
 }
