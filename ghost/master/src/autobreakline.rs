@@ -82,7 +82,8 @@ impl Inserter {
   }
 
   pub fn run(&mut self, src: String) -> String {
-    let parts = self.wakachi(src);
+    let mut parts = self.wakachi(src);
+    self.remove_last_whitespace(parts.as_mut());
     self.render(parts)
   }
 
@@ -242,6 +243,28 @@ impl Inserter {
     }
 
     results
+  }
+
+  fn remove_last_whitespace(&mut self, parts: &mut [String]) {
+    for part in parts.iter_mut() {
+      while SAKURA_SCRIPT_RE
+        .replace_all(part, "")
+        .chars()
+        .last()
+        .is_some_and(|c| c.is_whitespace())
+      {
+        let mut is_whitespace_skipped = false;
+        let mut chars: Vec<char> = Vec::new();
+        for c in part.chars().rev().collect::<String>().chars() {
+          if c.is_whitespace() && !is_whitespace_skipped {
+            is_whitespace_skipped = true;
+            continue;
+          }
+          chars.push(c);
+        }
+        *part = chars.iter().rev().collect::<String>();
+      }
+    }
   }
 
   fn render(&mut self, parts: Vec<String>) -> String {
