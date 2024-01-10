@@ -3,6 +3,18 @@ use crate::events::common::*;
 use rand::seq::SliceRandom;
 use shiorust::message::{Response, *};
 
+pub fn on_stick_surface(_req: &Request) -> Response {
+  // \1のサーフェスを\0に重ねて固定する
+  let stick_surfaces = "\
+  \\1\\_w[100]\
+  \\![reset,sticky-window]\
+  \\![set,alignmenttodesktop,free]\
+  \\![move,--X=0,--Y=0,--time=0,--base=0]\
+  \\![set,sticky-window,1,0]\
+  ";
+  new_response_with_value(stick_surfaces.to_string(), false)
+}
+
 pub fn on_boot(_req: &Request) -> Response {
   let talks = Talk::from_vec(all_combo(&vec![
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
@@ -11,8 +23,7 @@ pub fn on_boot(_req: &Request) -> Response {
     ],
   ]));
   let v = format!(
-    "{}{}{}",
-    STICK_SURFACES,
+    "\\![embed,OnStickSurface]{}{}",
     randomize_underwear(),
     choose_one(&talks, false).unwrap(),
   );

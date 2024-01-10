@@ -91,6 +91,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnExecuteHTTPFailure" => Some(on_execute_http_failure),
     "balloon_tooltip" => Some(balloon_tooltip),
     "OnBalloonTooltip" => Some(on_balloon_tooltip),
+    "OnStickSurface" => Some(on_stick_surface),
     _ => None,
   }
 }

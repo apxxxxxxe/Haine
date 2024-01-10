@@ -5,15 +5,6 @@ use core::fmt::{Display, Formatter};
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
-// \1のサーフェスを\0に重ねて固定する
-pub static STICK_SURFACES: &str = "\
-  \\1\\_w[100]\
-  \\![reset,sticky-window]\
-  \\![set,alignmenttodesktop,free]\
-  \\![move,--X=0,--Y=0,--time=0,--base=0]\
-  \\![set,sticky-window,1,0]\
-  ";
-
 pub fn new_response() -> Response {
   let mut headers = Headers::new();
   headers.insert(

@@ -537,8 +537,8 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   .unwrap();
 
   let m = format!(
-    "{}\\0\\![bind,シルエット,黒塗り4,{}]{}",
-    STICK_SURFACES, bind, choosed_talk.text
+    "\\0\\![bind,シルエット,黒塗り4,{}]{}",
+    bind, choosed_talk.text
   );
 
   let mut res = new_response_with_value(m, true);
