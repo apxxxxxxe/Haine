@@ -510,9 +510,11 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   let rnd = rand::thread_rng().gen_range(0..=100);
   let immersive: &str;
+  let bind: u8;
   let talks = if rnd < vars.volatility.immersive_degrees() {
     // 没入度が高いときのトーク
     immersive = "高";
+    bind = 1;
     let mut v = vec![];
     v.extend(TalkType::Abstract.talks());
     v.extend(TalkType::Past.talks());
@@ -520,6 +522,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   } else {
     // 没入度が低いときのトーク
     immersive = "低";
+    bind = 0;
     let mut v = vec![];
     v.extend(TalkType::SelfIntroduce.talks());
     v.extend(TalkType::Lore.talks());
@@ -533,7 +536,10 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   )
   .unwrap();
 
-  let m = format!("{}{}", STICK_SURFACES, choosed_talk.text);
+  let m = format!(
+    "{}\\0\\![bind,シルエット,黒塗り4,{}]{}",
+    STICK_SURFACES, bind, choosed_talk.text
+  );
 
   let mut res = new_response_with_value(m, true);
   res.headers.insert_by_header_name(
