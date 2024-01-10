@@ -26,10 +26,11 @@ fn find_change_scope(text: &str) -> Option<String> {
 }
 
 pub fn extract_scope(text: &str) -> Option<usize> {
-  let re_not_number = Regex::new(r"[^\d]").unwrap();
+  static RE_NOT_NUMBER: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^\d]").unwrap());
+
   if let Some(scope_tag) = find_change_scope(text) {
     debug!("scope_tag: {}", scope_tag);
-    if let Ok(s) = re_not_number.replace_all(&scope_tag, "").parse::<usize>() {
+    if let Ok(s) = RE_NOT_NUMBER.replace_all(&scope_tag, "").parse::<usize>() {
       debug!("scope: {}", s);
       return Some(s);
     }
@@ -82,9 +83,14 @@ impl Inserter {
   }
 
   pub fn run(&mut self, src: String) -> String {
-    let mut parts = self.wakachi(src);
-    self.remove_last_whitespace(parts.as_mut());
-    self.render(parts)
+    let parts = self.wakachi(src);
+    let mut lines = self
+      .render(parts)
+      .split("\\n")
+      .map(|s| s.to_string())
+      .collect::<Vec<String>>();
+    self.remove_last_whitespace(lines.as_mut());
+    lines.join("\\n")
   }
 
   #[allow(dead_code)]
@@ -101,6 +107,9 @@ impl Inserter {
   }
 
   fn wakachi(&mut self, src: String) -> Vec<String> {
+    static RE_LINE_SPLITTER: Lazy<Regex> =
+      Lazy::new(|| Regex::new(r"(\\n|\\_l\[0|\\x|\\c|\\[01]|\\p\[\d+\])").unwrap());
+
     let tokenizer_clone = self.tokenizer.clone();
     let tokenizer = tokenizer_clone.lock().unwrap();
     let t = tokenizer.as_ref().unwrap();
@@ -154,8 +163,7 @@ impl Inserter {
     let mut result = "".to_string();
     let delim_re = "\x1f$1";
     let delim = "\x1f";
-    let line_splitter = Regex::new(r"(\\n|\\_l\[0|\\x|\\c|\\[01]|\\p\[\d+\])").unwrap();
-    text = line_splitter.replace_all(&text, delim_re).to_string();
+    text = RE_LINE_SPLITTER.replace_all(&text, delim_re).to_string();
     let lines = text
       .split(delim)
       .map(|s| s.to_string())
@@ -268,10 +276,12 @@ impl Inserter {
   }
 
   fn render(&mut self, parts: Vec<String>) -> String {
-    let re_open_bracket = Regex::new(r"[「『（【]").unwrap();
-    let re_close_bracket = Regex::new(r"[」』）】]").unwrap();
-    let re_periods = Regex::new(r"[、。！？]").unwrap();
-    let re_change_line = Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap();
+    static RE_OPEN_BRACKET: Lazy<Regex> = Lazy::new(|| Regex::new(r"[「『（【]").unwrap());
+    static RE_CLOSE_BRACKET: Lazy<Regex> = Lazy::new(|| Regex::new(r"[」』）】]").unwrap());
+    static RE_PERIODS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[、。！？]").unwrap());
+    static RE_CHANGE_LINE: Lazy<Regex> =
+      Lazy::new(|| Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap());
+
     let mut result = String::new();
     let mut counts = [0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく
     let mut i = 0;
@@ -283,14 +293,14 @@ impl Inserter {
       }
       let part = parts[i].clone();
       let c = self.count(part.to_string());
-      brackets_depth += re_open_bracket.find_iter(&part).count() as i32;
-      brackets_depth -= (re_close_bracket.find_iter(&part).count() as i32).max(0);
+      brackets_depth += RE_OPEN_BRACKET.find_iter(&part).count() as i32;
+      brackets_depth -= (RE_CLOSE_BRACKET.find_iter(&part).count() as i32).max(0);
 
       if let Some(s) = extract_scope(&part) {
         scope = s;
       }
 
-      if re_change_line.is_match(&part) {
+      if RE_CHANGE_LINE.is_match(&part) {
         counts[scope] = 0.0;
       }
 
@@ -313,12 +323,12 @@ impl Inserter {
 
       // 句読点後の文章が1行に収まるなら、一気に出力して次へ
       // ただし括弧内では実行しない ぶつ切りの引用文とか台詞はなんか変な感じがするので
-      if re_periods.is_match(&part) && brackets_depth == 0 {
+      if RE_PERIODS.is_match(&part) && brackets_depth == 0 {
         let mut j = i + 1;
         let mut next_line = String::new();
         while j < parts.len() {
           let next = parts[j].clone();
-          if CHANGE_SCOPE_RE.is_match(&next).is_ok_and(|r| r) || re_change_line.is_match(&next) {
+          if CHANGE_SCOPE_RE.is_match(&next).is_ok_and(|r| r) || RE_CHANGE_LINE.is_match(&next) {
             j -= 1;
             break;
           }

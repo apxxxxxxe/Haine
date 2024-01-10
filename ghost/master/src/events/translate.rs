@@ -23,9 +23,12 @@ pub fn on_translate(text: String) -> String {
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
 fn text_only_translater(text: String) -> String {
-  let re_tags = Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap();
-  let tags = re_tags.find_iter(&text);
-  let splitted = re_tags.split(&text).collect::<Vec<&str>>();
+  static RE_TEXT_ONLY: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap()
+  });
+
+  let tags = RE_TEXT_ONLY.find_iter(&text);
+  let splitted = RE_TEXT_ONLY.split(&text).collect::<Vec<&str>>();
   let mut result = String::new();
 
   for (i, tag) in tags.enumerate() {
@@ -39,16 +42,19 @@ fn text_only_translater(text: String) -> String {
 
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
 fn translate_part(text: String) -> String {
-  let surface_snippet = Regex::new(r"h([0-9]{7})").unwrap();
+  static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
 
-  let surface_replaced = surface_snippet.replace_all(&text, "\\0\\s[$1]").to_string();
+  let surface_replaced = RE_SURFACE_SNIPPET
+    .replace_all(&text, "\\0\\s[$1]")
+    .to_string();
 
   let vars = get_global_vars();
   surface_replaced.replace("{user_name}", &vars.user_name().clone().unwrap())
 }
 
 fn translate_whole(text: String) -> String {
-  let last_wait = Regex::new(r"\\_w\[([0-9]+)\]$").unwrap();
+  static RE_LAST_WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\_w\[([0-9]+)\]$").unwrap());
+
   let mut translated = text.clone();
 
   let phi = "φ";
@@ -66,7 +72,7 @@ fn translate_whole(text: String) -> String {
   translated = replace_with_check(&translated, replaces);
   translated = translated.replace(phi, "");
 
-  translated = last_wait.replace(&translated, "").to_string();
+  translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
   translated
 }
