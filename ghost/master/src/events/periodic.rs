@@ -1,4 +1,5 @@
 use crate::events::aitalk::on_ai_talk;
+use crate::events::bootend::on_stick_surface;
 use crate::events::common::*;
 use crate::variables::get_global_vars;
 use chrono::Timelike;
@@ -29,6 +30,11 @@ pub fn on_second_change(req: &Request) -> Response {
       .is_some_and(|v| v)
   {
     on_ai_talk(req)
+  } else if vars.volatility.ghost_up_time() % 60 == 0
+    && !vars.volatility.status().get("talking").unwrap()
+  {
+    // 1分ごとにサーフェスを重ね直す
+    on_stick_surface(req)
   } else {
     new_response_nocontent()
   }
