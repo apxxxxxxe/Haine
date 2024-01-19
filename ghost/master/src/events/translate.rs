@@ -57,20 +57,20 @@ fn translate_whole(text: String) -> String {
 
   let mut translated = text.clone();
 
-  let phi = "φ";
+  const PHI: &str = "φ";
   let replaces = vec![
-    Replacee::new("、", "、\\_w[600]", phi, "", None),
-    Replacee::new("。", " \\_w[1200]", phi, ")）」』", Some(vec![0])),
-    Replacee::new("。", "。\\_w[1200]", phi, ")）」』", Some(vec![1])),
-    Replacee::new("！", "！\\_w[1200]", phi, ")）」』", None),
-    Replacee::new("？", "？\\_w[1200]", phi, ")）」』", None),
-    Replacee::new("…", "…\\_w[600]", phi, ")）」』", None),
-    Replacee::new("」", "」\\_w[600]", phi, ")）", None),
-    Replacee::new("』", "』\\_w[600]", phi, ")）」", None),
-    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", phi, "", None),
+    Replacee::new("、", "、\\_w[600]", PHI, "", None),
+    Replacee::new("。", " \\_w[1200]", PHI, ")）」』", Some(vec![0])),
+    Replacee::new("。", "。\\_w[1200]", PHI, ")）」』", Some(vec![1])),
+    Replacee::new("！", "！\\_w[1200]", PHI, ")）」』", None),
+    Replacee::new("？", "？\\_w[1200]", PHI, ")）」』", None),
+    Replacee::new("…", "…\\_w[600]", PHI, ")）」』", None),
+    Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
+    Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
+    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
   ];
   translated = replace_with_check(&translated, replaces);
-  translated = translated.replace(phi, "");
+  translated = translated.replace(PHI, "");
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
