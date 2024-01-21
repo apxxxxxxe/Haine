@@ -2,10 +2,12 @@
 .github
 .gitignore
 .gitmodules
+.gitattributes
 readme.md
 ReadMe.md
 README.md
 updates.txt
+updates.txt.bak
 updates2.dau
 
 desktop.ini
@@ -26,3 +28,10 @@ XtraStuf.mac/
 *.log
 
 sagyou/
+
+ipadic*/
+target/
+src/
+Cargo.*
+.cargo/
+rustfmt.toml
