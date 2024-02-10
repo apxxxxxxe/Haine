@@ -104,10 +104,10 @@ impl Dialog {
     let pre_texts = CHANGE_SCOPE_RE.replace_all(text, delim);
     let texts = pre_texts
       .split(delim)
-      .filter(|t| !t.is_empty())
       .collect::<Vec<_>>();
 
-    if scopes.len() != texts.len() {
+    // 文頭の暗黙的な\\0スコープを補完
+    if scopes.len() == texts.len() - 1 {
       scopes.insert(0, 0);
     }
 
