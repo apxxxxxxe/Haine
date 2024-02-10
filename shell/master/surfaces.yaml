@@ -312,33 +312,24 @@ parts:
     details:
       - name: こっち目
         text: |
-          animation500300.interval,runonce+rarely
+          animation500300.interval,runonce
           animation500300.pattern0,overlay,201,0,0,0
-          animation500300.pattern1,overlay,209,4000,0,0
-          animation500300.pattern2,overlay,204,100,0,0
-          animation500300.pattern3,overlay,201,100,0,0
 
           animation590004.interval,bind
           animation590004.pattern0,overlayfast,5,0,0
 
       - name: 上の空
         text: |
-          animation500300.interval,runonce+rarely
+          animation500300.interval,runonce
           animation500300.pattern0,overlay,202,0,0,0
-          animation500300.pattern1,overlay,209,4000,0,0
-          animation500300.pattern2,overlay,205,100,0,0
-          animation500300.pattern3,overlay,202,100,0,0
 
           animation590004.interval,bind
           animation590004.pattern0,overlayfast,5,0,0
 
       - name: あっち目
         text: |
-          animation500300.interval,runonce+rarely
+          animation500300.interval,runonce
           animation500300.pattern0,overlay,203,0,0,0
-          animation500300.pattern1,overlay,209,4000,0,0
-          animation500300.pattern2,overlay,206,100,0,0
-          animation500300.pattern3,overlay,203,100,0,0
 
           animation590004.interval,bind
           animation590004.pattern0,overlayfast,5,0,0
