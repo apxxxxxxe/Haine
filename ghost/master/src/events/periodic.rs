@@ -6,6 +6,16 @@ use chrono::Timelike;
 use rand::Rng;
 use shiorust::message::{Request, Response};
 
+pub fn on_notify_user_info(req: &Request) -> Response {
+  let vars = get_global_vars();
+  let refs = get_references(req);
+  let user_name = refs[0].to_string();
+  if vars.user_name().is_none() {
+    vars.set_user_name(Some(user_name));
+  }
+  new_response_nocontent()
+}
+
 pub fn on_second_change(req: &Request) -> Response {
   let vars = get_global_vars();
 

@@ -71,6 +71,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnVanishSelected" => Some(on_vanish_selected),
     "OnAiTalk" => Some(on_ai_talk),
     "OnAnchorSelectEx" => Some(on_anchor_select_ex),
+    "OnNotifyUserInfo" => Some(on_notify_user_info),
     "OnSecondChange" => Some(on_second_change),
     "OnSurfaceChange" => Some(on_surface_change),
     "OnSmoothBlink" => Some(on_smooth_blink),
