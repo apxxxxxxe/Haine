@@ -25,7 +25,7 @@ pub fn on_boot(_req: &Request) -> Response {
     .to_string()],
   ]));
   let v = format!(
-    "\\![embed,OnStickSurface]{}{}",
+    "\\![bind,シルエット,,0]\\![bind,ex,,0]\\![embed,OnStickSurface]{}{}",
     randomize_underwear(),
     choose_one(&talks, false).unwrap(),
   );
