@@ -525,10 +525,6 @@ static BOTSU: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
-pub fn version(_req: &Request) -> Response {
-  new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), false)
-}
-
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
 

@@ -132,6 +132,9 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
 
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
 pub struct VolatilityVariables {
+  // ログファイルのフルパス
+  pub log_path: Mutex<String>,
+
   // ゴーストが起動してからの秒数
   pub ghost_up_time: Mutex<u64>,
 
@@ -177,6 +180,7 @@ pub struct VolatilityVariables {
 
 #[allow(dead_code)]
 impl VolatilityVariables {
+  generate_getter_setter!(log_path, String, cloneable);
   generate_getter_setter!(ghost_up_time, u64, cloneable);
   generate_getter_setter!(last_random_talk_time, u64, cloneable);
   generate_getter_setter!(ghost_boot_time, SystemTime, cloneable);
@@ -205,6 +209,7 @@ impl VolatilityVariables {
 impl Default for VolatilityVariables {
   fn default() -> Self {
     Self {
+      log_path: Mutex::new("".to_string()),
       ghost_up_time: Mutex::new(0),
       last_random_talk_time: Mutex::new(0),
       ghost_boot_time: Mutex::new(SystemTime::now()),

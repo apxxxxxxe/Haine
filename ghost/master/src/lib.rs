@@ -32,11 +32,15 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
   let v = GStr::capture(h, len as usize);
   let s = v.to_utf8_str().unwrap();
 
-  if let Err(e) = get_global_vars().load() {
+  let vars = get_global_vars();
+
+  if let Err(e) = vars.load() {
     error!("{}", e);
   }
 
+  // ログの設定
   let log_path = Path::new(&s.to_string()).join("haine.log");
+  vars.volatility.set_log_path(log_path.to_str().unwrap().to_string());
   WriteLogger::init(
     LevelFilter::Debug,
     Config::default(),

@@ -62,9 +62,34 @@ pub fn handle_request(req: &Request) -> Response {
   res
 }
 
+fn version(_req: &Request) -> Response {
+  new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), false)
+}
+
+fn craftman(_req: &Request) -> Response {
+  new_response_with_value(String::from("HinoTsumi"), false)
+}
+
+fn craftmanw(_req: &Request) -> Response {
+  new_response_with_value(String::from("日野つみ"), false)
+}
+
+fn name(_req: &Request) -> Response {
+  new_response_with_value(String::from("haine"), false)
+}
+
+fn log_path(_req: &Request) -> Response {
+  let log_path = get_global_vars().volatility.log_path();
+  new_response_with_value(log_path, false)
+}
+
 fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
   match id {
     "version" => Some(version),
+    "craftman" => Some(craftman),
+    "craftmanw" => Some(craftmanw),
+    "name" => Some(name),
+    "log_path" => Some(log_path),
     "OnFirstBoot" => Some(on_first_boot),
     "OnBoot" => Some(on_boot),
     "OnClose" => Some(on_close),
