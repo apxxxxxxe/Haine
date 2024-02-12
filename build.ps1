@@ -1,9 +1,9 @@
-cd ghost\master
+cd $PSScriptRoot\ghost\master
 cargo build --release
-cp -Verbose -Force .\target\i686-pc-windows-msvc\release\haine.dll .\
+cp -Verbose -Force $PSScriptRoot\ghost\master\target\i686-pc-windows-msvc\release\haine.dll $PSScriptRoot\ghost\master\
 
 # カレントディレクトリ以下の.rsファイルから、7文字の数字をすべて検索し、リスト化する
-$files = Get-ChildItem -Path .\src -Filter *.rs -Recurse | ForEach-Object {
+$files = Get-ChildItem -Path $PSScriptRoot\ghost\master\src -Filter *.rs -Recurse | ForEach-Object {
     $content = Get-Content $_.FullName -Raw
     $matches = [Regex]::Matches($content, '\d{7}')
     $matches | ForEach-Object { $_.Value }
