@@ -18,6 +18,7 @@ use crate::events::menu::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::tooltip::*;
+use crate::events::translate::*;
 use crate::events::webclap::*;
 use crate::variables::get_global_vars;
 
@@ -118,6 +119,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "balloon_tooltip" => Some(balloon_tooltip),
     "OnBalloonTooltip" => Some(on_balloon_tooltip),
     "OnStickSurface" => Some(on_stick_surface),
+    "OnWaitTranslater" => Some(on_wait_translater),
     _ => None,
   }
 }

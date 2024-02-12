@@ -176,6 +176,8 @@ pub struct VolatilityVariables {
   pub idle_threshold: Mutex<i32>,
 
   pub immersive_degrees: Mutex<u32>,
+
+  pub waiting_talk: Mutex<Option<String>>,
 }
 
 #[allow(dead_code)]
@@ -204,6 +206,7 @@ impl VolatilityVariables {
   generate_getter_setter!(idle_seconds, i32, cloneable);
   generate_getter_setter!(idle_threshold, i32, cloneable);
   generate_getter_setter!(immersive_degrees, u32, cloneable);
+  generate_getter_setter!(waiting_talk, Option<String>, cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -230,6 +233,7 @@ impl Default for VolatilityVariables {
       idle_seconds: Mutex::new(0),
       idle_threshold: Mutex::new(60 * 5),
       immersive_degrees: Mutex::new(0),
+      waiting_talk: Mutex::new(None),
     }
   }
 }

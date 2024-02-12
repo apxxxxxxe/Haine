@@ -1,8 +1,20 @@
 use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
+use crate::events::common::*;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
 use regex::Regex;
+use shiorust::message::{Request, Response};
+use std::thread;
+use std::time::Duration;
+
+pub fn on_wait_translater(_req: &Request) -> Response {
+  while !get_global_vars().volatility.inserter_mut().is_ready() {
+    thread::sleep(Duration::from_millis(100));
+  }
+  let m = get_global_vars().volatility.waiting_talk().unwrap();
+  new_response_with_value(m, true)
+}
 
 pub fn on_translate(text: String) -> String {
   if text.is_empty() {
@@ -14,11 +26,10 @@ pub fn on_translate(text: String) -> String {
   translated = text_only_translater(translated);
 
   let vars = get_global_vars();
-  if vars.volatility.inserter_mut().is_ready() {
-    vars.volatility.inserter_mut().run(translated)
-  } else {
-    translated
+  if !vars.volatility.inserter_mut().is_ready() {
+    error!("on_translate: inserter is not ready");
   }
+  vars.volatility.inserter_mut().run(translated)
 }
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
@@ -102,9 +113,7 @@ impl Dialog {
 
     let delim = "\x01";
     let pre_texts = CHANGE_SCOPE_RE.replace_all(text, delim);
-    let texts = pre_texts
-      .split(delim)
-      .collect::<Vec<_>>();
+    let texts = pre_texts.split(delim).collect::<Vec<_>>();
 
     // 文頭の暗黙的な\\0スコープを補完
     if scopes.len() == texts.len() - 1 {

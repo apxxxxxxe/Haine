@@ -26,7 +26,13 @@ pub fn new_response_nocontent() -> Response {
 
 pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
   let v = if use_translate {
-    on_translate(value)
+    let vars = get_global_vars();
+    if vars.volatility.inserter_mut().is_ready() {
+      on_translate(value)
+    } else {
+      vars.volatility.set_waiting_talk(Some(value));
+      "\\1\\_qLoading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
+    }
   } else {
     value
   };
