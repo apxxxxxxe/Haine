@@ -280,7 +280,9 @@ impl Inserter {
     static RE_CLOSE_BRACKET: Lazy<Regex> = Lazy::new(|| Regex::new(r"[」』）】]").unwrap());
     static RE_PERIODS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[、。！？]").unwrap());
     static RE_CHANGE_LINE: Lazy<Regex> =
-      Lazy::new(|| Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\x|\\c)").unwrap());
+      Lazy::new(|| Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\c)").unwrap());
+    static RE_NEW_PAGE: Lazy<FancyRegex> =
+      Lazy::new(|| FancyRegex::new(r"\\x(?!\[noclear\])").unwrap());
 
     let mut result = String::new();
     let mut counts = [0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく
@@ -292,6 +294,7 @@ impl Inserter {
         break;
       }
       let part = parts[i].clone();
+      debug!("part: {}", part);
       let c = self.count(part.to_string());
       brackets_depth += RE_OPEN_BRACKET.find_iter(&part).count() as i32;
       brackets_depth -= (RE_CLOSE_BRACKET.find_iter(&part).count() as i32).max(0);
@@ -302,6 +305,15 @@ impl Inserter {
 
       if RE_CHANGE_LINE.is_match(&part) {
         counts[scope] = 0.0;
+      }
+      if RE_NEW_PAGE.is_match(&part).is_ok_and(|r| r) {
+        // \\xが来たら全てリセット
+        // TODO: continueせず以下の処理も通すべき？
+        result.push_str(&part);
+        counts = [0.0; 10];
+        scope = 0;
+        i += 1;
+        continue;
       }
 
       if c > self.cols_num {
@@ -328,7 +340,10 @@ impl Inserter {
         let mut next_line = String::new();
         while j < parts.len() {
           let next = parts[j].clone();
-          if CHANGE_SCOPE_RE.is_match(&next).is_ok_and(|r| r) || RE_CHANGE_LINE.is_match(&next) {
+          if CHANGE_SCOPE_RE.is_match(&next).is_ok_and(|r| r)
+            || RE_CHANGE_LINE.is_match(&next)
+            || RE_NEW_PAGE.is_match(&next).is_ok_and(|r| r)
+          {
             j -= 1;
             break;
           }
