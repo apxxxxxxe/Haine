@@ -31,7 +31,7 @@ pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
       on_translate(value)
     } else {
       vars.volatility.set_waiting_talk(Some(value));
-      "\\1\\_qLoading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
+      "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
     }
   } else {
     value
