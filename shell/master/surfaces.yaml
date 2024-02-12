@@ -325,6 +325,11 @@ parts:
           animation500401.pattern8,overlay,-1,80,0,0
           animation500401.pattern9,start,500399
 
+      - name: あ口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,365,0,0,0
+
   - group: 目
     details:
       - name: こっち目
