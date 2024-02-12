@@ -2,6 +2,8 @@ name: md5-CI-build
 
 on:
   push:
+    branches:
+      - main
   workflow_dispatch:
 
 concurrency:
