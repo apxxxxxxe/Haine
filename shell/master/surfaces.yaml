@@ -308,6 +308,23 @@ parts:
           animation500401.pattern8,overlay,-1,80,0,0
           animation500401.pattern9,start,500399
 
+      - name: いひひ口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,364,0,0,0
+
+          animation500401.interval,talk
+          animation500401.pattern0,stop,500399
+          animation500401.pattern1,overlay,303,0,0,0
+          animation500401.pattern2,overlay,323,50,0,0
+          animation500401.pattern3,overlay,303,100,0,0
+          animation500401.pattern4,overlay,361,100,0,0
+          animation500401.pattern5,overlay,323,50,0,0
+          animation500401.pattern6,overlay,362,80,0,0
+          animation500401.pattern7,overlay,303,80,0,0
+          animation500401.pattern8,overlay,-1,80,0,0
+          animation500401.pattern9,start,500399
+
   - group: 目
     details:
       - name: こっち目
