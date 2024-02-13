@@ -32,12 +32,9 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: release-build
-        run: |
-          cd ghost\master
-          cargo build --release --target=i686-pc-windows-msvc
-          Copy-Item -Force -Verbose .\target\i686-pc-windows-msvc\release\${{ env.DLL_NAME }}.dll .\
-          cd ..\..
         shell: pwsh
+        run: |
+          .\build.bat
       - name: disable auto crlf
         uses: steve02081504/disable-autocrlf@v1
       - name: updates build
@@ -53,6 +50,6 @@ jobs:
           git config --local core.safecrlf off
           git add .
           git status
-          git commit -m "update md5 & dll" -a
+          git commit -m "update md5, dll and surfaces.txt" -a
           git pull
           git push
