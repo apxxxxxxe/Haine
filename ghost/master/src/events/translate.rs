@@ -55,8 +55,17 @@ fn text_only_translater(text: String) -> String {
 fn translate_part(text: String) -> String {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
 
+  const DEFAULT_Y: i32 = -700;
+  const MAX_Y: i32 = -350;
+  let bind = format!(
+    "\\0\\![bind,シルエット,黒塗り2,1]\\![anim,offset,800002,0,{}]",
+    ((MAX_Y - DEFAULT_Y) as f32 * (get_global_vars().volatility.immersive_degrees() as f32 / 100.0))
+      as i32
+      + DEFAULT_Y
+  );
+
   let surface_replaced = RE_SURFACE_SNIPPET
-    .replace_all(&text, "\\0\\s[$1]")
+    .replace_all(&text, format!("\\0\\s[$1]{}", bind).as_str())
     .to_string();
 
   let vars = get_global_vars();
@@ -84,6 +93,11 @@ fn translate_whole(text: String) -> String {
   translated = translated.replace(PHI, "");
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
+
+  // \\Cが含まれているなら文頭に\\Cを補完
+  if translated.contains("\\C") {
+    translated = format!("\\C{}", translated.replace("\\C", ""));
+  }
 
   translated
 }

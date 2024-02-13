@@ -104,6 +104,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnHourTimeSignal" => Some(on_hour_time_signal),
     "OnMenuExec" => Some(on_menu_exec),
     "OnBreakTime" => Some(on_break_time),
+    "OnImmersiveRateReduced" => Some(on_immersive_rate_reduced),
     "OnTalkIntervalChanged" => Some(on_talk_interval_changed),
     "OnMouseClickEx" => Some(on_mouse_click_ex),
     "OnMouseDoubleClick" => Some(on_mouse_double_click),
