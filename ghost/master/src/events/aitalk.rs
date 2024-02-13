@@ -5,6 +5,9 @@ use once_cell::sync::Lazy;
 use rand::prelude::*;
 use shiorust::message::{parts::HeaderName, Request, Response};
 
+// トーク1回あたりに上昇する没入度
+const IMMERSIVE_RATE: u32 = 4;
+
 #[derive(Clone)]
 pub struct Talk {
   pub talk_type: Option<TalkType>,
@@ -529,10 +532,10 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
 
   // 没入度を上げる
-  let current_immersive_degrees = vars.volatility.immersive_degrees();
-  vars
-    .volatility
-    .set_immersive_degrees(std::cmp::min(current_immersive_degrees + 2, 100));
+  vars.volatility.set_immersive_degrees(std::cmp::min(
+    vars.volatility.immersive_degrees() + IMMERSIVE_RATE,
+    100,
+  ));
 
   vars
     .volatility
@@ -546,11 +549,9 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   let rnd = rand::thread_rng().gen_range(0..=100);
   let immersive: &str;
-  let bind: u8;
   let talks = if rnd < vars.volatility.immersive_degrees() {
     // 没入度が高いときのトーク
     immersive = "高";
-    bind = 1;
     let mut v = vec![];
     v.extend(TalkType::Abstract.talks());
     v.extend(TalkType::Past.talks());
@@ -558,7 +559,6 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   } else {
     // 没入度が低いときのトーク
     immersive = "低";
-    bind = 0;
     let mut v = vec![];
     v.extend(TalkType::SelfIntroduce.talks());
     v.extend(TalkType::Lore.talks());
@@ -572,12 +572,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   )
   .unwrap();
 
-  let m = format!(
-    "\\0\\![bind,シルエット,黒塗り4,{}]{}",
-    bind, choosed_talk.text
-  );
-
-  let mut res = new_response_with_value(m, true);
+  let mut res = new_response_with_value(choosed_talk.text, true);
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{} (没入度{})", choosed_talk.talk_type.unwrap(), immersive,),

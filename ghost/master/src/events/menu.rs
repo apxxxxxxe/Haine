@@ -104,6 +104,19 @@ fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
 }
 
 pub fn on_break_time(_req: &Request) -> Response {
+  let m = "\
+      h1111101\\1……少し話に集中しすぎていたようだ。\\n\
+      h1111204\\1カップを傾け、一息つく。\\n\
+      h1113705\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
+      \\n\
+      \\![embed,OnImmersiveRateReduced]\
+      "
+  .to_string();
+
+  new_response_with_value(m, true)
+}
+
+pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
   // 没入度を下げる
   let vars = get_global_vars();
   let current_immersive_degrees = vars.volatility.immersive_degrees();
@@ -112,11 +125,8 @@ pub fn on_break_time(_req: &Request) -> Response {
     .set_immersive_degrees((current_immersive_degrees / 2).saturating_sub(1));
 
   let m = "\
-      h1111101\\1……少し話に集中しすぎていたようだ。\\n\
-      h1111204\\1カップを傾け、一息つく。\\n\
-      h1000000\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
-      h1111209\\1\\n(没入度が半減した)\\x\\![raise,OnMenuExec]\
-      "
+  \\Ch1111209\\1(没入度が半減した)\\x\\![raise,OnMenuExec]\
+  "
   .to_string();
 
   new_response_with_value(m, true)

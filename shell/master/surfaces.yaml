@@ -330,6 +330,11 @@ parts:
           animation500399.interval,runonce
           animation500399.pattern0,overlay,365,0,0,0
 
+      - name: キス口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,366,0,0,0
+
   - group: 目
     details:
       - name: こっち目
@@ -337,72 +342,72 @@ parts:
           animation500300.interval,runonce
           animation500300.pattern0,overlay,201,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,5,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,5,0,0
 
       - name: 上の空
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,202,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,5,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,5,0,0
 
       - name: あっち目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,203,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,5,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,5,0,0
 
       - name: こっち半目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,204,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,4,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,4,0,0
 
       - name: 上の空半目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,205,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,4,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,4,0,0
 
       - name: あっち半目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,206,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,4,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,4,0,0
 
       - name: にこ目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,207,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,3,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
 
       - name: 驚き目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,208,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,5,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,5,0,0
 
       - name: 閉じ目
         text: |
           animation500300.interval,runonce
           animation500300.pattern0,overlay,209,0,0,0
 
-          animation590004.interval,bind
-          animation590004.pattern0,overlayfast,3,0,0
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
 
       - name: dummy
         text: |
@@ -665,15 +670,6 @@ base: |
   animation503361.pattern0,overlay,1609,0,0,0
   //手animation5099999
 
-  animation510001.interval,bind
-  animation510001.pattern0,overlayfast,1,0,0
-  animation510002.interval,bind
-  animation510002.pattern0,overlayfast,60000,0,0
-  animation510003.interval,bind
-  animation510003.pattern0,overlayfast,60002,0,0
-  animation511000.interval,bind
-  animation511000.pattern0,overlayfast,2,0,0
-
   animation650000.interval,bind
   animation650000.pattern0,reduce,90000,0,0,0
 
@@ -689,3 +685,11 @@ base: |
   animation750000.pattern2,overlay,55002,1500,0,0
   animation750000.pattern3,overlay,55000,1500,0,0
 
+  animation800001.interval,bind
+  animation800001.pattern0,overlayfast,1,0,0
+  animation800002.interval,bind
+  animation800002.pattern0,overlayfast,60000,0,0
+  animation800003.interval,bind
+  animation800003.pattern0,overlayfast,60002,0,0
+  animation801000.interval,bind
+  animation801000.pattern0,overlayfast,2,0,0
