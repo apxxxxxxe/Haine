@@ -19,9 +19,11 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -31,17 +33,27 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v4
+
+      - name: Install Go dependencies
+        run: go install github.com/apxxxxxxe/surfaces-mixer@latest
+
       - name: release-build
         shell: pwsh
         run: |
           .\build.bat
+
       - name: disable auto crlf
         uses: steve02081504/disable-autocrlf@v1
+
       - name: updates build
         uses: Taromati2/ukagaka-mirror-md5-CI-build@v1
         with:
           no-push: true
           build-mode: other
+
       - name: git push
         # commit and push all changes at once to avoid error
         run: |
