@@ -40,7 +40,9 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
 
   // ログの設定
   let log_path = Path::new(&s.to_string()).join("haine.log");
-  vars.volatility.set_log_path(log_path.to_str().unwrap().to_string());
+  vars
+    .volatility
+    .set_log_path(log_path.to_str().unwrap().to_string());
   WriteLogger::init(
     LevelFilter::Debug,
     Config::default(),

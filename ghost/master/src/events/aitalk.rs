@@ -572,7 +572,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   )
   .unwrap();
 
-  let mut res = new_response_with_value(choosed_talk.text, true);
+  let mut res = new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow);
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{} (没入度{})", choosed_talk.talk_type.unwrap(), immersive,),
@@ -601,7 +601,7 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
     }
     _ => return new_response_nocontent(),
   }
-  new_response_with_value(m, true)
+  new_response_with_value(m, TranslateOption::WithCompleteShadow)
 }
 
 #[cfg(test)]

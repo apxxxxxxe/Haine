@@ -12,7 +12,7 @@ pub fn on_stick_surface(_req: &Request) -> Response {
   \\![move,--X=0,--Y=0,--time=0,--base=0]\
   \\![set,sticky-window,1,0]\
   ";
-  new_response_with_value(stick_surfaces.to_string(), false)
+  new_response_with_value(stick_surfaces.to_string(), TranslateOption::None)
 }
 
 pub fn on_boot(_req: &Request) -> Response {
@@ -29,7 +29,7 @@ pub fn on_boot(_req: &Request) -> Response {
     randomize_underwear(),
     choose_one(&talks, false).unwrap(),
   );
-  new_response_with_value(v, true)
+  new_response_with_value(v, TranslateOption::OnlyText)
 }
 
 pub fn on_close(_req: &Request) -> Response {
@@ -45,7 +45,10 @@ pub fn on_close(_req: &Request) -> Response {
     ],
     vec!["がありますように。\\nh1111204またね、{user_name}。\\_w[1200]".to_string()],
   ]));
-  new_response_with_value(choose_one(&talks, true).unwrap().text + "\\-", true)
+  new_response_with_value(
+    choose_one(&talks, true).unwrap().text + "\\-",
+    TranslateOption::OnlyText,
+  )
 }
 
 pub fn on_first_boot(_req: &Request) -> Response {
@@ -277,7 +280,7 @@ pub fn on_first_boot(_req: &Request) -> Response {
     \\1彼女の微笑みは謎めいて親しげだった。\
     ";
 
-  new_response_with_value(m, true)
+  new_response_with_value(m, TranslateOption::OnlyText)
 }
 
 pub fn on_vanish_selected(_req: &Request) -> Response {

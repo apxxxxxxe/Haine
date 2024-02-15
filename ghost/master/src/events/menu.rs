@@ -53,7 +53,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     ),
   );
 
-  new_response_with_value(m, true)
+  new_response_with_value(m, TranslateOption::OnlyText)
 }
 
 fn show_minute(m: &u64) -> String {
@@ -113,7 +113,7 @@ pub fn on_break_time(_req: &Request) -> Response {
       "
   .to_string();
 
-  new_response_with_value(m, true)
+  new_response_with_value(m, TranslateOption::WithCompleteShadow)
 }
 
 pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
@@ -129,7 +129,7 @@ pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
   "
   .to_string();
 
-  new_response_with_value(m, true)
+  new_response_with_value(m, TranslateOption::WithCompleteShadow)
 }
 
 pub fn on_talk_interval_changed(req: &Request) -> Response {
@@ -266,11 +266,11 @@ pub fn on_talk(_req: &Request) -> Response {
   }
   m.push_str("\\q[戻る,OnMenuExec]");
 
-  new_response_with_value(m, true)
+  new_response_with_value(m, TranslateOption::WithCompleteShadow)
 }
 
 pub fn on_talk_answer(req: &Request) -> Response {
   let refs = get_references(req);
   let q = Question(refs[0].parse::<u32>().unwrap());
-  new_response_with_value(q.talk(), true)
+  new_response_with_value(q.talk(), TranslateOption::WithCompleteShadow)
 }

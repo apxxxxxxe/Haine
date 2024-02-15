@@ -5,6 +5,13 @@ use core::fmt::{Display, Formatter};
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
+#[derive(Debug, Clone, PartialEq)]
+pub enum TranslateOption {
+  WithCompleteShadow,
+  OnlyText,
+  None,
+}
+
 pub fn new_response() -> Response {
   let mut headers = Headers::new();
   headers.insert(
@@ -24,17 +31,18 @@ pub fn new_response_nocontent() -> Response {
   r
 }
 
-pub fn new_response_with_value(value: String, use_translate: bool) -> Response {
-  let v = if use_translate {
-    let vars = get_global_vars();
-    if vars.volatility.inserter_mut().is_ready() {
-      on_translate(value)
-    } else {
-      vars.volatility.set_waiting_talk(Some(value));
-      "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
+pub fn new_response_with_value(value: String, option: TranslateOption) -> Response {
+  let v = match option {
+    TranslateOption::None => value,
+    _ => {
+      let vars = get_global_vars();
+      if vars.volatility.inserter_mut().is_ready() {
+        on_translate(value, option == TranslateOption::WithCompleteShadow)
+      } else {
+        vars.volatility.set_waiting_talk(Some((value, option)));
+        "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
+      }
     }
-  } else {
-    value
   };
   let mut r = new_response();
   r.headers.insert(HeaderName::from("Value"), v);
@@ -130,7 +138,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let from_eyes = from_surface % 100;
 
   if from_surface == 0 {
-    return new_response_with_value(format!("\\s[{}]", dest_surface), false);
+    return new_response_with_value(format!("\\s[{}]", dest_surface), TranslateOption::None);
   } else if from_surface == dest_surface {
     return new_response_nocontent();
   }
@@ -176,7 +184,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
-  new_response_with_value(animation, false)
+  new_response_with_value(animation, TranslateOption::None)
 }
 
 pub enum Icon {

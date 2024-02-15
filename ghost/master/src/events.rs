@@ -1,6 +1,6 @@
 pub mod aitalk;
 mod bootend;
-mod common;
+pub mod common;
 mod key;
 mod menu;
 mod mouse;
@@ -64,24 +64,27 @@ pub fn handle_request(req: &Request) -> Response {
 }
 
 fn version(_req: &Request) -> Response {
-  new_response_with_value(String::from(env!("CARGO_PKG_VERSION")), false)
+  new_response_with_value(
+    String::from(env!("CARGO_PKG_VERSION")),
+    TranslateOption::None,
+  )
 }
 
 fn craftman(_req: &Request) -> Response {
-  new_response_with_value(String::from("HinoTsumi"), false)
+  new_response_with_value(String::from("HinoTsumi"), TranslateOption::None)
 }
 
 fn craftmanw(_req: &Request) -> Response {
-  new_response_with_value(String::from("日野つみ"), false)
+  new_response_with_value(String::from("日野つみ"), TranslateOption::None)
 }
 
 fn name(_req: &Request) -> Response {
-  new_response_with_value(String::from("haine"), false)
+  new_response_with_value(String::from("haine"), TranslateOption::None)
 }
 
 fn log_path(_req: &Request) -> Response {
   let log_path = get_global_vars().volatility.log_path();
-  new_response_with_value(log_path, false)
+  new_response_with_value(log_path, TranslateOption::None)
 }
 
 fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
