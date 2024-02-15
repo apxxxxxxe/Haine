@@ -141,7 +141,10 @@ fn new_mouse_response(info: String) -> Response {
     .set_touch_count(vars.volatility.touch_count() + 1);
 
   match mouse_dialogs(info, vars) {
-    Some(dialogs) => new_response_with_value(choose_one(&dialogs, true).unwrap().text, true),
+    Some(dialogs) => new_response_with_value(
+      choose_one(&dialogs, true).unwrap().text,
+      TranslateOption::WithCompleteShadow,
+    ),
     None => new_response_nocontent(),
   }
 }

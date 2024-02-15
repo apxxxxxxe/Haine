@@ -398,7 +398,7 @@ mod tests {
     }
     for (i, t) in talks.iter().enumerate() {
       println!("talk: {}", i);
-      let text = on_translate(t.to_string());
+      let text = on_translate(t.to_string(), true);
       ins.tokenize(text.clone());
       let breaked = ins.run(text).replace("\\n", "\n");
       let result = SAKURA_SCRIPT_RE.replace_all(&breaked, "");

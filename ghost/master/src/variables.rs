@@ -1,4 +1,5 @@
 use crate::autobreakline::Inserter;
+use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::roulette::TalkBias;
 use crate::status::Status;
@@ -177,7 +178,7 @@ pub struct VolatilityVariables {
 
   pub immersive_degrees: Mutex<u32>,
 
-  pub waiting_talk: Mutex<Option<String>>,
+  pub waiting_talk: Mutex<Option<(String, TranslateOption)>>,
 }
 
 #[allow(dead_code)]
@@ -206,7 +207,7 @@ impl VolatilityVariables {
   generate_getter_setter!(idle_seconds, i32, cloneable);
   generate_getter_setter!(idle_threshold, i32, cloneable);
   generate_getter_setter!(immersive_degrees, u32, cloneable);
-  generate_getter_setter!(waiting_talk, Option<String>, cloneable);
+  generate_getter_setter!(waiting_talk, Option<(String, TranslateOption)>, cloneable);
 }
 
 impl Default for VolatilityVariables {

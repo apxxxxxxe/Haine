@@ -77,7 +77,7 @@ pub fn on_hour_time_signal(_req: &Request) -> Response {
   let mut rng = rand::thread_rng();
   let index = rng.gen_range(0..tanka_list.len());
 
-  new_response_with_value(m + tanka_list[index], true)
+  new_response_with_value(m + tanka_list[index], TranslateOption::OnlyText)
 }
 
 pub fn on_surface_change(req: &Request) -> Response {

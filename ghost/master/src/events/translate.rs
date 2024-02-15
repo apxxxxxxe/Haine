@@ -13,17 +13,17 @@ pub fn on_wait_translater(_req: &Request) -> Response {
     thread::sleep(Duration::from_millis(100));
   }
   let m = get_global_vars().volatility.waiting_talk().unwrap();
-  new_response_with_value(m, true)
+  new_response_with_value(m.0, m.1)
 }
 
-pub fn on_translate(text: String) -> String {
+pub fn on_translate(text: String, complete_shadow: bool) -> String {
   if text.is_empty() {
     return text;
   }
 
   let mut translated = text.clone();
 
-  translated = text_only_translater(translated);
+  translated = text_only_translater(translated, complete_shadow);
 
   let vars = get_global_vars();
   if !vars.volatility.inserter_mut().is_ready() {
@@ -33,7 +33,7 @@ pub fn on_translate(text: String) -> String {
 }
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-fn text_only_translater(text: String) -> String {
+fn text_only_translater(text: String, complete_shadow: bool) -> String {
   static RE_TEXT_ONLY: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap()
   });
@@ -43,26 +43,31 @@ fn text_only_translater(text: String) -> String {
   let mut result = String::new();
 
   for (i, tag) in tags.enumerate() {
-    result.push_str(translate_part(splitted[i].to_string()).as_str());
+    result.push_str(translate_part(splitted[i].to_string(), complete_shadow).as_str());
     result.push_str(tag.as_str());
   }
-  result.push_str(translate_part(splitted[splitted.len() - 1].to_string()).as_str());
+  result
+    .push_str(translate_part(splitted[splitted.len() - 1].to_string(), complete_shadow).as_str());
 
   translate_whole(result)
 }
 
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
-fn translate_part(text: String) -> String {
+fn translate_part(text: String, complete_shadow: bool) -> String {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
 
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -350;
-  let bind = format!(
-    "\\0\\![bind,シルエット,黒塗り2,1]\\![anim,offset,800002,0,{}]",
-    ((MAX_Y - DEFAULT_Y) as f32 * (get_global_vars().volatility.immersive_degrees() as f32 / 100.0))
-      as i32
-      + DEFAULT_Y
-  );
+  let bind = if complete_shadow {
+    format!(
+      "\\0\\![bind,シルエット,黒塗り2,1]\\![anim,offset,800002,0,{}]",
+      ((MAX_Y - DEFAULT_Y) as f32
+        * (get_global_vars().volatility.immersive_degrees() as f32 / 100.0)) as i32
+        + DEFAULT_Y
+    )
+  } else {
+    "\\0\\![bind,シルエット,黒塗り2,0]".to_string()
+  };
 
   let surface_replaced = RE_SURFACE_SNIPPET
     .replace_all(&text, format!("\\0\\s[$1]{}", bind).as_str())
@@ -259,6 +264,6 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
 #[test]
 fn test_translate() {
   let text = "こんにちは、\\n{user_name}さん。\\nお元気ですか。\\1ええ、私は元気です。\\nあなたはどうですか、ゴースト。\\0\\_q私はほげ。\\n\\nふがふが。".to_string();
-  let translated = text_only_translater(text);
+  let translated = text_only_translater(text, true);
   println!("{}", translated);
 }
