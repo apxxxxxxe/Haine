@@ -1,3 +1,25 @@
+
+$isRequirementsInstalled = $true
+
+# check if cargo is installed
+if (!(Get-Command "cargo" -ErrorAction SilentlyContinue)) {
+    Write-Host "cargo is not installed"
+    $isRequirementsInstalled = $false
+}
+
+# check if surfaces-mixer is installed
+if (!(Get-Command "surfaces-mixer" -ErrorAction SilentlyContinue)) {
+    Write-Host "surfaces-mixer is not installed"
+    Write-Host "Please install surfaces-mixer using the following command"
+    Write-Host "go install github.com/apxxxxxxe/surfaces-mixer@latest"
+    $isRequirementsInstalled = $false
+}
+
+if (!$isRequirementsInstalled) {
+    Write-Host "Requirements are not installed. Please install the requirements and try again."
+    exit 1
+}
+
 cd $PSScriptRoot\ghost\master
 cargo build --release
 cp -Verbose -Force $PSScriptRoot\ghost\master\target\i686-pc-windows-msvc\release\haine.dll $PSScriptRoot\ghost\master\
