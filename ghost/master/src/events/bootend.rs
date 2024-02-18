@@ -6,7 +6,7 @@ use shiorust::message::{Response, *};
 pub fn on_stick_surface(_req: &Request) -> Response {
   // \1のサーフェスを\0に重ねて固定する
   let stick_surfaces = "\
-  \\1\\_w[100]\
+  \\1\
   \\![reset,sticky-window]\
   \\![set,alignmenttodesktop,free]\
   \\![move,--X=0,--Y=0,--time=0,--base=0]\
