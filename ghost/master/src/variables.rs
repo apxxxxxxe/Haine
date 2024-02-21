@@ -6,7 +6,7 @@ use crate::status::Status;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH, Duration};
 
 const VAR_PATH: &str = "vars.json";
 static mut GLOBALVARS: Option<GlobalVariables> = None;
@@ -179,14 +179,14 @@ pub struct VolatilityVariables {
   pub immersive_degrees: Mutex<u32>,
 
   pub waiting_talk: Mutex<Option<(String, TranslateOption)>>,
+
+  pub touch_info: Mutex<TouchInfoMap>,
 }
 
-#[allow(dead_code)]
 impl VolatilityVariables {
   generate_getter_setter!(log_path, String, cloneable);
   generate_getter_setter!(ghost_up_time, u64, cloneable);
   generate_getter_setter!(last_random_talk_time, u64, cloneable);
-  generate_getter_setter!(ghost_boot_time, SystemTime, cloneable);
   generate_getter_setter!(nade_counter, i32, cloneable);
   generate_getter_setter!(last_nade_count_unixtime, SystemTime, cloneable);
   generate_getter_setter!(last_nade_part, String, cloneable);
@@ -197,17 +197,14 @@ impl VolatilityVariables {
   generate_getter_setter!(first_sexial_touch, bool, cloneable);
   generate_getter_setter!(touch_count, i32, cloneable);
   generate_getter_setter!(last_touch_info, String, cloneable);
-  generate_getter_setter!(inserter, Inserter, non_cloneable);
   generate_mut_getter!(inserter, Inserter, non_cloneable);
-  generate_getter_setter!(talk_bias, TalkBias, non_cloneable);
   generate_mut_getter!(talk_bias, TalkBias, non_cloneable);
-  generate_getter_setter!(status, Status, non_cloneable);
   generate_mut_getter!(status, Status, non_cloneable);
   generate_getter_setter!(current_surface, i32, cloneable);
   generate_getter_setter!(idle_seconds, i32, cloneable);
-  generate_getter_setter!(idle_threshold, i32, cloneable);
   generate_getter_setter!(immersive_degrees, u32, cloneable);
   generate_getter_setter!(waiting_talk, Option<(String, TranslateOption)>, cloneable);
+  generate_mut_getter!(touch_info, TouchInfoMap, non_cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -235,6 +232,55 @@ impl Default for VolatilityVariables {
       idle_threshold: Mutex::new(60 * 5),
       immersive_degrees: Mutex::new(0),
       waiting_talk: Mutex::new(None),
+      touch_info: Mutex::new(TouchInfoMap::new()),
     }
+  }
+}
+
+#[derive(Clone)]
+pub struct TouchInfoMap {
+  pub head: TouchInfo,
+  pub shoulder: TouchInfo,
+  pub bust: TouchInfo,
+  pub hand: TouchInfo,
+  pub skirt: TouchInfo,
+}
+
+impl TouchInfoMap {
+  pub fn new() -> Self {
+    Self {
+      head: TouchInfo::new(),
+      shoulder: TouchInfo::new(),
+      bust: TouchInfo::new(),
+      hand: TouchInfo::new(),
+      skirt: TouchInfo::new(),
+    }
+  }
+}
+
+#[derive(Clone)]
+pub struct TouchInfo {
+  pub count: i32,
+  pub last_unixtime: SystemTime,
+}
+
+const TOUCH_RESET_DURATION: Duration = Duration::from_secs(60 * 5);
+
+impl TouchInfo {
+  pub fn new() -> Self {
+    Self {
+      count: 0,
+      last_unixtime: UNIX_EPOCH,
+    }
+  }
+
+  pub fn is_reset(&self) -> bool {
+    debug!("elapsed: {:?}", self.last_unixtime.elapsed().unwrap());
+    self.last_unixtime.elapsed().unwrap() > TOUCH_RESET_DURATION
+  }
+
+  pub fn add(&mut self) {
+    self.count += 1;
+    self.last_unixtime = SystemTime::now();
   }
 }

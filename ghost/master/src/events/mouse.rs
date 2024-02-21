@@ -1,6 +1,6 @@
 use crate::events::aitalk::Talk;
 use crate::events::common::*;
-use crate::variables::GlobalVariables;
+use crate::variables::{GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 
 static DIALOG_SEXIAL_FIRST: Lazy<Vec<String>> =
@@ -26,25 +26,43 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
+fn first_and_other(
+  touch_info: &mut TouchInfo,
+  first: Vec<String>,
+  other: Vec<String>,
+) -> Vec<Talk> {
+  let result = if touch_info.is_reset() {
+    Talk::from_vec(first)
+  } else {
+    Talk::from_vec(other)
+  };
+  touch_info.add();
+  result
+}
+
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Talk>> {
   match info.as_str() {
-    "0handnade" => Some(Talk::from_vec(vec![
-      "\
+    "0handnade" => Some(first_and_other(
+      &mut vars.volatility.touch_info_mut().hand,
+      vec![],
+      vec![
+        "\
         h1111205\\1触れた手の感触はゼリーを掴むような頼りなさ、冷たさだった。\
         ……手が冷えるわよ。h1111204ほどほどにね。\
         "
-      .to_string(),
-      "\
+        .to_string(),
+        "\
       h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
       ……それは不毛というものよ。\
       "
-      .to_string(),
-      "\
+        .to_string(),
+        "\
       h1111205\\1彼女の指は長い。
       h1111209……うん。\\n\
       "
-      .to_string(),
-    ])),
+        .to_string(),
+      ],
+    )),
     "0bustnade" => Some(bust_touch(vars)),
     "0bustdoubleclick" => Some(bust_touch(vars)),
     "0skirtup" => {
@@ -63,18 +81,26 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Tal
       let zero_skirt_up: Vec<Talk> = Talk::from_vec(all_combo(&conbo_parts));
       Some(zero_skirt_up)
     }
-    "0shoulderdown" => Some(Talk::from_vec(vec![
-      "\
+    "0shoulderdown" => Some(first_and_other(
+      &mut vars.volatility.touch_info_mut().shoulder,
+      vec!["\
+      h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
+      ……h1111206あまりスキンシップは好きじゃないのだけど。\\n\
+      "
+      .to_string()],
+      vec![
+        "\
       h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
       h1111101……h1111204私はあなたのものじゃないのよ。\\n\
       "
-      .to_string(),
-      "\
+        .to_string(),
+        "\
       h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
       h1111204……それで？h1111209あなたは私をどうしたいのかしら。\
       "
-      .to_string(),
-    ])),
+        .to_string(),
+      ],
+    )),
     _ => None,
   }
 }
