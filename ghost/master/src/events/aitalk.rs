@@ -1,5 +1,5 @@
 use crate::events::common::*;
-use crate::variables::get_global_vars;
+use crate::variables::{get_global_vars, IDLE_THRESHOLD};
 use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
@@ -600,8 +600,8 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   debug!(
     "{} < {}: {}",
     vars.volatility.idle_seconds(),
-    vars.volatility.idle_threshold(),
-    vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
+    IDLE_THRESHOLD,
+    vars.volatility.idle_seconds() < IDLE_THRESHOLD
   );
 
   let rnd = rand::thread_rng().gen_range(0..=100);
@@ -625,7 +625,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   let choosed_talk = choose_one(
     &talks,
-    vars.volatility.idle_seconds() < vars.volatility.idle_threshold(),
+    vars.volatility.idle_seconds() < IDLE_THRESHOLD,
   )
   .unwrap();
 
@@ -674,7 +674,6 @@ mod test {
     let vars = get_global_vars();
     vars.load()?;
     vars.volatility.set_idle_seconds(1);
-    vars.volatility.set_idle_threshold(2);
 
     let req = Request {
       method: Method::GET,

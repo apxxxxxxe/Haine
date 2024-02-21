@@ -174,8 +174,6 @@ pub struct VolatilityVariables {
 
   pub idle_seconds: Mutex<i32>,
 
-  pub idle_threshold: Mutex<i32>,
-
   pub immersive_degrees: Mutex<u32>,
 
   pub waiting_talk: Mutex<Option<(String, TranslateOption)>>,
@@ -183,6 +181,7 @@ pub struct VolatilityVariables {
   pub touch_info: Mutex<TouchInfoMap>,
 }
 
+#[allow(dead_code)]
 impl VolatilityVariables {
   generate_getter_setter!(log_path, String, cloneable);
   generate_getter_setter!(ghost_up_time, u64, cloneable);
@@ -199,6 +198,7 @@ impl VolatilityVariables {
   generate_getter_setter!(last_touch_info, String, cloneable);
   generate_mut_getter!(inserter, Inserter, non_cloneable);
   generate_mut_getter!(talk_bias, TalkBias, non_cloneable);
+  generate_getter_setter!(status, Status, non_cloneable);
   generate_mut_getter!(status, Status, non_cloneable);
   generate_getter_setter!(current_surface, i32, cloneable);
   generate_getter_setter!(idle_seconds, i32, cloneable);
@@ -229,13 +229,14 @@ impl Default for VolatilityVariables {
       current_surface: Mutex::new(0),
       status: Mutex::new(Status::new()),
       idle_seconds: Mutex::new(0),
-      idle_threshold: Mutex::new(60 * 5),
       immersive_degrees: Mutex::new(0),
       waiting_talk: Mutex::new(None),
       touch_info: Mutex::new(TouchInfoMap::new()),
     }
   }
 }
+
+pub const IDLE_THRESHOLD: i32 = 60 * 5;
 
 #[derive(Clone)]
 pub struct TouchInfoMap {
