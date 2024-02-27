@@ -383,13 +383,13 @@ impl Inserter {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::events::aitalk::TalkType;
+  use crate::events::aitalk::Talk;
   use crate::events::translate::on_translate;
   use rand::seq::SliceRandom;
 
   #[test]
   fn inserter() {
-    let mut talks = TalkType::all_talks();
+    let mut talks = Talk::all_talks();
     talks.shuffle(&mut rand::thread_rng());
     let mut ins = Inserter::default();
     ins.start_init();

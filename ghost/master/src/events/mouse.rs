@@ -1,4 +1,3 @@
-use crate::events::aitalk::Talk;
 use crate::events::common::*;
 use crate::variables::{GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
@@ -30,17 +29,13 @@ fn first_and_other(
   touch_info: &mut TouchInfo,
   first: Vec<String>,
   other: Vec<String>,
-) -> Vec<Talk> {
-  let result = if touch_info.is_reset() {
-    Talk::from_vec(first)
-  } else {
-    Talk::from_vec(other)
-  };
+) -> Vec<String> {
+  let result = if touch_info.is_reset() { first } else { other };
   touch_info.add();
   result
 }
 
-pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Talk>> {
+pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
   match info.as_str() {
     "0handnade" => Some(first_and_other(
       &mut vars.volatility.touch_info_mut().hand,
@@ -78,7 +73,7 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Tal
           "h1111304……悪餓鬼。".to_string(),
         ]);
       }
-      let zero_skirt_up: Vec<Talk> = Talk::from_vec(all_combo(&conbo_parts));
+      let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
       Some(zero_skirt_up)
     }
     "0shoulderdown" => Some(first_and_other(
@@ -105,7 +100,7 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Tal
   }
 }
 
-fn bust_touch(vars: &mut GlobalVariables) -> Vec<Talk> {
+fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   let zero_bust_touch_threshold = 12;
   let mut zero_bust_touch = Vec::new();
   if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
@@ -135,5 +130,5 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<Talk> {
   } else {
     zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
   }
-  Talk::from_vec(zero_bust_touch)
+  zero_bust_touch
 }
