@@ -1,5 +1,5 @@
-use crate::events::aitalk::Talk;
 use crate::events::translate::on_translate;
+use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
 
@@ -49,7 +49,7 @@ pub fn new_response_with_value(value: String, option: TranslateOption) -> Respon
   r
 }
 
-pub fn choose_one(values: &[Talk], update_weight: bool) -> Option<Talk> {
+pub fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> Option<usize> {
   if values.is_empty() {
     return None;
   }
@@ -58,7 +58,7 @@ pub fn choose_one(values: &[Talk], update_weight: bool) -> Option<Talk> {
     .volatility
     .talk_bias_mut()
     .roulette(values, update_weight);
-  Some(values.get(u).unwrap().clone())
+  Some(u)
 }
 
 // return all combinations of values

@@ -1,6 +1,9 @@
-use crate::events::aitalk::Talk;
 use rand::Rng;
 use std::collections::HashMap;
+
+pub trait RouletteCell {
+  fn key(&self) -> String; // トークの識別子: 全体において一意である必要がある
+}
 
 pub struct TalkBias(HashMap<String, u32>);
 
@@ -38,16 +41,16 @@ impl TalkBias {
     i32::MAX / key_count as i32
   }
 
-  pub fn roulette(&mut self, talks: &[Talk], is_consume: bool) -> usize {
+  pub fn roulette(&mut self, cells: &[impl RouletteCell], is_consume: bool) -> usize {
     let mut rng = rand::thread_rng();
 
-    let counts_vec: Vec<u32> = talks.iter().map(|s| self.get(&s.text)).collect();
+    let counts_vec: Vec<u32> = cells.iter().map(|s| self.get(&s.key())).collect();
     println!("counts: {:?}", counts_vec);
     let mut bias_vec: Vec<i32> = counts_vec.iter().map(|c| self.calc_bias(*c)).collect();
     println!("before_bias: {:?}", bias_vec);
 
     if !bias_vec.iter().any(|x| x != &0) {
-      bias_vec = vec![1; talks.len()];
+      bias_vec = vec![1; cells.len()];
     }
 
     let mut cumulative_sum: Vec<i32> = vec![];
@@ -60,11 +63,11 @@ impl TalkBias {
     let sum = *cumulative_sum.last().unwrap();
     let first_non_zero = cumulative_sum.iter().find(|&&x| x != 0).unwrap_or(&-1);
 
-    println!("talkslen: {}", talks.len());
+    println!("talkslen: {}", cells.len());
     println!("sum: {}", sum);
     let selected_index = if sum == 0 || *first_non_zero == -1 || first_non_zero == &sum {
       println!("random");
-      rng.gen_range(0..talks.len())
+      rng.gen_range(0..cells.len())
     } else {
       // binsearch
       println!("binsearch");
@@ -76,13 +79,13 @@ impl TalkBias {
 
     // increment bias without selection
     if is_consume {
-      for (i, talk) in talks.iter().enumerate() {
+      for (i, cell) in cells.iter().enumerate() {
         if i == selected_index {
           // 選ばれたトークの重みを0に
-          self.reset(talk.text.clone());
+          self.reset(cell.key());
         } else {
           // 全体の1/2が消費されるまで、それまでのトークが再び選ばれる可能性は生まれない
-          self.increment(talk.text.clone());
+          self.increment(cell.key());
         }
       }
     }
@@ -110,6 +113,7 @@ fn binsearch_min(v: &[i32], r: i32) -> usize {
 #[cfg(test)]
 mod test {
   use super::*;
+  use crate::events::aitalk::Talk;
 
   #[test]
   fn test_binsearch() {
@@ -131,7 +135,7 @@ mod test {
 
     let talks: Vec<Talk> = ["a", "b", "c", "d", "e", "f", "g", "h"]
       .iter()
-      .map(|s| Talk::new(None, s.to_string()))
+      .map(|s| Talk::new(None, s, s.to_string()))
       .collect();
 
     let mut indexes: Vec<usize> = vec![];

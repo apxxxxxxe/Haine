@@ -6,7 +6,7 @@ use crate::status::Status;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 const VAR_PATH: &str = "vars.json";
 static mut GLOBALVARS: Option<GlobalVariables> = None;

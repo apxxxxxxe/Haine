@@ -1,4 +1,3 @@
-use crate::events::aitalk::Talk;
 use crate::events::common::*;
 use rand::seq::SliceRandom;
 use shiorust::message::{Response, *};
@@ -16,24 +15,24 @@ pub fn on_stick_surface(_req: &Request) -> Response {
 }
 
 pub fn on_boot(_req: &Request) -> Response {
-  let talks = Talk::from_vec(all_combo(&vec![
+  let talks = all_combo(&vec![
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
     vec!["\
       h1113105……h1113101\\_w[300]h1113201あら。\\n\
       h1111204いらっしゃい、{user_name}。\
       "
     .to_string()],
-  ]));
+  ]);
   let v = format!(
     "\\![bind,シルエット,,0]\\![bind,ex,,0]\\![embed,OnStickSurface]{}{}",
     randomize_underwear(),
-    choose_one(&talks, false).unwrap(),
+    talks[choose_one(&talks, false).unwrap()],
   );
   new_response_with_value(v, TranslateOption::OnlyText)
 }
 
 pub fn on_close(_req: &Request) -> Response {
-  let talks = Talk::from_vec(all_combo(&vec![
+  let talks = all_combo(&vec![
     vec!["h1111209".to_string(), "h1111207".to_string()],
     vec!["あなたに".to_string()],
     vec![
@@ -44,9 +43,9 @@ pub fn on_close(_req: &Request) -> Response {
       "孤独と救い".to_string(),
     ],
     vec!["がありますように。\\nh1111204またね、{user_name}。\\_w[1200]".to_string()],
-  ]));
+  ]);
   new_response_with_value(
-    choose_one(&talks, true).unwrap().text + "\\-",
+    talks[choose_one(&talks, true).unwrap()].clone() + "\\-",
     TranslateOption::OnlyText,
   )
 }
