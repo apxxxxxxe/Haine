@@ -21,9 +21,7 @@ pub fn on_translate(text: String, complete_shadow: bool) -> String {
     return text;
   }
 
-  let mut translated = text.clone();
-
-  translated = text_only_translater(translated, complete_shadow);
+  let translated = translate(text, complete_shadow);
 
   let vars = get_global_vars();
   if !vars.volatility.inserter_mut().is_ready() {
@@ -32,28 +30,25 @@ pub fn on_translate(text: String, complete_shadow: bool) -> String {
   vars.volatility.inserter_mut().run(translated)
 }
 
-// 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-fn text_only_translater(text: String, complete_shadow: bool) -> String {
-  static RE_TEXT_ONLY: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap()
-  });
+fn translate(text: String, complete_shadow: bool) -> String {
+  let mut dialogs = Dialog::from_text(&text);
 
-  let tags = RE_TEXT_ONLY.find_iter(&text);
-  let splitted = RE_TEXT_ONLY.split(&text).collect::<Vec<&str>>();
-  let mut result = String::new();
-
-  for (i, tag) in tags.enumerate() {
-    result.push_str(translate_part(splitted[i].to_string(), complete_shadow).as_str());
-    result.push_str(tag.as_str());
+  for dialog in dialogs.iter_mut() {
+    translate_dialog(dialog, complete_shadow);
   }
-  result
-    .push_str(translate_part(splitted[splitted.len() - 1].to_string(), complete_shadow).as_str());
 
-  translate_whole(result)
+  translate_whole(
+    dialogs
+      .iter()
+      .enumerate()
+      .map(|(i, d)| d.render(i == 0))
+      .collect::<Vec<String>>()
+      .join(""),
+  )
 }
 
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
-fn translate_part(text: String, complete_shadow: bool) -> String {
+fn translate_dialog(dialog: &mut Dialog, complete_shadow: bool) {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
 
   const DEFAULT_Y: i32 = -700;
@@ -69,26 +64,43 @@ fn translate_part(text: String, complete_shadow: bool) -> String {
     "\\0\\![bind,シルエット,黒塗り2,0]".to_string()
   };
 
-  let surface_replaced = RE_SURFACE_SNIPPET
-    .replace_all(&text, format!("\\0\\s[$1]{}", bind).as_str())
-    .to_string();
+  // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
+  static RE_TEXT_ONLY: Lazy<Regex> = Lazy::new(|| {
+    Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap()
+  });
 
-  const PHI: &str = "φ";
-  let replaces = vec![
-    Replacee::new("、", "、\\_w[600]", PHI, "", None),
-    Replacee::new("。", " \\_w[1200]", PHI, ")）」』", Some(vec![0])),
-    Replacee::new("。", "。\\_w[1200]", PHI, ")）」』", Some(vec![1])),
-    Replacee::new("！", "！\\_w[1200]", PHI, ")）」』", None),
-    Replacee::new("？", "？\\_w[1200]", PHI, ")）」』", None),
-    Replacee::new("…", "…\\_w[600]", PHI, ")）」』", None),
-    Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
-    Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
-    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
-  ];
-  let words_replaced = replace_with_check(&surface_replaced, replaces).replace(PHI, "");
+  let tags = RE_TEXT_ONLY
+    .find_iter(&dialog.text)
+    .map(|m| m.as_str())
+    .collect::<Vec<&str>>();
+  let splitted_texts = RE_TEXT_ONLY.split(&dialog.text).collect::<Vec<&str>>();
 
-  let vars = get_global_vars();
-  words_replaced.replace("{user_name}", &vars.user_name().clone().unwrap())
+  let mut result = String::new();
+  for i in 0..splitted_texts.len() {
+    let mut splitted = splitted_texts[i].to_string();
+    splitted = RE_SURFACE_SNIPPET
+      .replace_all(&splitted, format!("\\0\\s[$1]{}", bind).as_str())
+      .to_string();
+
+    const PHI: &str = "φ";
+    let replaces = vec![
+      Replacee::new("、", "、\\_w[600]", PHI, "", None),
+      Replacee::new("。", " \\_w[1200]", PHI, ")）」』", Some(vec![0])),
+      Replacee::new("。", "。\\_w[1200]", PHI, ")）」』", Some(vec![1])),
+      Replacee::new("！", "！\\_w[1200]", PHI, ")）」』", None),
+      Replacee::new("？", "？\\_w[1200]", PHI, ")）」』", None),
+      Replacee::new("…", "…\\_w[600]", PHI, ")）」』", None),
+      Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
+      Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
+      Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
+    ];
+    result.push_str(&replace_with_check(&splitted, dialog.scope, replaces).replace(PHI, ""));
+    if i < tags.len() {
+      result.push_str(tags[i]);
+    }
+  }
+
+  dialog.text = result;
 }
 
 fn translate_whole(text: String) -> String {
@@ -97,6 +109,9 @@ fn translate_whole(text: String) -> String {
   let mut translated = text.clone();
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
+
+  let vars = get_global_vars();
+  translated = translated.replace("{user_name}", &vars.user_name().clone().unwrap());
 
   // \\Cが含まれているなら文頭に\\Cを補完
   if translated.contains("\\C") {
@@ -143,6 +158,14 @@ impl Dialog {
       result.push(Dialog::new(texts[i].to_string(), scopes[i]));
     }
     result
+  }
+
+  fn render(&self, is_first: bool) -> String {
+    if is_first {
+      self.text.clone()
+    } else {
+      self.to_string()
+    }
   }
 }
 
@@ -200,7 +223,7 @@ impl Replacee {
   }
 }
 
-fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
+fn replace_with_check(text: &str, scope: usize, replaces: Vec<Replacee>) -> String {
   static QUICK_SECTION_START: Lazy<Regex> =
     Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
   static QUICK_SECTION_END: Lazy<Regex> =
@@ -209,54 +232,45 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
 
   let mut translated = String::new();
 
-  let lines = Dialog::from_text(src);
+  let mut in_quicksection = false;
+  let text_chars_vec = text.char_indices().collect::<Vec<(usize, char)>>();
+  let mut checking_cursor = 0;
+  while let Some((j, c)) = text_chars_vec.get(checking_cursor) {
+    let text_slice = &text[*j..];
+    if QUICK_SECTION_START.is_match(text_slice) {
+      println!("in quicksection");
+      in_quicksection = true;
+    } else if QUICK_SECTION_END.is_match(text_slice) {
+      println!("out quicksection");
+      in_quicksection = false;
+    } else if text_slice.starts_with("\\_q") {
+      println!("toggle quicksection");
+      in_quicksection = !in_quicksection;
+    }
 
-  for (i, line) in lines.iter().enumerate() {
-    let mut in_quicksection = false;
-    let text = if i == 0 {
-      line.text.clone()
-    } else {
-      line.to_string()
-    };
-    let text_chars_vec = text.char_indices().collect::<Vec<(usize, char)>>();
-    let mut checking_cursor = 0;
-    while let Some((j, c)) = text_chars_vec.get(checking_cursor) {
-      let text_slice = &text[*j..];
-      if QUICK_SECTION_START.is_match(text_slice) {
-        println!("in quicksection");
-        in_quicksection = true;
-      } else if QUICK_SECTION_END.is_match(text_slice) {
-        println!("out quicksection");
-        in_quicksection = false;
-      } else if text_slice.starts_with("\\_q") {
-        println!("toggle quicksection");
-        in_quicksection = !in_quicksection;
+    let mut matched_replacee: Option<&Replacee> = None;
+    for r in replaces.iter() {
+      if text_slice.starts_with(r.old)
+        && r.is_in_scope(scope)
+        && !r.has_prefix(text, checking_cursor)
+        && !r.has_suffix(text, checking_cursor)
+      {
+        matched_replacee = Some(r);
+        break;
       }
-
-      let mut matched_replacee: Option<&Replacee> = None;
-      for r in replaces.iter() {
-        if text_slice.starts_with(r.old)
-          && r.is_in_scope(line.scope)
-          && !r.has_prefix(&text, checking_cursor)
-          && !r.has_suffix(&text, checking_cursor)
-        {
-          matched_replacee = Some(r);
-          break;
-        }
-      }
-      if matched_replacee.is_some() {
-        let r = matched_replacee.unwrap();
-        if in_quicksection {
-          println!("removing wait");
-          translated.push_str(&WAIT.replace(r.new, ""));
-        } else {
-          translated.push_str(r.new);
-        }
-        checking_cursor += r.old.chars().count();
+    }
+    if matched_replacee.is_some() {
+      let r = matched_replacee.unwrap();
+      if in_quicksection {
+        println!("removing wait");
+        translated.push_str(&WAIT.replace(r.new, ""));
       } else {
-        translated.push(*c);
-        checking_cursor += 1;
+        translated.push_str(r.new);
       }
+      checking_cursor += r.old.chars().count();
+    } else {
+      translated.push(*c);
+      checking_cursor += 1;
     }
   }
   translated
@@ -265,10 +279,11 @@ fn replace_with_check(src: &str, replaces: Vec<Replacee>) -> String {
 #[test]
 fn test_translate() {
   let text = "\
-    h1111209あなたたちが歩いている姿を、いつも窓から見ているの。\\n\
-    h1111204いつも何かをして、どこかへ向かっている。\\n\
-    h1111207羨ましいわ。h1111207私は\\_a[Fastened,どういうこと？]見ていることしかできない\\_aから、なおさら。\
-    ".to_string();
-  let translated = text_only_translater(text, true);
+    \\0これは、0のセリフ。\\n\
+    \\1これは、1のセリフ。\\n\
+    \\0そして、0のセリフ。\\n\
+    "
+  .to_string();
+  let translated = translate(text, true);
   println!("{}", translated);
 }
