@@ -1,9 +1,11 @@
 use crate::autobreakline::Inserter;
+use crate::events::aitalk::TalkType;
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::roulette::TalkBias;
 use crate::status::Status;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::error::Error;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -73,6 +75,8 @@ pub struct GlobalVariables {
   // ユーザ名
   user_name: Mutex<Option<String>>,
 
+  talk_collection: Mutex<HashMap<TalkType, Vec<String>>>,
+
   // 起動ごとにリセットされる変数
   #[serde(skip)]
   pub volatility: VolatilityVariables,
@@ -84,6 +88,7 @@ impl GlobalVariables {
       total_time: Mutex::new(Some(0)),
       random_talk_interval: Mutex::new(Some(180)),
       user_name: Mutex::new(Some("ユーザ".to_string())),
+      talk_collection: Mutex::new(HashMap::new()),
       volatility: VolatilityVariables::default(),
     };
 
@@ -107,19 +112,24 @@ impl GlobalVariables {
     if let Some(t) = vars.user_name() {
       self.set_user_name(Some(t));
     }
+    if !vars.talk_collection().is_empty() {
+      self.talk_collection_mut().extend(vars.talk_collection());
+    }
 
     Ok(())
   }
 
   pub fn save(&self) -> Result<(), Box<dyn Error>> {
-    let json_str = serde_json::to_string(self)?;
-    std::fs::write(VAR_PATH, json_str)?;
+    let json_str_indent = serde_json::to_string_pretty(&self)?;
+    std::fs::write(VAR_PATH, json_str_indent)?;
     Ok(())
   }
 
   generate_getter_setter!(total_time, Option<u64>, cloneable);
   generate_getter_setter!(random_talk_interval, Option<u64>, cloneable);
   generate_getter_setter!(user_name, Option<String>, cloneable);
+  generate_getter!(talk_collection, HashMap<TalkType, Vec<String>>, cloneable);
+  generate_mut_getter!(talk_collection, HashMap<TalkType, Vec<String>>, non_cloneable);
 }
 
 pub fn get_global_vars() -> &'static mut GlobalVariables {

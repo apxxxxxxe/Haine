@@ -124,6 +124,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnBalloonTooltip" => Some(on_balloon_tooltip),
     "OnStickSurface" => Some(on_stick_surface),
     "OnWaitTranslater" => Some(on_wait_translater),
+    "OnCheckTalkCollection" => Some(on_check_talk_collection),
     _ => None,
   }
 }

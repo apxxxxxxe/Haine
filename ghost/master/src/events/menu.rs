@@ -1,3 +1,4 @@
+use crate::events::aitalk::{random_talks, TalkType};
 use crate::events::common::*;
 use crate::events::tooltip::show_tooltip;
 use crate::variables::get_global_vars;
@@ -37,6 +38,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     \\![*]\\q[なにか話して,OnAiTalk]\\n\
     \\![*]\\q[話しかける,OnTalk]\\n\
     \\![*]\\q[ひと息つく,OnBreakTime]\\n\
+    \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
     \\n\
     \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\\n\
     {}
@@ -53,7 +55,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     ),
   );
 
-  new_response_with_value(m, TranslateOption::OnlyText)
+  new_response_with_value(m, TranslateOption::None)
 }
 
 fn show_minute(m: &u64) -> String {
@@ -273,4 +275,29 @@ pub fn on_talk_answer(req: &Request) -> Response {
   let refs = get_references(req);
   let q = Question(refs[0].parse::<u32>().unwrap());
   new_response_with_value(q.talk(), TranslateOption::WithCompleteShadow)
+}
+
+pub fn on_check_talk_collection(_req: &Request) -> Response {
+  let mut s = String::new();
+  let mut sum = 0;
+  let mut all_sum = 0;
+  let talk_collection = get_global_vars().talk_collection_mut();
+  for talk_type in TalkType::all() {
+    let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
+    let all_len = random_talks(talk_type).len();
+    s.push_str(&format!("{}: {}/{}\\n", talk_type, len, all_len));
+    sum += len;
+    all_sum += all_len;
+  }
+
+  new_response_with_value(
+    format!(
+      "\\_q{}\
+    ---\\n\
+    TOTAL: {}/{}\\n\
+    \\q[戻る,OnMenuExec]",
+      s, sum, all_sum
+    ),
+    TranslateOption::None,
+  )
 }

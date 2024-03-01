@@ -4,6 +4,7 @@ use crate::variables::{get_global_vars, IDLE_THRESHOLD};
 use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
+use serde::{Deserialize, Serialize};
 use shiorust::message::{parts::HeaderName, Request, Response};
 
 // トーク1回あたりに上昇する没入度
@@ -447,7 +448,7 @@ impl Talk {
   }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
 pub enum TalkType {
   SelfIntroduce,
   Lore,
@@ -470,7 +471,7 @@ impl Display for TalkType {
 }
 
 impl TalkType {
-  fn all() -> Vec<Self> {
+  pub fn all() -> Vec<Self> {
     vec![
       Self::SelfIntroduce,
       Self::Lore,
@@ -634,6 +635,21 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   let choosed_talk =
     talks[choose_one(&talks, vars.volatility.idle_seconds() < IDLE_THRESHOLD).unwrap()].clone();
+
+  let mut talk_collection = get_global_vars().talk_collection_mut();
+  match talk_collection.get_mut(&choosed_talk.talk_type.unwrap()) {
+    Some(t) => {
+      if !t.contains(&choosed_talk.id.to_string()) {
+        t.push(choosed_talk.id.to_string());
+      }
+    }
+    None => {
+      talk_collection.insert(
+        choosed_talk.talk_type.unwrap(),
+        vec![choosed_talk.id.to_string()],
+      );
+    }
+  }
 
   let mut res = new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow);
   res.headers.insert_by_header_name(
