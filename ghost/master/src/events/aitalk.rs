@@ -626,6 +626,7 @@ static BOTSU: Lazy<Vec<String>> = Lazy::new(|| {
 
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
+  let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
 
   // 没入度を上げる
   vars.volatility.set_immersive_degrees(std::cmp::min(
@@ -640,7 +641,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     "{} < {}: {}",
     vars.volatility.idle_seconds(),
     IDLE_THRESHOLD,
-    vars.volatility.idle_seconds() < IDLE_THRESHOLD
+    if_consume_talk_bias
   );
 
   let rnd = rand::thread_rng().gen_range(0..=100);
@@ -662,10 +663,12 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     v
   };
 
-  let choosed_talk =
-    talks[choose_one(&talks, vars.volatility.idle_seconds() < IDLE_THRESHOLD).unwrap()].clone();
+  let choosed_talk = talks[choose_one(&talks, if_consume_talk_bias).unwrap()].clone();
 
-  register_talk_collection(&choosed_talk);
+  if if_consume_talk_bias {
+    // ユーザが見ているときのみトークを消費する
+    register_talk_collection(&choosed_talk);
+  }
 
   let mut res = new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow);
   res.headers.insert_by_header_name(

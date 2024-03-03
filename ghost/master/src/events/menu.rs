@@ -1,4 +1,4 @@
-use crate::events::aitalk::{random_talks, Talk, TalkType, register_talk_collection};
+use crate::events::aitalk::{random_talks, register_talk_collection, Talk, TalkType};
 use crate::events::common::*;
 use crate::events::tooltip::show_tooltip;
 use crate::variables::get_global_vars;
