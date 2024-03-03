@@ -6,6 +6,7 @@ use once_cell::sync::Lazy;
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use shiorust::message::{parts::HeaderName, Request, Response};
+use std::collections::HashSet;
 
 // トーク1回あたりに上昇する没入度
 const IMMERSIVE_RATE: u32 = 4;
@@ -446,6 +447,13 @@ impl Talk {
     }
     v
   }
+
+  pub fn get_unseen_talks(talk_type: TalkType, seen: &HashSet<String>) -> Vec<Talk> {
+    random_talks(talk_type)
+      .into_iter()
+      .filter(|t| !seen.contains(t.id))
+      .collect()
+  }
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
@@ -471,6 +479,27 @@ impl Display for TalkType {
 }
 
 impl TalkType {
+  pub fn from_u32(n: u32) -> Self {
+    match n {
+      0 => Self::SelfIntroduce,
+      1 => Self::Lore,
+      2 => Self::Past,
+      3 => Self::Abstract,
+      4 => Self::WithYou,
+      _ => unreachable!(),
+    }
+  }
+
+  pub fn to_u32(self) -> u32 {
+    match self {
+      Self::SelfIntroduce => 0,
+      Self::Lore => 1,
+      Self::Past => 2,
+      Self::Abstract => 3,
+      Self::WithYou => 4,
+    }
+  }
+
   pub fn all() -> Vec<Self> {
     vec![
       Self::SelfIntroduce,
@@ -636,20 +665,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   let choosed_talk =
     talks[choose_one(&talks, vars.volatility.idle_seconds() < IDLE_THRESHOLD).unwrap()].clone();
 
-  let mut talk_collection = get_global_vars().talk_collection_mut();
-  match talk_collection.get_mut(&choosed_talk.talk_type.unwrap()) {
-    Some(t) => {
-      if !t.contains(&choosed_talk.id.to_string()) {
-        t.push(choosed_talk.id.to_string());
-      }
-    }
-    None => {
-      talk_collection.insert(
-        choosed_talk.talk_type.unwrap(),
-        vec![choosed_talk.id.to_string()],
-      );
-    }
-  }
+  register_talk_collection(&choosed_talk);
 
   let mut res = new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow);
   res.headers.insert_by_header_name(
@@ -657,6 +673,24 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     format!("{} (没入度{})", choosed_talk.talk_type.unwrap(), immersive,),
   );
   res
+}
+
+pub fn register_talk_collection(talk: &Talk) {
+  let mut talk_collection = get_global_vars().talk_collection_mut();
+  match talk_collection.get_mut(&talk.talk_type.unwrap()) {
+    Some(t) => {
+      let key = talk.id.to_string();
+      if !t.contains(&key) {
+        t.insert(key);
+      }
+    }
+    None => {
+      talk_collection.insert(
+        talk.talk_type.unwrap(),
+        HashSet::from_iter(vec![talk.id.to_string()]),
+      );
+    }
+  }
 }
 
 pub fn on_anchor_select_ex(req: &Request) -> Response {

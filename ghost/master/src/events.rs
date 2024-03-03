@@ -125,6 +125,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnStickSurface" => Some(on_stick_surface),
     "OnWaitTranslater" => Some(on_wait_translater),
     "OnCheckTalkCollection" => Some(on_check_talk_collection),
+    "OnCheckUnseenTalks" => Some(on_check_unseen_talks),
     _ => None,
   }
 }

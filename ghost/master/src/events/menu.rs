@@ -1,7 +1,8 @@
-use crate::events::aitalk::{random_talks, TalkType};
+use crate::events::aitalk::{random_talks, Talk, TalkType, register_talk_collection};
 use crate::events::common::*;
 use crate::events::tooltip::show_tooltip;
 use crate::variables::get_global_vars;
+use rand::seq::SliceRandom;
 use shiorust::message::{Request, Response};
 
 pub fn on_menu_exec(_req: &Request) -> Response {
@@ -285,7 +286,15 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
   for talk_type in TalkType::all() {
     let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
     let all_len = random_talks(talk_type).len();
-    s.push_str(&format!("{}: {}/{}\\n", talk_type, len, all_len));
+    let anal = if len < all_len {
+      format!(
+        "\\q[未読トーク再生,OnCheckUnseenTalks,{}]",
+        talk_type.to_u32()
+      )
+    } else {
+      "".to_string()
+    };
+    s.push_str(&format!("{}: {}/{} {}\\n", talk_type, len, all_len, anal));
     sum += len;
     all_sum += all_len;
   }
@@ -300,4 +309,18 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
     ),
     TranslateOption::None,
   )
+}
+
+pub fn on_check_unseen_talks(req: &Request) -> Response {
+  let refs = get_references(req);
+  let talk_type = TalkType::from_u32(refs[0].parse::<u32>().unwrap());
+  let talk_collection = get_global_vars().talk_collection();
+  let seen_talks = talk_collection.get(&talk_type).unwrap();
+
+  let talks = Talk::get_unseen_talks(talk_type, seen_talks);
+  let choosed_talk = talks.choose(&mut rand::thread_rng()).unwrap().to_owned();
+
+  register_talk_collection(&choosed_talk);
+
+  new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow)
 }

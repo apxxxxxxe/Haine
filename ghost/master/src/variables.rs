@@ -5,7 +5,7 @@ use crate::events::mouse_core::Direction;
 use crate::roulette::TalkBias;
 use crate::status::Status;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -75,7 +75,7 @@ pub struct GlobalVariables {
   // ユーザ名
   user_name: Mutex<Option<String>>,
 
-  talk_collection: Mutex<HashMap<TalkType, Vec<String>>>,
+  talk_collection: Mutex<HashMap<TalkType, HashSet<String>>>,
 
   // 起動ごとにリセットされる変数
   #[serde(skip)]
@@ -128,8 +128,8 @@ impl GlobalVariables {
   generate_getter_setter!(total_time, Option<u64>, cloneable);
   generate_getter_setter!(random_talk_interval, Option<u64>, cloneable);
   generate_getter_setter!(user_name, Option<String>, cloneable);
-  generate_getter!(talk_collection, HashMap<TalkType, Vec<String>>, cloneable);
-  generate_mut_getter!(talk_collection, HashMap<TalkType, Vec<String>>, non_cloneable);
+  generate_getter!(talk_collection, HashMap<TalkType, HashSet<String>>, cloneable);
+  generate_mut_getter!(talk_collection, HashMap<TalkType, HashSet<String>>, non_cloneable);
 }
 
 pub fn get_global_vars() -> &'static mut GlobalVariables {
