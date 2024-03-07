@@ -32,10 +32,10 @@ pub fn new_response_nocontent() -> Response {
 }
 
 pub fn new_response_with_value(value: String, option: TranslateOption) -> Response {
+  let vars = get_global_vars();
   let v = match option {
     TranslateOption::None => value,
     _ => {
-      let vars = get_global_vars();
       if vars.volatility.inserter_mut().is_ready() {
         on_translate(value, option == TranslateOption::WithCompleteShadow)
       } else {
@@ -45,7 +45,14 @@ pub fn new_response_with_value(value: String, option: TranslateOption) -> Respon
     }
   };
   let mut r = new_response();
-  r.headers.insert(HeaderName::from("Value"), v);
+  r.headers.insert(
+    HeaderName::from("Value"),
+    format!(
+      "\\b[{}]{}",
+      vars.volatility.talking_place().balloon_surface(),
+      v
+    ),
+  );
   r
 }
 

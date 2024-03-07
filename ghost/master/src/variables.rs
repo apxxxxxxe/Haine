@@ -1,5 +1,5 @@
 use crate::autobreakline::Inserter;
-use crate::events::aitalk::TalkType;
+use crate::events::aitalk::{TalkType, TalkingPlace};
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::roulette::TalkBias;
@@ -77,6 +77,8 @@ pub struct GlobalVariables {
 
   talk_collection: Mutex<HashMap<TalkType, HashSet<String>>>,
 
+  flags: Mutex<EventFlags>,
+
   // 起動ごとにリセットされる変数
   #[serde(skip)]
   pub volatility: VolatilityVariables,
@@ -90,6 +92,7 @@ impl GlobalVariables {
       user_name: Mutex::new(Some("ユーザ".to_string())),
       talk_collection: Mutex::new(HashMap::new()),
       volatility: VolatilityVariables::default(),
+      flags: Mutex::new(EventFlags::default()),
     };
 
     // 形態素解析器は時間がかかるので非同期的に初期化
@@ -113,7 +116,10 @@ impl GlobalVariables {
       self.set_user_name(Some(t));
     }
     if !vars.talk_collection().is_empty() {
-      self.talk_collection_mut().extend(vars.talk_collection());
+      self.set_talk_collection(vars.talk_collection());
+    }
+    if !vars.flags().is_empty() {
+      self.set_flags(vars.flags());
     }
 
     Ok(())
@@ -128,8 +134,10 @@ impl GlobalVariables {
   generate_getter_setter!(total_time, Option<u64>, cloneable);
   generate_getter_setter!(random_talk_interval, Option<u64>, cloneable);
   generate_getter_setter!(user_name, Option<String>, cloneable);
-  generate_getter!(talk_collection, HashMap<TalkType, HashSet<String>>, cloneable);
+  generate_getter_setter!(talk_collection, HashMap<TalkType, HashSet<String>>, cloneable);
   generate_mut_getter!(talk_collection, HashMap<TalkType, HashSet<String>>, non_cloneable);
+  generate_getter_setter!(flags, EventFlags, cloneable);
+  generate_mut_getter!(flags, EventFlags, non_cloneable);
 }
 
 pub fn get_global_vars() -> &'static mut GlobalVariables {
@@ -138,6 +146,30 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
       GLOBALVARS = Some(GlobalVariables::new());
     }
     GLOBALVARS.as_mut().unwrap()
+  }
+}
+
+#[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
+pub enum EventFlag {
+  FirstPlaceChange,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Default)]
+pub struct EventFlags {
+  flags: HashMap<EventFlag, bool>,
+}
+
+impl EventFlags {
+  pub fn is_empty(&self) -> bool {
+    self.flags.is_empty()
+  }
+
+  pub fn set(&mut self, flag: EventFlag, value: bool) {
+    self.flags.insert(flag, value);
+  }
+
+  pub fn get(&self, flag: EventFlag) -> bool {
+    *self.flags.get(&flag).unwrap_or(&false)
   }
 }
 
@@ -189,6 +221,8 @@ pub struct VolatilityVariables {
   pub waiting_talk: Mutex<Option<(String, TranslateOption)>>,
 
   pub touch_info: Mutex<TouchInfoMap>,
+
+  pub talking_place: Mutex<TalkingPlace>,
 }
 
 #[allow(dead_code)]
@@ -215,6 +249,7 @@ impl VolatilityVariables {
   generate_getter_setter!(immersive_degrees, u32, cloneable);
   generate_getter_setter!(waiting_talk, Option<(String, TranslateOption)>, cloneable);
   generate_mut_getter!(touch_info, TouchInfoMap, non_cloneable);
+  generate_getter_setter!(talking_place, TalkingPlace, cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -242,6 +277,7 @@ impl Default for VolatilityVariables {
       immersive_degrees: Mutex::new(0),
       waiting_talk: Mutex::new(None),
       touch_info: Mutex::new(TouchInfoMap::new()),
+      talking_place: Mutex::new(TalkingPlace::LivingRoom),
     }
   }
 }

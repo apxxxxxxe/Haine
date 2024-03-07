@@ -1,15 +1,14 @@
 use crate::events::common::*;
 use crate::roulette::RouletteCell;
-use crate::variables::{get_global_vars, IDLE_THRESHOLD};
+use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
-use rand::prelude::*;
 use serde::{Deserialize, Serialize};
 use shiorust::message::{parts::HeaderName, Request, Response};
 use std::collections::HashSet;
 
 // トーク1回あたりに上昇する没入度
-const IMMERSIVE_RATE: u32 = 4;
+const IMMERSIVE_RATE: u32 = 8;
 
 #[derive(Clone)]
 pub struct Talk {
@@ -78,7 +77,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111206私の元へ集うのは弱い人たち。\\n\
         自分だけでは溶けゆく自我を押し留められず、さりとてそれを受け入れることもできない霊。\\n\
         h1111209役割を与えてあげるの。一種の契約ね。\\n\
-        h1111205使命に縛られはするけれど、自分を保てるわ。\\n\
+        h1111205使命に縛られはするけれど、消滅するよりはよしと彼らは決断したの。\
         ".to_string()),
 
         ("カンテルベリオという土壌", "\
@@ -97,18 +96,20 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         ".to_string()),
 
         ("幽霊たちの役割", "\
-        h1111203従者、と私が呼ぶ幽霊たち。\\n\
+        h1111203従者……と、私が呼ぶ幽霊たち。\\n\
         h1111209私の与えた役割を全うしてくれるものは多くいるわ。\\n\
-        炊事をする人、掃除をする人、洗濯をする人、\\n\
-        h1111206ドアを開ける人、本をめくる人、読書灯を点ける人……\\n\
-        他にも、いろいろね。\\n\
-        h1111201そしてあなたは、h1111207私の話し相手をする人。\
+        h1111205最も多いのは、自分の生前の経験を記録として私に提供してくれる者たち。\\n\
+        h1111209一つとして同じものはない。読んでいて退屈しないわ。\\n\
+        ……h1113204少し形は違えど、あなたもその一部ね。\\n\
+        h1113207期待しているわ、{user_name}。\
         ".to_string()),
 
         ("幽霊たちの自由", "\
-        h1111206私が起きている間、私に尽くす。そういう契約なの。\\n\
-        逆に言えば、私が眠っている間、彼らは自由。\\n\
-        ……h1111209いつか、彼らと話す機会もあるかもしれないわね。\
+        h1111206私は彼らと直接話すことはできないの。\\n\
+        霊力の差があまりにも大きい場合、\\n\
+        h1111209会話や接触を少し行うだけで、弱い方の霊は力を奪われる。\\n\
+        間接的に指示を出すことはできるけれど、\\n\
+        h1111205何か伝えるなら仲立ちをする者が必要なのよ。\
         ".to_string()),
 
       ],
@@ -624,41 +625,124 @@ static BOTSU: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum TalkingPlace {
+  LivingRoom,
+  Library,
+}
+
+impl Display for TalkingPlace {
+  fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+    let s = match self {
+      Self::LivingRoom => "客間",
+      Self::Library => "書斎",
+    };
+    write!(f, "{}", s)
+  }
+}
+
+impl TalkingPlace {
+  pub fn balloon_surface(&self) -> u32 {
+    match self {
+      Self::LivingRoom => 0,
+      Self::Library => 6,
+    }
+  }
+
+  pub fn talk_types(&self) -> Vec<TalkType> {
+    match self {
+      Self::LivingRoom => vec![TalkType::SelfIntroduce, TalkType::Lore, TalkType::WithYou],
+      Self::Library => vec![TalkType::Abstract, TalkType::Past],
+    }
+  }
+}
+
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
 
-  // 没入度を上げる
-  vars.volatility.set_immersive_degrees(std::cmp::min(
-    vars.volatility.immersive_degrees() + IMMERSIVE_RATE,
-    100,
-  ));
-
   vars
     .volatility
     .set_last_random_talk_time(vars.volatility.ghost_up_time());
-  debug!(
-    "{} < {}: {}",
-    vars.volatility.idle_seconds(),
-    IDLE_THRESHOLD,
-    if_consume_talk_bias
-  );
 
-  let rnd = rand::thread_rng().gen_range(0..=100);
-  let talks = if rnd < vars.volatility.immersive_degrees() {
-    // 没入度が高いときのトーク
-    let mut v = vec![];
-    v.extend(random_talks(TalkType::Abstract));
-    v.extend(random_talks(TalkType::Past));
-    v
+  // 没入度を上げる
+  let immersive_degrees = std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
+
+  if immersive_degrees >= 100 {
+    let (previous_talking_place, current_talking_place) = match vars.volatility.talking_place() {
+      TalkingPlace::LivingRoom => (TalkingPlace::LivingRoom, TalkingPlace::Library),
+      TalkingPlace::Library => (TalkingPlace::Library, TalkingPlace::LivingRoom),
+    };
+
+    let messages: Vec<String> = {
+      let parts: Vec<Vec<String>> = if !vars.flags().get(EventFlag::FirstPlaceChange) {
+        vars.flags_mut().set(EventFlag::FirstPlaceChange, true);
+        vec![
+          vec![format!(
+            "\\0\\b[{}]h1000000……。\\1ふと目を離した間に、ハイネは姿を消していた。\\n\
+            \\0\\c\\1\\c…………。\
+            他の部屋を探し、\\0\\b[{}]\\1{}に入ったとき、彼女はそこにいた。\\n\
+          ",
+            previous_talking_place.balloon_surface(),
+            current_talking_place.balloon_surface(),
+            current_talking_place
+          )],
+          match current_talking_place {
+            TalkingPlace::Library => vec!["h1111204あなた、書斎は初めてね。\\n\
+              \\1……客間より少し狭い程度の間取りに、所狭しと本棚が設置されている。\\n\
+              窓すら本棚に覆われていて、ハイネは蝋燭の灯りで本を読んでいるようだった。\\n\
+              h1111204……あなたは、本を読むのは好き？\\n\
+              h1111306私は好きよ。巨人の肩に乗って遠くが見える。\\n\
+              h1111305あるいは、ここではないどこかへ、遠くへ行ける。\
+              h1111204あなたも自由に読みなさい。h1111309ここはそういう場所よ。\
+              "
+            .to_string()],
+            TalkingPlace::LivingRoom => vec!["これが表示されることはないはず".to_string()],
+          },
+        ]
+      } else {
+        vec![
+          vec![format!(
+            "\\0\\b[{}]h1000000……。\\1また、ハイネが姿を消してしまった。\\n\
+            \\0\\b[{}]\\1前回のように{}を探しに行くと、彼女はそこにいた。\\n\
+          ",
+            previous_talking_place.balloon_surface(),
+            current_talking_place.balloon_surface(),
+            current_talking_place
+          )],
+          match current_talking_place {
+            TalkingPlace::Library => vec!["\
+            h1111209さて、仕切り直しましょう。\\n\
+            ……h1111206もちろん、読みたい本があれば御自由にどうぞ。\
+            ".to_string()],
+            TalkingPlace::LivingRoom => vec!["\
+            h1111206さあ、お茶を淹れ直させましょう。\\n\
+            h1111204お席にどうぞ、お客人。\
+            ".to_string()],
+          },
+        ]
+      };
+      all_combo(&parts)
+    };
+
+    vars.volatility.set_talking_place(current_talking_place);
+    vars.volatility.set_immersive_degrees(0);
+
+    return new_response_with_value(
+      messages[choose_one(&messages, true).unwrap()].to_owned(),
+      TranslateOption::OnlyText,
+    );
   } else {
-    // 没入度が低いときのトーク
-    let mut v = vec![];
-    v.extend(random_talks(TalkType::SelfIntroduce));
-    v.extend(random_talks(TalkType::Lore));
-    v.extend(random_talks(TalkType::WithYou));
-    v
-  };
+    vars.volatility.set_immersive_degrees(immersive_degrees);
+  }
+
+  let talks = vars
+    .volatility
+    .talking_place()
+    .talk_types()
+    .iter()
+    .flat_map(|t| random_talks(*t))
+    .collect::<Vec<_>>();
 
   let choosed_talk = talks[choose_one(&talks, if_consume_talk_bias).unwrap()].clone();
 
@@ -667,7 +751,13 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     register_talk_collection(&choosed_talk);
   }
 
-  let mut res = new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow);
+  let text = format!(
+    "\\b[{}]{}",
+    vars.volatility.talking_place().balloon_surface(),
+    choosed_talk.text
+  );
+
+  let mut res = new_response_with_value(text, TranslateOption::WithCompleteShadow);
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{}: {}", choosed_talk.talk_type.unwrap(), choosed_talk.id,),
