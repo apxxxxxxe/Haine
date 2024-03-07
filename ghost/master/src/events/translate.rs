@@ -31,24 +31,6 @@ pub fn on_translate(text: String, complete_shadow: bool) -> String {
 }
 
 fn translate(text: String, complete_shadow: bool) -> String {
-  let mut dialogs = Dialog::from_text(&text);
-
-  for dialog in dialogs.iter_mut() {
-    translate_dialog(dialog, complete_shadow);
-  }
-
-  translate_whole(
-    dialogs
-      .iter()
-      .enumerate()
-      .map(|(i, d)| d.render(i == 0))
-      .collect::<Vec<String>>()
-      .join(""),
-  )
-}
-
-// さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
-fn translate_dialog(dialog: &mut Dialog, complete_shadow: bool) {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
 
   const DEFAULT_Y: i32 = -700;
@@ -64,6 +46,28 @@ fn translate_dialog(dialog: &mut Dialog, complete_shadow: bool) {
     "\\0\\![bind,シルエット,黒塗り2,0]".to_string()
   };
 
+  let text = RE_SURFACE_SNIPPET
+    .replace_all(&text, format!("\\0\\s[$1]{}", bind).as_str())
+    .to_string();
+
+  let mut dialogs = Dialog::from_text(&text);
+
+  for dialog in dialogs.iter_mut() {
+    translate_dialog(dialog);
+  }
+
+  translate_whole(
+    dialogs
+      .iter()
+      .enumerate()
+      .map(|(i, d)| d.render(i == 0))
+      .collect::<Vec<String>>()
+      .join(""),
+  )
+}
+
+// さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
+fn translate_dialog(dialog: &mut Dialog) {
   // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
   static RE_TEXT_ONLY: Lazy<Regex> = Lazy::new(|| {
     Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap()
@@ -77,10 +81,7 @@ fn translate_dialog(dialog: &mut Dialog, complete_shadow: bool) {
 
   let mut result = String::new();
   for i in 0..splitted_texts.len() {
-    let mut splitted = splitted_texts[i].to_string();
-    splitted = RE_SURFACE_SNIPPET
-      .replace_all(&splitted, format!("\\0\\s[$1]{}", bind).as_str())
-      .to_string();
+    let splitted = splitted_texts[i].to_string();
 
     const PHI: &str = "φ";
     let replaces = vec![
