@@ -42,19 +42,19 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
       vec![],
       vec![
         "\
-        h1111205\\1触れた手の感触はゼリーを掴むような頼りなさ、冷たさだった。\
-        ……手が冷えるわよ。h1111204ほどほどにね。\
+        h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
+        ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
         "
         .to_string(),
         "\
-      h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
-      ……それは不毛というものよ。\
-      "
+        h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+        ……それは不毛というものよ。\
+        "
         .to_string(),
         "\
-      h1111205\\1彼女の指は長い。
-      h1111209……うん。\\n\
-      "
+        h1111205\\1彼女の指は長い。
+        h1111209……うん。\\n\
+        "
         .to_string(),
       ],
     )),
@@ -112,6 +112,7 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
       "h1111209気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
       "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
       "h1111205気安いのね。あまり好きではないわ。".to_string(),
+      "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。".to_string(),
     ]);
   } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 * 2 {
     zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
@@ -125,7 +126,7 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
       h1111201許されていると思ったの？\\n\
       h1111304残念だけど、それほど気は長くないの。\\n\
       h1111309わきまえなさい。"
-        .to_string(),
+      .to_string(),
     );
   } else {
     zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
