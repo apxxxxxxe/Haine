@@ -1,5 +1,7 @@
-mod autobreakline;
+#[macro_use]
 mod events;
+
+mod autobreakline;
 mod roulette;
 mod status;
 mod variables;

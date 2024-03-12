@@ -21,7 +21,6 @@ use crate::events::tooltip::*;
 use crate::events::translate::*;
 use crate::events::webclap::*;
 use crate::variables::get_global_vars;
-
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
 pub fn handle_request(req: &Request) -> Response {
@@ -66,25 +65,25 @@ pub fn handle_request(req: &Request) -> Response {
 fn version(_req: &Request) -> Response {
   new_response_with_value(
     String::from(env!("CARGO_PKG_VERSION")),
-    TranslateOption::None,
+    TranslateOption::none(),
   )
 }
 
 fn craftman(_req: &Request) -> Response {
-  new_response_with_value(String::from("HinoTsumi"), TranslateOption::None)
+  new_response_with_value(String::from("HinoTsumi"), TranslateOption::none())
 }
 
 fn craftmanw(_req: &Request) -> Response {
-  new_response_with_value(String::from("日野つみ"), TranslateOption::None)
+  new_response_with_value(String::from("日野つみ"), TranslateOption::none())
 }
 
 fn name(_req: &Request) -> Response {
-  new_response_with_value(String::from("haine"), TranslateOption::None)
+  new_response_with_value(String::from("haine"), TranslateOption::none())
 }
 
 fn log_path(_req: &Request) -> Response {
   let log_path = get_global_vars().volatility.log_path();
-  new_response_with_value(log_path, TranslateOption::None)
+  new_response_with_value(log_path, TranslateOption::none())
 }
 
 fn get_event(id: &str) -> Option<fn(&Request) -> Response> {

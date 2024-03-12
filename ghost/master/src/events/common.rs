@@ -2,14 +2,44 @@ use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
+use std::collections::HashSet;
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TranslateOption {
-  WithCompleteShadow,
-  OnlyText,
-  None,
+  DoTranslate,
+  CompleteShadow,
+  CompleteBalloonSurface,
+}
+
+impl TranslateOption {
+  fn new(options: Vec<TranslateOption>) -> HashSet<TranslateOption> {
+    options.into_iter().collect()
+  }
+
+  pub fn none() -> HashSet<TranslateOption> {
+    TranslateOption::new(vec![])
+  }
+
+  pub fn balloon_surface_only() -> HashSet<TranslateOption> {
+    TranslateOption::new(vec![TranslateOption::CompleteBalloonSurface])
+  }
+
+  pub fn simple_translate() -> HashSet<TranslateOption> {
+    TranslateOption::new(vec![
+      TranslateOption::DoTranslate,
+      TranslateOption::CompleteBalloonSurface,
+    ])
+  }
+
+  pub fn with_shadow_completion() -> HashSet<TranslateOption> {
+    TranslateOption::new(vec![
+      TranslateOption::DoTranslate,
+      TranslateOption::CompleteShadow,
+      TranslateOption::CompleteBalloonSurface,
+    ])
+  }
 }
 
 pub fn new_response() -> Response {
@@ -31,28 +61,29 @@ pub fn new_response_nocontent() -> Response {
   r
 }
 
-pub fn new_response_with_value(value: String, option: TranslateOption) -> Response {
+pub fn new_response_with_value(value: String, option: HashSet<TranslateOption>) -> Response {
   let vars = get_global_vars();
-  let v = match option {
-    TranslateOption::None => value,
-    _ => {
-      if vars.volatility.inserter_mut().is_ready() {
-        on_translate(value, option == TranslateOption::WithCompleteShadow)
-      } else {
-        vars.volatility.set_waiting_talk(Some((value, option)));
-        "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
-      }
-    }
+
+  let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
+    format!("\\b[{}]", vars.volatility.talking_place().balloon_surface(),)
+  } else {
+    String::new()
   };
+
+  let v = if option.contains(&TranslateOption::DoTranslate) {
+    if vars.volatility.inserter_mut().is_ready() {
+      on_translate(value, option.contains(&TranslateOption::CompleteShadow))
+    } else {
+      vars.volatility.set_waiting_talk(Some((value, option)));
+      "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
+    }
+  } else {
+    value
+  };
+
   let mut r = new_response();
-  r.headers.insert(
-    HeaderName::from("Value"),
-    format!(
-      "\\b[{}]{}",
-      vars.volatility.talking_place().balloon_surface(),
-      v
-    ),
-  );
+  r.headers
+    .insert(HeaderName::from("Value"), balloon_completion + v.as_str());
   r
 }
 
@@ -145,7 +176,10 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let from_eyes = from_surface % 100;
 
   if from_surface == 0 {
-    return new_response_with_value(format!("\\s[{}]", dest_surface), TranslateOption::None);
+    return new_response_with_value(
+      format!("\\s[{}]", dest_surface),
+      TranslateOption::new(vec![]),
+    );
   } else if from_surface == dest_surface {
     return new_response_nocontent();
   }
@@ -191,7 +225,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
-  new_response_with_value(animation, TranslateOption::None)
+  new_response_with_value(animation, TranslateOption::new(vec![]))
 }
 
 pub enum Icon {

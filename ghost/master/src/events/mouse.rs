@@ -126,7 +126,7 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
       h1111201許されていると思ったの？\\n\
       h1111304残念だけど、それほど気は長くないの。\\n\
       h1111309わきまえなさい。"
-      .to_string(),
+        .to_string(),
     );
   } else {
     zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());

@@ -144,7 +144,7 @@ fn new_mouse_response(info: String) -> Response {
     Some(dialogs) => {
       return new_response_with_value(
         dialogs[choose_one(&dialogs, true).unwrap()].clone(),
-        TranslateOption::WithCompleteShadow,
+        TranslateOption::with_shadow_completion(),
       );
     }
     None => new_response_nocontent(),

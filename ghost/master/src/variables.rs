@@ -218,7 +218,7 @@ pub struct VolatilityVariables {
 
   pub immersive_degrees: Mutex<u32>,
 
-  pub waiting_talk: Mutex<Option<(String, TranslateOption)>>,
+  pub waiting_talk: Mutex<Option<(String, HashSet<TranslateOption>)>>,
 
   pub touch_info: Mutex<TouchInfoMap>,
 
@@ -247,7 +247,11 @@ impl VolatilityVariables {
   generate_getter_setter!(current_surface, i32, cloneable);
   generate_getter_setter!(idle_seconds, i32, cloneable);
   generate_getter_setter!(immersive_degrees, u32, cloneable);
-  generate_getter_setter!(waiting_talk, Option<(String, TranslateOption)>, cloneable);
+  generate_getter_setter!(
+    waiting_talk,
+    Option<(String, HashSet<TranslateOption>)>,
+    cloneable
+  );
   generate_mut_getter!(touch_info, TouchInfoMap, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
 }

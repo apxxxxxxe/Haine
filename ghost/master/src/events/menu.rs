@@ -56,7 +56,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     ),
   );
 
-  new_response_with_value(m, TranslateOption::None)
+  new_response_with_value(m, TranslateOption::balloon_surface_only())
 }
 
 fn show_minute(m: &u64) -> String {
@@ -116,7 +116,7 @@ pub fn on_break_time(_req: &Request) -> Response {
       "
   .to_string();
 
-  new_response_with_value(m, TranslateOption::WithCompleteShadow)
+  new_response_with_value(m, TranslateOption::with_shadow_completion())
 }
 
 pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
@@ -132,7 +132,7 @@ pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
   "
   .to_string();
 
-  new_response_with_value(m, TranslateOption::WithCompleteShadow)
+  new_response_with_value(m, TranslateOption::with_shadow_completion())
 }
 
 pub fn on_talk_interval_changed(req: &Request) -> Response {
@@ -269,13 +269,13 @@ pub fn on_talk(_req: &Request) -> Response {
   }
   m.push_str("\\q[戻る,OnMenuExec]");
 
-  new_response_with_value(m, TranslateOption::WithCompleteShadow)
+  new_response_with_value(m, TranslateOption::with_shadow_completion())
 }
 
 pub fn on_talk_answer(req: &Request) -> Response {
   let refs = get_references(req);
   let q = Question(refs[0].parse::<u32>().unwrap());
-  new_response_with_value(q.talk(), TranslateOption::WithCompleteShadow)
+  new_response_with_value(q.talk(), TranslateOption::with_shadow_completion())
 }
 
 pub fn on_check_talk_collection(_req: &Request) -> Response {
@@ -307,7 +307,7 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
     \\q[戻る,OnMenuExec]",
       s, sum, all_sum
     ),
-    TranslateOption::None,
+    TranslateOption::balloon_surface_only(),
   )
 }
 
@@ -322,5 +322,5 @@ pub fn on_check_unseen_talks(req: &Request) -> Response {
 
   register_talk_collection(&choosed_talk);
 
-  new_response_with_value(choosed_talk.text, TranslateOption::WithCompleteShadow)
+  new_response_with_value(choosed_talk.text, TranslateOption::with_shadow_completion())
 }

@@ -43,12 +43,16 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111206生前のこと、記録に残しているの。h1000000……h1111205このノートね。\\n\
         ……h1123305まあ、ずいぶん昔のことよ。実感はもうなくなってしまったの。\\n\
         h1123309今読んでも、他人の伝記を読んでいるようだわ。\\n\
+        ……h1111205それにしてもこのノート、昔は紙がこんなに厚かったのね。\\n\
+        h1113206今のはもう少し薄いと聞いているけれど、そうなのかしら。\
         ".to_string()),
 
         ("外出できない理由", "\
-        h1111101外出したいかって？……h1123304ええ、それはもう。\\n\
-        ……h1111209霊力の強い霊は、特定の場所に縛られる傾向にあるの。\\n\
-        h1121205私もそう。結び付きが強すぎて、この家から離れられないのよ。\
+        h1111104外出したいかって？h1121304ええ、それはもう。\\n\
+        ……h1123309霊力の強い霊は、特定の場所に縛られる傾向にあるの。\\n\
+        h1113205私もそう。結び付きが強すぎて、この家から離れられないのよ。\\n\
+        h1123209……まあ、外に出たら、今のファッションについていける自信がないわ。\\n\
+        ……h1123204ジーンズはまだ流行ってる？\
         ".to_string()),
 
         ("恋愛観", "\
@@ -157,8 +161,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111205私に救いは訪れなかった。\\n\
         想いは、今もずっと、私の中にある。\\n\
         あなたが、私を救える人だったら良かh1111101……。\\n\
-        ……h1111109……。いえ、死んだ後で報われようだなんて。\\n\
-        h1121205…………h1121305ごめんなさい。\
+        ……h1111109。いえ、死んだ後で報われようだなんて。\\n\
+        h1121205……h1121305悪いわね。\
         ".to_string()),
 
         ("死の瞬間", "\
@@ -226,10 +230,10 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111205ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
         どちらがその本の真の印象かしら。\\n\\n\
         h1111209私はどちらも正しいと思うの。\\n\
-        ……h1111504卑怯だと思う？\\n\
+        ……h1111504卑怯だと思った？\\n\
         h1111209印象なんてその時々で変わるもので、h1111205一つに定まることなんて稀だもの。\\n\\n\
-        正反対の感想を同時に抱いたっていいのよ。\\n\
-        どちらか一方だけだなんて、勿体ないもの。\
+        まして、自分の中に秘めるものならなおさら。\\n\
+        h1111506どちらか一方だけだなんて、勿体ないわ。\
         ".to_string()),
 
         ("納得のための因果", "\
@@ -324,7 +328,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         ("先の見えない苦しみ", "\
         h1111205一寸先は暗く、扉は閉ざされている。\\n\
         不明な道のりを諸手で探るよりも、\\n\
-        h1112305目先の手首を切り裂くほうがはるかに明瞭なのだ！\\n\
+        h1112305目先の手首を切り裂くほうが遥かに明瞭なのだ！\\n\
         ……h1111209なんてね。\
         ".to_string()),
 
@@ -347,8 +351,9 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111205環境と経験の総体こそが自己であるような気がするの。\\n\
         仮にそうだとすれば、自己同一性すら偶然の産物ということになる。\\n\
         h1111209執着しているのが馬鹿馬鹿しく思えてくるわ。\\n\
-        h1111205仮にそうでなければ。自己は最初から決定されている？\\n\
-        それこそ、ね。\\n\
+        h1111205仮にそうでなければ。\\n\
+        ……自己は最初から決定されている？\\n\
+        h1111209それこそ、ね。\\n\
         ".to_string()),
 
         ("自分の理解者は自分だけ", "\
@@ -381,7 +386,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
 
         ("霧の力", "\
         h1111206霧が、濃いでしょう。\\n\
-        ただの霧ではないの。むしろ、性質としては私たちに近い。\\n\
+        ただの霧ではないの。乾いた霧よ。\\n\
+        むしろ、性質としては私たちに近い。\\n\
         h1111209ただの霊である私がここまで力を持っているのも、\\n\
         この地に根付いているもののおかげ。\\n\\n\
         h1111205次も、霧の濃い日にいらっしゃい。\\n\
@@ -410,6 +416,14 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         彼らは私と話すようにはできていないから。\\n\
         h1111204あなたの価値は、その自由意志。\\n\
         h1111209ここは予想通りなものばかりで退屈なの。\
+        ".to_string()),
+
+        ("生前の食事事情", "\
+        h1111204あなたは、ちゃんと食べているかしら？\\n\
+        h1111209そう。いいことね。\\n\
+        h1111104私？……h1111205生前は食が細かったわ。\\n\
+        h1111209……というより、食そのものにあまり関心がなかったみたい。\\n\
+        ……h1123309思えば、家政婦には随分と世話をかけたわね。\
         ".to_string()),
 
         ("スケッチ", "\
@@ -523,7 +537,7 @@ pub fn random_talks_analysis() -> String {
   let mut sum = 0;
   for talk_type in TalkType::all() {
     let len = random_talks(talk_type).len();
-    s.push_str(&format!("{:?}: {}\n", talk_type, len,));
+    s.push_str(&format!("{:?}: {}\\n", talk_type, len,));
     sum += len;
   }
 
@@ -538,14 +552,6 @@ pub fn random_talks_analysis() -> String {
 #[allow(dead_code)]
 static BOTSU: Lazy<Vec<String>> = Lazy::new(|| {
   vec![
-
-    "\
-    h1111204あなたは、ちゃんと食べているかしら？\\n\
-    h1111209そう。いいことね。\\n\
-    h1111104私？……h1111205生前は食が細かったわ。\\n\
-    h1111209……というより、食そのものにあまり関心がなかったみたい。\\n\
-    ……h1123309思えば、使用人には随分と世話をかけたわね。\
-    ".to_string(),
 
     format!("\
     h1111201ある程度外見を変えることもできるの。h1111207……こんなふうに。\\n\\n\
@@ -722,7 +728,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
     return new_response_with_value(
       messages[choose_one(&messages, true).unwrap()].to_owned(),
-      TranslateOption::OnlyText,
+      TranslateOption::simple_translate(),
     );
   } else {
     vars.volatility.set_immersive_degrees(immersive_degrees);
@@ -749,7 +755,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     choosed_talk.text
   );
 
-  let mut res = new_response_with_value(text, TranslateOption::WithCompleteShadow);
+  let mut res = new_response_with_value(text, TranslateOption::with_shadow_completion());
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{}: {}", choosed_talk.talk_type.unwrap(), choosed_talk.id,),
@@ -796,7 +802,7 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
     }
     _ => return new_response_nocontent(),
   }
-  new_response_with_value(m, TranslateOption::WithCompleteShadow)
+  new_response_with_value(m, TranslateOption::with_shadow_completion())
 }
 
 #[cfg(test)]
