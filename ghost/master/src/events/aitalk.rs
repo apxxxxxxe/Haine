@@ -728,7 +728,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
     return new_response_with_value(
       messages[choose_one(&messages, true).unwrap()].to_owned(),
-      TranslateOption::simple_translate(),
+      TranslateOption::with_shadow_completion(),
     );
   } else {
     vars.volatility.set_immersive_degrees(immersive_degrees);
