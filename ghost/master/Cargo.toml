@@ -24,6 +24,8 @@ md5 = "0.7.0"
 shiori_hglobal = "0.3.0"
 paste = "1.0.14"
 fancy-regex = "0.13.0"
+strum = "0.26.2"
+strum_macros = "0.26.2"
 
 [target.'cfg(windows)'.dependencies]
 winapi = {version = "0.3.9", features = ["winbase", "libloaderapi", "stringapiset"]}

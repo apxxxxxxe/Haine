@@ -289,7 +289,7 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
     let anal = if len < all_len {
       format!(
         "\\q[未読トーク再生,OnCheckUnseenTalks,{}]",
-        talk_type.to_u32()
+        talk_type as u32
       )
     } else {
       "".to_string()
@@ -313,7 +313,7 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
 
 pub fn on_check_unseen_talks(req: &Request) -> Response {
   let refs = get_references(req);
-  let talk_type = TalkType::from_u32(refs[0].parse::<u32>().unwrap());
+  let talk_type = TalkType::from_u32(refs[0].parse::<u32>().unwrap()).unwrap();
   let talk_collection = get_global_vars().talk_collection();
   let seen_talks = talk_collection.get(&talk_type).unwrap();
 

@@ -6,6 +6,8 @@ use once_cell::sync::Lazy;
 use serde::{Deserialize, Serialize};
 use shiorust::message::{parts::HeaderName, Request, Response};
 use std::collections::HashSet;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
 // トーク1回あたりに上昇する没入度
 const IMMERSIVE_RATE: u32 = 8;
@@ -477,7 +479,7 @@ impl Talk {
   }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
 pub enum TalkType {
   SelfIntroduce,
   Lore,
@@ -500,35 +502,12 @@ impl Display for TalkType {
 }
 
 impl TalkType {
-  pub fn from_u32(n: u32) -> Self {
-    match n {
-      0 => Self::SelfIntroduce,
-      1 => Self::Lore,
-      2 => Self::Past,
-      3 => Self::Abstract,
-      4 => Self::WithYou,
-      _ => unreachable!(),
-    }
-  }
-
-  pub fn to_u32(self) -> u32 {
-    match self {
-      Self::SelfIntroduce => 0,
-      Self::Lore => 1,
-      Self::Past => 2,
-      Self::Abstract => 3,
-      Self::WithYou => 4,
-    }
+  pub fn from_u32(n: u32) -> Option<Self> {
+    Self::all().into_iter().find(|t| *t as u32 == n)
   }
 
   pub fn all() -> Vec<Self> {
-    vec![
-      Self::SelfIntroduce,
-      Self::Lore,
-      Self::Past,
-      Self::Abstract,
-      Self::WithYou,
-    ]
+    Self::iter().collect()
   }
 }
 
