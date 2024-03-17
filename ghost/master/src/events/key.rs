@@ -2,6 +2,7 @@ use crate::events::aitalk::{on_ai_talk, random_talks_analysis};
 use crate::events::bootend::on_first_boot;
 use crate::events::common::*;
 use crate::events::periodic::on_hour_time_signal;
+use crate::variables::{get_global_vars, EventFlag};
 use shiorust::message::{Request, Response};
 
 pub fn on_key_press(req: &Request) -> Response {
@@ -18,6 +19,12 @@ pub fn on_key_press(req: &Request) -> Response {
       random_talks_analysis(),
       TranslateOption::balloon_surface_only(),
     ),
+    "d" => {
+        let vars = get_global_vars();
+        vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(0));
+        vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(1));
+        on_ai_talk(req)
+    },
     _ => new_response_nocontent(),
   }
 }

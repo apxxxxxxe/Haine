@@ -25,56 +25,61 @@ impl RouletteCell for Talk {
   }
 }
 
-impl RouletteCell for String {
-  fn key(&self) -> String {
-    self.clone()
-  }
-}
-
 impl Display for Talk {
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     write!(f, "{}", self.text)
   }
 }
 
+fn talk_with_punchline(text: String, funny_punchline: String) -> String {
+  text + "\\n" + &funny_punchline
+}
+
 pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
   let strings = match talk_type {
       TalkType::SelfIntroduce => vec![
 
-        ("生前の記録", "\
+        ("生前の記録", talk_with_punchline("\
         h1111206生前のこと、記録に残しているの。h1000000……h1111205このノートね。\\n\
         ……h1123305まあ、ずいぶん昔のことよ。実感はもうなくなってしまったの。\\n\
         h1123309今読んでも、他人の伝記を読んでいるようだわ。\\n\
-        ……h1111205それにしてもこのノート、昔は紙がこんなに厚かったのね。\\n\
-        h1113206今のはもう少し薄いと聞いているけれど、そうなのかしら。\
-        ".to_string()),
+        ".to_string(),
+        " ……h1111105それにしてもこのノート、昔は紙がこんなに厚かったのね。\\n\
+        h1113104今のはもう少し薄いと聞いているけれど、本当？".to_string())),
 
-        ("外出できない理由", "\
+        ("外出できない理由", talk_with_punchline("\
         h1111104外出したいかって？h1121304ええ、それはもう。\\n\
         ……h1123309霊力の強い霊は、特定の場所に縛られる傾向にあるの。\\n\
         h1113205私もそう。結び付きが強すぎて、この家から離れられないのよ。\\n\
-        h1123209……まあ、外に出たら、今のファッションについていける自信がないわ。\\n\
+        ".to_string(),
+        "\
+        h1123209……まあ、外に出たとしても問題は山積みでしょうけど。\\n\
+        なにせ、今のファッションについていける自信がないわ。\\n\
         ……h1123204ジーンズはまだ流行ってる？\
-        ".to_string()),
+        ".to_string())),
 
-        ("恋愛観", "\
+        ("恋愛観", talk_with_punchline("\
         h1111205幽霊は生前の想い……好みや恨みに執着するの。\\n\
         h1111209想い人がいればその人に、恨みがあればその相手に。\\n\
         h1111203逆に、死後新たな執着が生まれることはほとんどないわ。\\n\
         だから幽霊同士、h1111206ましてや人と幽霊の間に恋愛が生まれることは皆無といっていいでしょう。\\n\
-        h1111304……なに、その顔は。h1111309あいにく、私は生きていた頃から恋愛とは無縁よ。\\n\
-        ".to_string()),
+        ".to_string(),
+        "h1111304……なに、その顔は。h1111309あいにく、私は生きていた頃から恋愛とは無縁よ。\\n\
+        ".to_string())),
 
-        ("霊力と可視性", "\
+        ("霊力と可視性", talk_with_punchline("\
         h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
         \\0……h1111204私が見えて彼らが見えないのは、霊としての力量の違いよ。\\n\
         h1111206私たちは霊力と呼んでいるのだけど。\\n\
         物理的な質量を持つほどに強い霊力があれば、\\n\
         あなたのように霊感のない人間の目にも見えるの。\
-        ".to_string()),
+        ".to_string(),
+        "h1111209……身を隠す必要があるのは、私たちの難点ね。\\n\
+        h1121305あまりに目立つと、それはそれで面倒なことになるから。\
+        ".to_string())),
 
         ("霊力の多寡", "\
-        h1111204霊力の多寡は……年月や才能、特別な契約の有無などで変わるけれど、\\n\
+        h1111204霊力の多寡は年月や才能、特別な契約の有無などで変わるけれど、\\n\
         最も大きな要因は環境──つまり、その地との関わりの深さによるの。\\n\
         h1111309私のように生家に根付いた霊はいわずもがな。\\n\
         h1111205……まあ、強いからといって良いことばかりでもないの。\\n\
@@ -95,14 +100,14 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         ……h1111209あなたがここに来たのも偶然ではないのかもしれないわね。\
         ".to_string()),
 
-        ("生家、そして主", "\
+        ("生家、そして主", talk_with_punchline("\
         h1111209ここは私の生家なの。実際は別荘なのだけど。\\n\
         h1111205そして、ここで死んだ。\\n\
         \\n\
         h1111209だから私は、ここの主とならなければならなかったの。\\n\
         懇願されてね。h1111206断ろうにもここを離れることもできないし。\\n\
-        ……h1121304静かに眠りたかったのに、h1121305貧乏くじを引いたものだわ。\
-        ".to_string()),
+        ".to_string(),
+        "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。".to_string())),
 
         ("幽霊たちの役割", "\
         h1111203従者……と、私が呼ぶ幽霊たち。\\n\
@@ -113,13 +118,16 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1113207期待しているわ、{user_name}。\
         ".to_string()),
 
-        ("幽霊たちの自由", "\
+        ("幽霊たちの自由", talk_with_punchline("\
         h1111206私は彼らと直接話すことはできないの。\\n\
         霊力の差があまりにも大きい場合、\\n\
         h1111209会話や接触を少し行うだけで、弱い方の霊は力を奪われる。\\n\
         間接的に指示を出すことはできるけれど、\\n\
         h1111205何か伝えるなら仲立ちをする者が必要なのよ。\
-        ".to_string()),
+        ".to_string(),
+        "h1141201……あら、あなたがその役割を果たしてくれるの？\\n\
+        ……h1111204いいえ？私は必要だ、と言っただけよ。\\n\
+        でもあなたがそうしてくれるというなら、h1111504そのときは任せようかしらね。".to_string())),
 
       ],
       TalkType::Lore => vec![
@@ -403,7 +411,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         ".to_string()),
 
         ("あなたのゴスファッション", "\
-        h1111201あなたの趣味……ゴスファッション、と言うんだったかしら。\\n\
+        h1111201あなたの趣味……ゴス・ファッションと言うんだったかしら。\\n\
+        \\1ハイネは私の首元にある十字架のアクセサリーを見て、微笑んだ。\\n\
         h1111207素敵ね。よく似合っているわ。\\n\
         h1111101……初めて言われた？\\n\
         h1111204あなたの周りの人たちは見る目がないのね。\\n\
@@ -424,7 +433,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111204あなたは、ちゃんと食べているかしら？\\n\
         h1111209そう。いいことね。\\n\
         h1111104私？……h1111205生前は食が細かったわ。\\n\
-        h1111209……というより、食そのものにあまり関心がなかったみたい。\\n\
+        h1111209……というより、食そのものにあまり関心がなくてね。\\n\
+        h1111205何かに没頭していると、食事をとる時間も惜しく思えてしまって。\\n\
         ……h1123309思えば、家政婦には随分と世話をかけたわね。\
         ".to_string()),
 
@@ -632,6 +642,82 @@ impl TalkingPlace {
   }
 }
 
+pub static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
+  vec!["\
+      h1111206いま、別の者にお茶の準備をさせているわ。\\n\
+      \\n\
+      h1111201さて。\\n\
+      h1111204それで、ここには死ににきたのですってね。\\n\
+      \\n\
+      h1113209……相当な覚悟がなければ決断できなかったでしょう。\\n\
+      h1113205なにがあなたを追い詰めたのかしらね。\\n\
+      仕事、学問、病気、怪我、家庭環境……h1113206あるいは、名前もつけられないほど微妙で、それでいて耐えられないなにか。\
+      \\c\
+      h1111204ああ、話せなんて言わないわ。\\n\
+      話したければそうすればいいけれど、まあ、今はそうではないでしょう？\\n\
+      \\n\
+      それに、それを聞いて、私があなたを救うこともない。\\n\
+      私の立場でできることなどたかが知れているし、\\n\
+      あなたの生死は、h1111209なんというか、あまり大きな関心事ではないから。\
+      \\x\
+      ……h1111201あなたに興味がないわけではないのよ。\\n\
+      h1111209もしそうならば引き止めたりせずに追い出しているわ。\\n\
+      h1111204ただ、あなたの宿痾に特別な興味があるわけではないということ。\\n\
+      h1111209あなたの食事の好み、やめられない癖、なんでもいいの。\\n\
+      h1111205この腐った脳に刺激を与えてくれるなら、情報に貴賤はない。\
+      \\x\
+      ……h1111209なにせ、私はここを出られない身なの。\\n\
+      h1112205ずっと、ずっと、ずっと、退屈だったのよ。\\n\
+      h1111204そんなところにあなたという玩具が\\n\
+      転がりこんできたものだから、\\n\
+      都合のいい遊び道具として使っているの。\\n\
+      \\n\
+      ……h1111209ふふ、ここまで言われても怒らないのね。\\n\
+      とても、根深い。h1111207ますます気に入ったわ。\
+      \\x\
+      h1111204ともかく。逝きたくなったら、そうすればいい。\\n\
+      必要ならばいくらか手助けもしましょう。\\n\
+      ただ、それまでは私の話し相手になってもらうわ。\\n\
+      いいわねφ？\\_w[750]{user_name}。\
+      ".to_string(),
+
+      "\
+      \\1(コンコン)\\_w[1250]\\n\
+      h1111203入りなさい。\\n\\1ハイネの後方、客室のドアが開き、なにかが静かに入ってきた。\\n\
+      ……カップとポット。ティーセットだ。浮いている。透明な何かに支えられているかのように。\\n\
+      \\n\
+      h1111203契約している霊よ。召使のようなもの。\\n\
+      ……h1141101ああ、h1111204あなたには見えないのかしら？低級霊だものね。\\n\
+      h1111206それなら、さぞ不思議な光景に見えているのでしょうね。\\n\
+      \\n\
+      ……h1111204そう、ならば伝えておくけれど、この部屋には常に数人がついているの。\\n\
+      h1111201……h1111204驚いた顔ね。まあ、普段は居ないのとそう変わらないわ。\\n\
+      お茶のおかわりが欲しかったら、h1111306そうね……あのあたりに合図を送ればいいわ。\\n\
+      \\x\
+      h1111204彼らはみな、私と契約している霊たち。\\n\
+      私は力が強いから、それで彼らの……まあ、身の安全を保障しているの。\\n\
+      代わりに、彼らは私の命令に従う。これ以上なく忠実にね。\\n\
+      \\x\
+      h1111203霊にとっての契約は、生者のそれとは重みが違うわ。\\n\
+      h1111206なにせ、文字通り存在をかけて結ぶものだから。\\n\
+      h1113209肉体は重くはあれど強固な鎧だったのだと、死んだ後からしみじみ思うわ。\
+      \\x\
+      h1111204……混乱しているかしら。\\n\
+      今すぐにすべてを理解する必要はないわ。\\n\
+      どうせ時間はたっぷりあるのだから。\\n\
+      \\n\
+      ほら、お茶を飲んで。\\n\
+      \\1勧められるままに、私は深赤色の液体を口に含んだ。\\n\
+      ……まろやかな苦味の後に、薬草を想わせる複雑な香りが広がる。\\n\
+      深く、コクのある味わい。……美味しい。\\n\
+      h1111207悪くないでしょう？h1111204それが私のお気に入り。\
+      ……h1111207これで、私の好物を1つ知れたわね。\\n\
+      h1111204全て、このように。\\n\
+      じっくり、互いを知っていけばいいのよ。\
+      ".to_string()
+  ]
+});
+
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
@@ -639,6 +725,21 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   vars
     .volatility
     .set_last_random_talk_time(vars.volatility.ghost_up_time());
+
+  let text_count = FIRST_RANDOMTALKS.len();
+  for (i, text) in FIRST_RANDOMTALKS.iter().enumerate() {
+    if !vars.flags().check(EventFlag::FirstRandomTalkDone(i as u32)) {
+      vars
+        .flags_mut()
+        .done(EventFlag::FirstRandomTalkDone(i as u32));
+      let mut res = new_response_with_value(text.clone(), TranslateOption::with_shadow_completion());
+      res.headers.insert_by_header_name(
+        HeaderName::from("Marker"),
+        format!("邂逅({}/{})", i + 2, text_count + 1),
+      );
+      return res;
+    }
+  }
 
   // 没入度を上げる
   let immersive_degrees = std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
@@ -650,8 +751,8 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     };
 
     let messages: Vec<String> = {
-      let parts: Vec<Vec<String>> = if !vars.flags().get(EventFlag::FirstPlaceChange) {
-        vars.flags_mut().set(EventFlag::FirstPlaceChange, true);
+      let parts: Vec<Vec<String>> = if vars.flags().check(EventFlag::FirstPlaceChange) {
+        vars.flags_mut().done(EventFlag::FirstPlaceChange);
         vec![
           vec![format!(
             "\\0\\b[{}]h1000000……。\\1ふと目を離した間に、ハイネは姿を消していた。\\n\
@@ -678,7 +779,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
       } else {
         vec![
           vec![format!(
-            "\\0\\b[{}]h1000000……。\\1また、ハイネが姿を消してしまった。\\n\
+            "\\0\\b[{}]h1000000……。\\n\\n\\1また、ハイネが姿を消してしまった。\\n\
             \\0\\b[{}]\\1前回のように{}を探しに行くと、彼女はそこにいた。\\n\
           ",
             previous_talking_place.balloon_surface(),
@@ -728,13 +829,8 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     register_talk_collection(&choosed_talk);
   }
 
-  let text = format!(
-    "\\b[{}]{}",
-    vars.volatility.talking_place().balloon_surface(),
-    choosed_talk.text
-  );
-
-  let mut res = new_response_with_value(text, TranslateOption::with_shadow_completion());
+  let mut res =
+    new_response_with_value(choosed_talk.text, TranslateOption::with_shadow_completion());
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{}: {}", choosed_talk.talk_type.unwrap(), choosed_talk.id,),

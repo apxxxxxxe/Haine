@@ -5,6 +5,12 @@ pub trait RouletteCell {
   fn key(&self) -> String; // トークの識別子: 全体において一意である必要がある
 }
 
+impl RouletteCell for String {
+  fn key(&self) -> String {
+    self.clone()
+  }
+}
+
 pub struct TalkBias(HashMap<String, u32>);
 
 impl TalkBias {

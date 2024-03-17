@@ -151,12 +151,14 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
 
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
 pub enum EventFlag {
+  FirstRandomTalkDone(u32),
   FirstPlaceChange,
+  FirstClose,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
 pub struct EventFlags {
-  flags: HashMap<EventFlag, bool>,
+  flags: HashSet<EventFlag>,
 }
 
 impl EventFlags {
@@ -164,12 +166,16 @@ impl EventFlags {
     self.flags.is_empty()
   }
 
-  pub fn set(&mut self, flag: EventFlag, value: bool) {
-    self.flags.insert(flag, value);
+  pub fn done(&mut self, flag: EventFlag) {
+    self.flags.insert(flag);
   }
 
-  pub fn get(&self, flag: EventFlag) -> bool {
-    *self.flags.get(&flag).unwrap_or(&false)
+  pub fn check(&self, flag: EventFlag) -> bool {
+    self.flags.get(&flag).is_some()
+  }
+
+  pub fn delete(&mut self, flag: EventFlag) {
+    self.flags.remove(&flag);
   }
 }
 

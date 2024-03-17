@@ -1,6 +1,8 @@
+use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
+use crate::variables::{get_global_vars, EventFlag};
 use rand::seq::SliceRandom;
-use shiorust::message::{Response, *};
+use shiorust::message::{parts::HeaderName, Response, *};
 
 pub fn on_stick_surface(_req: &Request) -> Response {
   // \1のサーフェスを\0に重ねて固定する
@@ -33,6 +35,25 @@ pub fn on_boot(_req: &Request) -> Response {
 }
 
 pub fn on_close(_req: &Request) -> Response {
+  let vars = get_global_vars();
+  if !vars.flags().check(EventFlag::FirstClose) {
+    vars.flags_mut().done(EventFlag::FirstClose);
+    let v = "\
+    h1111201あら、今日はやめるの？h1111204そう。\\n\
+    ならば、送っていきましょう。\\n\
+    h1111209安心しなさい、他意などないわ。\\n\
+    \\n\
+    h1141101逃がして良いのかって？h1121204それ、自分で聞くの？\\n\
+    h1111209まあいいわ。h1111204ええ、良いのよ。あなたはきっとまた来る。\\n\
+    h1111205カンテルベリオの幽霊の────この私のもとへ。\\n\
+    だから良いのよ。\\n\
+    \\n\
+    h1111204さあ、もう行きなさい。\\n\
+    h1111209良い夢を、ユーザ。\
+    "
+    .to_string();
+    return new_response_with_value(v + "\\-", TranslateOption::simple_translate());
+  }
   let talks = all_combo(&vec![
     vec!["h1111209".to_string(), "h1111207".to_string()],
     vec!["あなたに".to_string()],
@@ -281,7 +302,12 @@ pub fn on_first_boot(_req: &Request) -> Response {
     \\1彼女の微笑みは謎めいて親しげだった。\
     ";
 
-  new_response_with_value(m, TranslateOption::simple_translate())
+  let mut res = new_response_with_value(m, TranslateOption::simple_translate());
+  res.headers.insert_by_header_name(
+    HeaderName::from("Marker"),
+    format!("邂逅(1/{})", FIRST_RANDOMTALKS.len() + 1),
+  );
+  res
 }
 
 pub fn on_vanish_selected(_req: &Request) -> Response {

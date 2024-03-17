@@ -1,11 +1,22 @@
-use crate::events::aitalk::{random_talks, register_talk_collection, Talk, TalkType};
+use crate::events::aitalk::{
+  random_talks, register_talk_collection, Talk, TalkType, FIRST_RANDOMTALKS,
+};
 use crate::events::common::*;
 use crate::events::tooltip::show_tooltip;
-use crate::variables::get_global_vars;
+use crate::variables::{get_global_vars, EventFlag};
 use rand::seq::SliceRandom;
 use shiorust::message::{Request, Response};
 
 pub fn on_menu_exec(_req: &Request) -> Response {
+  if !get_global_vars()
+    .flags()
+    .check(EventFlag::FirstRandomTalkDone(
+      (FIRST_RANDOMTALKS.len() - 1) as u32,
+    ))
+  {
+    return on_menu_when_first_boot();
+  }
+
   let current_talk_interval = get_global_vars().random_talk_interval().unwrap_or(180);
   let mut selections = Vec::new();
 
@@ -54,6 +65,21 @@ pub fn on_menu_exec(_req: &Request) -> Response {
       "没入度",
       "WhatIsImersiveDegree",
     ),
+  );
+
+  new_response_with_value(m, TranslateOption::balloon_surface_only())
+}
+
+fn on_menu_when_first_boot() -> Response {
+  let m = format!(
+    "\
+  \\_q\
+  \\![*]\\q[話の続き,OnAiTalk]\\n\
+  \\n\
+  \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\
+  \\_l[0,12em]\\__q[script:\\e]{}\\__q\
+  ",
+    Icon::Cross,
   );
 
   new_response_with_value(m, TranslateOption::balloon_surface_only())
