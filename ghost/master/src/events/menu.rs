@@ -46,15 +46,16 @@ pub fn on_menu_exec(_req: &Request) -> Response {
 
   let m = format!(
     "\\_q\
-    \\_l[0,2em]\
+    \\_l[0,1.5em]\
     \\![*]\\q[なにか話して,OnAiTalk]\\n\
     \\![*]\\q[話しかける,OnTalk]\\n\
     \\![*]\\q[ひと息つく,OnBreakTime]\\n\
-    \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
-    \\n\
-    \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\\n\
+    \\![*]\\q[トーク統計,OnCheckTalkCollection]\
+    \\_l[0,@1.75em]\
+    \\![*]\\q[手紙を書く,OnWebClapOpen]\
+    \\_l[0,@1.75em]\
     {}
-    \\_l[0,12em]\\__q[script:\\e]{}\\__q\
+    \\_l[0,11em]\\__q[script:\\e]{}\\__q\
     \\_l[0,0]{}\
     ",
     talk_interval_selector,
