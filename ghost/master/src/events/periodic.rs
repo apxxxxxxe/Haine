@@ -1,9 +1,8 @@
 use crate::events::aitalk::on_ai_talk;
-use crate::events::bootend::on_stick_surface;
 use crate::events::common::*;
 use crate::variables::get_global_vars;
 use chrono::Timelike;
-use rand::Rng;
+use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
 pub fn on_notify_user_info(req: &Request) -> Response {
@@ -39,45 +38,85 @@ pub fn on_second_change(req: &Request) -> Response {
       .get("minimizing")
       .is_some_and(|v| v)
   {
-    on_ai_talk(req)
-  } else if vars.volatility.ghost_up_time() % 60 == 0
-    && !vars.volatility.status().get("talking").unwrap()
+    return on_ai_talk(req);
+  }
+
+  let mut text = String::new();
+  if vars.volatility.ghost_up_time() % 60 == 0 && !vars.volatility.status().get("talking").unwrap()
   {
     // 1分ごとにサーフェスを重ね直す
-    on_stick_surface(req)
-  } else {
+    text += STICK_SURFACE;
+  }
+
+  let now = chrono::Local::now();
+  if now.minute() == 0 && now.second() == 0 {
+    let tanka_list = [
+      tanka(
+        "もう二度と死ななくてよい安らぎに\\n見つめてゐたり祖母の寝顔を",
+        "梶原さい子",
+      ),
+      tanka(
+        "眼のまはり真紅(まあか)くなして泣きやめぬ\\n妻のうしろに吾子死にてあり",
+        "木下利玄",
+      ),
+      tanka(
+        "我が母よ死にたまひゆく我が母よ\\n我(わ)を生まし乳足(ちた)らひし母よ",
+        "斎藤茂吉",
+      ),
+      tanka(
+        "眠られぬ母のためわが誦む童話\\n母の寝入りし後王子死す",
+        "岡井隆",
+      ),
+      tanka(
+        "死せる犬またもわが眼にうかび来ぬ、\\nかの川ばたの夕ぐれの色",
+        "金子薫園",
+      ),
+      tanka(
+        "死に一歩踏み入りしとふ実感は\\nひるがへつて生の実感なりし",
+        "後藤悦良",
+      ),
+      tanka(
+        "蛍光灯のカヴァーの底を死場所としたる\\nこの世の虫のかずかず",
+        "小池光",
+      ),
+      tanka(
+        "死に向かふ生の底知れぬ虚無の淵を\\nのぞき見たりき彼の夜の君に",
+        "柴生田稔",
+      ),
+      tanka(
+        "やわらかく厚い果肉を掘りすすみ\\n核の付近で死んでいる虫",
+        "北辻千展",
+      ),
+      tanka(
+        "死にし子をまつたく忘れてゐる日あり\\n百日忌日(ひやくにちきじつ)にそれをしぞ嘆く",
+        "吉野秀雄",
+      ),
+      tanka(
+        "十トンの恐竜もゐしこの星に\\n四十八キロの妻生きて死す",
+        "高野公彦",
+      ),
+      tanka(
+        "生まれてはつひに死ぬてふことのみぞ\\n定めなき世に定めありける",
+        "平維盛",
+      ),
+    ];
+
+    text += &format!(
+      "\\1\\_q{}時\\n\\n{}",
+      now.hour(),
+      tanka_list.choose(&mut rand::thread_rng()).unwrap()
+    );
+  }
+
+  if text.is_empty() {
     new_response_nocontent()
+  } else {
+    new_response_with_value(text, TranslateOption::simple_translate())
   }
 }
 
-pub fn on_hour_time_signal(_req: &Request) -> Response {
-  let now = chrono::Local::now();
-  let mut m = format!("\\1\\_q{}時", now.hour());
-  let minute = now.minute();
-  if minute != 0 {
-    m += &format!("{}分", minute);
-  }
-  m += "\\n\\n";
-
-  let tanka_list = [
-      "もう二度と死ななくてよい安らぎに\\n見つめてゐたり祖母の寝顔を\\n\\f[align,right](梶原さい子)",
-      "眼のまはり真紅(まあか)くなして泣きやめぬ\\n妻のうしろに吾子死にてあり\\n\\f[align,right](木下利玄)",
-      "我が母よ死にたまひゆく我が母よ\\n我(わ)を生まし乳足(ちた)らひし母よ\\n\\f[align,right](斎藤茂吉)",
-      "眠られぬ母のためわが誦む童話\\n母の寝入りし後王子死す\\n\\f[align,right](岡井隆)",
-      "死せる犬またもわが眼にうかび来ぬ、\\nかの川ばたの夕ぐれの色\\n\\f[align,right](金子薫園)",
-      "死に一歩踏み入りしとふ実感は\\nひるがへつて生の実感なりし\\n\\f[align,right](後藤悦良)",
-      "蛍光灯のカヴァーの底を死場所としたる\\nこの世の虫のかずかず\\n\\f[align,right](小池光)",
-      "死に向かふ生の底知れぬ虚無の淵を\\nのぞき見たりき彼の夜の君に\\n\\f[align,right](柴生田稔)",
-      "やわらかく厚い果肉を掘りすすみ\\n核の付近で死んでいる虫\\n\\f[align,right](北辻千展)",
-      "死にし子をまつたく忘れてゐる日あり\\n百日忌日(ひやくにちきじつ)にそれをしぞ嘆く\\n\\f[align,right](吉野秀雄)",
-      "十トンの恐竜もゐしこの星に\\n四十八キロの妻生きて死す\\n\\f[align,right](高野公彦)",
-      "生まれてはつひに死ぬてふことのみぞ\\n定めなき世に定めありける\\n\\f[align,right](平維盛)",
-    ];
-
-  let mut rng = rand::thread_rng();
-  let index = rng.gen_range(0..tanka_list.len());
-
-  new_response_with_value(m + tanka_list[index], TranslateOption::none())
+fn tanka(text: &str, author: &str) -> String {
+  format!("{}\\n\\f[align,right]({})", text, author)
 }
 
 pub fn on_surface_change(req: &Request) -> Response {

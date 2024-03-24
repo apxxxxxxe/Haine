@@ -4,19 +4,6 @@ use crate::variables::{get_global_vars, EventFlag};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
-pub fn on_stick_surface(_req: &Request) -> Response {
-  // \1のサーフェスを\0に重ねて固定する
-  let stick_surfaces = "\
-  \\C\
-  \\1\
-  \\![reset,sticky-window]\
-  \\![set,alignmenttodesktop,free]\
-  \\![move,--X=0,--Y=0,--time=0,--base=0]\
-  \\![set,sticky-window,1,0]\
-  ";
-  new_response_with_value(stick_surfaces.to_string(), TranslateOption::none())
-}
-
 pub fn on_boot(_req: &Request) -> Response {
   let talks = all_combo(&vec![
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
