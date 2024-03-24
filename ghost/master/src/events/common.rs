@@ -6,6 +6,20 @@ use std::collections::HashSet;
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
+pub const STICK_SURFACE: &str = "\
+  \\C\
+  \\1\
+  \\![reset,sticky-window]\
+  \\![set,alignmenttodesktop,free]\
+  \\![move,--X=0,--Y=0,--time=0,--base=0]\
+  \\![set,sticky-window,1,0]\
+  ";
+
+pub fn on_stick_surface(_req: &Request) -> Response {
+  // \1のサーフェスを\0に重ねて固定する
+  new_response_with_value(STICK_SURFACE.to_string(), TranslateOption::none())
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TranslateOption {
   DoTranslate,
