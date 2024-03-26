@@ -52,10 +52,15 @@ parts:
       - name: 通常顔
         text: |
 
-      - name: 照れ顔
+      - name: 照れ顔1
         text: |
           animation500600.interval,runonce
           animation500600.pattern0,overlay,101,0,0,0
+
+      - name: 照れ顔2
+        text: |
+          animation500600.interval,runonce
+          animation500600.pattern0,overlay,104,0,0,0
 
       - name: 焦り顔
         text: |
@@ -66,13 +71,6 @@ parts:
         text: |
           animation500600.interval,runonce
           animation500600.pattern0,overlay,103,0,0,0
-
-      - name: 血+照れ
-        text: |
-          animation500550.interval,runonce
-          animation500550.pattern0,overlay,2000,0,0,0
-          animation500600.interval,runonce
-          animation500600.pattern0,overlay,101,0,0,0
 
   - group: 眉
     details:
@@ -311,6 +309,11 @@ parts:
           animation500399.interval,runonce
           animation500399.pattern0,overlay,366,0,0,0
 
+      - name: にひ口
+        text: |
+          animation500399.interval,runonce
+          animation500399.pattern0,overlay,367,0,0,0
+
   - group: 目
     details:
       - name: こっち目
@@ -385,8 +388,29 @@ parts:
           animation800004.interval,bind
           animation800004.pattern0,overlayfast,3,0,0
 
-      - name: dummy
+      - name: 皮肉目
         text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,210,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
+
+      - name: びっくり目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,211,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
+
+      - name: あっち皮肉目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,212,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
 
 base: |
   collisionex12,bust,polygon,228,327,271,304,316,325,318,347,311,378,231,375,225,349

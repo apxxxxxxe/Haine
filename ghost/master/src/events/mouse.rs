@@ -1,5 +1,5 @@
 use crate::events::common::*;
-use crate::variables::{GlobalVariables, TouchInfo};
+use crate::variables::{EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 
 static DIALOG_SEXIAL_FIRST: Lazy<Vec<String>> =
@@ -37,6 +37,7 @@ fn first_and_other(
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
   match info.as_str() {
+    "0headdoubleclick" => Some(head_hit(vars)),
     "0handnade" => Some(first_and_other(
       &mut vars.volatility.touch_info_mut().hand,
       vec![],
@@ -132,4 +133,42 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
     zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
   }
   zero_bust_touch
+}
+
+pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
+  let is_aroused = vars.volatility.aroused();
+  to_aroused();
+  if !vars.flags().check(EventFlag::FirstHitTalkDone) && !is_aroused {
+    vec!["h1121411\\1半ば衝動的に、彼女の頭を打った。\\n\
+    h1112101\\1それは嫌悪からだ。私を受け入れるようなそぶりを見せながら、\\n\
+    同時に私を助けないと嘯く傲慢さ。\\n\
+    そして何よりも、理性的な物言いをしておきながら一欠片も倫理の匂いを感じさせない態度に、毒虫にも似た嫌悪感を感じたのだ。\\n\
+    \\0……。\\1叩かれたハイネは呆けたように私を見つめ…………h1222804\\1笑った。\\n\
+    \\0……殴られるなんて、ずいぶん久しぶりだわ。\\n\
+    h1222309ウフ、あなたのせいで思い出しちゃった。\\n\
+    痛いってこういうものだったわね。\\n\
+    h1222506アハハ、素敵だわ、とても。\\n\
+    h1222507ねえ、もっとやってみて。\\n\
+    嫌悪したから叩いたのでしょう？あなた。\\n\
+    双方に得があるのよ、遠慮はいらないわ。\\n\
+    さあ。h1322810さあ！\\n\
+    "
+    .to_string()]
+  } else if !is_aroused {
+    vec!["h1121407痛っ……。h1311204あら、その気になってくれた？".to_string()]
+  } else {
+    all_combo(&vec![
+      ["h1121409ぐっ……。", "h1121407痛っ……。"]
+        .iter()
+        .map(|s| s.to_string())
+        .collect(),
+      [
+        "h1311204すてき。h1311207もっとして。",
+        "h1111210ああ、星が舞っているわ。痛くて苦しくて、死んでしまいそう。",
+      ]
+      .iter()
+      .map(|s| s.to_string())
+      .collect(),
+    ])
+  }
 }

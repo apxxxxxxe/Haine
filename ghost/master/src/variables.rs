@@ -154,6 +154,7 @@ pub enum EventFlag {
   FirstRandomTalkDone(u32),
   FirstPlaceChange,
   FirstClose,
+  FirstHitTalkDone,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -229,6 +230,8 @@ pub struct VolatilityVariables {
   pub touch_info: Mutex<TouchInfoMap>,
 
   pub talking_place: Mutex<TalkingPlace>,
+
+  pub aroused: Mutex<bool>,
 }
 
 #[allow(dead_code)]
@@ -260,6 +263,7 @@ impl VolatilityVariables {
   );
   generate_mut_getter!(touch_info, TouchInfoMap, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
+  generate_getter_setter!(aroused, bool, cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -288,6 +292,7 @@ impl Default for VolatilityVariables {
       waiting_talk: Mutex::new(None),
       touch_info: Mutex::new(TouchInfoMap::new()),
       talking_place: Mutex::new(TalkingPlace::LivingRoom),
+      aroused: Mutex::new(false),
     }
   }
 }
