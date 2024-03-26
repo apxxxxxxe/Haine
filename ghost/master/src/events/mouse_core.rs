@@ -142,10 +142,10 @@ fn new_mouse_response(info: String) -> Response {
 
   match mouse_dialogs(info, vars) {
     Some(dialogs) => {
-      return new_response_with_value(
+      new_response_with_value(
         dialogs[choose_one(&dialogs, true).unwrap()].clone(),
         TranslateOption::with_shadow_completion(),
-      );
+      )
     }
     None => new_response_nocontent(),
   }
