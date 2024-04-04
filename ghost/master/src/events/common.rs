@@ -1,3 +1,4 @@
+use crate::events::aitalk::TalkingPlace;
 use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
@@ -177,6 +178,25 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   format!("\\1{}\\n", v.join("\\n"))
 }
 
+fn complete_shadow(is_complete: bool) -> String {
+  const DEFAULT_Y: i32 = -700;
+  const MAX_Y: i32 = -350;
+  if is_complete {
+    let vars = get_global_vars();
+    let degree = if vars.volatility.talking_place() == TalkingPlace::Library {
+      100 - vars.volatility.immersive_degrees()
+    } else {
+      vars.volatility.immersive_degrees()
+    };
+    format!(
+      "\\0\\![bind,シルエット,黒塗り2,1]\\![anim,offset,800002,0,{}]",
+      ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / 100.0)) as i32 + DEFAULT_Y,
+    )
+  } else {
+    "\\0\\![bind,シルエット,黒塗り2,0]".to_string()
+  }
+}
+
 // サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
 pub fn on_smooth_blink(req: &Request) -> Response {
   const DELAY: i32 = 100;
@@ -184,6 +204,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let refs = get_references(req);
 
   let dest_surface = refs[0].parse::<i32>().unwrap();
+  let is_complete = refs[1].parse::<i32>().unwrap() == 1;
   let dest_eyes = dest_surface % 100;
   let dest_remain = dest_surface - dest_eyes;
   let from_surface = get_global_vars().volatility.current_surface();
@@ -235,7 +256,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let delay = format!("\\_w[{}]", DELAY);
   let animation = cuts
     .iter()
-    .map(|s| format!("\\s[{}]", s))
+    .map(|s| format!("\\s[{}]{}", s, complete_shadow(is_complete)))
     .collect::<Vec<String>>()
     .join(delay.as_str());
 

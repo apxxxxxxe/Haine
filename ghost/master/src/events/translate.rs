@@ -1,5 +1,4 @@
 use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
-use crate::events::aitalk::TalkingPlace;
 use crate::events::common::*;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
@@ -34,25 +33,15 @@ pub fn on_translate(text: String, complete_shadow: bool) -> String {
 fn translate(text: String, complete_shadow: bool) -> String {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
 
-  const DEFAULT_Y: i32 = -700;
-  const MAX_Y: i32 = -350;
-  let bind = if complete_shadow {
-    let vars = get_global_vars();
-    let degree = if vars.volatility.talking_place() == TalkingPlace::Library {
-      100 - vars.volatility.immersive_degrees()
-    } else {
-      vars.volatility.immersive_degrees()
-    };
-    format!(
-      "\\0\\![bind,シルエット,黒塗り2,1]\\![anim,offset,800002,0,{}]",
-      ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / 100.0)) as i32 + DEFAULT_Y,
-    )
-  } else {
-    "\\0\\![bind,シルエット,黒塗り2,0]".to_string()
-  };
-
   let text = RE_SURFACE_SNIPPET
-    .replace_all(&text, format!("\\0\\s[$1]{}", bind).as_str())
+    .replace_all(
+      &text,
+      format!(
+        "\\0\\![embed,OnSmoothBlink,$1,{}]",
+        if complete_shadow { 1 } else { 0 }
+      )
+      .as_str(),
+    )
     .to_string();
 
   let mut dialogs = Dialog::from_text(&text);
