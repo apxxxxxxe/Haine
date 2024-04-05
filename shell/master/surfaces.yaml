@@ -364,6 +364,38 @@ parts:
           animation800004.interval,bind
           animation800004.pattern0,overlayfast,4,0,0
 
+      - name: こっち半半目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,213,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
+
+      - name: 上の空半半目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,214,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
+
+      - name: あっち半半目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,215,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
+
+      - name: 閉じ目
+        text: |
+          animation500300.interval,runonce
+          animation500300.pattern0,overlay,209,0,0,0
+
+          animation800004.interval,bind
+          animation800004.pattern0,overlayfast,3,0,0
+
       - name: にこ目
         text: |
           animation500300.interval,runonce
@@ -379,14 +411,6 @@ parts:
 
           animation800004.interval,bind
           animation800004.pattern0,overlayfast,5,0,0
-
-      - name: 閉じ目
-        text: |
-          animation500300.interval,runonce
-          animation500300.pattern0,overlay,209,0,0,0
-
-          animation800004.interval,bind
-          animation800004.pattern0,overlayfast,3,0,0
 
       - name: 皮肉目
         text: |

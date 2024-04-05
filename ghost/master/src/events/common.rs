@@ -200,6 +200,9 @@ fn complete_shadow(is_complete: bool) -> String {
 // サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
 pub fn on_smooth_blink(req: &Request) -> Response {
   const DELAY: i32 = 100;
+  const CLOSE_EYES_INDEX: i32 = 10;
+  const SMILE_EYES_INDEX: i32 = 11;
+  const EYE_DIRECTION_NUM: i32 = 3; //こっち、下、あっち
 
   let refs = get_references(req);
 
@@ -209,6 +212,28 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let dest_remain = dest_surface - dest_eyes;
   let from_surface = get_global_vars().volatility.current_surface();
   let from_eyes = from_surface % 100;
+
+  let is_close_eyes = |i: i32| -> bool { i == SMILE_EYES_INDEX || i == CLOSE_EYES_INDEX };
+
+  let to_close = |from_eyes: i32, dest_remain: i32| -> Vec<i32> {
+    let mut res = vec![];
+    let mut i = from_eyes + EYE_DIRECTION_NUM;
+    while i < CLOSE_EYES_INDEX {
+      res.push(dest_remain + i);
+      i += EYE_DIRECTION_NUM;
+    }
+    res
+  };
+
+  let from_close = |dest_eyes: i32, dest_remain: i32| -> Vec<i32> {
+    let mut res = vec![];
+    let mut i = CLOSE_EYES_INDEX - EYE_DIRECTION_NUM;
+    while i > dest_eyes {
+      res.push(dest_remain + i);
+      i -= EYE_DIRECTION_NUM;
+    }
+    res
+  };
 
   if from_surface == 0 {
     return new_response_with_value(
@@ -220,36 +245,19 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   }
 
   let mut cuts = vec![from_surface];
-  if (from_eyes == 7 || from_eyes == 9) && (1..=3).contains(&dest_eyes) {
-    //直前が目閉じかつ目標が全目の場合
-    cuts.push(dest_surface + 3);
-  } else if (dest_eyes == 7 || dest_eyes == 9) && (1..=3).contains(&from_eyes) {
-    // 直前が全目かつ目標が目閉じの場合
-    cuts.push(dest_remain + from_eyes + 3);
-  } else if (1..=3).contains(&dest_eyes) && (1..=3).contains(&from_eyes) && (from_eyes != dest_eyes)
-  {
-    // 直前が全目かつ目標が全目の場合（直前と目標が同じ場合を除く）
-    cuts.push(dest_surface + 3);
-    cuts.push(dest_remain + 9);
-    cuts.push(dest_surface + 3);
-  } else if (4..=6).contains(&dest_eyes)
-    && (1..=3).contains(&from_eyes)
-    && ((from_eyes + 3) != dest_eyes)
-  {
-    // 直前が全目かつ目標が半目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
-    cuts.push(from_surface + 3);
-    cuts.push(dest_remain + 9);
-  } else if (1..=3).contains(&dest_eyes)
-    && (4..=6).contains(&from_eyes)
-    && ((from_eyes - 3) != dest_eyes)
-  {
-    // 直前が半目かつ目標が全目の場合（直前と目標が同じ場合, 直前と目標の目線方向が同じ場合を除く）
-    cuts.push(dest_remain + 9);
-    cuts.push(dest_surface + 3);
-  } else if (4..=6).contains(&dest_eyes) && (4..=6).contains(&from_eyes) && (from_eyes != dest_eyes)
-  {
-    // 直前と目標が半目の場合（直前と目標が同じ場合を除く）
-    cuts.push(dest_remain + 9);
+  if dest_eyes < SMILE_EYES_INDEX {
+    if is_close_eyes(from_eyes) && !is_close_eyes(dest_eyes) {
+      //直前が目閉じかつ目標が開き目の場合
+      cuts.extend(from_close(dest_eyes, dest_remain));
+    } else if !is_close_eyes(from_eyes) && is_close_eyes(dest_eyes) {
+      // 直前が開き目かつ目標が目閉じの場合
+      cuts.extend(to_close(from_eyes, dest_remain));
+    } else if from_eyes % EYE_DIRECTION_NUM != dest_eyes % EYE_DIRECTION_NUM {
+      // 直前と目標の目線方向が違う場合）
+      cuts.extend(to_close(from_eyes, dest_remain));
+      cuts.push(dest_remain + CLOSE_EYES_INDEX);
+      cuts.extend(from_close(dest_eyes, dest_remain));
+    }
   }
   cuts.push(dest_surface);
 
