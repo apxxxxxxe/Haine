@@ -15,6 +15,13 @@
 #               - name: △△ # 「半目」「閉じ目」など、そのパーツが何であるかの目安。
 #                 text: ...  # そのパーツのサーフェス定義。
 
+raw: |
+  surface1000000 {
+    // 無
+    animation500200.interval,runonce
+    animation500200.pattern0,overlay,0,0,0,0
+  }
+
 parts:
   - group: スカート
     details:
