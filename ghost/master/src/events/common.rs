@@ -227,10 +227,10 @@ pub fn on_smooth_blink(req: &Request) -> Response {
 
   let from_close = |dest_eyes: i32, dest_remain: i32| -> Vec<i32> {
     let mut res = vec![];
-    let mut i = CLOSE_EYES_INDEX - EYE_DIRECTION_NUM;
-    while i > dest_eyes {
-      res.push(dest_remain + i);
-      i -= EYE_DIRECTION_NUM;
+    let mut i = dest_eyes + EYE_DIRECTION_NUM;
+    while i < CLOSE_EYES_INDEX {
+      res.insert(0, dest_remain + i);
+      i += EYE_DIRECTION_NUM;
     }
     res
   };
