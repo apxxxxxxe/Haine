@@ -73,26 +73,41 @@ fn translate_dialog(dialog: &mut Dialog) {
     .collect::<Vec<&str>>();
   let splitted_texts = RE_TEXT_ONLY.split(&dialog.text).collect::<Vec<&str>>();
 
+  static QUICK_SECTION_START: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
+  static QUICK_SECTION_END: Lazy<Regex> =
+    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
+  const PHI: &str = "φ";
+  let replaces = [
+    Replacee::new("、", "、\\_w[600]", PHI, "", None),
+    Replacee::new("。", " \\_w[1200]", PHI, ")）」』", Some(vec![0])),
+    Replacee::new("。", "。\\_w[1200]", PHI, ")）」』", Some(vec![1])),
+    Replacee::new("！", "！\\_w[1200]", PHI, ")）」』", None),
+    Replacee::new("？", "？\\_w[1200]", PHI, ")）」』", None),
+    Replacee::new("…", "…\\_w[600]", PHI, ")）」』", None),
+    Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
+    Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
+    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
+  ];
   let mut result = String::new();
-  for i in 0..splitted_texts.len() {
-    let splitted = splitted_texts[i].to_string();
+  let mut in_quicksection = false;
+  for (i, splitted) in splitted_texts.iter().enumerate() {
+    let tag = tags.get(i).unwrap_or(&"");
+    result.push_str(
+      &replace_with_check(splitted, dialog.scope, &replaces, in_quicksection).replace(PHI, ""),
+    );
 
-    const PHI: &str = "φ";
-    let replaces = vec![
-      Replacee::new("、", "、\\_w[600]", PHI, "", None),
-      Replacee::new("。", " \\_w[1200]", PHI, ")）」』", Some(vec![0])),
-      Replacee::new("。", "。\\_w[1200]", PHI, ")）」』", Some(vec![1])),
-      Replacee::new("！", "！\\_w[1200]", PHI, ")）」』", None),
-      Replacee::new("？", "？\\_w[1200]", PHI, ")）」』", None),
-      Replacee::new("…", "…\\_w[600]", PHI, ")）」』", None),
-      Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
-      Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
-      Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
-    ];
-    result.push_str(&replace_with_check(&splitted, dialog.scope, replaces).replace(PHI, ""));
-    if i < tags.len() {
-      result.push_str(tags[i]);
+    if QUICK_SECTION_START.is_match(tag) {
+      println!("in quicksection");
+      in_quicksection = true;
+    } else if QUICK_SECTION_END.is_match(tag) {
+      println!("out quicksection");
+      in_quicksection = false;
+    } else if *tag == "\\_q" {
+      println!("toggle quicksection");
+      in_quicksection = !in_quicksection;
     }
+    result.push_str(tag);
   }
 
   dialog.text = result;
@@ -149,8 +164,16 @@ impl Dialog {
     }
 
     let mut result = Vec::new();
-    for i in 0..texts.len() {
-      result.push(Dialog::new(texts[i].to_string(), scopes[i]));
+    let mut i = 0;
+    while i < texts.len() {
+      let mut text = texts[i].to_string();
+      let scope = scopes[i];
+      while i + 1 < texts.len() && scope == scopes[i + 1] {
+        text.push_str(texts[i + 1]);
+        i += 1;
+      }
+      result.push(Dialog::new(text, scope));
+      i += 1;
     }
     result
   }
@@ -218,37 +241,27 @@ impl Replacee {
   }
 }
 
-fn replace_with_check(text: &str, scope: usize, replaces: Vec<Replacee>) -> String {
-  static QUICK_SECTION_START: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
-  static QUICK_SECTION_END: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
+fn replace_with_check(
+  text_part: &str,
+  scope: usize,
+  replaces: &[Replacee],
+  in_quicksection: bool,
+) -> String {
   static WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\\_w\[[0-9]+\]|\\w[1-9])").unwrap());
 
   let mut translated = String::new();
 
-  let mut in_quicksection = false;
-  let text_chars_vec = text.char_indices().collect::<Vec<(usize, char)>>();
+  let text_chars_vec = text_part.char_indices().collect::<Vec<(usize, char)>>();
   let mut checking_cursor = 0;
   while let Some((j, c)) = text_chars_vec.get(checking_cursor) {
-    let text_slice = &text[*j..];
-    if QUICK_SECTION_START.is_match(text_slice) {
-      println!("in quicksection");
-      in_quicksection = true;
-    } else if QUICK_SECTION_END.is_match(text_slice) {
-      println!("out quicksection");
-      in_quicksection = false;
-    } else if text_slice.starts_with("\\_q") {
-      println!("toggle quicksection");
-      in_quicksection = !in_quicksection;
-    }
+    let text_slice = &text_part[*j..];
 
     let mut matched_replacee: Option<&Replacee> = None;
     for r in replaces.iter() {
       if text_slice.starts_with(r.old)
         && r.is_in_scope(scope)
-        && !r.has_prefix(text, checking_cursor)
-        && !r.has_suffix(text, checking_cursor)
+        && !r.has_prefix(text_part, checking_cursor)
+        && !r.has_suffix(text_part, checking_cursor)
       {
         matched_replacee = Some(r);
         break;
@@ -274,7 +287,7 @@ fn replace_with_check(text: &str, scope: usize, replaces: Vec<Replacee>) -> Stri
 #[test]
 fn test_translate() {
   let text = "\
-    \\0これは、0のセリフ。\\n\
+    \\_q\\0これは、0のセリフ。\\_qこれはウェイト付きで置換されるべき文章。\\0なお置換されるべき文章。\\n\
     \\1これは、1のセリフ。\\n\
     \\0そして、0のセリフ。\\n\
     "
