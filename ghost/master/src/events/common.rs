@@ -245,7 +245,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   }
 
   let mut cuts = vec![from_surface];
-  if dest_eyes < SMILE_EYES_INDEX {
+  if dest_eyes <= SMILE_EYES_INDEX {
     if is_close_eyes(from_eyes) && !is_close_eyes(dest_eyes) {
       //直前が目閉じかつ目標が開き目の場合
       cuts.extend(from_close(dest_eyes, dest_remain));
