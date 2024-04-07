@@ -180,6 +180,8 @@ impl EventFlags {
   }
 }
 
+pub const TRANSPARENT_SURFACE: i32 = 1000000;
+
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
 pub struct VolatilityVariables {
   // ログファイルのフルパス

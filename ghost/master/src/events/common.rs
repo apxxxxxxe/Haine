@@ -14,6 +14,7 @@ pub const STICK_SURFACE: &str = "\
   \\![set,alignmenttodesktop,free]\
   \\![move,--X=0,--Y=0,--time=0,--base=0]\
   \\![set,sticky-window,1,0]\
+  \\0\
   ";
 
 pub fn on_stick_surface(_req: &Request) -> Response {
@@ -203,60 +204,55 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   const CLOSE_EYES_INDEX: i32 = 10;
   const SMILE_EYES_INDEX: i32 = 11;
   const EYE_DIRECTION_NUM: i32 = 3; //こっち、下、あっち
+  const EYE_INDEX_DIGIT: u32 = 2;
+  let eye_index_digit_pow = 10_i32.pow(EYE_INDEX_DIGIT);
 
   let refs = get_references(req);
-
   let dest_surface = refs[0].parse::<i32>().unwrap();
   let is_complete = refs[1].parse::<i32>().unwrap() == 1;
-  let dest_eyes = dest_surface % 100;
+  let dest_eyes = dest_surface % eye_index_digit_pow;
   let dest_remain = dest_surface - dest_eyes;
   let from_surface = get_global_vars().volatility.current_surface();
-  let from_eyes = from_surface % 100;
-
+  let from_eyes = from_surface % eye_index_digit_pow;
   let is_close_eyes = |i: i32| -> bool { i == SMILE_EYES_INDEX || i == CLOSE_EYES_INDEX };
 
-  let to_close = |from_eyes: i32, dest_remain: i32| -> Vec<i32> {
-    let mut res = vec![];
-    let mut i = from_eyes + EYE_DIRECTION_NUM;
-    while i < CLOSE_EYES_INDEX {
-      res.push(dest_remain + i);
-      i += EYE_DIRECTION_NUM;
-    }
-    res
-  };
-
-  let from_close = |dest_eyes: i32, dest_remain: i32| -> Vec<i32> {
-    let mut res = vec![];
-    let mut i = dest_eyes + EYE_DIRECTION_NUM;
-    while i < CLOSE_EYES_INDEX {
-      res.insert(0, dest_remain + i);
-      i += EYE_DIRECTION_NUM;
-    }
-    res
-  };
-
-  if from_surface == 0 {
-    return new_response_with_value(
-      format!("\\s[{}]", dest_surface),
-      TranslateOption::new(vec![]),
-    );
-  } else if from_surface == dest_surface {
+  if from_surface == dest_surface {
     return new_response_nocontent();
   }
 
   let mut cuts = vec![from_surface];
-  if dest_eyes <= SMILE_EYES_INDEX {
+  if (1..=SMILE_EYES_INDEX).contains(&from_eyes) {
     if is_close_eyes(from_eyes) && !is_close_eyes(dest_eyes) {
       //直前が目閉じかつ目標が開き目の場合
-      cuts.extend(from_close(dest_eyes, dest_remain));
+      cuts.extend(from_close(
+        dest_eyes,
+        dest_remain,
+        EYE_DIRECTION_NUM,
+        CLOSE_EYES_INDEX,
+      ));
     } else if !is_close_eyes(from_eyes) && is_close_eyes(dest_eyes) {
       // 直前が開き目かつ目標が目閉じの場合
-      cuts.extend(to_close(from_eyes, dest_remain));
+      cuts.extend(to_close(
+        from_eyes,
+        dest_remain,
+        EYE_DIRECTION_NUM,
+        CLOSE_EYES_INDEX,
+      ));
     } else if from_eyes % EYE_DIRECTION_NUM != dest_eyes % EYE_DIRECTION_NUM {
       // 直前と目標の目線方向が違う場合）
-      cuts.extend(to_close(from_eyes, dest_remain));
+      cuts.extend(to_close(
+        from_eyes,
+        dest_remain,
+        EYE_DIRECTION_NUM,
+        CLOSE_EYES_INDEX,
+      ));
       cuts.push(dest_remain + CLOSE_EYES_INDEX);
-      cuts.extend(from_close(dest_eyes, dest_remain));
+      cuts.extend(from_close(
+        dest_eyes,
+        dest_remain,
+        EYE_DIRECTION_NUM,
+        CLOSE_EYES_INDEX,
+      ));
     }
   }
   cuts.push(dest_surface);
@@ -269,6 +265,36 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     .join(delay.as_str());
 
   new_response_with_value(animation, TranslateOption::new(vec![]))
+}
+
+fn to_close(
+  from_eyes: i32,
+  dest_remain: i32,
+  eye_direction_num: i32,
+  close_eyes_index: i32,
+) -> Vec<i32> {
+  let mut res = vec![];
+  let mut i = from_eyes + eye_direction_num;
+  while i < close_eyes_index {
+    res.push(dest_remain + i);
+    i += eye_direction_num;
+  }
+  res
+}
+
+fn from_close(
+  dest_eyes: i32,
+  dest_remain: i32,
+  eye_direction_num: i32,
+  close_eyes_index: i32,
+) -> Vec<i32> {
+  let mut res = vec![];
+  let mut i = dest_eyes + eye_direction_num;
+  while i < close_eyes_index {
+    res.insert(0, dest_remain + i);
+    i += eye_direction_num;
+  }
+  res
 }
 
 pub fn to_aroused() {

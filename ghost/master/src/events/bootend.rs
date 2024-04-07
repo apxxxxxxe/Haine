@@ -1,6 +1,6 @@
 use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
-use crate::variables::{get_global_vars, EventFlag};
+use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
@@ -14,7 +14,8 @@ pub fn on_boot(_req: &Request) -> Response {
     .to_string()],
   ]);
   let v = format!(
-    "\\![bind,シルエット,,0]\\![bind,ex,,0]\\![embed,OnStickSurface]{}{}",
+    "\\0\\s[{}]\\![bind,シルエット,,0]\\![bind,ex,,0]\\![embed,OnStickSurface]{}{}",
+    TRANSPARENT_SURFACE,
     randomize_underwear(),
     talks[choose_one(&talks, false).unwrap()],
   );
