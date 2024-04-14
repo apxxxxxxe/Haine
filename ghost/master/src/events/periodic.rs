@@ -117,7 +117,7 @@ pub fn on_second_change(req: &Request) -> Response {
     ];
 
     text += &format!(
-      "\\1\\_q{}時\\n\\n{}",
+      "\\1\\_q{}時\\n{}",
       now.hour(),
       tanka_list.choose(&mut rand::thread_rng()).unwrap()
     );
