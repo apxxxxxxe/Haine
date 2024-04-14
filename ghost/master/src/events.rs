@@ -93,7 +93,6 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "craftmanw" => Some(craftmanw),
     "name" => Some(name),
     "log_path" => Some(log_path),
-    "OnFirstBoot" => Some(on_first_boot),
     "OnBoot" => Some(on_boot),
     "OnClose" => Some(on_close),
     "OnVanishSelected" => Some(on_vanish_selected),

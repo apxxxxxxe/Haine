@@ -1,5 +1,4 @@
 use crate::events::aitalk::{on_ai_talk, random_talks_analysis};
-use crate::events::bootend::on_first_boot;
 use crate::events::common::*;
 use crate::variables::{get_global_vars, EventFlag};
 use rand::prelude::*;
@@ -13,7 +12,6 @@ pub fn on_key_press(req: &Request) -> Response {
       TranslateOption::balloon_surface_only(),
     ),
     "t" => on_ai_talk(req),
-    "b" => on_first_boot(req),
     "c" => new_response_with_value(
       random_talks_analysis(),
       TranslateOption::balloon_surface_only(),

@@ -151,6 +151,7 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
 
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
 pub enum EventFlag {
+  FirstBoot,
   FirstRandomTalkDone(u32),
   FirstPlaceChange,
   FirstClose,
