@@ -220,40 +220,45 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     return new_response_nocontent();
   }
 
+  if !(1..=SMILE_EYES_INDEX).contains(&from_eyes) || !(1..=SMILE_EYES_INDEX).contains(&dest_eyes) {
+    return new_response_with_value(
+      format!("\\s[{}]{}", dest_surface, complete_shadow(is_complete)),
+      TranslateOption::none(),
+    );
+  }
+
   let mut cuts = vec![from_surface];
-  if (1..=SMILE_EYES_INDEX).contains(&from_eyes) {
-    if is_close_eyes(from_eyes) && !is_close_eyes(dest_eyes) {
-      //直前が目閉じかつ目標が開き目の場合
-      cuts.extend(from_close(
-        dest_eyes,
-        dest_remain,
-        EYE_DIRECTION_NUM,
-        CLOSE_EYES_INDEX,
-      ));
-    } else if !is_close_eyes(from_eyes) && is_close_eyes(dest_eyes) {
-      // 直前が開き目かつ目標が目閉じの場合
-      cuts.extend(to_close(
-        from_eyes,
-        dest_remain,
-        EYE_DIRECTION_NUM,
-        CLOSE_EYES_INDEX,
-      ));
-    } else if from_eyes % EYE_DIRECTION_NUM != dest_eyes % EYE_DIRECTION_NUM {
-      // 直前と目標の目線方向が違う場合）
-      cuts.extend(to_close(
-        from_eyes,
-        dest_remain,
-        EYE_DIRECTION_NUM,
-        CLOSE_EYES_INDEX,
-      ));
-      cuts.push(dest_remain + CLOSE_EYES_INDEX);
-      cuts.extend(from_close(
-        dest_eyes,
-        dest_remain,
-        EYE_DIRECTION_NUM,
-        CLOSE_EYES_INDEX,
-      ));
-    }
+  if is_close_eyes(from_eyes) && !is_close_eyes(dest_eyes) {
+    //直前が目閉じかつ目標が開き目の場合
+    cuts.extend(from_close(
+      dest_eyes,
+      dest_remain,
+      EYE_DIRECTION_NUM,
+      CLOSE_EYES_INDEX,
+    ));
+  } else if !is_close_eyes(from_eyes) && is_close_eyes(dest_eyes) {
+    // 直前が開き目かつ目標が目閉じの場合
+    cuts.extend(to_close(
+      from_eyes,
+      dest_remain,
+      EYE_DIRECTION_NUM,
+      CLOSE_EYES_INDEX,
+    ));
+  } else if from_eyes % EYE_DIRECTION_NUM != dest_eyes % EYE_DIRECTION_NUM {
+    // 直前と目標の目線方向が違う場合）
+    cuts.extend(to_close(
+      from_eyes,
+      dest_remain,
+      EYE_DIRECTION_NUM,
+      CLOSE_EYES_INDEX,
+    ));
+    cuts.push(dest_remain + CLOSE_EYES_INDEX);
+    cuts.extend(from_close(
+      dest_eyes,
+      dest_remain,
+      EYE_DIRECTION_NUM,
+      CLOSE_EYES_INDEX,
+    ));
   }
   cuts.push(dest_surface);
 
@@ -264,7 +269,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
-  new_response_with_value(animation, TranslateOption::new(vec![]))
+  new_response_with_value(animation, TranslateOption::none())
 }
 
 fn to_close(
