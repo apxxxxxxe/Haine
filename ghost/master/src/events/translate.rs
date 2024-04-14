@@ -60,6 +60,11 @@ fn translate(text: String, complete_shadow: bool) -> String {
   )
 }
 
+static QUICK_SECTION_START: Lazy<Regex> =
+  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
+static QUICK_SECTION_END: Lazy<Regex> =
+  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
+
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
 fn translate_dialog(dialog: &mut Dialog) {
   // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
@@ -73,10 +78,6 @@ fn translate_dialog(dialog: &mut Dialog) {
     .collect::<Vec<&str>>();
   let splitted_texts = RE_TEXT_ONLY.split(&dialog.text).collect::<Vec<&str>>();
 
-  static QUICK_SECTION_START: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
-  static QUICK_SECTION_END: Lazy<Regex> =
-    Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
   const PHI: &str = "φ";
   let replaces = [
     Replacee::new("、", "、\\_w[600]", PHI, "", None),
@@ -84,7 +85,13 @@ fn translate_dialog(dialog: &mut Dialog) {
     Replacee::new("。", "。\\_w[1200]", PHI, ")）」』", Some(vec![1])),
     Replacee::new("！", "！\\_w[1200]", PHI, ")）」』", None),
     Replacee::new("？", "？\\_w[1200]", PHI, ")）」』", None),
-    Replacee::new("…", "…\\_w[600]", PHI, ")）」』", None),
+    Replacee::new(
+      "…",
+      "\\![quicksection,1]…\\_w[600]\\![quicksection,0]",
+      PHI,
+      ")）」』",
+      None,
+    ),
     Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
     Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
     Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
@@ -168,7 +175,7 @@ impl Dialog {
     while i < texts.len() {
       let mut text = texts[i].to_string();
       let scope = scopes[i];
-      while i + 1 < texts.len() && scope == scopes[i + 1] {
+      while i + 1 < texts.len() && scope == scopes[i + 1] && !text.contains("\\x") {
         text.push_str(texts[i + 1]);
         i += 1;
       }
@@ -179,11 +186,12 @@ impl Dialog {
   }
 
   fn render(&self, is_first: bool) -> String {
-    if is_first {
+    let text = if is_first {
       self.text.clone()
     } else {
       self.to_string()
-    }
+    };
+    format!("\\![quicksection,0]{}", text)
   }
 }
 
@@ -270,8 +278,12 @@ fn replace_with_check(
     if matched_replacee.is_some() {
       let r = matched_replacee.unwrap();
       if in_quicksection {
-        println!("removing wait");
-        translated.push_str(&WAIT.replace(r.new, ""));
+        println!("removing wait and additional quicksection");
+        let mut s = r.new.to_string();
+        for reg in [&WAIT, &QUICK_SECTION_START, &QUICK_SECTION_END].iter() {
+          s = reg.replace_all(&s, "").to_string();
+        }
+        translated.push_str(&s);
       } else {
         translated.push_str(r.new);
       }
