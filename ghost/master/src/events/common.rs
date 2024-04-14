@@ -182,19 +182,19 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
 fn complete_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -350;
+  let vars = get_global_vars();
   if is_complete {
-    let vars = get_global_vars();
     let degree = if vars.volatility.talking_place() == TalkingPlace::Library {
       100 - vars.volatility.immersive_degrees()
     } else {
       vars.volatility.immersive_degrees()
     };
     format!(
-      "\\0\\![bind,シルエット,黒塗り2,1]\\![anim,offset,800002,0,{}]",
+      "\\0\\![bind,ex,没入度用,1]\\![anim,offset,800100,0,{}]",
       ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / 100.0)) as i32 + DEFAULT_Y,
     )
   } else {
-    "\\0\\![bind,シルエット,黒塗り2,0]".to_string()
+    "\\0\\![bind,ex,没入度用,0]".to_string()
   }
 }
 

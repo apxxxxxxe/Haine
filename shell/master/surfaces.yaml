@@ -722,5 +722,7 @@ base: |
   animation800002.pattern0,overlayfast,60000,0,0
   animation800003.interval,bind
   animation800003.pattern0,overlayfast,60002,0,0
+  animation800100.interval,bind
+  animation800100.pattern0,overlayfast,60002,0,0
   animation801000.interval,bind
   animation801000.pattern0,overlayfast,2,0,0

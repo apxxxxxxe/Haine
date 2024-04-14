@@ -184,6 +184,7 @@ sakura.bindgroup801000.name,ex,こわいかお
 sakura.bindgroup650000.name,ex,半透明
 sakura.bindgroup700000.name,ex,霧消え
 sakura.bindgroup750000.name,ex,霧覆い
+sakura.bindgroup800100.name,ex,没入度用
 
 sakura.menuitemex1,頭,507001
 sakura.menuitemex2,頭,507005
