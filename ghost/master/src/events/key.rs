@@ -1,6 +1,6 @@
 use crate::events::aitalk::{on_ai_talk, random_talks_analysis};
 use crate::events::common::*;
-use crate::variables::{get_global_vars, EventFlag};
+use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
 use rand::prelude::*;
 use shiorust::message::{Request, Response};
 
@@ -18,22 +18,12 @@ pub fn on_key_press(req: &Request) -> Response {
     ),
     "d" => {
       let vars = get_global_vars();
+      vars.flags_mut().delete(EventFlag::FirstBoot);
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(0));
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(1));
-      on_ai_talk(req)
-    }
-    "e" => {
-      let mut rng = rand::thread_rng();
-      let a = 1;
-      let b = rng.gen_range(1..=3);
-      let c = rng.gen_range(1..=4);
-      let d = rng.gen_range(1..=4);
-      let e = rng.gen_range(1..=8);
-      let f = rng.gen_range(1..=12);
-      let m = format!("{}{}{}{}{}{:02}", a, b, c, d, e, f);
       new_response_with_value(
-        format!("\\_qh{}{}", m, m),
-        TranslateOption::simple_translate(),
+        format!("\\![change,ghost,{}]", GHOST_NAME),
+        TranslateOption::none(),
       )
     }
     _ => new_response_nocontent(),

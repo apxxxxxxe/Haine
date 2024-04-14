@@ -10,6 +10,7 @@ use std::error::Error;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+pub const GHOST_NAME: &str = "Crave The Grave";
 const VAR_PATH: &str = "vars.json";
 static mut GLOBALVARS: Option<GlobalVariables> = None;
 
