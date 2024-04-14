@@ -1,6 +1,43 @@
 use crate::events::common::*;
-use crate::variables::{EventFlag, GlobalVariables, TouchInfo};
+use crate::events::menu::on_menu_exec;
+use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
+use shiorust::message::{Parser, Request, Response};
+
+pub fn new_mouse_response(info: String) -> Response {
+  let vars = get_global_vars();
+  let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
+  if info != *vars.volatility.last_touch_info() {
+    vars.volatility.set_touch_count(0);
+  }
+  vars.volatility.set_last_touch_info(info.clone());
+  vars
+    .volatility
+    .set_touch_count(vars.volatility.touch_count() + 1);
+
+  match info.as_str() {
+    "0doubleclick" => {
+      return on_menu_exec(&dummy_req);
+    }
+    "0headdoubleclick" => {
+      if !get_global_vars()
+        .flags()
+        .check(&EventFlag::FirstHitTalkDone)
+      {
+        return on_menu_exec(&dummy_req);
+      }
+    }
+    _ => (),
+  }
+
+  match mouse_dialogs(info, vars) {
+    Some(dialogs) => new_response_with_value(
+      dialogs[choose_one(&dialogs, true).unwrap()].clone(),
+      TranslateOption::with_shadow_completion(),
+    ),
+    None => new_response_nocontent(),
+  }
+}
 
 static DIALOG_SEXIAL_FIRST: Lazy<Vec<String>> =
   Lazy::new(|| vec!["h1111205……会って早々、これ？\nなんというか……h1111204流石ね。".to_string()]);
@@ -104,7 +141,10 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
 fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   let zero_bust_touch_threshold = 12;
   let mut zero_bust_touch = Vec::new();
-  if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
+  if !vars.volatility.first_sexial_touch()
+    && vars.volatility.ghost_up_time() < 30
+    && vars.flags().check(&EventFlag::FirstClose)
+  {
     vars.volatility.set_first_sexial_touch(true);
     zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
   } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 {
@@ -135,12 +175,16 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   zero_bust_touch
 }
 
-pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
-  let is_aroused = vars.volatility.aroused();
+pub fn on_head_hit(_req: &Request) -> Response {
   to_aroused();
-  if !vars.flags().check(&EventFlag::FirstHitTalkDone) && !is_aroused {
-    vec!["h1121414\\1半ば衝動的に、彼女の頭を打った。\\n\
-    h1112101\\1それは嫌悪からだ。私を受け入れるようなそぶりを見せながら、\\n\
+  get_global_vars()
+    .flags_mut()
+    .done(EventFlag::FirstHitTalkDone);
+  let m = "\\t\\*\
+    h1111201あら、話す気に……h1121414っ！？\\n\
+    \\1半ば衝動的に、彼女を突き飛ばした。\\n\
+    h1112101\\1それは嫌悪からだ。\\n\
+    私を受け入れるようなそぶりを見せながら、\\n\
     同時に私を助けないと嘯く傲慢さ。\\n\
     そして何よりも、理性的な物言いをしておきながら一欠片も倫理の匂いを感じさせない態度に、毒虫にも似た嫌悪感を感じたのだ。\\n\
     \\0……。\\1叩かれたハイネは呆けたように私を見つめ…………h1222804\\1笑った。\\n\
@@ -153,8 +197,14 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
     双方に得があるのよ、遠慮はいらないわ。\\n\
     さあ。h1322813さあ！\\n\
     "
-    .to_string()]
-  } else if !is_aroused {
+    .to_string();
+  new_response_with_value(m, TranslateOption::simple_translate())
+}
+
+pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
+  let is_aroused = vars.volatility.aroused();
+  to_aroused();
+  if !is_aroused {
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
     all_combo(&vec![
@@ -174,3 +224,13 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
     ])
   }
 }
+
+const DUMMY_REQUEST: &str = "GET SHIORI/3.0\r\n\
+Charset: UTF-8\r\n\
+Sender: SSP\r\n\
+SenderType: internal,raise\r\n\
+SecurityLevel: local\r\n\
+Status: choosing,balloon(0=0)\r\n\
+ID: OnFirstBoot\r\n\
+BaseID: OnBoot\r\n\
+Reference0: 1\r\n\r\n";

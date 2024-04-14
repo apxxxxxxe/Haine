@@ -1,5 +1,4 @@
 use crate::events::common::*;
-use crate::events::menu::on_menu_exec;
 use crate::events::mouse::*;
 use crate::variables::get_global_vars;
 
@@ -79,11 +78,7 @@ pub fn on_mouse_wheel(req: &Request) -> Response {
 
 pub fn on_mouse_double_click(req: &Request) -> Response {
   let refs = get_references(req);
-  if refs[4].is_empty() {
-    on_menu_exec(req)
-  } else {
-    new_mouse_response(format!("{}{}doubleclick", refs[3], refs[4]))
-  }
+  new_mouse_response(format!("{}{}doubleclick", refs[3], refs[4]))
 }
 
 pub fn on_mouse_click_ex(req: &Request) -> Response {
@@ -127,24 +122,5 @@ pub fn on_mouse_move(req: &Request) -> Response {
     } else {
       new_response_nocontent()
     }
-  }
-}
-
-fn new_mouse_response(info: String) -> Response {
-  let vars = get_global_vars();
-  if info != *vars.volatility.last_touch_info() {
-    vars.volatility.set_touch_count(0);
-  }
-  vars.volatility.set_last_touch_info(info.clone());
-  vars
-    .volatility
-    .set_touch_count(vars.volatility.touch_count() + 1);
-
-  match mouse_dialogs(info, vars) {
-    Some(dialogs) => new_response_with_value(
-      dialogs[choose_one(&dialogs, true).unwrap()].clone(),
-      TranslateOption::with_shadow_completion(),
-    ),
-    None => new_response_nocontent(),
   }
 }

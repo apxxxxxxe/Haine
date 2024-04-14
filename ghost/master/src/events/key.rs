@@ -1,7 +1,6 @@
 use crate::events::aitalk::{on_ai_talk, random_talks_analysis};
 use crate::events::common::*;
 use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
-use rand::prelude::*;
 use shiorust::message::{Request, Response};
 
 pub fn on_key_press(req: &Request) -> Response {
@@ -21,6 +20,8 @@ pub fn on_key_press(req: &Request) -> Response {
       vars.flags_mut().delete(EventFlag::FirstBoot);
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(0));
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(1));
+      vars.flags_mut().delete(EventFlag::FirstClose);
+      vars.flags_mut().delete(EventFlag::FirstHitTalkDone);
       new_response_with_value(
         format!("\\![change,ghost,{}]", GHOST_NAME),
         TranslateOption::none(),

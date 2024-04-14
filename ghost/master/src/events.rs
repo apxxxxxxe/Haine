@@ -15,6 +15,7 @@ use crate::events::bootend::*;
 use crate::events::common::*;
 use crate::events::key::*;
 use crate::events::menu::*;
+use crate::events::mouse::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::tooltip::*;
@@ -126,6 +127,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnBalloonClose" => Some(on_balloon_close),
     "OnBalloonBreak" => Some(on_balloon_break),
     "OnBalloonTimeout" => Some(on_balloon_timeout),
+    "OnHeadHit" => Some(on_head_hit),
     _ => None,
   }
 }

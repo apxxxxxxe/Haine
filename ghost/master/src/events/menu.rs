@@ -8,15 +8,6 @@ use rand::seq::SliceRandom;
 use shiorust::message::{Request, Response};
 
 pub fn on_menu_exec(_req: &Request) -> Response {
-  if !get_global_vars()
-    .flags()
-    .check(&EventFlag::FirstRandomTalkDone(
-      (FIRST_RANDOMTALKS.len() - 1) as u32,
-    ))
-  {
-    return on_menu_when_first_boot();
-  }
-
   let current_talk_interval = get_global_vars().random_talk_interval().unwrap_or(180);
   let mut selections = Vec::new();
 
@@ -44,40 +35,44 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     selections.join("  ")
   );
 
+  let vars = get_global_vars();
   let m = format!(
     "\\_q\
-    \\_l[0,1.5em]\
-    \\![*]\\q[なにか話して,OnAiTalk]\\n\
-    \\![*]\\q[話しかける,OnTalk]\\n\
-    \\![*]\\q[ひと息つく,OnBreakTime]\\n\
-    \\![*]\\q[トーク統計,OnCheckTalkCollection]\
-    \\_l[0,@1.75em]\
-    \\![*]\\q[手紙を書く,OnWebClapOpen]\
-    \\_l[0,@1.75em]\
-    {}
+    {}\
     \\_l[0,11em]\\__q[script:\\e]{}\\__q\
-    \\_l[0,0]{}\
     ",
-    talk_interval_selector,
-    Icon::Cross,
-    show_bar(
-      100,
-      get_global_vars().volatility.immersive_degrees(),
-      "没入度",
-      "WhatIsImersiveDegree",
-    ),
-  );
-
-  new_response_with_value(m, TranslateOption::balloon_surface_only())
-}
-
-fn on_menu_when_first_boot() -> Response {
-  let m = format!(
-    "\
-  \\_q\
-  \\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n\
-  \\_l[0,11em]\\__q[script:\\e]{}\\__q\
-  ",
+    if !get_global_vars()
+      .flags()
+      .check(&EventFlag::FirstRandomTalkDone(
+        (FIRST_RANDOMTALKS.len() - 1) as u32,
+      ))
+    {
+      "\\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n".to_string()
+    } else if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
+      "\\_l[0,3em]\\![*]\\q[突き飛ばす,OnHeadHit]\\n".to_string()
+    } else {
+      format!(
+        "\
+        \\_l[0,1.5em]\
+        \\![*]\\q[なにか話して,OnAiTalk]\\n\
+        \\![*]\\q[話しかける,OnTalk]\\n\
+        \\![*]\\q[ひと息つく,OnBreakTime]\\n\
+        \\![*]\\q[トーク統計,OnCheckTalkCollection]\
+        \\_l[0,@1.75em]\
+        \\![*]\\q[手紙を書く,OnWebClapOpen]\
+        \\_l[0,@1.75em]\
+        {}\
+        \\_l[0,0]{}\
+        ",
+        talk_interval_selector,
+        show_bar(
+          100,
+          vars.volatility.immersive_degrees(),
+          "没入度",
+          "WhatIsImersiveDegree",
+        ),
+      )
+    },
     Icon::Cross,
   );
 
