@@ -21,5 +21,5 @@ icon.minimize,icon_minimize.ico
 
 shiori,haine.dll
 
-sakura.seriko.defaultsurface,1111101
+sakura.seriko.defaultsurface,1000000
 kero.seriko.defaultsurface,1000000
