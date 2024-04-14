@@ -5,7 +5,7 @@ type,ghost
 
 craftman,HinoTsumi
 craftmanw,日野つみ
-craftmanurl,https://apxxxxxxe.github.io/ukagaka/
+craftmanurl,https://apxxxxxxe.dev
 
 sakura.name,ハイネ
 kero.name,霧
