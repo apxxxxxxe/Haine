@@ -75,10 +75,8 @@ fn on_menu_when_first_boot() -> Response {
   let m = format!(
     "\
   \\_q\
-  \\![*]\\q[話の続き,OnAiTalk]\\n\
-  \\n\
-  \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\
-  \\_l[0,12em]\\__q[script:\\e]{}\\__q\
+  \\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n\
+  \\_l[0,11em]\\__q[script:\\e]{}\\__q\
   ",
     Icon::Cross,
   );
