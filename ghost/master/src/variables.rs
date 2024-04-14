@@ -171,8 +171,8 @@ impl EventFlags {
     self.flags.insert(flag);
   }
 
-  pub fn check(&self, flag: EventFlag) -> bool {
-    self.flags.get(&flag).is_some()
+  pub fn check(&self, flag: &EventFlag) -> bool {
+    self.flags.get(flag).is_some()
   }
 
   pub fn delete(&mut self, flag: EventFlag) {

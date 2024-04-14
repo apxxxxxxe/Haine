@@ -138,7 +138,7 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
 pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
-  if !vars.flags().check(EventFlag::FirstHitTalkDone) && !is_aroused {
+  if !vars.flags().check(&EventFlag::FirstHitTalkDone) && !is_aroused {
     vec!["h1121414\\1半ば衝動的に、彼女の頭を打った。\\n\
     h1112101\\1それは嫌悪からだ。私を受け入れるようなそぶりを見せながら、\\n\
     同時に私を助けないと嘯く傲慢さ。\\n\

@@ -10,7 +10,7 @@ use shiorust::message::{Request, Response};
 pub fn on_menu_exec(_req: &Request) -> Response {
   if !get_global_vars()
     .flags()
-    .check(EventFlag::FirstRandomTalkDone(
+    .check(&EventFlag::FirstRandomTalkDone(
       (FIRST_RANDOMTALKS.len() - 1) as u32,
     ))
   {
