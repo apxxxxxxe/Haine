@@ -3,6 +3,7 @@ use crate::roulette::RouletteCell;
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
+use rand::prelude::SliceRandom;
 use serde::{Deserialize, Serialize};
 use shiorust::message::{parts::HeaderName, Request, Response};
 use std::collections::HashSet;
@@ -33,6 +34,12 @@ impl Display for Talk {
 
 fn talk_with_punchline(text: String, funny_punchline: String) -> String {
   text + "\\n" + &funny_punchline
+}
+
+static BOOK_TOPICS: [(&str, &str); 1] = [("funkcia lingvo", "referenca travidebleco")];
+
+fn random_book_topic() -> (&'static str, &'static str) {
+  *BOOK_TOPICS.choose(&mut rand::thread_rng()).unwrap()
 }
 
 pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
@@ -297,6 +304,19 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1121204もちろん、区別がつかないという意味ではなくて。\\n\
         ……h1111210人に期待するものがそれだけしか無かったの。\
         ".to_string()),
+        ("分厚い本", {
+            let (topic, description) = random_book_topic();
+            format!("\
+                h1111204……手持ち無沙汰のようね。\\n\
+                h1111206なにか本を見繕ってあげましょうか。\\n\
+                h1111203……h1111201これはどうかしら。\\n\
+                \\1……ずいぶん分厚い本を手渡された。\\n\
+                h1111202{}の構成要素について論じられているの。\\n\
+                {}についての項が特に興味深いわ。\
+                h1111205要点だけなら半日もあれば読み終わると思うから、\\n\
+                h1111204終わったら意見を交換しましょう。\
+            ",topic,description)
+        }, vec![]),
 
         ("今度こそ無へ", "\
         h1111205死にぞこなったものだから、次の手段を求めている。\\n\
