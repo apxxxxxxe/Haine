@@ -39,6 +39,12 @@ pub fn new_mouse_response(info: String) -> Response {
   }
 }
 
+static DIALOG_SEXIAL_WHILE_HITTING: Lazy<Vec<String>> =
+  Lazy::new(|| vec!["h1321204ねえ、焦らさないで。\\nもっと叩いて。\\n死を、感じさせて。".to_string()]);
+
+static DIALOG_TOUCH_WHILE_HITTING: Lazy<Vec<String>> =
+  Lazy::new(|| vec!["h1311104優しくしないで。退屈になるじゃない。".to_string()]);
+
 static DIALOG_SEXIAL_FIRST: Lazy<Vec<String>> =
   Lazy::new(|| vec!["h1111205……会って早々、これ？\nなんというか……h1111204流石ね。".to_string()]);
 
@@ -73,6 +79,14 @@ fn first_and_other(
 }
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
+  if vars.volatility.aroused() {
+    if info.contains("0bust") {
+      return Some(DIALOG_SEXIAL_WHILE_HITTING.clone());
+    } else if info.contains("nade") {
+      return Some(DIALOG_TOUCH_WHILE_HITTING.clone());
+    }
+  }
+
   match info.as_str() {
     "0headdoubleclick" => Some(head_hit(vars)),
     "0handnade" => Some(first_and_other(
