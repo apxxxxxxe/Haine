@@ -1,6 +1,6 @@
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
-use crate::variables::get_global_vars;
+use crate::variables::{get_global_vars, EventFlag};
 use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
@@ -39,6 +39,11 @@ pub fn on_second_change(req: &Request) -> Response {
   vars
     .volatility
     .set_ghost_up_time(vars.volatility.ghost_up_time() + 1);
+
+  // 初回起動イベントが終わるまではランダムトークなし
+  if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
+    return new_response_nocontent();
+  }
 
   let refs = get_references(req);
   let idle_secs = refs[4].parse::<i32>().unwrap();
