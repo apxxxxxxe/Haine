@@ -5,21 +5,6 @@ use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
-pub fn on_balloon_close(_req: &Request) -> Response {
-  new_response_with_value(
-    "\\0\\![set,balloonnum,,,]".to_string(),
-    TranslateOption::none(),
-  )
-}
-
-pub fn on_balloon_break(req: &Request) -> Response {
-  on_balloon_close(req)
-}
-
-pub fn on_balloon_timeout(req: &Request) -> Response {
-  on_balloon_close(req)
-}
-
 pub fn on_notify_user_info(req: &Request) -> Response {
   let vars = get_global_vars();
   let refs = get_references(req);

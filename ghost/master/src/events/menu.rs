@@ -39,8 +39,10 @@ pub fn on_menu_exec(_req: &Request) -> Response {
   let m = format!(
     "\\_q\
     {}\
+    {}\
     \\_l[0,11em]\\__q[script:\\e]{}\\__q\
     ",
+    REMOVE_BALLOON_NUM,
     if !get_global_vars()
       .flags()
       .check(&EventFlag::FirstRandomTalkDone(
