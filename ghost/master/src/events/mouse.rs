@@ -32,15 +32,20 @@ pub fn new_mouse_response(info: String) -> Response {
 
   match mouse_dialogs(info, vars) {
     Some(dialogs) => new_response_with_value(
-      dialogs[choose_one(&dialogs, true).unwrap()].clone(),
+      format!(
+        "{}{}",
+        REMOVE_BALLOON_NUM,
+        dialogs[choose_one(&dialogs, true).unwrap()].clone()
+      ),
       TranslateOption::with_shadow_completion(),
     ),
     None => new_response_nocontent(),
   }
 }
 
-static DIALOG_SEXIAL_WHILE_HITTING: Lazy<Vec<String>> =
-  Lazy::new(|| vec!["h1321204ねえ、焦らさないで。\\nもっと叩いて。\\n死を、感じさせて。".to_string()]);
+static DIALOG_SEXIAL_WHILE_HITTING: Lazy<Vec<String>> = Lazy::new(|| {
+  vec!["h1321204ねえ、焦らさないで。\\nもっと叩いて。\\n死を、感じさせて。".to_string()]
+});
 
 static DIALOG_TOUCH_WHILE_HITTING: Lazy<Vec<String>> =
   Lazy::new(|| vec!["h1311104優しくしないで。退屈になるじゃない。".to_string()]);

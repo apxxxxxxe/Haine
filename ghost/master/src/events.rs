@@ -124,9 +124,6 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnWaitTranslater" => Some(on_wait_translater),
     "OnCheckTalkCollection" => Some(on_check_talk_collection),
     "OnCheckUnseenTalks" => Some(on_check_unseen_talks),
-    "OnBalloonClose" => Some(on_balloon_close),
-    "OnBalloonBreak" => Some(on_balloon_break),
-    "OnBalloonTimeout" => Some(on_balloon_timeout),
     "OnHeadHit" => Some(on_head_hit),
     _ => None,
   }
