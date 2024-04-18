@@ -50,8 +50,6 @@ pub fn on_menu_exec(_req: &Request) -> Response {
       ))
     {
       "\\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n".to_string()
-    } else if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
-      "\\_l[0,3em]\\![*]\\q[突き飛ばす,OnHeadHit]\\n".to_string()
     } else {
       format!(
         "\
