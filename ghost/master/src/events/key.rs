@@ -10,7 +10,16 @@ pub fn on_key_press(req: &Request) -> Response {
       "unload:10秒後にリロード\\![unload,shiori]\\_w[10000]\\![reload,ghost]".to_string(),
       TranslateOption::balloon_surface_only(),
     ),
-    "t" => on_ai_talk(req),
+    "t" => {
+      if get_global_vars()
+        .flags()
+        .check(&EventFlag::FirstHitTalkDone)
+      {
+        on_ai_talk(req)
+      } else {
+        new_response_nocontent()
+      }
+    }
     "c" => new_response_with_value(
       random_talks_analysis(),
       TranslateOption::balloon_surface_only(),
