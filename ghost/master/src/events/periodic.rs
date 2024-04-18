@@ -1,4 +1,4 @@
-use crate::events::aitalk::on_ai_talk;
+use crate::events::aitalk::{on_ai_talk, FIRST_RANDOMTALKS};
 use crate::events::common::*;
 use crate::variables::{get_global_vars, EventFlag};
 use chrono::Timelike;
@@ -26,7 +26,9 @@ pub fn on_second_change(req: &Request) -> Response {
     .set_ghost_up_time(vars.volatility.ghost_up_time() + 1);
 
   // 初回起動イベントが終わるまではランダムトークなし
-  if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
+  if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
+    FIRST_RANDOMTALKS.len() as u32 - 1,
+  )) {
     return new_response_nocontent();
   }
 

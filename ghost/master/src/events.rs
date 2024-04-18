@@ -125,6 +125,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnCheckTalkCollection" => Some(on_check_talk_collection),
     "OnCheckUnseenTalks" => Some(on_check_unseen_talks),
     "OnHeadHit" => Some(on_head_hit),
+    "OnHeadHitCancel" => Some(on_head_hit_cancel),
     _ => None,
   }
 }

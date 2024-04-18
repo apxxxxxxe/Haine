@@ -1,3 +1,4 @@
+use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
@@ -22,7 +23,9 @@ pub fn new_mouse_response(info: String) -> Response {
     "0headdoubleclick" => {
       if !get_global_vars()
         .flags()
-        .check(&EventFlag::FirstHitTalkDone)
+        .check(&EventFlag::FirstRandomTalkDone(
+          FIRST_RANDOMTALKS.len() as u32 - 1,
+        ))
       {
         return on_menu_exec(&dummy_req);
       }
@@ -194,6 +197,11 @@ fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
   zero_bust_touch
 }
 
+pub fn on_head_hit_cancel(_req: &Request) -> Response {
+  let m = "\\1……踏みとどまった。".to_string();
+  new_response_with_value(m, TranslateOption::simple_translate())
+}
+
 pub fn on_head_hit(_req: &Request) -> Response {
   to_aroused();
   get_global_vars()
@@ -223,19 +231,24 @@ pub fn on_head_hit(_req: &Request) -> Response {
 pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
-  if !is_aroused {
+  if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
+    vec!["\
+    \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
+    "
+    .to_string()]
+  } else if !is_aroused {
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
     all_combo(&vec![
-      ["h1221410ぐっ……", "h1221411痛っ……", "h1221714づっ……"]
-        .iter()
-        .map(|s| s.to_string())
-        .collect(),
-      vec!["\\n".to_string()],
+      vec![
+        "h1221410ぐっ……\\n".to_string(),
+        "h1221411痛っ……\\n".to_string(),
+        "h1221714づっ……\\n".to_string(),
+      ],
       [
         "h1311204すてき。h1311207もっとして。",
-        "h1111206ああ、星が舞っているわ。h1311215痛くて苦しくて、死んでしまいそう。",
-        "h1111204ひどい。h1111210ひどいわ。\\nh1311513癖になってしまったらどうするの？",
+        "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。",
+        "h1121104ひどい。h1121110ひどいわ。\\nh1311513癖になってしまったらどうするの？",
       ]
       .iter()
       .map(|s| s.to_string())

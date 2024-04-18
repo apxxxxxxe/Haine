@@ -1,4 +1,4 @@
-use crate::events::aitalk::{on_ai_talk, random_talks_analysis};
+use crate::events::aitalk::{on_ai_talk, random_talks_analysis, FIRST_RANDOMTALKS};
 use crate::events::common::*;
 use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
 use shiorust::message::{Request, Response};
@@ -13,7 +13,9 @@ pub fn on_key_press(req: &Request) -> Response {
     "t" => {
       if get_global_vars()
         .flags()
-        .check(&EventFlag::FirstHitTalkDone)
+        .check(&EventFlag::FirstRandomTalkDone(
+          FIRST_RANDOMTALKS.len() as u32 - 1,
+        ))
       {
         on_ai_talk(req)
       } else {
