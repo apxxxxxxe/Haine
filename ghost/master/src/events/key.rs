@@ -1,5 +1,6 @@
 use crate::events::aitalk::{on_ai_talk, random_talks_analysis, FIRST_RANDOMTALKS};
 use crate::events::common::*;
+use crate::events::mouse::on_head_hit;
 use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
 use shiorust::message::{Request, Response};
 
@@ -11,15 +12,15 @@ pub fn on_key_press(req: &Request) -> Response {
       TranslateOption::balloon_surface_only(),
     ),
     "t" => {
-      if get_global_vars()
-        .flags()
-        .check(&EventFlag::FirstRandomTalkDone(
-          FIRST_RANDOMTALKS.len() as u32 - 1,
-        ))
-      {
-        on_ai_talk(req)
-      } else {
+      let vars = get_global_vars();
+      if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
+        FIRST_RANDOMTALKS.len() as u32 - 1,
+      )) {
         new_response_nocontent()
+      } else if vars.volatility.aroused() {
+        on_head_hit(req)
+      } else {
+        on_ai_talk(req)
       }
     }
     "c" => new_response_with_value(
