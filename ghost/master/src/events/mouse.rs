@@ -228,7 +228,8 @@ pub fn on_head_hit(_req: &Request) -> Response {
 pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
-  if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
+  if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
+    vars.flags_mut().done(EventFlag::FirstHitTalkStart);
     vec!["\
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
     "

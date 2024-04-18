@@ -156,6 +156,7 @@ pub enum EventFlag {
   FirstRandomTalkDone(u32),
   FirstPlaceChange,
   FirstClose,
+  FirstHitTalkStart,
   FirstHitTalkDone,
 }
 
