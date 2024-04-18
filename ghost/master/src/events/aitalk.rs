@@ -808,6 +808,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   if vars.volatility.aroused() {
     vars.volatility.set_aroused(false);
+    vars.volatility.set_arousing_hit_count(0);
     let mut talk_parts = vec![vec![
       "h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。".to_string(),
     ]];

@@ -204,9 +204,6 @@ pub fn on_head_hit_cancel(_req: &Request) -> Response {
 
 pub fn on_head_hit(_req: &Request) -> Response {
   to_aroused();
-  get_global_vars()
-    .flags_mut()
-    .done(EventFlag::FirstHitTalkDone);
   let m = "\\t\\*\
     h1111201あら、話す気に……h1121414っ！？\\n\
     \\1半ば衝動的に、彼女を突き飛ばした。\\n\
@@ -239,20 +236,29 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   } else if !is_aroused {
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
+    vars
+      .volatility
+      .set_arousing_hit_count(vars.volatility.arousing_hit_count() + 1);
+    let dialogs = if vars.volatility.arousing_hit_count() < 3 {
+      [
+        "h1311204すてき。h1311207もっとして。",
+        "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。",
+        "h1121104ひどい。h1121110ひどいわ。\\nh1321513癖になってしまったらどうするの？",
+      ]
+    } else {
+      [
+        "h1311204あは、ずきずきする。\\nh1311213血は通っていないはずなのに、脈打ってるの。",
+        "h1311210ああ、痛い。h1311215痛いのがいいの。",
+        "h1321101目の奥が痛むわ。\\nh1321204容赦がないの、好きよ。",
+      ]
+    };
     all_combo(&vec![
       vec![
         "h1221410ぐっ……\\n".to_string(),
         "h1221411痛っ……\\n".to_string(),
         "h1221714づっ……\\n".to_string(),
       ],
-      [
-        "h1311204すてき。h1311207もっとして。",
-        "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。",
-        "h1121104ひどい。h1121110ひどいわ。\\nh1311513癖になってしまったらどうするの？",
-      ]
-      .iter()
-      .map(|s| s.to_string())
-      .collect(),
+      dialogs.iter().map(|s| s.to_string()).collect(),
     ])
   }
 }
