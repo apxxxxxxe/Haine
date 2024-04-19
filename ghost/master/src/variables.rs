@@ -238,7 +238,7 @@ pub struct VolatilityVariables {
 
   pub aroused: Mutex<bool>,
 
-  pub arousing_hit_count: Mutex<i32>,
+  pub arousing_hit_count: Mutex<u32>,
 }
 
 #[allow(dead_code)]
@@ -271,7 +271,7 @@ impl VolatilityVariables {
   generate_mut_getter!(touch_info, TouchInfoMap, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
   generate_getter_setter!(aroused, bool, cloneable);
-  generate_getter_setter!(arousing_hit_count, i32, cloneable);
+  generate_getter_setter!(arousing_hit_count, u32, cloneable);
 }
 
 impl Default for VolatilityVariables {
