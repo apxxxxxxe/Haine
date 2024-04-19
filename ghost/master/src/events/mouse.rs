@@ -207,7 +207,7 @@ pub fn on_head_hit(_req: &Request) -> Response {
   let m = "\\t\\*\
     h1111201あら、話す気に……h1121414っ！？\\n\
     \\1半ば衝動的に、彼女を突き飛ばした。\\n\
-    h1112101\\1それは嫌悪からだ。\\n\
+    h1112401\\1それは嫌悪からだ。\\n\
     私を受け入れるようなそぶりを見せながら、\\n\
     同時に私を助けないと嘯く傲慢さ。\\n\
     そして何よりも、理性的な物言いをしておきながら一欠片も倫理の匂いを感じさせない態度に、毒虫にも似た嫌悪感を感じたのだ。\\n\
@@ -237,30 +237,79 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   } else if !is_aroused {
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
+    let last_arousing_hit_count = vars.volatility.arousing_hit_count();
     vars
       .volatility
       .set_arousing_hit_count(vars.volatility.arousing_hit_count() + 1);
-    let dialogs = if vars.volatility.arousing_hit_count() < 3 {
-      [
+    // 各段階ごとのセリフ
+    let suffixes_list = vec![
+      vec![
         "h1311204すてき。h1311207もっとして。",
         "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。",
         "h1121104ひどい。h1121110ひどいわ。\\nh1321513癖になってしまったらどうするの？",
-      ]
-    } else {
-      [
+      ],
+      vec![
         "h1311204あは、ずきずきする。\\nh1311213血は通っていないはずなのに、脈打ってるの。",
         "h1311210ああ、痛い。h1311215痛いのがいいの。",
         "h1321101目の奥が痛むわ。\\nh1321204容赦がないの、好きよ。",
-      ]
-    };
-    all_combo(&vec![
-      vec![
-        "h1221410ぐっ……\\n".to_string(),
-        "h1221411痛っ……\\n".to_string(),
-        "h1221714づっ……\\n".to_string(),
       ],
-      dialogs.iter().map(|s| s.to_string()).collect(),
-    ])
+      vec![
+        "h1311308あぁ……こんなに幸せでいいのかしら。",
+        "h1321304だめな、だめなことなのに、あなたを求める気持ちが止まらないの。",
+        "h1321408んう……h1322304もう少し、もう少しなの。",
+      ],
+      vec![
+        "h1311308……ん、ぐっ",
+        "h1321208……あは、あは、は……",
+        "h1321808ひゅー、ひゅ……んん、あ、は……",
+      ],
+    ];
+    let dialog_lengthes = suffixes_list
+      .iter()
+      .map(|x| x.len() as u32)
+      .collect::<Vec<u32>>();
+    let dialog_cumsum = dialog_lengthes
+      .iter()
+      .scan(0, |sum, x| {
+        *sum += x;
+        Some(*sum)
+      })
+      .collect::<Vec<u32>>();
+
+    if dialog_cumsum.last().unwrap() <= &last_arousing_hit_count {
+      vars.volatility.set_arousing_hit_count(0);
+      vars.volatility.set_aroused(false);
+      return vec!["\\t\\*\
+        h1322808っ、～～h1000000～～～……！\\n\
+        \\1ひときわ大きく震えて、彼女はへたりこんだ。\\n\
+        \\0………………。\\n\
+        うふ、ふふふ。\\n\
+        h1211209よかったわ、とても。\\n\
+        \\n\
+        h1211310………………h1111310ふー。\\n\
+        h1111205\\1……落ち着いたようだ。\\n\
+        "
+      .to_string()];
+    }
+
+    let mut i = 0;
+    let suffixies = loop {
+      if last_arousing_hit_count < dialog_cumsum[i] {
+        break &suffixes_list[i];
+      }
+      i += 1;
+    };
+
+    let prefixes = [
+      "h1221410ぐっ……\\n".to_string(),
+      "h1221411痛っ……\\n".to_string(),
+      "h1221714づっ……\\n".to_string(),
+    ];
+    let mut result = Vec::new();
+    for j in 0..suffixies.len() {
+      result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixies[j]));
+    }
+    result
   }
 }
 
