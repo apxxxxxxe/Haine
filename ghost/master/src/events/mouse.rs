@@ -237,68 +237,59 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   } else if !is_aroused {
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
-    let last_arousing_hit_count = vars.volatility.arousing_hit_count();
-    vars
-      .volatility
-      .set_arousing_hit_count(vars.volatility.arousing_hit_count() + 1);
     // 各段階ごとのセリフ
     let suffixes_list = vec![
       vec![
-        "h1311204すてき。h1311207もっとして。",
-        "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。",
-        "h1121104ひどい。h1121110ひどいわ。\\nh1321513癖になってしまったらどうするの？",
+        "h1311204すてき。h1311207もっとして。".to_string(),
+        "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。".to_string(),
+        "h1121104ひどい。h1121110ひどいわ。\\nh1321513癖になってしまったらどうするの？".to_string(),
       ],
       vec![
-        "h1311204あは、ずきずきする。\\nh1311213血は通っていないはずなのに、脈打ってるの。",
-        "h1311210ああ、痛い。h1311215痛いのがいいの。",
-        "h1321101目の奥が痛むわ。\\nh1321204容赦がないの、好きよ。",
+        "h1311204あは、ずきずきする。\\nh1311213血は通っていないはずなのに、脈打ってるの。"
+          .to_string(),
+        "h1311210ああ、痛い。h1311215痛いのがいいの。".to_string(),
+        "h1321101目の奥が痛むわ。\\nh1321204容赦がないの、好きよ。".to_string(),
       ],
       vec![
-        "h1311308あぁ……こんなに幸せでいいのかしら。",
-        "h1321304だめな、だめなことなのに、あなたを求める気持ちが止まらないの。",
-        "h1321408んう……h1322304もう少し、もう少しなの。",
+        "h1311308あぁ……こんなに幸せでいいのかしら。".to_string(),
+        "h1321304だめな、だめなことなのに、あなたを求める気持ちが止まらないの。".to_string(),
+        "h1321408んう……h1322304もう少し、もう少しなの。".to_string(),
       ],
       vec![
-        "h1311308……ん、ぐっ",
-        "h1321208……あは、あは、は……",
-        "h1321808ひゅー、ひゅ……んん、あ、は……",
+        "h1311308……ん、ぐっ".to_string(),
+        "h1321208……あは、あは、は……".to_string(),
+        "h1321808ひゅー、ひゅ……んん、あ、は……".to_string(),
       ],
     ];
-    let dialog_lengthes = suffixes_list
-      .iter()
-      .map(|x| x.len() as u32)
-      .collect::<Vec<u32>>();
-    let dialog_cumsum = dialog_lengthes
-      .iter()
-      .scan(0, |sum, x| {
-        *sum += x;
-        Some(*sum)
-      })
-      .collect::<Vec<u32>>();
 
-    if dialog_cumsum.last().unwrap() <= &last_arousing_hit_count {
+    // 最後のセリフ
+    let last_dialog = "\\t\\*\
+    h1322808っ、～～h1000000～～～……！\\n\
+    \\1ひときわ大きく震えて、彼女はへたりこんだ。\\n\
+    \\0………………。\\n\
+    うふ、ふふふ。\\n\
+    h1211209よかったわ、とても。\\n\
+    \\n\
+    h1211310………………h1111310ふー。\\n\
+    h1111205\\1……落ち着いたようだ。\\n\
+    "
+    .to_string();
+
+    let (suffixies, is_last) = phased_talks(
+      vars.volatility.arousing_hit_count(),
+      suffixes_list,
+      last_dialog,
+    );
+
+    vars
+      .volatility
+      .set_arousing_hit_count(vars.volatility.arousing_hit_count() + 1);
+
+    if is_last {
       vars.volatility.set_arousing_hit_count(0);
       vars.volatility.set_aroused(false);
-      return vec!["\\t\\*\
-        h1322808っ、～～h1000000～～～……！\\n\
-        \\1ひときわ大きく震えて、彼女はへたりこんだ。\\n\
-        \\0………………。\\n\
-        うふ、ふふふ。\\n\
-        h1211209よかったわ、とても。\\n\
-        \\n\
-        h1211310………………h1111310ふー。\\n\
-        h1111205\\1……落ち着いたようだ。\\n\
-        "
-      .to_string()];
+      return suffixies;
     }
-
-    let mut i = 0;
-    let suffixies = loop {
-      if last_arousing_hit_count < dialog_cumsum[i] {
-        break &suffixes_list[i];
-      }
-      i += 1;
-    };
 
     let prefixes = [
       "h1221410ぐっ……\\n".to_string(),
@@ -310,6 +301,36 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
       result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixies[j]));
     }
     result
+  }
+}
+
+pub fn phased_talks(
+  count: u32,
+  phased_talk_list: Vec<Vec<String>>,
+  last: String,
+) -> (Vec<String>, bool) {
+  let dialog_lengthes = phased_talk_list
+    .iter()
+    .map(|x| x.len() as u32)
+    .collect::<Vec<u32>>();
+  let dialog_cumsum = dialog_lengthes
+    .iter()
+    .scan(0, |sum, x| {
+      *sum += x;
+      Some(*sum)
+    })
+    .collect::<Vec<u32>>();
+
+  if dialog_cumsum.last().unwrap() <= &count {
+    return (vec![last], true);
+  }
+
+  let mut i = 0;
+  loop {
+    if count < dialog_cumsum[i] {
+      return (phased_talk_list[i].to_owned(), false);
+    }
+    i += 1;
   }
 }
 
