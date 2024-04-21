@@ -49,7 +49,9 @@ pub fn new_mouse_response(info: String) -> Response {
     },
     Err(e) => {
       error!("Error in mouse_dialogs: {}", e);
-      new_response_nocontent()
+      let mut res = new_response_nocontent();
+      add_error_description(&mut res, &e.to_string());
+      res
     }
   }
 }
