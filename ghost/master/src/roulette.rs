@@ -11,6 +11,12 @@ impl RouletteCell for String {
   }
 }
 
+impl RouletteCell for &str {
+  fn key(&self) -> String {
+    self.to_string()
+  }
+}
+
 pub struct TalkBias(HashMap<String, u32>);
 
 impl TalkBias {
