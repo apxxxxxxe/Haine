@@ -254,18 +254,18 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Result<Vec<String>, InvalidIndexE
     let suffixes_list = vec![
       vec![
         "h1311204すてき。h1311207もっとして。".to_string(),
-        "h1111206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。".to_string(),
-        "h1121104ひどい。h1121110ひどいわ。\\nh1321513癖になってしまったらどうするの？".to_string(),
+        "h1311206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。".to_string(),
+        "h1221104ひどい。h1221110ひどいわ。\\nh1322513癖になってしまったらどうするの？".to_string(),
       ],
       vec![
-        "h1311204あは、ずきずきする。\\nh1311213血は通っていないはずなのに、脈打ってるの。"
+        "h1311204あは、ずきずきする。\\nh1311307血は通っていないはずなのに、脈打ってる。"
           .to_string(),
-        "h1311210ああ、痛い。h1311215痛いのがいいの。".to_string(),
-        "h1321101目の奥が痛むわ。\\nh1321204容赦がないの、好きよ。".to_string(),
+        "h1311210ああ、痛い。h1321409痛いのがいいの。".to_string(),
+        "h1321104目の奥が痛むわ。\\nh1321207容赦がないの、好きよ。".to_string(),
       ],
       vec![
         "h1311308あぁ……こんなに幸せでいいのかしら。".to_string(),
-        "h1321304だめな、だめなことなのに、あなたを求める気持ちが止まらないの。".to_string(),
+        "h1321304だめな、だめなことなのに、\\n求める気持ちが止まらないの。".to_string(),
         "h1321408んう……h1322304もう少し、もう少しなの。".to_string(),
       ],
       vec![
@@ -278,7 +278,7 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Result<Vec<String>, InvalidIndexE
       \\1ひときわ大きく震えて、彼女はへたりこんだ。\\n\
       \\0………………。\\n\
       うふ、ふふふ。\\n\
-      h1211209よかったわ、とても。\\n\
+      h1211308よかったわ、とても。\\n\
       \\n\
       h1211310………………h1111310ふー。\\n\
       h1111205\\1……落ち着いたようだ。\\n\
@@ -300,8 +300,8 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Result<Vec<String>, InvalidIndexE
 
     let prefixes = [
       "h1221410ぐっ……\\n".to_string(),
-      "h1221411痛っ……\\n".to_string(),
       "h1221714づっ……\\n".to_string(),
+      "h1221710うぅっ……\\n".to_string(),
     ];
     let mut result = Vec::new();
     for j in 0..suffixes.len() {
