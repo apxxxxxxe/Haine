@@ -933,8 +933,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     "「街の端にある花屋は色とりどりの花で溢れていた。」",
     "「昔ながらの本屋は知識の宝庫だった。」",
   ];
-  let mut rng = rand::thread_rng();
-  let comment = comments.choose(&mut rng).unwrap();
+  let comment = comments[choose_one(&comments, false).unwrap()];
 
   new_response_with_value(
     format!("\\0\\![set,balloonnum,{}]{}", comment, choosed_talk.text),
