@@ -60,6 +60,15 @@ impl TranslateOption {
   }
 }
 
+pub fn add_error_description(res: &mut Response, error: &str) {
+  res
+    .headers
+    .insert(HeaderName::from("ErrorDescription"), error.to_string());
+  res
+    .headers
+    .insert(HeaderName::from("ErrorLevel"), "error".to_string());
+}
+
 pub fn new_response() -> Response {
   let mut headers = Headers::new();
   headers.insert(
