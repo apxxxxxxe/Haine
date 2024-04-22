@@ -254,7 +254,7 @@ pub fn head_hit_dialog(vars: &mut GlobalVariables) -> Vec<String> {
       vec![
         "h1311204あは、ずきずきする。\\nh1311307血は通っていないはずなのに、脈打ってる。"
           .to_string(),
-        "h1311210ああ、痛い。h1321409痛いのがいいの。".to_string(),
+        "h1311104ああ、痛い。h1321407痛いのがいいの。".to_string(),
         "h1321104目の奥が痛むわ。\\nh1321207容赦がないの、好きよ。".to_string(),
       ],
       vec![
