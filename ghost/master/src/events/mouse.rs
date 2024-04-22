@@ -87,21 +87,48 @@ fn first_and_other(
 }
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
-  if vars.volatility.aroused() {
-    if info.contains("0bust") {
-      return Some(DIALOG_SEXIAL_WHILE_HITTING.clone());
-    } else if info.contains("nade") {
-      return Some(DIALOG_TOUCH_WHILE_HITTING.clone());
-    }
+  match info.as_str() {
+    "0headdoubleclick" => Some(head_hit_dialog(vars)),
+    "0handnade" => Some(zero_hand_nade(vars)),
+    "0bustnade" | "0bustdoubleclick" => Some(zero_bust_touch(vars)),
+    "0skirtup" => Some(zero_skirt_up(vars)),
+    "0shoulderdown" => Some(zero_shoulder_down(vars)),
+    _ => None,
   }
+}
 
-  let zero_bust_touch = if vars.volatility.aroused() {
-    bust_touch(vars)
-  } else {
+fn zero_hand_nade(vars: &mut GlobalVariables) -> Vec<String> {
+  if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
-  };
+  } else {
+    first_and_other(
+      &mut vars.volatility.touch_info_mut().hand,
+      vec![],
+      vec![
+        "\
+        h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
+        ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
+        "
+        .to_string(),
+        "\
+        h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+        ……それは不毛というものよ。\
+        "
+        .to_string(),
+        "\
+        h1111205\\1彼女の指は長い。
+        h1111210……うん。\\n\
+        "
+        .to_string(),
+      ],
+    )
+  }
+}
 
-  let zero_skirt_up = {
+fn zero_skirt_up(vars: &mut GlobalVariables) -> Vec<String> {
+  if vars.volatility.aroused() {
+    DIALOG_SEXIAL_WHILE_HITTING.clone()
+  } else {
     let mut conbo_parts: Vec<Vec<String>> =
       vec![vec!["h2244402……！\\nh1241102\\_w[500]".to_string()]];
     if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
@@ -115,9 +142,11 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
       ]);
     }
     all_combo(&conbo_parts)
-  };
+  }
+}
 
-  let zero_shoulder_down = first_and_other(
+fn zero_shoulder_down(vars: &mut GlobalVariables) -> Vec<String> {
+  first_and_other(
     &mut vars.volatility.touch_info_mut().shoulder,
     vec!["\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
@@ -136,75 +165,49 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
       "
       .to_string(),
     ],
-  );
-
-  let zero_hand_nade = first_and_other(
-    &mut vars.volatility.touch_info_mut().hand,
-    vec![],
-    vec![
-      "\
-      h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
-      ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
-      "
-      .to_string(),
-      "\
-      h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
-      ……それは不毛というものよ。\
-      "
-      .to_string(),
-      "\
-      h1111205\\1彼女の指は長い。
-      h1111210……うん。\\n\
-      "
-      .to_string(),
-    ],
-  );
-
-  match info.as_str() {
-    "0headdoubleclick" => Some(head_hit_dialog(vars)),
-    "0handnade" => Some(zero_hand_nade),
-    "0bustnade" | "0bustdoubleclick" => Some(zero_bust_touch),
-    "0skirtup" => Some(zero_skirt_up),
-    "0shoulderdown" => Some(zero_shoulder_down),
-    _ => None,
-  }
+  )
 }
 
-fn bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
-  let zero_bust_touch_threshold = 12;
-  let mut zero_bust_touch = Vec::new();
-  if !vars.volatility.first_sexial_touch()
-    && vars.volatility.ghost_up_time() < 30
-    && vars.flags().check(&EventFlag::FirstClose)
-  {
-    vars.volatility.set_first_sexial_touch(true);
-    zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
-  } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 {
-    zero_bust_touch.extend(vec![
-      "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
-      "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
-      "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
-      "h1111205気安いのね。あまり好きではないわ。".to_string(),
-      "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。".to_string(),
-    ]);
-  } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 * 2 {
-    zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
-  } else if vars.volatility.touch_count() < zero_bust_touch_threshold {
-    zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
-  } else if vars.volatility.touch_count() == zero_bust_touch_threshold {
-    zero_bust_touch.push(
-      "\
+fn zero_bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
+  if vars.volatility.aroused() {
+    DIALOG_TOUCH_WHILE_HITTING.clone()
+  } else {
+    let zero_bust_touch_threshold = 12;
+    let mut zero_bust_touch = Vec::new();
+    if !vars.volatility.first_sexial_touch()
+      && vars.volatility.ghost_up_time() < 30
+      && vars.flags().check(&EventFlag::FirstClose)
+    {
+      vars.volatility.set_first_sexial_touch(true);
+      zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
+    } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 {
+      zero_bust_touch.extend(vec![
+        "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
+        "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
+        "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
+        "h1111205気安いのね。あまり好きではないわ。".to_string(),
+        "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。"
+          .to_string(),
+      ]);
+    } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 * 2 {
+      zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
+    } else if vars.volatility.touch_count() < zero_bust_touch_threshold {
+      zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
+    } else if vars.volatility.touch_count() == zero_bust_touch_threshold {
+      zero_bust_touch.push(
+        "\
       h1111205\\1触れようとした手先が、霧に溶けた。\\n\
       慌てて引っ込めると、手は元通りになった。\
       h1111201許されていると思ったの？\\n\
       h1111304残念だけど、それほど気は長くないの。\\n\
       h1111310わきまえなさい。"
-        .to_string(),
-    );
-  } else {
-    zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
+          .to_string(),
+      );
+    } else {
+      zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
+    }
+    zero_bust_touch
   }
-  zero_bust_touch
 }
 
 pub fn on_head_hit_cancel(_req: &Request) -> Response {
