@@ -7,7 +7,6 @@ use shiorust::message::{Parser, Request, Response};
 
 pub fn new_mouse_response(info: String) -> Response {
   let vars = get_global_vars();
-  let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
   if info != *vars.volatility.last_touch_info() {
     vars.volatility.set_touch_count(0);
   }
@@ -16,21 +15,16 @@ pub fn new_mouse_response(info: String) -> Response {
     .volatility
     .set_touch_count(vars.volatility.touch_count() + 1);
 
-  match info.as_str() {
-    "0doubleclick" => {
-      return on_menu_exec(&dummy_req);
-    }
-    "0headdoubleclick" => {
-      if !get_global_vars()
+  if info.as_str() == "0doubleclick"
+    || info.as_str() == "0headdoubleclick"
+      && !get_global_vars()
         .flags()
         .check(&EventFlag::FirstRandomTalkDone(
           FIRST_RANDOMTALKS.len() as u32 - 1,
         ))
-      {
-        return on_menu_exec(&dummy_req);
-      }
-    }
-    _ => (),
+  {
+    let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
+    return on_menu_exec(&dummy_req);
   }
 
   match mouse_dialogs(info, vars) {
