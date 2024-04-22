@@ -2,10 +2,8 @@ use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
-use core::fmt::Display;
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
-use std::error;
 
 pub fn new_mouse_response(info: String) -> Response {
   let vars = get_global_vars();
@@ -36,23 +34,15 @@ pub fn new_mouse_response(info: String) -> Response {
   }
 
   match mouse_dialogs(info, vars) {
-    Ok(md) => match md {
-      Some(dialogs) => new_response_with_value(
-        format!(
-          "{}{}",
-          REMOVE_BALLOON_NUM,
-          dialogs[choose_one(&dialogs, true).unwrap()].clone()
-        ),
-        TranslateOption::with_shadow_completion(),
+    Some(dialogs) => new_response_with_value(
+      format!(
+        "{}{}",
+        REMOVE_BALLOON_NUM,
+        dialogs[choose_one(&dialogs, true).unwrap()].clone()
       ),
-      None => new_response_nocontent(),
-    },
-    Err(e) => {
-      error!("Error in mouse_dialogs: {}", e);
-      let mut res = new_response_nocontent();
-      add_error_description(&mut res, &e.to_string());
-      res
-    }
+      TranslateOption::with_shadow_completion(),
+    ),
+    None => new_response_nocontent(),
   }
 }
 
@@ -96,21 +86,18 @@ fn first_and_other(
   result
 }
 
-pub fn mouse_dialogs(
-  info: String,
-  vars: &mut GlobalVariables,
-) -> Result<Option<Vec<String>>, InvalidIndexError> {
+pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
   if vars.volatility.aroused() {
     if info.contains("0bust") {
-      return Ok(Some(DIALOG_SEXIAL_WHILE_HITTING.clone()));
+      return Some(DIALOG_SEXIAL_WHILE_HITTING.clone());
     } else if info.contains("nade") {
-      return Ok(Some(DIALOG_TOUCH_WHILE_HITTING.clone()));
+      return Some(DIALOG_TOUCH_WHILE_HITTING.clone());
     }
   }
 
   match info.as_str() {
-    "0headdoubleclick" => Ok(Some(head_hit(vars)?)),
-    "0handnade" => Ok(Some(first_and_other(
+    "0headdoubleclick" => Some(head_hit(vars)),
+    "0handnade" => Some(first_and_other(
       &mut vars.volatility.touch_info_mut().hand,
       vec![],
       vec![
@@ -130,9 +117,9 @@ pub fn mouse_dialogs(
         "
         .to_string(),
       ],
-    ))),
-    "0bustnade" => Ok(Some(bust_touch(vars))),
-    "0bustdoubleclick" => Ok(Some(bust_touch(vars))),
+    )),
+    "0bustnade" => Some(bust_touch(vars)),
+    "0bustdoubleclick" => Some(bust_touch(vars)),
     "0skirtup" => {
       let mut conbo_parts: Vec<Vec<String>> =
         vec![vec!["h2244402……！\\nh1241102\\_w[500]".to_string()]];
@@ -147,9 +134,9 @@ pub fn mouse_dialogs(
         ]);
       }
       let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
-      Ok(Some(zero_skirt_up))
+      Some(zero_skirt_up)
     }
-    "0shoulderdown" => Ok(Some(first_and_other(
+    "0shoulderdown" => Some(first_and_other(
       &mut vars.volatility.touch_info_mut().shoulder,
       vec!["\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
@@ -158,18 +145,18 @@ pub fn mouse_dialogs(
       .to_string()],
       vec![
         "\
-      h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
-      h1111101……h1111204私はあなたのものじゃないのよ。\\n\
-      "
+        h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
+        h1111101……h1111204私はあなたのものじゃないのよ。\\n\
+        "
         .to_string(),
         "\
-      h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
-      h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
-      "
+        h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
+        h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
+        "
         .to_string(),
       ],
-    ))),
-    _ => Ok(None),
+    )),
+    _ => None,
   }
 }
 
@@ -238,19 +225,17 @@ pub fn on_head_hit(_req: &Request) -> Response {
   new_response_with_value(m, TranslateOption::simple_translate())
 }
 
-pub fn head_hit(vars: &mut GlobalVariables) -> Result<Vec<String>, InvalidIndexError> {
+pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
     vars.flags_mut().done(EventFlag::FirstHitTalkStart);
-    Ok(vec!["\
+    vec!["\
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
     "
-    .to_string()])
+    .to_string()]
   } else if !is_aroused {
-    Ok(vec![
-      "h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string(),
-    ])
+    vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
     // 各段階ごとのセリフ
     let suffixes_list = vec![
@@ -292,12 +277,12 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Result<Vec<String>, InvalidIndexE
       .volatility
       .set_arousing_hit_count(vars.volatility.arousing_hit_count() + 1);
 
-    let (suffixes, is_last) = phased_talks(vars.volatility.arousing_hit_count(), suffixes_list)?;
+    let (suffixes, is_last) = phased_talks(vars.volatility.arousing_hit_count(), suffixes_list);
 
     if is_last {
       vars.volatility.set_arousing_hit_count(0);
       vars.volatility.set_aroused(false);
-      return Ok(suffixes);
+      return suffixes;
     }
 
     let prefixes = [
@@ -309,36 +294,11 @@ pub fn head_hit(vars: &mut GlobalVariables) -> Result<Vec<String>, InvalidIndexE
     for j in 0..suffixes.len() {
       result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixes[j]));
     }
-    Ok(result)
+    result
   }
 }
 
-pub struct InvalidIndexError;
-
-impl std::fmt::Debug for InvalidIndexError {
-  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    write!(f, "invalid index")
-  }
-}
-
-impl Display for InvalidIndexError {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    write!(f, "invalid index")
-  }
-}
-
-impl error::Error for InvalidIndexError {
-  fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-    // Generic error, underlying cause isn't tracked.
-    // 基本となるエラー、原因は記録されていない。
-    None
-  }
-}
-
-pub fn phased_talks(
-  count: u32,
-  phased_talk_list: Vec<Vec<String>>,
-) -> Result<(Vec<String>, bool), InvalidIndexError> {
+pub fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (Vec<String>, bool) {
   let dialog_lengthes = phased_talk_list
     .iter()
     .map(|x| x.len() as u32)
@@ -351,15 +311,12 @@ pub fn phased_talks(
     })
     .collect::<Vec<u32>>();
 
-  for i in 0..dialog_cumsum.len() {
+  for i in 0..dialog_cumsum.len() - 1 {
     if count < dialog_cumsum[i] {
-      return Ok((
-        phased_talk_list[i].clone(),
-        count == *dialog_cumsum.last().unwrap() - 1,
-      ));
+      return (phased_talk_list[i].clone(), false);
     }
   }
-  Err(InvalidIndexError)
+  (phased_talk_list.last().unwrap().to_owned(), true)
 }
 
 const DUMMY_REQUEST: &str = "GET SHIORI/3.0\r\n\
