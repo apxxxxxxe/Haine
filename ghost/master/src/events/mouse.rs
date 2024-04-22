@@ -95,67 +95,77 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
     }
   }
 
-  match info.as_str() {
-    "0headdoubleclick" => Some(head_hit(vars)),
-    "0handnade" => Some(first_and_other(
-      &mut vars.volatility.touch_info_mut().hand,
-      vec![],
-      vec![
-        "\
-        h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
-        ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
-        "
-        .to_string(),
-        "\
-        h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
-        ……それは不毛というものよ。\
-        "
-        .to_string(),
-        "\
-        h1111205\\1彼女の指は長い。
-        h1111210……うん。\\n\
-        "
-        .to_string(),
-      ],
-    )),
-    "0bustnade" => Some(bust_touch(vars)),
-    "0bustdoubleclick" => Some(bust_touch(vars)),
-    "0skirtup" => {
-      let mut conbo_parts: Vec<Vec<String>> =
-        vec![vec!["h2244402……！\\nh1241102\\_w[500]".to_string()]];
-      if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
-        vars.volatility.set_first_sexial_touch(true);
-        conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
-      } else {
-        conbo_parts.push(vec![
-          "h1111204……いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
-          "h1111205……ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
-          "h1111304……悪餓鬼。".to_string(),
-        ]);
-      }
-      let zero_skirt_up: Vec<String> = all_combo(&conbo_parts);
-      Some(zero_skirt_up)
+  let zero_bust_touch = if vars.volatility.aroused() {
+    bust_touch(vars)
+  } else {
+    DIALOG_TOUCH_WHILE_HITTING.clone()
+  };
+
+  let zero_skirt_up = {
+    let mut conbo_parts: Vec<Vec<String>> =
+      vec![vec!["h2244402……！\\nh1241102\\_w[500]".to_string()]];
+    if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
+      vars.volatility.set_first_sexial_touch(true);
+      conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
+    } else {
+      conbo_parts.push(vec![
+        "h1111204……いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
+        "h1111205……ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
+        "h1111304……悪餓鬼。".to_string(),
+      ]);
     }
-    "0shoulderdown" => Some(first_and_other(
-      &mut vars.volatility.touch_info_mut().shoulder,
-      vec!["\
+    all_combo(&conbo_parts)
+  };
+
+  let zero_shoulder_down = first_and_other(
+    &mut vars.volatility.touch_info_mut().shoulder,
+    vec!["\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
       ……h1111206あまりスキンシップは好きじゃないのだけど。\\n\
       "
-      .to_string()],
-      vec![
-        "\
-        h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
-        h1111101……h1111204私はあなたのものじゃないのよ。\\n\
-        "
-        .to_string(),
-        "\
-        h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
-        h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
-        "
-        .to_string(),
-      ],
-    )),
+    .to_string()],
+    vec![
+      "\
+      h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
+      h1111101……h1111204私はあなたのものじゃないのよ。\\n\
+      "
+      .to_string(),
+      "\
+      h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
+      h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
+      "
+      .to_string(),
+    ],
+  );
+
+  let zero_hand_nade = first_and_other(
+    &mut vars.volatility.touch_info_mut().hand,
+    vec![],
+    vec![
+      "\
+      h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
+      ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
+      "
+      .to_string(),
+      "\
+      h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+      ……それは不毛というものよ。\
+      "
+      .to_string(),
+      "\
+      h1111205\\1彼女の指は長い。
+      h1111210……うん。\\n\
+      "
+      .to_string(),
+    ],
+  );
+
+  match info.as_str() {
+    "0headdoubleclick" => Some(head_hit_dialog(vars)),
+    "0handnade" => Some(zero_hand_nade),
+    "0bustnade" | "0bustdoubleclick" => Some(zero_bust_touch),
+    "0skirtup" => Some(zero_skirt_up),
+    "0shoulderdown" => Some(zero_shoulder_down),
     _ => None,
   }
 }
@@ -225,7 +235,7 @@ pub fn on_head_hit(_req: &Request) -> Response {
   new_response_with_value(m, TranslateOption::simple_translate())
 }
 
-pub fn head_hit(vars: &mut GlobalVariables) -> Vec<String> {
+pub fn head_hit_dialog(vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
