@@ -18,7 +18,10 @@ pub fn on_key_press(req: &Request) -> Response {
       )) {
         new_response_nocontent()
       } else if vars.volatility.aroused() {
-        on_head_hit(req)
+        new_response_with_value(
+          "\\![raise,OnMouseDoubleClick,dummy,dummy,dummy,0,head]".to_string(),
+          TranslateOption::none(),
+        )
       } else {
         on_ai_talk(req)
       }
