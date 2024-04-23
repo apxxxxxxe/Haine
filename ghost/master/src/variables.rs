@@ -276,7 +276,6 @@ impl VolatilityVariables {
       touch_info.insert(name.to_string(), info.clone());
       info
     }
-  }
 }
 
 impl Default for VolatilityVariables {
@@ -332,8 +331,13 @@ impl TouchInfo {
     self.last_unixtime = SystemTime::UNIX_EPOCH;
   }
 
-  pub fn count(self) -> u32 {
-    self.count
+  pub fn count(&mut self) -> u32 {
+    if self.last_unixtime.elapsed().unwrap() > TOUCH_RESET_DURATION {
+      self.count = 0;
+      0
+    } else {
+      self.count
+    }
   }
 
   pub fn add(&mut self) {
