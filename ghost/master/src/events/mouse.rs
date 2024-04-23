@@ -7,16 +7,27 @@ use shiorust::message::{Parser, Request, Response};
 
 pub fn new_mouse_response(info: String) -> Response {
   let vars = get_global_vars();
-  if info != *vars.volatility.last_touch_info() {
-    vars.volatility.set_touch_count(0);
-  }
-  vars.volatility.set_last_touch_info(info.clone());
-  vars
-    .volatility
-    .set_touch_count(vars.volatility.touch_count() + 1);
+  let last_touch_info = vars.volatility.last_touch_info();
 
-  if info.as_str() == "0doubleclick"
-    || info.as_str() == "0headdoubleclick"
+  // 同一に扱う
+  let i = if info == "0bustdoubleclick" {
+    "0bustnade".to_string()
+  } else {
+    info
+  };
+
+  if i != last_touch_info.as_str() {
+    if let Some(touch_info) = vars
+      .volatility
+      .touch_info_mut()
+      .get_mut(last_touch_info.as_str())
+    {
+      touch_info.reset();
+    }
+    vars.volatility.set_last_touch_info(i.clone());
+  }
+  if i.as_str() == "0doubleclick"
+    || i.as_str() == "0headdoubleclick"
       && !get_global_vars()
         .flags()
         .check(&EventFlag::FirstRandomTalkDone(
@@ -27,7 +38,7 @@ pub fn new_mouse_response(info: String) -> Response {
     return on_menu_exec(&dummy_req);
   }
 
-  match mouse_dialogs(info, vars) {
+  let response = match mouse_dialogs(i.clone(), vars) {
     Some(dialogs) => new_response_with_value(
       format!(
         "{}{}",
@@ -37,7 +48,17 @@ pub fn new_mouse_response(info: String) -> Response {
       TranslateOption::with_shadow_completion(),
     ),
     None => new_response_nocontent(),
-  }
+  };
+
+  // 一括で回数を増やす
+  vars
+    .volatility
+    .touch_info_mut()
+    .entry(i)
+    .or_insert(TouchInfo::new())
+    .add();
+
+  response
 }
 
 static DIALOG_SEXIAL_WHILE_HITTING: Lazy<Vec<String>> = Lazy::new(|| {
@@ -70,56 +91,44 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
-fn first_and_other(
-  touch_info: &mut TouchInfo,
-  first: Vec<String>,
-  other: Vec<String>,
-) -> Vec<String> {
-  let result = if touch_info.is_reset() { first } else { other };
-  touch_info.add();
-  result
-}
-
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
+  let touch_count = vars.volatility.get_touch_info(info.as_str()).count();
   match info.as_str() {
-    "0headdoubleclick" => Some(head_hit_dialog(vars)),
-    "0handnade" => Some(zero_hand_nade(vars)),
-    "0bustnade" | "0bustdoubleclick" => Some(zero_bust_touch(vars)),
-    "0skirtup" => Some(zero_skirt_up(vars)),
-    "0shoulderdown" => Some(zero_shoulder_down(vars)),
+    "0headdoubleclick" => Some(head_hit_dialog(touch_count, vars)),
+    "0handnade" => Some(zero_hand_nade(touch_count, vars)),
+    "0bustnade" => Some(zero_bust_touch(touch_count, vars)),
+    "0skirtup" => Some(zero_skirt_up(touch_count, vars)),
+    "0shoulderdown" => Some(zero_shoulder_down(touch_count, vars)),
     _ => None,
   }
 }
 
-fn zero_hand_nade(vars: &mut GlobalVariables) -> Vec<String> {
+fn zero_hand_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
-    first_and_other(
-      &mut vars.volatility.touch_info_mut().hand,
-      vec![],
-      vec![
-        "\
+    let dialogs = vec![vec![
+      "\
         h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
         ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
         "
-        .to_string(),
-        "\
+      .to_string(),
+      "\
         h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
         ……それは不毛というものよ。\
         "
-        .to_string(),
-        "\
+      .to_string(),
+      "\
         h1111205\\1彼女の指は長い。
         h1111210……うん。\\n\
         "
-        .to_string(),
-      ],
-    )
+      .to_string(),
+    ]];
+    phased_talks(count, dialogs).0
   }
 }
 
-fn zero_skirt_up(vars: &mut GlobalVariables) -> Vec<String> {
+fn zero_skirt_up(_count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   if vars.volatility.aroused() {
     DIALOG_SEXIAL_WHILE_HITTING.clone()
   } else {
@@ -139,14 +148,17 @@ fn zero_skirt_up(vars: &mut GlobalVariables) -> Vec<String> {
   }
 }
 
-fn zero_shoulder_down(vars: &mut GlobalVariables) -> Vec<String> {
-  first_and_other(
-    &mut vars.volatility.touch_info_mut().shoulder,
-    vec!["\
+fn zero_shoulder_down(count: u32, _vars: &mut GlobalVariables) -> Vec<String> {
+  let dialogs = vec![
+    vec![
+      "\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
       ……h1111206あまりスキンシップは好きじゃないのだけど。\\n\
       "
-    .to_string()],
+      .to_string(),
+      "hogefuga".to_string(),
+      "minute".to_string(),
+    ],
     vec![
       "\
       h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
@@ -154,15 +166,16 @@ fn zero_shoulder_down(vars: &mut GlobalVariables) -> Vec<String> {
       "
       .to_string(),
       "\
-      h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
+          h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
       h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
       "
       .to_string(),
     ],
-  )
+  ];
+  phased_talks(count, dialogs).0
 }
 
-fn zero_bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
+fn zero_bust_touch(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
@@ -174,7 +187,7 @@ fn zero_bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
     {
       vars.volatility.set_first_sexial_touch(true);
       zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
-    } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 {
+    } else if count < zero_bust_touch_threshold / 3 {
       zero_bust_touch.extend(vec![
         "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
         "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
@@ -183,11 +196,11 @@ fn zero_bust_touch(vars: &mut GlobalVariables) -> Vec<String> {
         "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。"
           .to_string(),
       ]);
-    } else if vars.volatility.touch_count() < zero_bust_touch_threshold / 3 * 2 {
+    } else if count < zero_bust_touch_threshold / 3 * 2 {
       zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
-    } else if vars.volatility.touch_count() < zero_bust_touch_threshold {
+    } else if count < zero_bust_touch_threshold {
       zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
-    } else if vars.volatility.touch_count() == zero_bust_touch_threshold {
+    } else if count == zero_bust_touch_threshold {
       zero_bust_touch.push(
         "\
       h1111205\\1触れようとした手先が、霧に溶けた。\\n\
@@ -232,7 +245,7 @@ pub fn on_head_hit(_req: &Request) -> Response {
   new_response_with_value(m, TranslateOption::simple_translate())
 }
 
-pub fn head_hit_dialog(vars: &mut GlobalVariables) -> Vec<String> {
+pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
@@ -280,15 +293,11 @@ pub fn head_hit_dialog(vars: &mut GlobalVariables) -> Vec<String> {
       .to_string()],
     ];
 
-    vars
-      .volatility
-      .set_arousing_hit_count(vars.volatility.arousing_hit_count() + 1);
-
-    let (suffixes, is_last) = phased_talks(vars.volatility.arousing_hit_count(), suffixes_list);
+    let (suffixes, is_last) = phased_talks(count, suffixes_list);
 
     if is_last {
-      vars.volatility.set_arousing_hit_count(0);
       vars.volatility.set_aroused(false);
+      vars.volatility.get_touch_info("0headdoubleclick").reset();
       return suffixes;
     }
 

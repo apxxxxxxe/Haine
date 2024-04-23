@@ -214,8 +214,6 @@ pub struct VolatilityVariables {
 
   pub first_sexial_touch: Mutex<bool>,
 
-  pub touch_count: Mutex<i32>,
-
   pub last_touch_info: Mutex<String>,
 
   pub inserter: Mutex<Inserter>,
@@ -232,13 +230,11 @@ pub struct VolatilityVariables {
 
   pub waiting_talk: Mutex<Option<(String, HashSet<TranslateOption>)>>,
 
-  pub touch_info: Mutex<TouchInfoMap>,
+  pub touch_info: Mutex<HashMap<String, TouchInfo>>,
 
   pub talking_place: Mutex<TalkingPlace>,
 
   pub aroused: Mutex<bool>,
-
-  pub arousing_hit_count: Mutex<u32>,
 }
 
 #[allow(dead_code)]
@@ -254,7 +250,6 @@ impl VolatilityVariables {
   generate_getter_setter!(last_wheel_count_unixtime, SystemTime, cloneable);
   generate_getter_setter!(last_wheel_part, String, cloneable);
   generate_getter_setter!(first_sexial_touch, bool, cloneable);
-  generate_getter_setter!(touch_count, i32, cloneable);
   generate_getter_setter!(last_touch_info, String, cloneable);
   generate_mut_getter!(inserter, Inserter, non_cloneable);
   generate_mut_getter!(talk_bias, TalkBias, non_cloneable);
@@ -268,10 +263,20 @@ impl VolatilityVariables {
     Option<(String, HashSet<TranslateOption>)>,
     cloneable
   );
-  generate_mut_getter!(touch_info, TouchInfoMap, non_cloneable);
+  generate_mut_getter!(touch_info, HashMap<String, TouchInfo>, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
   generate_getter_setter!(aroused, bool, cloneable);
-  generate_getter_setter!(arousing_hit_count, u32, cloneable);
+
+  pub fn get_touch_info(&mut self, name: &str) -> TouchInfo {
+    let mut touch_info = self.touch_info_mut();
+    if let Some(info) = touch_info.get_mut(name) {
+      info.to_owned()
+    } else {
+      let info = TouchInfo::new();
+      touch_info.insert(name.to_string(), info.clone());
+      info
+    }
+  }
 }
 
 impl Default for VolatilityVariables {
@@ -289,7 +294,6 @@ impl Default for VolatilityVariables {
       last_wheel_count_unixtime: Mutex::new(UNIX_EPOCH),
       last_wheel_part: Mutex::new("".to_string()),
       first_sexial_touch: Mutex::new(false),
-      touch_count: Mutex::new(0),
       last_touch_info: Mutex::new("".to_string()),
       inserter: Mutex::new(Inserter::new(22.0)), // "霧の郊外にて"に合わせた値
       talk_bias: Mutex::new(TalkBias::new()),
@@ -298,10 +302,9 @@ impl Default for VolatilityVariables {
       idle_seconds: Mutex::new(0),
       immersive_degrees: Mutex::new(0),
       waiting_talk: Mutex::new(None),
-      touch_info: Mutex::new(TouchInfoMap::new()),
+      touch_info: Mutex::new(HashMap::new()),
       talking_place: Mutex::new(TalkingPlace::LivingRoom),
       aroused: Mutex::new(false),
-      arousing_hit_count: Mutex::new(0),
     }
   }
 }
@@ -309,29 +312,8 @@ impl Default for VolatilityVariables {
 pub const IDLE_THRESHOLD: i32 = 60 * 5;
 
 #[derive(Clone)]
-pub struct TouchInfoMap {
-  pub head: TouchInfo,
-  pub shoulder: TouchInfo,
-  pub bust: TouchInfo,
-  pub hand: TouchInfo,
-  pub skirt: TouchInfo,
-}
-
-impl TouchInfoMap {
-  pub fn new() -> Self {
-    Self {
-      head: TouchInfo::new(),
-      shoulder: TouchInfo::new(),
-      bust: TouchInfo::new(),
-      hand: TouchInfo::new(),
-      skirt: TouchInfo::new(),
-    }
-  }
-}
-
-#[derive(Clone)]
 pub struct TouchInfo {
-  pub count: i32,
+  count: u32,
   pub last_unixtime: SystemTime,
 }
 
@@ -345,9 +327,13 @@ impl TouchInfo {
     }
   }
 
-  pub fn is_reset(&self) -> bool {
-    debug!("elapsed: {:?}", self.last_unixtime.elapsed().unwrap());
-    self.last_unixtime.elapsed().unwrap() > TOUCH_RESET_DURATION
+  pub fn reset(&mut self) {
+    self.count = 0;
+    self.last_unixtime = SystemTime::UNIX_EPOCH;
+  }
+
+  pub fn count(self) -> u32 {
+    self.count
   }
 
   pub fn add(&mut self) {
