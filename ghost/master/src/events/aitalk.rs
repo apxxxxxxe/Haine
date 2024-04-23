@@ -48,8 +48,9 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
 
         ("生前の記録", "\
         h1111206生前のこと、記録に残しているの。h1000000……h1111205このノートに。\\n\
-        ……h1123305まあ、ずいぶん昔のことよ。実感はもうなくなってしまったの。\\n\
-        h1123310今読んでも、他人の伝記を読んでいるようだわ。\\n\
+        ……h1123305まあ、ずいぶん昔のことよ。\\n\
+        自分のものだという実感はもうなくなってしまって、\\n\
+        h1123310今読んでも他人の伝記を読んでいるようだわ。\\n\
         ".to_string(), vec![]),
 
         ("外出できない理由", talk_with_punchline("\
@@ -160,12 +161,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111210今は手軽に写真が撮れていいわね。\\n\
         h1111205印象的な光景を、いつでも手元に残しておける。\\n\
         ……h1111201あら、私？h1121204光栄だけれど、残念ながら写真には写らないわ。\
-        ".to_string(), vec![]),
-
-        ("茶菓子は用意してね", "\
-        h1111210茶葉や茶菓子はあなたが持ってきてね。\\n\
-        h1111206ここにある分は限られているし、私一人では補充する手段がないから。\\n\
-        h1111210あなたが食べられるようなものは、私には用意できないの。\
         ".to_string(), vec![]),
 
         ("霧の力", "\
@@ -589,6 +584,12 @@ pub fn random_talks_analysis() -> String {
 static BOTSU: Lazy<Vec<(&str, String)>> = Lazy::new(|| {
   vec![
 
+    ("茶菓子は用意してね", "\
+    h1111210茶葉や茶菓子はあなたが持ってきてね。\\n\
+    h1111206ここにある分は限られているし、私一人では補充する手段がないから。\\n\
+    h1111210あなたが食べられるようなものは、私には用意できないの。\
+    ".to_string()),
+
     ("不安を書き出す", "\
     h1111204……なにか不安なの？\\n\
     それとも、何が不安かもわからない？\\n\
@@ -808,7 +809,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   if vars.volatility.aroused() {
     vars.volatility.set_aroused(false);
-    vars.volatility.set_arousing_hit_count(0);
+    vars.volatility.get_touch_info("0headdoubleclick").reset();
     let mut talk_parts = vec![vec![
       "h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。".to_string(),
     ]];
