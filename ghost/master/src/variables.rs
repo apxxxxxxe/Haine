@@ -266,16 +266,6 @@ impl VolatilityVariables {
   generate_mut_getter!(touch_info, HashMap<String, TouchInfo>, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
   generate_getter_setter!(aroused, bool, cloneable);
-
-  pub fn get_touch_info(&mut self, name: &str) -> TouchInfo {
-    let mut touch_info = self.touch_info_mut();
-    if let Some(info) = touch_info.get_mut(name) {
-      info.to_owned()
-    } else {
-      let info = TouchInfo::new();
-      touch_info.insert(name.to_string(), info.clone());
-      info
-    }
 }
 
 impl Default for VolatilityVariables {

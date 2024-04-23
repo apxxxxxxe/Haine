@@ -1,4 +1,5 @@
 use crate::events::common::*;
+use crate::get_touch_info;
 use crate::roulette::RouletteCell;
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use core::fmt::{Display, Formatter};
@@ -809,7 +810,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   if vars.volatility.aroused() {
     vars.volatility.set_aroused(false);
-    vars.volatility.get_touch_info("0headdoubleclick").reset();
+    get_touch_info!("0headdoubleclick").reset();
     let mut talk_parts = vec![vec![
       "h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。".to_string(),
     ]];
