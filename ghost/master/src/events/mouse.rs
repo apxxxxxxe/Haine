@@ -5,6 +5,17 @@ use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
 
+#[macro_export]
+macro_rules! get_touch_info {
+  ($info:expr) => {
+    get_global_vars()
+      .volatility
+      .touch_info_mut()
+      .entry($info.to_string())
+      .or_insert($crate::variables::TouchInfo::new())
+  };
+}
+
 pub fn new_mouse_response(info: String) -> Response {
   let vars = get_global_vars();
   let last_touch_info = vars.volatility.last_touch_info();
@@ -92,7 +103,7 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
 });
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
-  let touch_count = vars.volatility.get_touch_info(info.as_str()).count();
+  let touch_count = get_touch_info!(info.as_str()).count();
   match info.as_str() {
     "0headdoubleclick" => Some(head_hit_dialog(touch_count, vars)),
     "0handnade" => Some(zero_hand_nade(touch_count, vars)),
@@ -250,11 +261,13 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
     vars.flags_mut().done(EventFlag::FirstHitTalkStart);
+    get_touch_info!("0headdoubleclick").reset(); // 選択肢だけなのでカウントしない
     vec!["\
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
     "
     .to_string()]
   } else if !is_aroused {
+    get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
   } else {
     // 各段階ごとのセリフ
@@ -297,7 +310,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
 
     if is_last {
       vars.volatility.set_aroused(false);
-      vars.volatility.get_touch_info("0headdoubleclick").reset();
+      get_touch_info!("0headdoubleclick").reset();
       return suffixes;
     }
 
