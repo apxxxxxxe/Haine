@@ -37,7 +37,13 @@ fn talk_with_punchline(text: String, funny_punchline: String) -> String {
   text + "\\n" + &funny_punchline
 }
 
-static BOOK_TOPICS: [(&str, &str); 1] = [("funkcia lingvo", "referenca travidebleco")];
+// esperantoで本のジャンルを記述
+// それっぽければよし
+static BOOK_TOPICS: [(&str, &str); 3] = [
+  ("funkcia lingvo", "referenca travidebleco"), // 関数型言語, 参照透過性
+  ("metafiziko", "ontologio"),                  // 形而上学, 存在論
+  ("harmonio", "konsonanco"),                   // 調和, 一致
+];
 
 fn random_book_topic() -> (&'static str, &'static str) {
   *BOOK_TOPICS.choose(&mut rand::thread_rng()).unwrap()
