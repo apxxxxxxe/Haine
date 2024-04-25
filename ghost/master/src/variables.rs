@@ -306,7 +306,7 @@ pub struct TouchInfo {
   pub last_unixtime: SystemTime,
 }
 
-const TOUCH_RESET_DURATION: Duration = Duration::from_secs(60 * 5);
+const TOUCH_RESET_DURATION: Duration = Duration::from_secs(60 * 3);
 
 impl TouchInfo {
   pub fn new() -> Self {
@@ -319,6 +319,12 @@ impl TouchInfo {
   pub fn reset(&mut self) {
     self.count = 0;
     self.last_unixtime = SystemTime::UNIX_EPOCH;
+  }
+
+  pub fn reset_if_timeover(&mut self) {
+    if self.last_unixtime.elapsed().unwrap() > TOUCH_RESET_DURATION {
+      self.reset();
+    }
   }
 
   pub fn count(&mut self) -> u32 {
