@@ -33,7 +33,7 @@ pub fn new_mouse_response(info: String) -> Response {
       .touch_info_mut()
       .get_mut(last_touch_info.as_str())
     {
-      touch_info.reset();
+      touch_info.reset_if_timeover();
     }
     vars.volatility.set_last_touch_info(i.clone());
   }
