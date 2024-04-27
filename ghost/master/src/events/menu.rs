@@ -35,13 +35,10 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     selections.join("  ")
   );
 
+  let close_button = format!("\\_l[0,11em]\\__q[script:\\e]{}\\__q", Icon::Cross);
   let vars = get_global_vars();
   let m = format!(
-    "\\_q\
-    {}\
-    {}\
-    \\_l[0,11em]\\__q[script:\\e]{}\\__q\
-    ",
+    "\\_q{}{}",
     REMOVE_BALLOON_NUM,
     if !get_global_vars()
       .flags()
@@ -49,7 +46,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         (FIRST_RANDOMTALKS.len() - 1) as u32,
       ))
     {
-      "\\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n".to_string()
+      "\\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n".to_string() + &close_button
     } else {
       format!(
         "\
@@ -62,9 +59,11 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
         \\_l[0,@1.75em]\
         {}\
+        {}\
         \\_l[0,0]{}\
         ",
         talk_interval_selector,
+        close_button,
         show_bar(
           100,
           vars.volatility.immersive_degrees(),
@@ -73,7 +72,6 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         ),
       )
     },
-    Icon::Cross,
   );
 
   new_response_with_value(m, TranslateOption::balloon_surface_only())
