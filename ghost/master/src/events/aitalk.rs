@@ -972,7 +972,7 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
   let user_dialog = refs.get(2).unwrap_or(&"").to_string();
 
   let mut m = String::from("\\C");
-  m += "\\0\\n\\_q─\\w1──\\w1───\\w1─────\\w1────\\w1──\\w1──\\w1─\\w1─\\n\\_w[750]\\_q";
+  m += "\\0\\n\\f[align,center]\\_q─\\w1──\\w1───\\w1─────\\w1────\\w1──\\w1──\\w1─\\w1─\\n\\_w[750]\\_q\\_l[@0,]";
   if !user_dialog.is_empty() {
     m += &format!("\\1『{}』\\_w[500]", user_dialog);
   }
