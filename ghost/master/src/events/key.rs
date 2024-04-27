@@ -1,6 +1,5 @@
 use crate::events::aitalk::{on_ai_talk, random_talks_analysis, FIRST_RANDOMTALKS};
 use crate::events::common::*;
-use crate::events::mouse::on_head_hit;
 use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
 use shiorust::message::{Request, Response};
 
