@@ -2,8 +2,10 @@ use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
 use crate::events::menu::on_menu_exec;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
+use core::fmt::Display;
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
+use std::error;
 
 #[macro_export]
 macro_rules! get_touch_info {
@@ -265,7 +267,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
     vec!["\
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
     "
-    .to_string()]
+    .to_string()])
   } else if !is_aroused {
     get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
     vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
@@ -308,6 +310,8 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
 
     let (suffixes, is_last) = phased_talks(count, suffixes_list);
 
+    let (suffixes, is_last) = phased_talks(vars.volatility.arousing_hit_count(), suffixes_list)?;
+
     if is_last {
       vars.volatility.set_aroused(false);
       get_touch_info!("0headdoubleclick").reset();
@@ -323,7 +327,29 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
     for j in 0..suffixes.len() {
       result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixes[j]));
     }
-    result
+    Ok(result)
+  }
+}
+
+pub struct InvalidIndexError;
+
+impl std::fmt::Debug for InvalidIndexError {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "invalid index")
+  }
+}
+
+impl Display for InvalidIndexError {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    write!(f, "invalid index")
+  }
+}
+
+impl error::Error for InvalidIndexError {
+  fn source(&self) -> Option<&(dyn error::Error + 'static)> {
+    // Generic error, underlying cause isn't tracked.
+    // 基本となるエラー、原因は記録されていない。
+    None
   }
 }
 
