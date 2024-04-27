@@ -1,5 +1,5 @@
 use crate::autobreakline::Inserter;
-use crate::events::aitalk::{TalkType, TalkingPlace};
+use crate::events::aitalk::{random_talks, TalkType, TalkingPlace};
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::roulette::TalkBias;
@@ -123,6 +123,8 @@ impl GlobalVariables {
       self.set_flags(vars.flags());
     }
 
+    self.delete_undefined_talks();
+
     Ok(())
   }
 
@@ -130,6 +132,21 @@ impl GlobalVariables {
     let json_str_indent = serde_json::to_string_pretty(&self)?;
     std::fs::write(VAR_PATH, json_str_indent)?;
     Ok(())
+  }
+
+  fn delete_undefined_talks(&mut self) {
+    let mut talk_collection = self.talk_collection_mut();
+    for (k, v) in talk_collection.iter_mut() {
+      let talk_ids = random_talks(*k)
+        .iter()
+        .map(|t| t.id.to_string())
+        .collect::<HashSet<String>>();
+      for talk_id in v.clone() {
+        if !talk_ids.contains(&talk_id) {
+          v.remove(&talk_id);
+        }
+      }
+    }
   }
 
   generate_getter_setter!(total_time, Option<u64>, cloneable);
