@@ -108,9 +108,14 @@ pub fn new_response_with_value(value: String, option: HashSet<TranslateOption>) 
     value
   };
 
+  let mut v = balloon_completion + v.as_str();
+  // \\Cが含まれているなら文頭に\\Cを補完
+  if v.contains("\\C") {
+    v = format!("\\C{}", v.replace("\\C", ""));
+  }
+
   let mut r = new_response();
-  r.headers
-    .insert(HeaderName::from("Value"), balloon_completion + v.as_str());
+  r.headers.insert(HeaderName::from("Value"), v);
   r
 }
 

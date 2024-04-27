@@ -130,11 +130,6 @@ fn translate_whole(text: String) -> String {
   let vars = get_global_vars();
   translated = translated.replace("{user_name}", &vars.user_name().clone().unwrap());
 
-  // \\Cが含まれているなら文頭に\\Cを補完
-  if translated.contains("\\C") {
-    translated = format!("\\C{}", translated.replace("\\C", ""));
-  }
-
   translated
 }
 
