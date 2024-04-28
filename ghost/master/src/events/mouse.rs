@@ -167,8 +167,6 @@ fn zero_shoulder_down(count: u32, _vars: &mut GlobalVariables) -> Vec<String> {
       ……h1111206あまりスキンシップは好きじゃないのだけど。\\n\
       "
       .to_string(),
-      "hogefuga".to_string(),
-      "minute".to_string(),
     ],
     vec![
       "\
