@@ -234,9 +234,9 @@ pub fn on_head_hit_cancel(_req: &Request) -> Response {
 pub fn on_head_hit(_req: &Request) -> Response {
   to_aroused();
   let m = "\\t\\*\
-    h1111201あら、話す気に……h1121414っ！？\\n\
+    h1111201あら、話す気に……h1000000っ！？\\n\
     \\1半ば衝動的に、彼女を突き飛ばした。\\n\
-    h1112401\\1それは嫌悪からだ。\\n\
+    \\0\\![bind,ex,流血,1]h1112401\\1それは嫌悪からだ。\\n\
     私を受け入れるようなそぶりを見せながら、\\n\
     同時に私を助けないと嘯く傲慢さ。\\n\
     そして何よりも、理性的な物言いをしておきながら一欠片も倫理の匂いを感じさせない態度に、毒虫にも似た嫌悪感を感じたのだ。\\n\
@@ -266,7 +266,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
     .to_string()]
   } else if !is_aroused {
     get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
-    vec!["h1121414痛っ……\\nh1311204あら、その気になってくれた？".to_string()]
+    vec!["h1000000痛っ……\\n\\0\\![bind,ex,流血,1]h1311204あら、その気になってくれた？".to_string()]
   } else {
     // 各段階ごとのセリフ
     let suffixes_list = vec![
@@ -276,7 +276,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
         "h1221104ひどい。h1221110ひどいわ。\\nh1322513癖になってしまったらどうするの？".to_string(),
       ],
       vec![
-        "h1311204あは、ずきずきする。\\nh1311307血は通っていないはずなのに、脈打ってる。"
+        "h1311204あは、ずきずきする。\\nh1311307もはや血は通っていないはずなのに、脈打ってる。"
           .to_string(),
         "h1311104ああ、痛い。h1321407痛いのがいいの。".to_string(),
         "h1321104目の奥が痛むわ。\\nh1321207容赦がないの、好きよ。".to_string(),
@@ -298,7 +298,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
       うふ、ふふふ。\\n\
       h1211308よかったわ、とても。\\n\
       \\n\
-      h1211310………………h1111310ふー。\\n\
+      h1211310………………\\0\\![bind,ex,流血,0]h1111310ふー。\\n\
       h1111205\\1……落ち着いたようだ。\\n\
       "
       .to_string()],

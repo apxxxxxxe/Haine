@@ -899,7 +899,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.set_aroused(false);
     get_touch_info!("0headdoubleclick").reset();
     let mut talk_parts = vec![vec![
-      "h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。".to_string(),
+      "\\0\\![bind,ex,流血,0]h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。".to_string(),
     ]];
     talk_parts.push(if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
       vars.flags_mut().done(EventFlag::FirstHitTalkDone);
