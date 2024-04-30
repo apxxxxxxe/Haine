@@ -727,3 +727,5 @@ characters:
       animation800100.pattern0,overlayfast,60002,0,0
       animation801000.interval,bind
       animation801000.pattern0,overlayfast,2,0,0
+      animation500601.interval,bind
+      animation500601.pattern0,overlay,110,0,0,0
