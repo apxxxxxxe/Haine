@@ -3,6 +3,7 @@ use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
+use once_cell::sync::Lazy;
 use std::collections::HashSet;
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
@@ -214,15 +215,130 @@ fn complete_shadow(is_complete: bool) -> String {
   }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+enum BlinkType {
+  Open,
+  Half,
+  Quarter,
+  Close,
+  Here,
+  Down,
+  There,
+}
+
+struct BlinkTransition {
+  base: i32,
+  types: Vec<BlinkType>,
+  to_close: Vec<i32>,
+}
+
+impl BlinkTransition {
+  const OPEN_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 1,
+    types: vec![BlinkType::Open, BlinkType::Here],
+    to_close: vec![4, 7],
+  });
+  const OPEN_DOWN: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 2,
+    types: vec![BlinkType::Open, BlinkType::Down],
+    to_close: vec![5, 8],
+  });
+  const OPEN_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 3,
+    types: vec![BlinkType::Open, BlinkType::There],
+    to_close: vec![6, 9],
+  });
+  const HALF_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 4,
+    types: vec![BlinkType::Half, BlinkType::Here],
+    to_close: vec![7],
+  });
+  const HALF_DOWN: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 5,
+    types: vec![BlinkType::Half, BlinkType::Down],
+    to_close: vec![8],
+  });
+  const HALF_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 6,
+    types: vec![BlinkType::Half, BlinkType::There],
+    to_close: vec![9],
+  });
+  const QUARTER_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 7,
+    types: vec![BlinkType::Quarter, BlinkType::Here],
+    to_close: vec![],
+  });
+  const QUARTER_DOWN: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 8,
+    types: vec![BlinkType::Quarter, BlinkType::Down],
+    to_close: vec![],
+  });
+  const QUARTER_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 9,
+    types: vec![BlinkType::Quarter, BlinkType::There],
+    to_close: vec![],
+  });
+  const CLOSE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 10,
+    types: vec![BlinkType::Close],
+    to_close: vec![],
+  });
+  const SMILE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 11,
+    types: vec![BlinkType::Close],
+    to_close: vec![],
+  });
+  const SURPRISED: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 12,
+    types: vec![BlinkType::Open],
+    to_close: vec![],
+  });
+  const IRONIC_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 13,
+    types: vec![BlinkType::Open, BlinkType::Here],
+    to_close: vec![4, 7],
+  });
+  const SURPRISED_HALF: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 14,
+    types: vec![BlinkType::Half, BlinkType::Here],
+    to_close: vec![11],
+  });
+  const IRONIC_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
+    base: 15,
+    types: vec![BlinkType::Open, BlinkType::There],
+    to_close: vec![6, 9],
+  });
+
+  fn all() -> Vec<Lazy<Self>> {
+    vec![
+      BlinkTransition::OPEN_HERE,
+      BlinkTransition::OPEN_DOWN,
+      BlinkTransition::OPEN_THERE,
+      BlinkTransition::HALF_HERE,
+      BlinkTransition::HALF_DOWN,
+      BlinkTransition::HALF_THERE,
+      BlinkTransition::QUARTER_HERE,
+      BlinkTransition::QUARTER_DOWN,
+      BlinkTransition::QUARTER_THERE,
+      BlinkTransition::CLOSE,
+      BlinkTransition::SMILE,
+      BlinkTransition::SURPRISED,
+      BlinkTransition::IRONIC_HERE,
+      BlinkTransition::SURPRISED_HALF,
+      BlinkTransition::IRONIC_THERE,
+    ]
+  }
+}
+
 // サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
 pub fn on_smooth_blink(req: &Request) -> Response {
+  let transitions = BlinkTransition::all();
   const DELAY: i32 = 100;
   const CLOSE_EYES_INDEX: i32 = 10;
-  const SMILE_EYES_INDEX: i32 = 11;
-  const EYE_DIRECTION_NUM: i32 = 3; //こっち、下、あっち
   const EYE_INDEX_DIGIT: u32 = 2;
   let eye_index_digit_pow = 10_i32.pow(EYE_INDEX_DIGIT);
 
+  let mut err = String::new();
   let refs = get_references(req);
   let dest_surface = refs[0].parse::<i32>().unwrap();
   let is_complete = refs[1].parse::<i32>().unwrap() == 1;
@@ -230,52 +346,32 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let dest_remain = dest_surface - dest_eyes;
   let from_surface = get_global_vars().volatility.current_surface();
   let from_eyes = from_surface % eye_index_digit_pow;
-  let is_close_eyes = |i: i32| -> bool { i == SMILE_EYES_INDEX || i == CLOSE_EYES_INDEX };
 
-  if from_surface == dest_surface {
-    return new_response_nocontent();
-  }
-
-  if !(1..=SMILE_EYES_INDEX).contains(&from_eyes) || !(1..=SMILE_EYES_INDEX).contains(&dest_eyes) {
+  if from_eyes == 0 || dest_eyes == 0 {
     return new_response_with_value(
       format!("\\s[{}]{}", dest_surface, complete_shadow(is_complete)),
       TranslateOption::none(),
     );
   }
+  if from_surface == dest_surface {
+    return new_response_nocontent();
+  }
 
   let mut cuts = vec![from_surface];
-  if is_close_eyes(from_eyes) && !is_close_eyes(dest_eyes) {
-    //直前が目閉じかつ目標が開き目の場合
-    cuts.extend(from_close(
-      dest_eyes,
-      dest_remain,
-      EYE_DIRECTION_NUM,
-      CLOSE_EYES_INDEX,
-    ));
-  } else if !is_close_eyes(from_eyes) && is_close_eyes(dest_eyes) {
-    // 直前が開き目かつ目標が目閉じの場合
-    cuts.extend(to_close(
-      from_eyes,
-      dest_remain,
-      EYE_DIRECTION_NUM,
-      CLOSE_EYES_INDEX,
-    ));
-  } else if from_eyes % EYE_DIRECTION_NUM != dest_eyes % EYE_DIRECTION_NUM {
-    // 直前と目標の目線方向が違う場合）
-    cuts.extend(to_close(
-      from_eyes,
-      dest_remain,
-      EYE_DIRECTION_NUM,
-      CLOSE_EYES_INDEX,
-    ));
-    cuts.push(dest_remain + CLOSE_EYES_INDEX);
-    cuts.extend(from_close(
-      dest_eyes,
-      dest_remain,
-      EYE_DIRECTION_NUM,
-      CLOSE_EYES_INDEX,
-    ));
+  if let Some(from) = transitions.iter().find(|t| t.base == from_eyes) {
+    if let Some(dest) = transitions.iter().find(|t| t.base == dest_eyes) {
+      cuts.extend(from.to_close.clone().iter().map(|i| dest_remain + i));
+      if !from.types.contains(&BlinkType::Close) && !dest.types.contains(&BlinkType::Close) {
+        cuts.push(dest_remain + CLOSE_EYES_INDEX);
+      }
+      cuts.extend(dest.to_close.clone().iter().rev().map(|i| dest_remain + i));
+    } else {
+      err = format!("目線の変更先が不正です: {}", dest_eyes);
+    }
+  } else {
+    err = format!("目線の変更元が不正です: {}", from_eyes);
   }
+
   cuts.push(dest_surface);
 
   let delay = format!("\\_w[{}]", DELAY);
@@ -285,35 +381,12 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
-  new_response_with_value(animation, TranslateOption::none())
-}
-
-fn to_close(
-  from_eyes: i32,
-  dest_remain: i32,
-  eye_direction_num: i32,
-  close_eyes_index: i32,
-) -> Vec<i32> {
-  let mut res = vec![];
-  let mut i = from_eyes + eye_direction_num;
-  while i < close_eyes_index {
-    res.push(dest_remain + i);
-    i += eye_direction_num;
-  }
-  res
-}
-
-fn from_close(
-  dest_eyes: i32,
-  dest_remain: i32,
-  eye_direction_num: i32,
-  close_eyes_index: i32,
-) -> Vec<i32> {
-  let mut res = vec![];
-  let mut i = dest_eyes + eye_direction_num;
-  while i < close_eyes_index {
-    res.insert(0, dest_remain + i);
-    i += eye_direction_num;
+  let mut res = new_response_with_value(animation, TranslateOption::none());
+  if !err.is_empty() {
+    add_error_description(
+      &mut res,
+      format!("まばたき補完中にエラーが発生しました: {}", err).as_str(),
+    );
   }
   res
 }
