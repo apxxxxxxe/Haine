@@ -27,16 +27,12 @@ cp -Verbose -Force $PSScriptRoot\ghost\master\target\i686-pc-windows-msvc\releas
 # カレントディレクトリ以下の.rsファイルから、7文字の数字をすべて検索し、リスト化する
 $files = Get-ChildItem -Path $PSScriptRoot\ghost\master\src -Filter *.rs -Recurse | ForEach-Object {
   $content = Get-Content $_.FullName -Raw
-  $matches = [Regex]::Matches($content, '\d{5}0[1-9]|\d{5}10|\d{7}')
+  $matches = [Regex]::Matches($content, '\d{7}')
   $matches | ForEach-Object {
-    if ($_.Value -match '\d{5}0[1-9]|\d{5}1[01]') {
-      $baseNumber = $_.Value.Substring(0, 5)
-      $lastTwoDigits = $_.Value.Substring(5)
-      1..11 | ForEach-Object {
-        $baseNumber + $_.ToString("00")
-      }
-    } else {
-      $_.Value
+    $baseNumber = $_.Value.Substring(0, 5)
+    $lastTwoDigits = $_.Value.Substring(5)
+    1..15 | ForEach-Object {
+      $baseNumber + $_.ToString("00")
     }
   }
 }
