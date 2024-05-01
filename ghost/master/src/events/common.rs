@@ -9,7 +9,7 @@ use std::collections::HashSet;
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
 pub const REMOVE_BALLOON_NUM: &str = "\\0\\![set,balloonnum,,,]";
-
+pub const RESET_BINDS: &str = "\\![bind,シルエット,,0]\\![bind,ex,,0]";
 pub const STICK_SURFACE: &str = "\
   \\C\
   \\1\

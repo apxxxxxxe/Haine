@@ -222,8 +222,9 @@ pub fn on_boot(_req: &Request) -> Response {
       .to_string()],
     ]);
     let v = format!(
-      "\\0\\s[{}]\\![bind,シルエット,,0]\\![bind,ex,,0]\\![embed,OnStickSurface]{}{}",
+      "\\0\\s[{}]{}\\![embed,OnStickSurface]{}{}",
       TRANSPARENT_SURFACE,
+      RESET_BINDS,
       randomize_underwear(),
       talks[choose_one(&talks, false).unwrap()],
     );
@@ -235,21 +236,24 @@ pub fn on_close(_req: &Request) -> Response {
   let vars = get_global_vars();
   if !vars.flags().check(&EventFlag::FirstClose) {
     vars.flags_mut().done(EventFlag::FirstClose);
-    let v = "\
-    h1111201あら、今日はやめるの？h1111204そう。\\n\
-    ならば、送っていきましょう。\\n\
-    h1111210安心しなさい、他意などないわ。\\n\
-    \\n\
-    h1141101逃がして良いのかって？h1121204それ、自分で聞くの？\\n\
-    h1111210まあいいわ。h1111204ええ、良いのよ。あなたはきっとまた来る。\\n\
-    h1111205カンテルベリオの幽霊の────この私のもとへ。\\n\
-    だから良いのよ。\\n\
-    \\n\
-    h1111204さあ、もう行きなさい。\\n\
-    h1111210良い夢を、ユーザ。\
-    "
-    .to_string();
-    return new_response_with_value(v + "\\-", TranslateOption::simple_translate());
+    let v = format!(
+      "\
+      {}
+      h1111201あら、今日はやめるの？h1111204そう。\\n\
+      ならば、送っていきましょう。\\n\
+      h1111210安心しなさい、他意などないわ。\\n\
+      \\n\
+      h1141101逃がして良いのかって？h1121204それ、自分で聞くの？\\n\
+      h1111210まあいいわ。h1111204ええ、良いのよ。あなたはきっとまた来る。\\n\
+      h1111205カンテルベリオの幽霊の────この私のもとへ。\\n\
+      だから良いのよ。\\n\
+      \\n\
+      h1111204さあ、もう行きなさい。\\n\
+      h1111210良い夢を、ユーザ。\
+      \\-",
+      RESET_BINDS
+    );
+    return new_response_with_value(v, TranslateOption::simple_translate());
   }
   let talks = all_combo(&vec![
     vec!["h1111210".to_string(), "h1111211".to_string()],
@@ -264,7 +268,11 @@ pub fn on_close(_req: &Request) -> Response {
     vec!["がありますように。\\nh1111204またね、{user_name}。\\_w[1200]".to_string()],
   ]);
   new_response_with_value(
-    talks[choose_one(&talks, true).unwrap()].clone() + "\\-",
+    format!(
+      "{}{}\\-",
+      RESET_BINDS,
+      talks[choose_one(&talks, true).unwrap()].clone()
+    ),
     TranslateOption::simple_translate(),
   )
 }
