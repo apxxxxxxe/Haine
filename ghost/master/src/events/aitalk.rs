@@ -102,7 +102,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         h1111205……まあ、強いからといって良いことばかりでもないの。\\n\
         ".to_string(),
         "\
-        h1111203霊にも社会があってね。h1111515ノブレス・オブリージュというわけ。\
+        h1111203霊にも社会があってね。\\n\
+        h1111515ノブレス・オブリージュというわけ。\
         ".to_string()), vec![]),
 
         ("低級霊との契約", talk_with_punchline("\
