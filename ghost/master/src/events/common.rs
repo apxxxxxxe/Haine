@@ -3,7 +3,6 @@ use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
-use once_cell::sync::Lazy;
 use std::collections::HashSet;
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
@@ -231,114 +230,98 @@ struct BlinkTransition {
 }
 
 impl BlinkTransition {
-  const OPEN_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 1,
-    is_closed: false,
-    direction: BlinkDirection::Here,
-    to_close: vec![4, 7],
-  });
-  const OPEN_DOWN: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 2,
-    is_closed: false,
-    direction: BlinkDirection::Down,
-    to_close: vec![5, 8],
-  });
-  const OPEN_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 3,
-    is_closed: false,
-    direction: BlinkDirection::There,
-    to_close: vec![6, 9],
-  });
-  const HALF_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 4,
-    is_closed: false,
-    direction: BlinkDirection::Here,
-    to_close: vec![7],
-  });
-  const HALF_DOWN: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 5,
-    is_closed: false,
-    direction: BlinkDirection::Down,
-    to_close: vec![8],
-  });
-  const HALF_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 6,
-    is_closed: false,
-    direction: BlinkDirection::There,
-    to_close: vec![9],
-  });
-  const QUARTER_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 7,
-    is_closed: false,
-    direction: BlinkDirection::Here,
-    to_close: vec![],
-  });
-  const QUARTER_DOWN: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 8,
-    is_closed: false,
-    direction: BlinkDirection::Down,
-    to_close: vec![],
-  });
-  const QUARTER_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 9,
-    is_closed: false,
-    direction: BlinkDirection::There,
-    to_close: vec![],
-  });
-  const CLOSE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 10,
-    is_closed: true,
-    direction: BlinkDirection::None,
-    to_close: vec![],
-  });
-  const SMILE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 11,
-    is_closed: true,
-    direction: BlinkDirection::None,
-    to_close: vec![],
-  });
-  const SURPRISED: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 12,
-    is_closed: false,
-    direction: BlinkDirection::None,
-    to_close: vec![],
-  });
-  const IRONIC_HERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 13,
-    is_closed: false,
-    direction: BlinkDirection::Here,
-    to_close: vec![4, 7],
-  });
-  const SURPRISED_HALF: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 14,
-    is_closed: false,
-    direction: BlinkDirection::Here,
-    to_close: vec![11],
-  });
-  const IRONIC_THERE: Lazy<Self> = Lazy::new(|| BlinkTransition {
-    base: 15,
-    is_closed: false,
-    direction: BlinkDirection::There,
-    to_close: vec![6, 9],
-  });
-
-  fn all() -> Vec<Lazy<Self>> {
+  fn all() -> Vec<Self> {
     vec![
-      BlinkTransition::OPEN_HERE,
-      BlinkTransition::OPEN_DOWN,
-      BlinkTransition::OPEN_THERE,
-      BlinkTransition::HALF_HERE,
-      BlinkTransition::HALF_DOWN,
-      BlinkTransition::HALF_THERE,
-      BlinkTransition::QUARTER_HERE,
-      BlinkTransition::QUARTER_DOWN,
-      BlinkTransition::QUARTER_THERE,
-      BlinkTransition::CLOSE,
-      BlinkTransition::SMILE,
-      BlinkTransition::SURPRISED,
-      BlinkTransition::IRONIC_HERE,
-      BlinkTransition::SURPRISED_HALF,
-      BlinkTransition::IRONIC_THERE,
+      BlinkTransition {
+        base: 1,
+        is_closed: false,
+        direction: BlinkDirection::Here,
+        to_close: vec![4, 7],
+      },
+      BlinkTransition {
+        base: 2,
+        is_closed: false,
+        direction: BlinkDirection::Down,
+        to_close: vec![5, 8],
+      },
+      BlinkTransition {
+        base: 3,
+        is_closed: false,
+        direction: BlinkDirection::There,
+        to_close: vec![6, 9],
+      },
+      BlinkTransition {
+        base: 4,
+        is_closed: false,
+        direction: BlinkDirection::Here,
+        to_close: vec![7],
+      },
+      BlinkTransition {
+        base: 5,
+        is_closed: false,
+        direction: BlinkDirection::Down,
+        to_close: vec![8],
+      },
+      BlinkTransition {
+        base: 6,
+        is_closed: false,
+        direction: BlinkDirection::There,
+        to_close: vec![9],
+      },
+      BlinkTransition {
+        base: 7,
+        is_closed: false,
+        direction: BlinkDirection::Here,
+        to_close: vec![],
+      },
+      BlinkTransition {
+        base: 8,
+        is_closed: false,
+        direction: BlinkDirection::Down,
+        to_close: vec![],
+      },
+      BlinkTransition {
+        base: 9,
+        is_closed: false,
+        direction: BlinkDirection::There,
+        to_close: vec![],
+      },
+      BlinkTransition {
+        base: 10,
+        is_closed: true,
+        direction: BlinkDirection::None,
+        to_close: vec![],
+      },
+      BlinkTransition {
+        base: 11,
+        is_closed: true,
+        direction: BlinkDirection::None,
+        to_close: vec![],
+      },
+      BlinkTransition {
+        base: 12,
+        is_closed: false,
+        direction: BlinkDirection::None,
+        to_close: vec![],
+      },
+      BlinkTransition {
+        base: 13,
+        is_closed: false,
+        direction: BlinkDirection::Here,
+        to_close: vec![4, 7],
+      },
+      BlinkTransition {
+        base: 14,
+        is_closed: false,
+        direction: BlinkDirection::Here,
+        to_close: vec![11],
+      },
+      BlinkTransition {
+        base: 15,
+        is_closed: false,
+        direction: BlinkDirection::There,
+        to_close: vec![6, 9],
+      },
     ]
   }
 }
