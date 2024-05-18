@@ -175,6 +175,7 @@ pub enum EventFlag {
   FirstClose,
   FirstHitTalkStart,
   FirstHitTalkDone,
+  LoreTalkUnlock,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
