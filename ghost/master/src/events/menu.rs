@@ -340,5 +340,5 @@ pub fn on_check_unseen_talks(req: &Request) -> Response {
 
   register_talk_collection(&choosed_talk);
 
-  new_response_with_value(choosed_talk.text, TranslateOption::with_shadow_completion())
+  new_response_with_value(choosed_talk.consume(), TranslateOption::with_shadow_completion())
 }
