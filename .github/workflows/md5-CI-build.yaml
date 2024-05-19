@@ -12,6 +12,7 @@ concurrency:
 
 env:
   DLL_NAME: haine
+  SM_VERSION: v0.3.0
 
 jobs:
   build:
@@ -37,10 +38,10 @@ jobs:
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
 
       - name: Install Go dependencies
-        run: go install github.com/apxxxxxxe/surfaces-mixer@latest
+        run: go install github.com/apxxxxxxe/surfaces-mixer@${{ env.SM_VERSION }}
 
       - name: release-build
         shell: pwsh

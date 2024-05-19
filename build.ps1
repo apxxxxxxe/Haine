@@ -11,7 +11,7 @@ if (!(Get-Command "cargo" -ErrorAction SilentlyContinue)) {
 if (!(Get-Command "surfaces-mixer" -ErrorAction SilentlyContinue)) {
     Write-Host "surfaces-mixer is not installed"
     Write-Host "Please install surfaces-mixer using the following command"
-    Write-Host "go install github.com/apxxxxxxe/surfaces-mixer@latest"
+    Write-Host "go install github.com/apxxxxxxe/surfaces-mixer@v0.3.0"
     $isRequirementsInstalled = $false
 }
 
