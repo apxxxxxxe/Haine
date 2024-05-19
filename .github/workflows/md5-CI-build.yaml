@@ -36,10 +36,10 @@ jobs:
 
       - name: Setup Go ${{ matrix.go-version }}
         uses: actions/setup-go@v4
-
-      - name: Install Go dependencies
         with:
           go-version: 1.19
+
+      - name: Install Go dependencies
         run: go install github.com/apxxxxxxe/surfaces-mixer@latest
 
       - name: release-build
