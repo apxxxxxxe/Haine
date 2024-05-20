@@ -1,4 +1,4 @@
-use crate::events::aitalk::TalkingPlace;
+use crate::events::aitalk::{TalkType, TalkingPlace};
 use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
@@ -425,6 +425,16 @@ impl Icon {
       Icon::Cross => 901,
     }
   }
+}
+
+pub fn render_achievement_message(talk_type: TalkType) -> String {
+  format!(
+    "\\1\\![quicksection,1]\
+    \\f[align,center]\\f[valign,center]\\f[bold,1]\
+    トークカテゴリ「{}」が解放された。\
+    \\f[default]",
+    talk_type
+  )
 }
 
 #[cfg(test)]

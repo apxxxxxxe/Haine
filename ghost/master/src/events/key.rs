@@ -1,4 +1,4 @@
-use crate::events::aitalk::{on_ai_talk, random_talks_analysis, FIRST_RANDOMTALKS};
+use crate::events::aitalk::{on_ai_talk, random_talks_analysis, TalkType, FIRST_RANDOMTALKS};
 use crate::events::common::*;
 use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
 use shiorust::message::{Request, Response};
@@ -36,6 +36,11 @@ pub fn on_key_press(req: &Request) -> Response {
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(1));
       vars.flags_mut().delete(EventFlag::FirstClose);
       vars.flags_mut().delete(EventFlag::FirstHitTalkDone);
+      for talk_type in TalkType::all() {
+        vars
+          .flags_mut()
+          .delete(EventFlag::TalkTypeUnlock(talk_type));
+      }
       new_response_with_value(
         format!("\\![change,ghost,{}]", GHOST_NAME),
         TranslateOption::none(),

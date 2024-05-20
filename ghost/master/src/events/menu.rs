@@ -301,13 +301,18 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
   let mut sum = 0;
   let mut all_sum = 0;
   let talk_collection = get_global_vars().talk_collection_mut();
-  for talk_type in TalkType::all() {
-    let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
-    let all_len = random_talks(talk_type).len();
+  let vars = get_global_vars();
+  for talk_type in TalkType::all()
+    .iter()
+    .filter(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(**t)))
+    .collect::<Vec<_>>()
+  {
+    let len = talk_collection.get(talk_type).map_or(0, |v| v.len());
+    let all_len = random_talks(*talk_type).len();
     let anal = if len < all_len {
       format!(
         "\\q[未読トーク再生,OnCheckUnseenTalks,{}]",
-        talk_type as u32
+        *talk_type as u32
       )
     } else {
       "".to_string()
@@ -340,5 +345,8 @@ pub fn on_check_unseen_talks(req: &Request) -> Response {
 
   register_talk_collection(&choosed_talk);
 
-  new_response_with_value(choosed_talk.consume(), TranslateOption::with_shadow_completion())
+  new_response_with_value(
+    choosed_talk.consume(),
+    TranslateOption::with_shadow_completion(),
+  )
 }

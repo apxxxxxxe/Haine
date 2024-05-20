@@ -145,7 +145,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             "h1111206……つまり、彼らのように霊力が弱ければ、\\n\
             誰かさんにべたべたと触られることもなかったということね。\
             ".to_string()),
-          required_flags: vec![],
+          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -176,7 +176,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ".to_string(),
             "\
             ".to_string()),
-          required_flags: vec![],
+          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -214,7 +214,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1113204少し形は違えど、あなたもその一人ね。\\n\
             h1113211期待しているわ、{user_name}。\
             ".to_string(),
-          required_flags: vec![],
+          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -230,7 +230,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1121206……他人の魂を玩具になんてしないわよ。\\n\
             h1121301勘違いしているようだけど、私にそんな嗜好はないわ。\
             ".to_string()),
-          required_flags: vec![],
+          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -325,7 +325,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204あなたの価値は、その自由意志。\\n\
             h1111210ここは予想通りなものばかりで退屈なの。\
             ".to_string(),
-          required_flags: vec![],
+          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -366,17 +366,23 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         // 死にまつわるロアへの興味についてのイントロトーク
         RandomTalk {
           id: "死に対する興味",
-          text: "\
+          text: format!("\
             h1111201死について。深く考えることはある？\\n\
             h1111206……あなたには聞くまでもないようね。\\n\
             h1111205私もそう。\\n\
             生きていたころから、なぜ生きるのか、死ぬとはどういうことかをずっと考えていたわ。\\n\
             いくつか不思議な話を知っているの。\\n\
-            話の種に、いくつか語ってみましょうか。\
-            ".to_string(),
+            話の種に、いくつか語ってみましょうか。{}\
+            ",
+            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Lore)) {
+              render_achievement_message(TalkType::Lore)
+            } else {
+              "".to_string()
+            },
+            ),
             required_flags: vec![],
             callback: Some(|| {
-                get_global_vars().flags_mut().done(EventFlag::LoreTalkUnlock);
+                get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
             }),
         },
 
@@ -390,7 +396,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             彼らにとって、境界線といえばまず川が連想されたのかしら。\\n\
             h1111210あなたなら、あの世とこの世の間にはなにがあると思う？\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -405,7 +411,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1111201呆れるほどに多彩で、\\n\
             身近に根ざした感情の象徴だわ。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -423,7 +429,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204神が起こした奇跡として大切に扱われることもあるの。\\n\
             ……どちらにせよ、ふつうの葬送は望めなさそうね。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -438,7 +444,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あるいは夢枕に立って生命を吸い取るという民話は、\\n\
             そんな様子に理由をつけるためのものじゃないかしら。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -450,7 +456,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             乾燥して縮むから、皮膚の下の髪や爪が露出する。\\n\
             それがまるで生長しているように見えたの。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -463,7 +469,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210あなたも墓地を歩くときは気をつけて……って、\\n\
             h1111204あなたの住む場所にそんなところは少ないかしら。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -475,7 +481,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ときに命を落としていることもあるわね。\\n\
             ……h1113101求めるのは間違ったことなのかしら？\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -487,7 +493,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あの現象は、\\_a[Misemono,どんな見世物だったの？]死者の蘇りを謳う見世物\\_aに\\n\
             利用されたことがあったの。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -499,7 +505,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             それ以上に、死を恐れる人々を抑えるためだったのかもしれないわね。\\n\
             h1113205罰ではあれど、必要以上に苦しませることはない、と。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -511,7 +517,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210……いつかその時が来るのかしら。霊体を観測し、干渉し……あるいは、消滅させる方法。\\n\
             h1111205ふふ。私、期待しているの。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -525,7 +531,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1212210自分で出られない状態で、冷たい土の下へ。\\n\
             ……h1211506どんな心地がしたのかしらね。\
             ".to_string(),
-          required_flags: vec![EventFlag::LoreTalkUnlock],
+          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
           callback: None,
         },
 
@@ -1258,8 +1264,24 @@ pub fn on_ai_talk(_req: &Request) -> Response {
       vars
         .flags_mut()
         .done(EventFlag::FirstRandomTalkDone(i as u32));
-      let mut res =
-        new_response_with_value(text.clone(), TranslateOption::with_shadow_completion());
+      let m = if i == text_count - 1 {
+        let achieved_talk_types = [TalkType::SelfIntroduce, TalkType::WithYou];
+        achieved_talk_types.iter().for_each(|t| {
+          vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+        });
+        let achievements_messages = achieved_talk_types
+          .iter()
+          .map(|t| render_achievement_message(*t))
+          .collect::<Vec<_>>();
+        format!(
+          "{}\\1\\c{}",
+          text.clone(),
+          &achievements_messages.join("\\n")
+        )
+      } else {
+        text.clone()
+      };
+      let mut res = new_response_with_value(m, TranslateOption::with_shadow_completion());
       res.headers.insert_by_header_name(
         HeaderName::from("Marker"),
         format!("邂逅({}/{})", i + 2, text_count + 1),
@@ -1369,6 +1391,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     .talking_place()
     .talk_types()
     .iter()
+    .filter(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(**t)))
     .flat_map(|t| random_talks(*t))
     .collect::<Vec<_>>();
 
@@ -1399,7 +1422,11 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   let comment = comments[choose_one(&comments, false).unwrap()];
 
   new_response_with_value(
-    format!("\\0\\![set,balloonnum,{}]{}", comment, choosed_talk.consume()),
+    format!(
+      "\\0\\![set,balloonnum,{}]{}",
+      comment,
+      choosed_talk.consume()
+    ),
     TranslateOption::with_shadow_completion(),
   )
 }
