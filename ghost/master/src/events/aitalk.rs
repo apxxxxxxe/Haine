@@ -1299,7 +1299,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     ]];
     talk_parts.push(if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
       vars.flags_mut().done(EventFlag::FirstHitTalkDone);
-      vec!["……h1111204これで終わり？そう。\\n\
+      vec!["\\0……h1111204これで終わり？そう。\\n\
         では今回は、終わりにしましょう。\\n\
         h1111211次に期待しているわ、{user_name}。"
         .to_string()]
