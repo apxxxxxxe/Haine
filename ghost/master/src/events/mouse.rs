@@ -232,6 +232,8 @@ pub fn on_head_hit_cancel(_req: &Request) -> Response {
 }
 
 pub fn on_head_hit(_req: &Request) -> Response {
+  let vars = get_global_vars();
+  vars.flags_mut().done(EventFlag::FirstHitTalkStart);
   to_aroused();
   let m = "\\t\\*\
     h1111201あら、話す気に……h1000000っ！？\\n\
@@ -258,7 +260,6 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   let is_aroused = vars.volatility.aroused();
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
-    vars.flags_mut().done(EventFlag::FirstHitTalkStart);
     get_touch_info!("0headdoubleclick").reset(); // 選択肢だけなのでカウントしない
     vec!["\
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
