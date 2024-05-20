@@ -78,6 +78,8 @@ pub struct GlobalVariables {
 
   talk_collection: Mutex<HashMap<TalkType, HashSet<String>>>,
 
+  cumulative_talk_count: Mutex<u64>,
+
   flags: Mutex<EventFlags>,
 
   // 起動ごとにリセットされる変数
@@ -93,6 +95,7 @@ impl GlobalVariables {
       user_name: Mutex::new(Some("ユーザ".to_string())),
       talk_collection: Mutex::new(HashMap::new()),
       volatility: VolatilityVariables::default(),
+      cumulative_talk_count: Mutex::new(0),
       flags: Mutex::new(EventFlags::default()),
     };
 
@@ -154,6 +157,7 @@ impl GlobalVariables {
   generate_getter_setter!(user_name, Option<String>, cloneable);
   generate_getter_setter!(talk_collection, HashMap<TalkType, HashSet<String>>, cloneable);
   generate_mut_getter!(talk_collection, HashMap<TalkType, HashSet<String>>, non_cloneable);
+  generate_getter_setter!(cumulative_talk_count, u64, cloneable);
   generate_getter_setter!(flags, EventFlags, cloneable);
   generate_mut_getter!(flags, EventFlags, non_cloneable);
 }

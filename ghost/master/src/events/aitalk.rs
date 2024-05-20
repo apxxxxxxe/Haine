@@ -361,7 +361,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           callback: None,
         },
       ],
-      TalkType::Lore => vec![
+      TalkType::LoreIntroduction => vec! [
 
         // 死にまつわるロアへの興味についてのイントロトーク
         RandomTalk {
@@ -382,9 +382,12 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ),
             required_flags: vec![],
             callback: Some(|| {
-                get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
+              get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
             }),
         },
+
+      ],
+      TalkType::Lore => vec![
 
         RandomTalk {
           id: "冥界の渡し賃",
@@ -396,7 +399,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             彼らにとって、境界線といえばまず川が連想されたのかしら。\\n\
             h1111210あなたなら、あの世とこの世の間にはなにがあると思う？\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -411,7 +414,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1111201呆れるほどに多彩で、\\n\
             身近に根ざした感情の象徴だわ。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -429,7 +432,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204神が起こした奇跡として大切に扱われることもあるの。\\n\
             ……どちらにせよ、ふつうの葬送は望めなさそうね。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -444,7 +447,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あるいは夢枕に立って生命を吸い取るという民話は、\\n\
             そんな様子に理由をつけるためのものじゃないかしら。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -456,7 +459,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             乾燥して縮むから、皮膚の下の髪や爪が露出する。\\n\
             それがまるで生長しているように見えたの。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -469,7 +472,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210あなたも墓地を歩くときは気をつけて……って、\\n\
             h1111204あなたの住む場所にそんなところは少ないかしら。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -481,7 +484,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ときに命を落としていることもあるわね。\\n\
             ……h1113101求めるのは間違ったことなのかしら？\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -493,7 +496,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あの現象は、\\_a[Misemono,どんな見世物だったの？]死者の蘇りを謳う見世物\\_aに\\n\
             利用されたことがあったの。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -505,7 +508,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             それ以上に、死を恐れる人々を抑えるためだったのかもしれないわね。\\n\
             h1113205罰ではあれど、必要以上に苦しませることはない、と。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -517,7 +520,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210……いつかその時が来るのかしら。霊体を観測し、干渉し……あるいは、消滅させる方法。\\n\
             h1111205ふふ。私、期待しているの。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -531,7 +534,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1212210自分で出られない状態で、冷たい土の下へ。\\n\
             ……h1211506どんな心地がしたのかしらね。\
             ".to_string(),
-          required_flags: vec![EventFlag::TalkTypeUnlock(TalkType::Lore)],
+          required_flags: vec![],
           callback: None,
         },
 
@@ -1001,6 +1004,7 @@ impl Talk {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
 pub enum TalkType {
   SelfIntroduce,
+  LoreIntroduction,
   Lore,
   Past,
   Abstract,
@@ -1011,6 +1015,7 @@ impl Display for TalkType {
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     let s = match self {
       Self::SelfIntroduce => "ハイネ自身の話題",
+      Self::LoreIntroduction => "ロア/オカルト: Introduction",
       Self::Lore => "ロア/オカルト",
       Self::Past => "ハイネの過去についての話題",
       Self::Abstract => "抽象的な話題",
@@ -1313,6 +1318,8 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   // 没入度を上げる
   let immersive_degrees = std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
+
+  vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
 
   if immersive_degrees >= 100 {
     let (previous_talking_place, current_talking_place) = match vars.volatility.talking_place() {
