@@ -238,7 +238,7 @@ pub fn on_close(_req: &Request) -> Response {
     vars.flags_mut().done(EventFlag::FirstClose);
     let v = format!(
       "\
-      {}
+      {}\
       h1111201あら、今日はやめるの？h1111204そう。\\n\
       ならば、送っていきましょう。\\n\
       h1111210安心しなさい、他意などないわ。\\n\
