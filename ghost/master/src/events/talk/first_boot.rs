@@ -1,5 +1,7 @@
 use once_cell::sync::Lazy;
 
+pub const FIRST_BOOT_MARKER: &str = "邂逅";
+
 pub static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
   vec!["\
       h1111206いま、別の者にお茶の準備をさせているわ。\\n\
@@ -82,5 +84,3 @@ pub static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
       ".to_string()
   ]
 });
-
-

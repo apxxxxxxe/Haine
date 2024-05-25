@@ -1,5 +1,5 @@
 use crate::events::common::*;
-use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS};
 use crate::events::randomtalk::{
   changing_place_talks, finishing_aroused_talks, RANDOMTALK_COMMENTS,
 };
@@ -16,46 +16,22 @@ const IMMERSIVE_RATE: u32 = 8;
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
-
   vars
     .volatility
     .set_last_random_talk_time(vars.volatility.ghost_up_time());
 
+  // 初回ランダムトーク
   let text_count = FIRST_RANDOMTALKS.len();
   for (i, text) in FIRST_RANDOMTALKS.iter().enumerate() {
     if !vars
       .flags()
       .check(&EventFlag::FirstRandomTalkDone(i as u32))
     {
-      vars
-        .flags_mut()
-        .done(EventFlag::FirstRandomTalkDone(i as u32));
-      let m = if i == text_count - 1 {
-        let achieved_talk_types = [TalkType::SelfIntroduce, TalkType::WithYou];
-        achieved_talk_types.iter().for_each(|t| {
-          vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
-        });
-        let achievements_messages = achieved_talk_types
-          .iter()
-          .map(|t| render_achievement_message(*t))
-          .collect::<Vec<_>>();
-        format!(
-          "{}\\1\\c{}",
-          text.clone(),
-          &achievements_messages.join("\\n")
-        )
-      } else {
-        text.clone()
-      };
-      let mut res = new_response_with_value(m, TranslateOption::with_shadow_completion());
-      res.headers.insert_by_header_name(
-        HeaderName::from("Marker"),
-        format!("邂逅({}/{})", i + 2, text_count + 1),
-      );
-      return res;
+      return first_random_talk_response(text.to_string(), i, text_count);
     }
   }
 
+  // 興奮状態の終了
   if vars.volatility.aroused() {
     vars.volatility.set_aroused(false);
     get_touch_info!("0headdoubleclick").reset();
@@ -66,28 +42,13 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
   // 没入度を上げる
   let immersive_degrees = std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
-
-  vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
-
   if immersive_degrees >= 100 {
-    let (previous_talking_place, current_talking_place) = match vars.volatility.talking_place() {
-      TalkingPlace::LivingRoom => (TalkingPlace::LivingRoom, TalkingPlace::Library),
-      TalkingPlace::Library => (TalkingPlace::Library, TalkingPlace::LivingRoom),
-    };
-
-    let messages = changing_place_talks(&previous_talking_place, &current_talking_place);
-
-    vars.volatility.set_talking_place(current_talking_place);
-    vars.volatility.set_immersive_degrees(0);
-
-    return new_response_with_value(
-      messages[choose_one(&messages, true).unwrap()].to_owned(),
-      TranslateOption::with_shadow_completion(),
-    );
-  } else {
-    vars.volatility.set_immersive_degrees(immersive_degrees);
+    // 没入度が100に達したら、場所を変える
+    return change_talking_response();
   }
+  vars.volatility.set_immersive_degrees(immersive_degrees);
 
+  // 通常ランダムトーク
   let talks = vars
     .volatility
     .talking_place()
@@ -96,14 +57,12 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     .filter(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(**t)))
     .flat_map(|t| random_talks(*t))
     .collect::<Vec<_>>();
-
   let choosed_talk = talks[choose_one(&talks, if_consume_talk_bias).unwrap()].clone();
-
   if if_consume_talk_bias {
-    // ユーザが見ているときのみトークを消費する
+    // ユーザが見ているときのみトークを消費&トークカウントを加算
     register_talk_collection(&choosed_talk);
+    vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
   }
-
   let comment = RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()];
   new_response_with_value(
     format!(
@@ -113,6 +72,54 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     ),
     TranslateOption::with_shadow_completion(),
   )
+}
+
+fn change_talking_response() -> Response {
+  let vars = get_global_vars();
+  let (previous_talking_place, current_talking_place) = match vars.volatility.talking_place() {
+    TalkingPlace::LivingRoom => (TalkingPlace::LivingRoom, TalkingPlace::Library),
+    TalkingPlace::Library => (TalkingPlace::Library, TalkingPlace::LivingRoom),
+  };
+
+  let messages = changing_place_talks(&previous_talking_place, &current_talking_place);
+
+  vars.volatility.set_talking_place(current_talking_place);
+  vars.volatility.set_immersive_degrees(0);
+
+  new_response_with_value(
+    messages[choose_one(&messages, true).unwrap()].to_owned(),
+    TranslateOption::with_shadow_completion(),
+  )
+}
+
+fn first_random_talk_response(text: String, i: usize, text_count: usize) -> Response {
+  let vars = get_global_vars();
+  vars
+    .flags_mut()
+    .done(EventFlag::FirstRandomTalkDone(i as u32));
+  let m = if i == text_count - 1 {
+    let achieved_talk_types = [TalkType::SelfIntroduce, TalkType::WithYou];
+    achieved_talk_types.iter().for_each(|t| {
+      vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+    });
+    let achievements_messages = achieved_talk_types
+      .iter()
+      .map(|t| render_achievement_message(*t))
+      .collect::<Vec<_>>();
+    format!(
+      "{}\\1\\c{}",
+      text.clone(),
+      &achievements_messages.join("\\n")
+    )
+  } else {
+    text.clone()
+  };
+  let mut res = new_response_with_value(m, TranslateOption::with_shadow_completion());
+  res.headers.insert_by_header_name(
+    HeaderName::from("Marker"),
+    format!("{}({}/{})", FIRST_BOOT_MARKER, i + 2, text_count + 1),
+  );
+  res
 }
 
 pub fn on_anchor_select_ex(req: &Request) -> Response {

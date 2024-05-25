@@ -1,5 +1,5 @@
 use crate::events::common::*;
-use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS};
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
@@ -209,7 +209,7 @@ pub fn on_boot(_req: &Request) -> Response {
     let mut res = new_response_with_value(m, TranslateOption::simple_translate());
     res.headers.insert_by_header_name(
       HeaderName::from("Marker"),
-      format!("邂逅(1/{})", FIRST_RANDOMTALKS.len() + 1),
+      format!("{}(1/{})", FIRST_BOOT_MARKER, FIRST_RANDOMTALKS.len() + 1),
     );
     res
   } else {
