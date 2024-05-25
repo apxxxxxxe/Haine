@@ -1,5 +1,5 @@
-use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
+use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
@@ -161,13 +161,11 @@ fn zero_skirt_up(_count: u32, vars: &mut GlobalVariables) -> Vec<String> {
 
 fn zero_shoulder_down(count: u32, _vars: &mut GlobalVariables) -> Vec<String> {
   let dialogs = vec![
-    vec![
-      "\
+    vec!["\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
       ……h1111206あまりスキンシップは好きじゃないのだけど。\\n\
       "
-      .to_string(),
-    ],
+    .to_string()],
     vec![
       "\
       h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\

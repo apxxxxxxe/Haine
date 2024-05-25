@@ -125,7 +125,7 @@ fn binsearch_min(v: &[i32], r: i32) -> usize {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::events::aitalk::Talk;
+  use crate::events::talk::Talk;
 
   #[test]
   fn test_binsearch() {
@@ -162,7 +162,7 @@ mod test {
       };
       let biases: Vec<i32> = talks
         .iter()
-        .map(|s| bias.calc_bias(bias.get(&s.text)))
+        .map(|s| bias.calc_bias(bias.get(&s.key())))
         .collect();
       println!("biases: {:?}", biases);
       indexes.push(selected_index);

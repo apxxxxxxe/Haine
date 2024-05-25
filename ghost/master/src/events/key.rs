@@ -1,5 +1,7 @@
-use crate::events::aitalk::{on_ai_talk, random_talks_analysis, TalkType, FIRST_RANDOMTALKS};
+use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
+use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::talk::{random_talks_analysis, TalkType};
 use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
 use shiorust::message::{Request, Response};
 

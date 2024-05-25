@@ -383,7 +383,7 @@ impl Inserter {
 #[cfg(test)]
 mod tests {
   use super::*;
-  use crate::events::aitalk::Talk;
+  use crate::events::talk::Talk;
   use crate::events::translate::on_translate;
   use rand::seq::SliceRandom;
 

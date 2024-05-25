@@ -1,4 +1,4 @@
-use crate::events::aitalk::{TalkType, TalkingPlace};
+use crate::events::talk::{TalkType, TalkingPlace};
 use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;

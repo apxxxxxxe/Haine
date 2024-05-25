@@ -1,7 +1,8 @@
 use crate::autobreakline::Inserter;
-use crate::events::aitalk::{random_talks, TalkType, TalkingPlace};
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
+use crate::events::talk::randomtalk::random_talks;
+use crate::events::talk::{TalkType, TalkingPlace};
 use crate::roulette::TalkBias;
 use crate::status::Status;
 use serde::{Deserialize, Serialize};

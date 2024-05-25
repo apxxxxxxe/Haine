@@ -1,10 +1,9 @@
-use crate::events::aitalk::{
-  random_talks, register_talk_collection, Talk, TalkType, FIRST_RANDOMTALKS,
-};
 use crate::events::common::*;
+use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::talk::randomtalk::random_talks;
+use crate::events::talk::TalkType;
 use crate::events::tooltip::show_tooltip;
 use crate::variables::{get_global_vars, EventFlag};
-use rand::seq::SliceRandom;
 use shiorust::message::{Request, Response};
 
 pub fn on_menu_exec(_req: &Request) -> Response {
@@ -331,22 +330,5 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
       s, sum, all_sum
     ),
     TranslateOption::balloon_surface_only(),
-  )
-}
-
-pub fn on_check_unseen_talks(req: &Request) -> Response {
-  let refs = get_references(req);
-  let talk_type = TalkType::from_u32(refs[0].parse::<u32>().unwrap()).unwrap();
-  let talk_collection = get_global_vars().talk_collection();
-  let seen_talks = talk_collection.get(&talk_type).unwrap();
-
-  let talks = Talk::get_unseen_talks(talk_type, seen_talks);
-  let choosed_talk = talks.choose(&mut rand::thread_rng()).unwrap().to_owned();
-
-  register_talk_collection(&choosed_talk);
-
-  new_response_with_value(
-    choosed_talk.consume(),
-    TranslateOption::with_shadow_completion(),
   )
 }
