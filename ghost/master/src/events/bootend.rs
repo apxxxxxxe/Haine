@@ -1,5 +1,5 @@
-use crate::events::aitalk::FIRST_RANDOMTALKS;
 use crate::events::common::*;
+use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};

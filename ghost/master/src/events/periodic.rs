@@ -1,5 +1,7 @@
-use crate::events::aitalk::{on_ai_talk, TalkType, FIRST_RANDOMTALKS};
+use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
+use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::talk::TalkType;
 use crate::variables::{get_global_vars, EventFlag};
 use chrono::Timelike;
 use rand::prelude::SliceRandom;
