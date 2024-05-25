@@ -1,8 +1,27 @@
+use crate::events::TalkingPlace;
 use crate::events::common::*;
 use crate::events::talk::{Talk, TalkType};
 use crate::variables::{get_global_vars, EventFlag};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
+
+pub const RANDOMTALK_COMMENTS: [&str; 15] = [
+  "霧が濃い。",
+  "「主に誉れあれ。」",
+  "「館近くのパン屋は絶品だった。」",
+  "彼女の声は低いがよく通る。",
+  "彼女の赤い瞳の奥の思考は伺い知れない。",
+  "「主には秘密が多いのだ。」",
+  "「主は客人をたいそうお気に入りのようだ。」",
+  "「古木のように主は佇む。」",
+  "「常に主に心からの賛辞を。」",
+  "「街角の喫茶店は素晴らしいコーヒーを出していた。」",
+  "「主の思考は大樹のように広がっている。」",
+  "「主には永遠の美しさが宿っている。」",
+  "「主に語りかけることは奇跡的な経験だ。」",
+  "「街の端にある花屋は色とりどりの花で溢れていた。」",
+  "「昔ながらの本屋は知識の宝庫だった。」",
+];
 
 pub fn talk_with_punchline(text: String, funny_punchline: String) -> String {
   text + "\\n" + &funny_punchline
@@ -1023,3 +1042,92 @@ static BOTSU: Lazy<Vec<(&str, String)>> = Lazy::new(|| {
 
   ]
 });
+
+pub fn finishing_aroused_talks() -> Vec<String> {
+  let vars = get_global_vars();
+  let mut talk_parts = vec![vec![
+    "\\0\\![bind,ex,流血,0]h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。"
+      .to_string(),
+  ]];
+  talk_parts.push(if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
+    vars.flags_mut().done(EventFlag::FirstHitTalkDone);
+    vec!["\\0……h1111204これで終わり？そう。\\n\
+        では今回は、終わりにしましょう。\\n\
+        h1111211次に期待しているわ、{user_name}。"
+      .to_string()]
+  } else {
+    vec!["\\0……h1111204もっと殴ってもよかったのに。".to_string()]
+  });
+  all_combo(&talk_parts)
+}
+
+pub fn changing_place_talks(
+  previous_talking_place: &TalkingPlace,
+  current_talking_place: &TalkingPlace,
+) -> Vec<String> {
+  let vars = get_global_vars();
+  let parts: Vec<Vec<String>> = if vars.flags().check(&EventFlag::FirstPlaceChange) {
+    vars.flags_mut().done(EventFlag::FirstPlaceChange);
+    vec![
+      vec![format!(
+        "\\0\\b[{}]h1000000……。\\1ふと目を離した間に、ハイネは姿を消していた。\\n\
+            \\0\\c\\1\\c…………。\
+            他の部屋を探し、\\0\\b[{}]\\1{}に入ったとき、彼女はそこにいた。\\n\
+            ",
+        previous_talking_place.balloon_surface(),
+        current_talking_place.balloon_surface(),
+        current_talking_place
+      )],
+      match current_talking_place {
+        TalkingPlace::Library => {
+          vars
+            .flags_mut()
+            .done(EventFlag::TalkTypeUnlock(TalkType::Abstract));
+          vars
+            .flags_mut()
+            .done(EventFlag::TalkTypeUnlock(TalkType::Past));
+          vec![format!(
+            "h1111204あなた、書斎は初めてね。\\n\
+                \\1……客間より少し狭い程度の間取りに、所狭しと本棚が設置されている。\\n\
+                窓すら本棚に覆われていて、ハイネは蝋燭の灯りで本を読んでいるようだった。\\n\
+                h1111210ここは私の私室でもあるの。\\n\
+                h1111204……あなたは、本を読むのは好き？\\n\
+                h1111306私は好きよ。巨人の肩に乗って遠くが見える。\\n\
+                h1111305あるいは、ここではないどこかへ、遠くへ行ける。\
+                h1111204あなたも自由に読み、そして考えなさい。\\n\
+                h1111310ここはそういう場所よ。{}{}\
+                ",
+            render_achievement_message(TalkType::Abstract),
+            render_achievement_message(TalkType::Past),
+          )]
+        }
+        TalkingPlace::LivingRoom => vec!["これが表示されることはないはず".to_string()],
+      },
+    ]
+  } else {
+    vec![
+      vec![format!(
+        "\\0\\b[{}]h1000000……。\\n\\n\\1また、ハイネが姿を消してしまった。\\n\
+            \\0\\b[{}]\\1前回のように{}を探しに行くと、彼女はそこにいた。\\n\
+          ",
+        previous_talking_place.balloon_surface(),
+        current_talking_place.balloon_surface(),
+        current_talking_place
+      )],
+      match current_talking_place {
+        TalkingPlace::Library => vec!["\
+            h1111210さて、仕切り直しましょう。\\n\
+            ……h1111206もちろん、読みたい本があれば御自由にどうぞ。\
+            "
+        .to_string()],
+        TalkingPlace::LivingRoom => vec!["\
+            h1111206さあ、お茶を淹れ直させましょう。\\n\
+            h1111204お席にどうぞ、お客人。\
+            "
+        .to_string()],
+      },
+    ]
+  };
+  all_combo(&parts)
+}
+

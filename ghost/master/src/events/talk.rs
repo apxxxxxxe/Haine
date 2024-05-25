@@ -1,3 +1,4 @@
+pub mod anchor;
 pub mod first_boot;
 pub mod randomtalk;
 
