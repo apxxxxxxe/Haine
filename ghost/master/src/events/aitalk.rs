@@ -1,5 +1,9 @@
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::randomtalk::{
+  changing_place_talks, finishing_aroused_talks, RANDOMTALK_COMMENTS,
+};
+use crate::events::talk::anchor::anchor_talks;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
 use crate::get_touch_info;
@@ -55,20 +59,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   if vars.volatility.aroused() {
     vars.volatility.set_aroused(false);
     get_touch_info!("0headdoubleclick").reset();
-    let mut talk_parts = vec![vec![
-      "\\0\\![bind,ex,流血,0]h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。"
-        .to_string(),
-    ]];
-    talk_parts.push(if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
-      vars.flags_mut().done(EventFlag::FirstHitTalkDone);
-      vec!["\\0……h1111204これで終わり？そう。\\n\
-        では今回は、終わりにしましょう。\\n\
-        h1111211次に期待しているわ、{user_name}。"
-        .to_string()]
-    } else {
-      vec!["\\0……h1111204もっと殴ってもよかったのに。".to_string()]
-    });
-    let talks = all_combo(&talk_parts);
+    let talks = finishing_aroused_talks();
     let choosed_talk = talks[choose_one(&talks, if_consume_talk_bias).unwrap()].to_string();
     return new_response_with_value(choosed_talk, TranslateOption::with_shadow_completion());
   }
@@ -84,71 +75,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
       TalkingPlace::Library => (TalkingPlace::Library, TalkingPlace::LivingRoom),
     };
 
-    let messages: Vec<String> = {
-      let parts: Vec<Vec<String>> = if vars.flags().check(&EventFlag::FirstPlaceChange) {
-        vars.flags_mut().done(EventFlag::FirstPlaceChange);
-        vec![
-          vec![format!(
-            "\\0\\b[{}]h1000000……。\\1ふと目を離した間に、ハイネは姿を消していた。\\n\
-            \\0\\c\\1\\c…………。\
-            他の部屋を探し、\\0\\b[{}]\\1{}に入ったとき、彼女はそこにいた。\\n\
-            ",
-            previous_talking_place.balloon_surface(),
-            current_talking_place.balloon_surface(),
-            current_talking_place
-          )],
-          match current_talking_place {
-            TalkingPlace::Library => {
-              vars
-                .flags_mut()
-                .done(EventFlag::TalkTypeUnlock(TalkType::Abstract));
-              vars
-                .flags_mut()
-                .done(EventFlag::TalkTypeUnlock(TalkType::Past));
-              vec![format!(
-                "h1111204あなた、書斎は初めてね。\\n\
-                \\1……客間より少し狭い程度の間取りに、所狭しと本棚が設置されている。\\n\
-                窓すら本棚に覆われていて、ハイネは蝋燭の灯りで本を読んでいるようだった。\\n\
-                h1111210ここは私の私室でもあるの。\\n\
-                h1111204……あなたは、本を読むのは好き？\\n\
-                h1111306私は好きよ。巨人の肩に乗って遠くが見える。\\n\
-                h1111305あるいは、ここではないどこかへ、遠くへ行ける。\
-                h1111204あなたも自由に読み、そして考えなさい。\\n\
-                h1111310ここはそういう場所よ。{}{}\
-                ",
-                render_achievement_message(TalkType::Abstract),
-                render_achievement_message(TalkType::Past),
-              )]
-            }
-            TalkingPlace::LivingRoom => vec!["これが表示されることはないはず".to_string()],
-          },
-        ]
-      } else {
-        vec![
-          vec![format!(
-            "\\0\\b[{}]h1000000……。\\n\\n\\1また、ハイネが姿を消してしまった。\\n\
-            \\0\\b[{}]\\1前回のように{}を探しに行くと、彼女はそこにいた。\\n\
-          ",
-            previous_talking_place.balloon_surface(),
-            current_talking_place.balloon_surface(),
-            current_talking_place
-          )],
-          match current_talking_place {
-            TalkingPlace::Library => vec!["\
-            h1111210さて、仕切り直しましょう。\\n\
-            ……h1111206もちろん、読みたい本があれば御自由にどうぞ。\
-            "
-            .to_string()],
-            TalkingPlace::LivingRoom => vec!["\
-            h1111206さあ、お茶を淹れ直させましょう。\\n\
-            h1111204お席にどうぞ、お客人。\
-            "
-            .to_string()],
-          },
-        ]
-      };
-      all_combo(&parts)
-    };
+    let messages = changing_place_talks(&previous_talking_place, &current_talking_place);
 
     vars.volatility.set_talking_place(current_talking_place);
     vars.volatility.set_immersive_degrees(0);
@@ -177,25 +104,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     register_talk_collection(&choosed_talk);
   }
 
-  let comments = [
-    "霧が濃い。",
-    "「主に誉れあれ。」",
-    "「館近くのパン屋は絶品だった。」",
-    "彼女の声は低いがよく通る。",
-    "彼女の赤い瞳の奥の思考は伺い知れない。",
-    "「主には秘密が多いのだ。」",
-    "「主は客人をたいそうお気に入りのようだ。」",
-    "「古木のように主は佇む。」",
-    "「常に主に心からの賛辞を。」",
-    "「街角の喫茶店は素晴らしいコーヒーを出していた。」",
-    "「主の思考は大樹のように広がっている。」",
-    "「主には永遠の美しさが宿っている。」",
-    "「主に語りかけることは奇跡的な経験だ。」",
-    "「街の端にある花屋は色とりどりの花で溢れていた。」",
-    "「昔ながらの本屋は知識の宝庫だった。」",
-  ];
-  let comment = comments[choose_one(&comments, false).unwrap()];
-
+  let comment = RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()];
   new_response_with_value(
     format!(
       "\\0\\![set,balloonnum,{}]{}",
@@ -208,7 +117,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
 
 pub fn on_anchor_select_ex(req: &Request) -> Response {
   let refs = get_references(req);
-  let id = refs[1].to_string();
+  let id = refs[1];
   let user_dialog = refs.get(2).unwrap_or(&"").to_string();
 
   let mut m = String::from("\\C");
@@ -216,33 +125,10 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
   if !user_dialog.is_empty() {
     m += &format!("\\1『{}』\\_w[500]", user_dialog);
   }
-  match id.as_str() {
-    "Fastened" => {
-      m += "\
-      h1111205文字通りの意味よ。\\n\
-      私はこの街から出られない。物理的にね。\\n\
-      h1111210私の身体はここに縛られている。\\n\
-      h1111205きっと、それは消滅する瞬間まで変わらないでしょう。\\n\
-      ";
-    }
-    "Misemono" => {
-      m += "\
-      h1111203かつてある国で催された、\\n\
-      死刑囚の遺体を使った\\n\
-      「復活の奇術」という趣向。\\n\
-      h1111204その異様さと目新しさから、\\n\
-      誰もがそれを目的に訪れる人気の演目だった……けれど、\\n\
-      h1111205一方で不安と混乱も生まれたの。\\n\
-      h1113210罪人の蘇生なんて、冷静になってみれば恐ろしいものね。\\n\\n\
-      h1113206見かねたお国が鎮静を促すために\\n\
-      「生き返った死刑囚は再度絞首刑に処すように」\\_w[400]\\n\
-      というお触れを出したのだけど、\\n\
-      h1113210かえって真実味を上乗せするだけだったみたい。\
-      ";
-    }
-    _ => return new_response_nocontent(),
+  match anchor_talks(id) {
+    Some(t) => new_response_with_value(m + &t, TranslateOption::with_shadow_completion()),
+    None => new_response_nocontent(),
   }
-  new_response_with_value(m, TranslateOption::with_shadow_completion())
 }
 
 #[cfg(test)]
