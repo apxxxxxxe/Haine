@@ -1,7 +1,6 @@
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
-use crate::events::talk::TalkType;
 use crate::variables::{get_global_vars, EventFlag};
 use chrono::Timelike;
 use rand::prelude::SliceRandom;
@@ -47,14 +46,22 @@ pub fn on_second_change(req: &Request) -> Response {
       .get("minimizing")
       .is_some_and(|v| v)
   {
-    let response = on_ai_talk(req);
-    if vars.cumulative_talk_count() == 10 {
-      // 10回話したらロア解放
-      vars
-        .flags_mut()
-        .done(EventFlag::TalkTypeUnlock(TalkType::LoreIntroduction));
+    match vars.cumulative_talk_count() {
+      5 => {
+        // 5回話したら従者関連のトークを解放
+        vars.flags_mut().done(EventFlag::ServantIntroduction);
+      }
+      10 => {
+        // 10回話したらロア解放
+        vars.flags_mut().done(EventFlag::LoreIntroduction);
+      }
+      20 => {
+        // 20回話したら没入度解放
+        vars.flags_mut().done(EventFlag::ImmersionIntroduction);
+      }
+      _ => {}
     }
-    return response;
+    return on_ai_talk(req);
   }
 
   let mut text = String::new();

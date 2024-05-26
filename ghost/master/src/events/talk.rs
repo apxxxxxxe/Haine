@@ -78,8 +78,8 @@ impl Talk {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
 pub enum TalkType {
   SelfIntroduce,
-  LoreIntroduction,
   Lore,
+  Servant,
   Past,
   Abstract,
   WithYou,
@@ -89,8 +89,8 @@ impl Display for TalkType {
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     let s = match self {
       Self::SelfIntroduce => "ハイネ自身の話題",
-      Self::LoreIntroduction => "ロア/オカルト: Introduction",
       Self::Lore => "ロア/オカルト",
+      Self::Servant => "従者について",
       Self::Past => "ハイネの過去についての話題",
       Self::Abstract => "抽象的な話題",
       Self::WithYou => "あなたについての話題",

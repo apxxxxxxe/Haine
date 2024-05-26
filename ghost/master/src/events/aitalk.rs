@@ -41,12 +41,15 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   }
 
   // 没入度を上げる
-  let immersive_degrees = std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
-  if immersive_degrees >= 100 {
-    // 没入度が100に達したら、場所を変える
-    return change_talking_response();
+  if vars.flags().check(&EventFlag::ImmsersionUnlock) {
+    let immersive_degrees =
+      std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
+    if immersive_degrees >= 100 {
+      // 没入度が100に達したら、場所を変える
+      return change_talking_response();
+    }
+    vars.volatility.set_immersive_degrees(immersive_degrees);
   }
-  vars.volatility.set_immersive_degrees(immersive_degrees);
 
   // 通常ランダムトーク
   let talks = vars

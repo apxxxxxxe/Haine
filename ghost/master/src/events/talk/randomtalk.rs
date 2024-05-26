@@ -51,11 +51,68 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       TalkType::SelfIntroduce => vec![
 
         RandomTalk {
-          id: "イントロ：従者",
-          text: "".to_string(),
+          id: "没入度について：イントロ",
+          text: "\
+            h1111204\\1……気付けば、辺りが暗くなっていた。\\n\
+            そんなに長く話していただろうか。腕時計を見ると、まだ昼間だった。\\n\
+            h1111207少し話し込んでいたようね。\\n\
+            \\1ハイネは呟き、しばらく手をつけていなかったカップを傾けた。\\n\
+            h1111209\\1……？あたりが再び明るくなっている。\\n\
+            h1111205明かりは、私の霊力で灯しているの。\\n\
+            特別な灯。そちらに注意を払えなくなると、すぐに消えてしまう。\\n\
+            h1121209我ながら不便だけれど、従者に頼むにも難しい仕事でね。\\n\
+            h1121204悪いけれど、そういうものだと思ってちょうだい。\\n\
+          ".to_string(),
           required_flags: vec![],
           callback: Some(|| {
-            get_global_vars().flags_mut().done(EventFlag::IntroductionServantsDone);
+            get_global_vars().flags_mut().done(EventFlag::ImmersionUnlock);
+          })
+        },
+
+        RandomTalk {
+          id: "死に対する興味：イントロ",
+          text: format!("\
+            h1111201死について。深く考えることはある？\\n\
+            h1111206……あなたには聞くまでもないようね。\\n\
+            h1111205私もそう。\\n\
+            生きていたころから、なぜ生きるのか、死ぬとはどういうことかをずっと考えていたわ。\\n\
+            いくつか不思議な話を知っているの。\\n\
+            話の種に、いくつか語ってみましょうか。{}\
+            ",
+            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Lore)) {
+              render_achievement_message(TalkType::Lore)
+            } else {
+              "".to_string()
+            },
+            ),
+            required_flags: vec![],
+            callback: Some(|| {
+              get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
+            }),
+        },
+
+        RandomTalk {
+          id: "従者について：イントロ",
+          text: format!("\
+            \\1……h1111101お茶がなくなってしまった。\\n\
+            最初にハイネに言われたのを思いだし、\\n\
+            部屋の隅に向って手を上げてみせる。\\n\
+            h1111204\\1するとポットが浮き上がり、空になっていたカップにお茶が注がれた。\\n\
+            \\0……h1111206彼らは私のことを「主」と呼ぶの。\\n\
+            契約関係としては対等なのだけれど、彼ら自身がそう呼ぶのを好むのよ。\\n\
+            \\n\
+            h1111209耳を澄ませていれば、彼らの声が聞こえることもあるんじゃない？\\n\
+            私を通して彼らとも縁ができているはずだから。{}\
+            ",
+            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
+              render_achievement_message(TalkType::Servant)
+            } else {
+              "".to_string()
+            },
+          ),
+          required_flags: vec![],
+          callback: Some(|| {
+            get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
           }),
         },
 
@@ -124,21 +181,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         },
 
         RandomTalk {
-          id: "霊力と可視性",
-          text: talk_with_punchline("\
-            h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
-            \\0……h1111204私が見えて彼らが見えないのは、霊としての力量の違いよ。\\n\
-            h1111206強い霊力があればあなたのような人間の目にも見えるし、\\n\
-            物理的な接触も可能になるの。\\n\
-            ".to_string(),
-            "h1111206……つまり、彼らのように霊力が弱ければ、\\n\
-            誰かさんにべたべたと触られることもなかったということね。\
-            ".to_string()),
-          required_flags: vec![EventFlag::IntroductionServantsDone],
-          callback: None,
-        },
-
-        RandomTalk {
           id: "霊力の多寡",
           text: talk_with_punchline("\
             h1111204霊力の多寡は年月や才能、特別な契約の有無などで変わるけれど、\\n\
@@ -151,21 +193,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111515ノブレス・オブリージュというわけ。\
             ".to_string()),
           required_flags: vec![],
-          callback: None,
-        },
-
-        RandomTalk {
-          id: "低級霊との契約",
-          text: talk_with_punchline("\
-            h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
-            h1111206私の元へ集うのは弱い人たち。\\n\
-            自分だけでは溶けゆく自我を押し留められず、さりとてそれを受け入れることもできない霊。\\n\
-            h1111210役割を与えてあげるの。一種の契約ね。\\n\
-            h1111205使命に縛られはするけれど、消滅するよりはよしと彼らは決断したの。\
-            ".to_string(),
-            "\
-            ".to_string()),
-          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -190,36 +217,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\
             ".to_string()),
           required_flags: vec![],
-          callback: None,
-        },
-
-        RandomTalk {
-          id: "幽霊たちの役割",
-          text: "\
-            h1111203従者……と、私が呼ぶ幽霊たち。\\n\
-            h1111210私の与えた役割を全うしてくれるものは多くいるわ。\\n\
-            h1111205最も多いのは、自分の生前の経験を記録として私に提供してくれる者たち。\\n\
-            h1111210一つとして同じものはない。読んでいて退屈しないわ。\\n\
-            ……h1113204少し形は違えど、あなたもその一人ね。\\n\
-            h1113211期待しているわ、{user_name}。\
-            ".to_string(),
-          required_flags: vec![EventFlag::IntroductionServantsDone],
-          callback: None,
-        },
-
-        RandomTalk {
-          id: "幽霊たちの自由",
-          text: talk_with_punchline("\
-            h1111206私は彼らと直接話すことはできないの。\\n\
-            霊力の差があまりにも大きい場合、\\n\
-            h1111210会話や接触を少し行うだけで、弱い方の霊は力を奪われる。\\n\
-            ".to_string(),
-            "\
-            h1111701……h1111204いえ、私はやったことがなくて、伝聞なのだけど。\\n\
-            h1121206……他人の魂を玩具になんてしないわよ。\\n\
-            h1121301勘違いしているようだけど、私にそんな嗜好はないわ。\
-            ".to_string()),
-          required_flags: vec![EventFlag::IntroductionServantsDone],
           callback: None,
         },
 
@@ -305,20 +302,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         },
 
         RandomTalk {
-          id: "あなたの価値",
-          text: "\
-            h1111101何をすればいいかって？\\n\
-            h1111204今しているように、ただ話し相手になればいいのよ。\\n\
-            h1111206私には従者がいるけれど、\\n\
-            彼らは私と話すようにはできていないから。\\n\
-            h1111204あなたの価値は、その自由意志。\\n\
-            h1111210ここは予想通りなものばかりで退屈なの。\
-            ".to_string(),
-          required_flags: vec![EventFlag::IntroductionServantsDone],
-          callback: None,
-        },
-
-        RandomTalk {
           id: "生前の食事事情",
           text: "\
             h1111204あなたは、ちゃんと食べているかしら？\\n\
@@ -349,32 +332,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           required_flags: vec![],
           callback: None,
         },
-      ],
-      TalkType::LoreIntroduction => vec! [
-
-        // 死にまつわるロアへの興味についてのイントロトーク
-        RandomTalk {
-          id: "死に対する興味",
-          text: format!("\
-            h1111201死について。深く考えることはある？\\n\
-            h1111206……あなたには聞くまでもないようね。\\n\
-            h1111205私もそう。\\n\
-            生きていたころから、なぜ生きるのか、死ぬとはどういうことかをずっと考えていたわ。\\n\
-            いくつか不思議な話を知っているの。\\n\
-            話の種に、いくつか語ってみましょうか。{}\
-            ",
-            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Lore)) {
-              render_achievement_message(TalkType::Lore)
-            } else {
-              "".to_string()
-            },
-            ),
-            required_flags: vec![],
-            callback: Some(|| {
-              get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
-            }),
-        },
-
       ],
       TalkType::Lore => vec![
 
@@ -522,6 +479,82 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204彼、デモンストレーションのために自ら生き埋めになってみせたそうよ。\\n\
             h1212210自分で出られない状態で、冷たい土の下へ。\\n\
             ……h1211506どんな心地がしたのかしらね。\
+            ".to_string(),
+          required_flags: vec![],
+          callback: None,
+        },
+
+      ],
+      TalkType::Servant => vec![
+        RandomTalk {
+          id: "霊力と可視性",
+          text: talk_with_punchline("\
+            h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
+            \\0……h1111204私が見えて彼らが見えないのは、霊としての力量の違いよ。\\n\
+            h1111206強い霊力があればあなたのような人間の目にも見えるし、\\n\
+            物理的な接触も可能になるの。\\n\
+            ".to_string(),
+            "h1111206……つまり、彼らのように霊力が弱ければ、\\n\
+            誰かさんにべたべたと触られることもなかったということね。\
+            ".to_string()),
+          required_flags: vec![],
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "低級霊との契約",
+          text: talk_with_punchline("\
+            h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
+            h1111206私の元へ集うのは弱い人たち。\\n\
+            自分だけでは溶けゆく自我を押し留められず、さりとてそれを受け入れることもできない霊。\\n\
+            h1111210役割を与えてあげるの。一種の契約ね。\\n\
+            h1111205使命に縛られはするけれど、消滅するよりはよしと彼らは決断したの。\
+            ".to_string(),
+            "\
+            ".to_string()),
+          required_flags: vec![],
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "幽霊たちの役割",
+          text: "\
+            h1111203従者……と、私が呼ぶ幽霊たち。\\n\
+            h1111210私の与えた役割を全うしてくれるものは多くいるわ。\\n\
+            h1111205最も多いのは、自分の生前の経験を記録として私に提供してくれる者たち。\\n\
+            h1111210一つとして同じものはない。読んでいて退屈しないわ。\\n\
+            ……h1113204少し形は違えど、あなたもその一人ね。\\n\
+            h1113211期待しているわ、{user_name}。\
+            ".to_string(),
+          required_flags: vec![],
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "幽霊たちの自由",
+          text: talk_with_punchline("\
+            h1111206私は彼らと直接話すことはできないの。\\n\
+            霊力の差があまりにも大きい場合、\\n\
+            h1111210会話や接触を少し行うだけで、弱い方の霊は力を奪われる。\\n\
+            ".to_string(),
+            "\
+            h1111701……h1111204いえ、私はやったことがなくて、伝聞なのだけど。\\n\
+            h1121206……他人の魂を玩具になんてしないわよ。\\n\
+            h1121301勘違いしているようだけど、私にそんな嗜好はないわ。\
+            ".to_string()),
+          required_flags: vec![],
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "あなたの価値",
+          text: "\
+            h1111101何をすればいいかって？\\n\
+            h1111204今しているように、ただ話し相手になればいいのよ。\\n\
+            h1111206私には従者がいるけれど、\\n\
+            彼らは私と話すようにはできていないから。\\n\
+            h1111204あなたの価値は、その自由意志。\\n\
+            h1111210ここは予想通りなものばかりで退屈なの。\
             ".to_string(),
           required_flags: vec![],
           callback: None,
