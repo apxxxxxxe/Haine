@@ -1,6 +1,6 @@
-use crate::events::TalkingPlace;
 use crate::events::common::*;
 use crate::events::talk::{Talk, TalkType};
+use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
@@ -1130,4 +1130,3 @@ pub fn changing_place_talks(
   };
   all_combo(&parts)
 }
-
