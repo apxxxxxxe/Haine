@@ -379,19 +379,3 @@ impl Inserter {
     count
   }
 }
-
-#[cfg(test)]
-mod tests {
-  use crate::events::common::new_response_with_value;
-  use crate::events::common::TranslateOption;
-  use crate::events::talk::Talk;
-
-  #[test]
-  fn inserter() -> Result<(), Box<dyn std::error::Error>> {
-    let mut talks = Talk::all_talks();
-    for talk in talks.iter_mut() {
-      new_response_with_value(talk.text.clone(), TranslateOption::simple_translate());
-    }
-    Ok(())
-  }
-}

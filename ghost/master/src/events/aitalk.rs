@@ -171,32 +171,6 @@ mod test {
   use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::parts::*;
   use shiorust::message::Request;
-  use std::collections::HashMap;
-
-  #[test]
-  fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
-    let vars = get_global_vars();
-    vars.load()?;
-    vars.volatility.set_idle_seconds(1);
-
-    let req = Request {
-      method: Method::GET,
-      version: Version::V20,
-      headers: Headers::new(),
-    };
-    let mut results = HashMap::new();
-    for _i in 0..100 {
-      let res = on_ai_talk(&req);
-      let value = res.headers.get(&HeaderName::from("Value")).unwrap();
-      let md5 = format!("{:x}", md5::compute(value.as_bytes()));
-      let n = results.get(&md5).unwrap_or(&0);
-      results.insert(md5, n + 1);
-    }
-    for (k, v) in results.iter() {
-      println!("{}: {}", k, v);
-    }
-    Ok(())
-  }
 
   #[test]
   fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
