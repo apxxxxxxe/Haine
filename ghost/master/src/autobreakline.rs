@@ -382,27 +382,16 @@ impl Inserter {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+  use crate::events::common::new_response_with_value;
+  use crate::events::common::TranslateOption;
   use crate::events::talk::Talk;
-  use crate::events::translate::on_translate;
-  use rand::seq::SliceRandom;
 
   #[test]
-  fn inserter() {
+  fn inserter() -> Result<(), Box<dyn std::error::Error>> {
     let mut talks = Talk::all_talks();
-    talks.shuffle(&mut rand::thread_rng());
-    let mut ins = Inserter::default();
-    ins.start_init();
-    while !ins.is_ready() {
-      std::thread::sleep(std::time::Duration::from_millis(100));
+    for talk in talks.iter_mut() {
+      new_response_with_value(talk.text.clone(), TranslateOption::simple_translate());
     }
-    for (i, t) in talks.iter().enumerate() {
-      println!("talk: {}", i);
-      let text = on_translate(t.to_string(), true);
-      ins.tokenize(text.clone());
-      let breaked = ins.run(text).replace("\\n", "\n");
-      let result = SAKURA_SCRIPT_RE.replace_all(&breaked, "");
-      println!("\n{}\n", result);
-    }
+    Ok(())
   }
 }

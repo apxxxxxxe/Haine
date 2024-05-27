@@ -167,7 +167,8 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::variables::get_global_vars;
+  use crate::events::on_boot;
+  use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::parts::*;
   use shiorust::message::Request;
   use std::collections::HashMap;
@@ -194,6 +195,62 @@ mod test {
     for (k, v) in results.iter() {
       println!("{}: {}", k, v);
     }
+    Ok(())
+  }
+
+  #[test]
+  fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
+    let vars = get_global_vars();
+    *vars = GlobalVariables::new();
+    let req = Request {
+      method: Method::GET,
+      version: Version::V20,
+      headers: Headers::new(),
+    };
+
+    // 初回起動時のフラグチェック
+    assert!(!vars.flags().check(&EventFlag::FirstBoot));
+    on_boot(&req);
+    assert!(vars.flags().check(&EventFlag::FirstBoot));
+
+    // 初回ランダムトークのフラグチェック
+    assert!(!vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::SelfIntroduce)));
+    assert!(!vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
+    for i in 0..FIRST_RANDOMTALKS.len() {
+      on_ai_talk(&req);
+      assert!(vars
+        .flags()
+        .check(&EventFlag::FirstRandomTalkDone(i as u32)));
+    }
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::SelfIntroduce)));
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
+
+    // 没入度の開放確認
+    let mut required_talk_count = IMMERSIVE_RATE_MAX / IMMERSIVE_RATE;
+    if IMMERSIVE_RATE_MAX % IMMERSIVE_RATE != 0 {
+      required_talk_count += 1;
+    }
+    assert!(!vars.flags().check(&EventFlag::ImmersionUnlock));
+    for _i in 0..required_talk_count {
+      on_ai_talk(&req);
+    }
+    assert!(vars.flags().check(&EventFlag::ImmersionUnlock));
+
+    // 初回没入度マックス時の場所変更
+    assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
+    for _i in 0..required_talk_count {
+      on_ai_talk(&req);
+    }
+    assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
+
     Ok(())
   }
 }

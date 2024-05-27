@@ -17,7 +17,7 @@ use strum_macros::EnumIter;
 #[derive(Clone)]
 pub struct Talk {
   pub talk_type: Option<TalkType>,
-  text: String,
+  pub text: String,
   pub id: &'static str,
   pub callback: Option<fn()>,
 }
