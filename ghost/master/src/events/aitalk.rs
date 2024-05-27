@@ -4,14 +4,15 @@ use crate::events::randomtalk::{
   changing_place_talks, finishing_aroused_talks, RANDOMTALK_COMMENTS,
 };
 use crate::events::talk::anchor::anchor_talks;
-use crate::events::talk::randomtalk::random_talks;
+use crate::events::talk::randomtalk::{random_talks, IMMERSION_INTRODUCTION_TALK};
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
 use crate::get_touch_info;
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::HeaderName, Request, Response};
 
-// トーク1回あたりに上昇する没入度
-const IMMERSIVE_RATE: u32 = 8;
+// トーク1回あたりに上昇する没入度の割合(%)
+const IMMERSIVE_RATE: u32 = 5;
+pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
@@ -41,9 +42,27 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   }
 
   // 没入度を上げる
-  let immersive_degrees = std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
-  if immersive_degrees >= 100 {
-    // 没入度が100に達したら、場所を変える
+  let immersive_degrees = std::cmp::min(
+    vars.volatility.immersive_degrees() + IMMERSIVE_RATE,
+    IMMERSIVE_RATE_MAX,
+  );
+  if immersive_degrees >= IMMERSIVE_RATE_MAX {
+    // 没入度が最大に達したら、場所を変える
+    if !vars.flags().check(&EventFlag::ImmersionUnlock) {
+      get_global_vars()
+        .flags_mut()
+        .done(EventFlag::ImmersionUnlock);
+      let response = new_response_with_value(
+        format!(
+          "\\0\\s[1111204]{}{}",
+          complete_shadow(true),
+          IMMERSION_INTRODUCTION_TALK
+        ),
+        TranslateOption::simple_translate(),
+      );
+      vars.volatility.set_immersive_degrees(0);
+      return response;
+    }
     return change_talking_response();
   }
   vars.volatility.set_immersive_degrees(immersive_degrees);
@@ -63,7 +82,14 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     register_talk_collection(&choosed_talk);
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
   }
-  let comment = RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()];
+  let comment = if vars
+    .flags()
+    .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
+  {
+    RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()]
+  } else {
+    ""
+  };
   new_response_with_value(
     format!(
       "\\0\\![set,balloonnum,{}]{}",
@@ -141,33 +167,64 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
 #[cfg(test)]
 mod test {
   use super::*;
-  use crate::variables::get_global_vars;
+  use crate::events::on_boot;
+  use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::parts::*;
   use shiorust::message::Request;
-  use std::collections::HashMap;
 
   #[test]
-  fn test_aitalk() -> Result<(), Box<dyn std::error::Error>> {
+  fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
     let vars = get_global_vars();
-    vars.load()?;
-    vars.volatility.set_idle_seconds(1);
-
+    *vars = GlobalVariables::new();
     let req = Request {
       method: Method::GET,
       version: Version::V20,
       headers: Headers::new(),
     };
-    let mut results = HashMap::new();
-    for _i in 0..100 {
-      let res = on_ai_talk(&req);
-      let value = res.headers.get(&HeaderName::from("Value")).unwrap();
-      let md5 = format!("{:x}", md5::compute(value.as_bytes()));
-      let n = results.get(&md5).unwrap_or(&0);
-      results.insert(md5, n + 1);
+
+    // 初回起動時のフラグチェック
+    assert!(!vars.flags().check(&EventFlag::FirstBoot));
+    on_boot(&req);
+    assert!(vars.flags().check(&EventFlag::FirstBoot));
+
+    // 初回ランダムトークのフラグチェック
+    assert!(!vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::SelfIntroduce)));
+    assert!(!vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
+    for i in 0..FIRST_RANDOMTALKS.len() {
+      on_ai_talk(&req);
+      assert!(vars
+        .flags()
+        .check(&EventFlag::FirstRandomTalkDone(i as u32)));
     }
-    for (k, v) in results.iter() {
-      println!("{}: {}", k, v);
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::SelfIntroduce)));
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
+
+    // 没入度の開放確認
+    let mut required_talk_count = IMMERSIVE_RATE_MAX / IMMERSIVE_RATE;
+    if IMMERSIVE_RATE_MAX % IMMERSIVE_RATE != 0 {
+      required_talk_count += 1;
     }
+    assert!(!vars.flags().check(&EventFlag::ImmersionUnlock));
+    for _i in 0..required_talk_count {
+      on_ai_talk(&req);
+    }
+    assert!(vars.flags().check(&EventFlag::ImmersionUnlock));
+
+    // 初回没入度マックス時の場所変更
+    assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
+    for _i in 0..required_talk_count {
+      on_ai_talk(&req);
+    }
+    assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
+
     Ok(())
   }
 }

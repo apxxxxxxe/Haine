@@ -52,7 +52,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         \\_l[0,1.5em]\
         \\![*]\\q[なにか話して,OnAiTalk]\\n\
         \\![*]\\q[話しかける,OnTalk]\\n\
-        \\![*]\\q[ひと息つく,OnBreakTime]\\n\
+        {}
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\
         \\_l[0,@1.75em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
@@ -61,6 +61,11 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         {}\
         \\_l[0,0]{}\
         ",
+        if vars.flags().check(&EventFlag::ImmersionUnlock) {
+          "\\![*]\\q[ひと息つく,OnBreakTime]\\n".to_string()
+        } else {
+          "".to_string()
+        },
         talk_interval_selector,
         close_button,
         show_bar(

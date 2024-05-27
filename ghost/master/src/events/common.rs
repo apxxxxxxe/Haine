@@ -1,3 +1,4 @@
+use crate::events::aitalk::IMMERSIVE_RATE_MAX;
 use crate::events::talk::{TalkType, TalkingPlace};
 use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
@@ -195,7 +196,7 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   format!("\\1{}\\n", v.join("\\n"))
 }
 
-fn complete_shadow(is_complete: bool) -> String {
+pub fn complete_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -350;
   let vars = get_global_vars();
@@ -207,7 +208,8 @@ fn complete_shadow(is_complete: bool) -> String {
     };
     format!(
       "\\0\\![bind,ex,没入度用,1]\\![anim,offset,800100,0,{}]",
-      ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / 100.0)) as i32 + DEFAULT_Y,
+      ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32
+        + DEFAULT_Y,
     )
   } else {
     "\\0\\![bind,ex,没入度用,0]".to_string()

@@ -33,11 +33,16 @@ pub fn on_key_press(req: &Request) -> Response {
     ),
     "d" => {
       let vars = get_global_vars();
+      vars.set_cumulative_talk_count(0);
       vars.flags_mut().delete(EventFlag::FirstBoot);
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(0));
       vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(1));
       vars.flags_mut().delete(EventFlag::FirstClose);
       vars.flags_mut().delete(EventFlag::FirstHitTalkDone);
+      vars.flags_mut().delete(EventFlag::FirstPlaceChange);
+      vars.flags_mut().delete(EventFlag::LoreIntroduction);
+      vars.flags_mut().delete(EventFlag::ServantIntroduction);
+      vars.flags_mut().delete(EventFlag::ImmersionUnlock);
       for talk_type in TalkType::all() {
         vars
           .flags_mut()
