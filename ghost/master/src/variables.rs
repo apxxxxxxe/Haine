@@ -183,7 +183,6 @@ pub enum EventFlag {
   TalkTypeUnlock(TalkType),
   ServantIntroduction,
   LoreIntroduction,
-  ImmersionIntroduction,
   ImmersionUnlock,
 }
 

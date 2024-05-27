@@ -55,10 +55,6 @@ pub fn on_second_change(req: &Request) -> Response {
         // 10回話したらロア解放
         vars.flags_mut().done(EventFlag::LoreIntroduction);
       }
-      20 => {
-        // 20回話したら没入度解放
-        vars.flags_mut().done(EventFlag::ImmersionIntroduction);
-      }
       _ => {}
     }
     return on_ai_talk(req);

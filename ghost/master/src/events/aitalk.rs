@@ -4,14 +4,15 @@ use crate::events::randomtalk::{
   changing_place_talks, finishing_aroused_talks, RANDOMTALK_COMMENTS,
 };
 use crate::events::talk::anchor::anchor_talks;
-use crate::events::talk::randomtalk::random_talks;
+use crate::events::talk::randomtalk::{random_talks, IMMERSION_INTRODUCTION_TALK};
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
 use crate::get_touch_info;
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::HeaderName, Request, Response};
 
-// トーク1回あたりに上昇する没入度
-const IMMERSIVE_RATE: u32 = 8;
+// トーク1回あたりに上昇する没入度の割合(%)
+const IMMERSIVE_RATE: u32 = 5;
+pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
 pub fn on_ai_talk(_req: &Request) -> Response {
   let vars = get_global_vars();
@@ -41,15 +42,30 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   }
 
   // 没入度を上げる
-  if vars.flags().check(&EventFlag::ImmsersionUnlock) {
-    let immersive_degrees =
-      std::cmp::min(vars.volatility.immersive_degrees() + IMMERSIVE_RATE, 100);
-    if immersive_degrees >= 100 {
-      // 没入度が100に達したら、場所を変える
-      return change_talking_response();
+  let immersive_degrees = std::cmp::min(
+    vars.volatility.immersive_degrees() + IMMERSIVE_RATE,
+    IMMERSIVE_RATE_MAX,
+  );
+  if immersive_degrees >= IMMERSIVE_RATE_MAX {
+    // 没入度が最大に達したら、場所を変える
+    if !vars.flags().check(&EventFlag::ImmersionUnlock) {
+      get_global_vars()
+        .flags_mut()
+        .done(EventFlag::ImmersionUnlock);
+      let response = new_response_with_value(
+        format!(
+          "\\0\\s[1111204]{}{}",
+          complete_shadow(true),
+          IMMERSION_INTRODUCTION_TALK
+        ),
+        TranslateOption::simple_translate(),
+      );
+      vars.volatility.set_immersive_degrees(0);
+      return response;
     }
-    vars.volatility.set_immersive_degrees(immersive_degrees);
+    return change_talking_response();
   }
+  vars.volatility.set_immersive_degrees(immersive_degrees);
 
   // 通常ランダムトーク
   let talks = vars
@@ -66,7 +82,14 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     register_talk_collection(&choosed_talk);
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
   }
-  let comment = RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()];
+  let comment = if vars
+    .flags()
+    .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
+  {
+    RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()]
+  } else {
+    ""
+  };
   new_response_with_value(
     format!(
       "\\0\\![set,balloonnum,{}]{}",

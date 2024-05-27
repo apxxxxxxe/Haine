@@ -42,7 +42,6 @@ pub fn on_key_press(req: &Request) -> Response {
       vars.flags_mut().delete(EventFlag::FirstPlaceChange);
       vars.flags_mut().delete(EventFlag::LoreIntroduction);
       vars.flags_mut().delete(EventFlag::ServantIntroduction);
-      vars.flags_mut().delete(EventFlag::ImmersionIntroduction);
       vars.flags_mut().delete(EventFlag::ImmersionUnlock);
       for talk_type in TalkType::all() {
         vars

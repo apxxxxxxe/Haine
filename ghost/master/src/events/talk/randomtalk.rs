@@ -51,25 +51,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       TalkType::SelfIntroduce => vec![
 
         RandomTalk {
-          id: "没入度について：イントロ",
-          text: "\
-            h1111204\\1……気付けば、辺りが暗くなっていた。\\n\
-            そんなに長く話していただろうか。腕時計を見ると、まだ昼間だった。\\n\
-            h1111207少し話し込んでいたようね。\\n\
-            \\1ハイネは呟き、しばらく手をつけていなかったカップを傾けた。\\n\
-            h1111209\\1……？あたりが再び明るくなっている。\\n\
-            h1111205明かりは、私の霊力で灯しているの。\\n\
-            特別な灯。そちらに注意を払えなくなると、すぐに消えてしまう。\\n\
-            h1121209我ながら不便だけれど、従者に頼むにも難しい仕事でね。\\n\
-            h1121204悪いけれど、そういうものだと思ってちょうだい。\\n\
-          ".to_string(),
-          required_flags: vec![],
-          callback: Some(|| {
-            get_global_vars().flags_mut().done(EventFlag::ImmersionUnlock);
-          })
-        },
-
-        RandomTalk {
           id: "死に対する興味：イントロ",
           text: format!("\
             h1111201死について。深く考えることはある？\\n\
@@ -85,7 +66,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
             ),
-            required_flags: vec![],
+            required_flags: vec![EventFlag::LoreIntroduction],
             callback: Some(|| {
               get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
             }),
@@ -94,7 +75,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         RandomTalk {
           id: "従者について：イントロ",
           text: format!("\
-            \\1……h1111101お茶がなくなってしまった。\\n\
+            \\1……h1111101\\1お茶がなくなってしまった。\\n\
             最初にハイネに言われたのを思いだし、\\n\
             部屋の隅に向って手を上げてみせる。\\n\
             h1111204\\1するとポットが浮き上がり、空になっていたカップにお茶が注がれた。\\n\
@@ -110,7 +91,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
           ),
-          required_flags: vec![],
+          required_flags: vec![EventFlag::ServantIntroduction],
           callback: Some(|| {
             get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
           }),
@@ -1099,7 +1080,7 @@ pub fn changing_place_talks(
   current_talking_place: &TalkingPlace,
 ) -> Vec<String> {
   let vars = get_global_vars();
-  let parts: Vec<Vec<String>> = if vars.flags().check(&EventFlag::FirstPlaceChange) {
+  let parts: Vec<Vec<String>> = if !vars.flags().check(&EventFlag::FirstPlaceChange) {
     vars.flags_mut().done(EventFlag::FirstPlaceChange);
     vec![
       vec![format!(
@@ -1163,3 +1144,15 @@ pub fn changing_place_talks(
   };
   all_combo(&parts)
 }
+
+pub const IMMERSION_INTRODUCTION_TALK: &str = "\
+  \\1……気付けば、辺りが暗くなっていた。\\n\
+  そんなに長く話していただろうか。腕時計を見ると、まだ昼間だった。\\n\
+  \\0少し話し込んでいたようね。\\n\
+  \\1ハイネは呟き、しばらく手をつけていなかった\\0\\![bind,ex,没入度用,0]\\1カップを傾けた。\\n\
+  h1111210\\1……？あたりが再び明るくなっている。\\n\
+  h1111205明かりは、私の霊力で灯しているの。\\n\
+  特別な灯。そちらに注意を払えなくなると、すぐに消えてしまうのよ。\\n\
+  h1121210我ながら不便だけれど、従者に頼むにも難しい仕事でね。\\n\
+  h1121204悪いけれど、そういうものだと思ってちょうだい。\\n\
+  ";
