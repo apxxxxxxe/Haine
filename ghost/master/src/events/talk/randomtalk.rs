@@ -1094,25 +1094,26 @@ pub fn changing_place_talks(
       )],
       match current_talking_place {
         TalkingPlace::Library => {
-          vars
-            .flags_mut()
-            .done(EventFlag::TalkTypeUnlock(TalkType::Abstract));
-          vars
-            .flags_mut()
-            .done(EventFlag::TalkTypeUnlock(TalkType::Past));
+          let achieved_talk_types = [TalkType::Abstract, TalkType::Past];
+          achieved_talk_types.iter().for_each(|t| {
+            vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+          });
+          let achievements_messages = achieved_talk_types
+            .iter()
+            .map(|t| render_achievement_message(*t))
+            .collect::<Vec<_>>();
           vec![format!(
             "h1111204あなた、書斎は初めてね。\\n\
-                \\1……客間より少し狭い程度の間取りに、所狭しと本棚が設置されている。\\n\
-                窓すら本棚に覆われていて、ハイネは蝋燭の灯りで本を読んでいるようだった。\\n\
-                h1111210ここは私の私室でもあるの。\\n\
-                h1111204……あなたは、本を読むのは好き？\\n\
-                h1111306私は好きよ。巨人の肩に乗って遠くが見える。\\n\
-                h1111305あるいは、ここではないどこかへ、遠くへ行ける。\
-                h1111204あなたも自由に読み、そして考えなさい。\\n\
-                h1111310ここはそういう場所よ。{}{}\
-                ",
-            render_achievement_message(TalkType::Abstract),
-            render_achievement_message(TalkType::Past),
+            \\1……客間より少し狭い程度の間取りに、所狭しと本棚が設置されている。\\n\
+            窓すら本棚に覆われていて、ハイネは蝋燭の灯りで本を読んでいるようだった。\\n\
+            h1111210ここは私の私室でもあるの。\\n\
+            h1111204……あなたは、本を読むのは好き？\\n\
+            h1111306私は好きよ。巨人の肩に乗って遠くが見える。\\n\
+            h1111305あるいは、ここではないどこかへ、遠くへ行ける。\
+            h1111204あなたも自由に読み、そして考えなさい。\\n\
+            h1111310ここはそういう場所よ。{}\
+            ",
+            achievements_messages.join("\\n")
           )]
         }
         TalkingPlace::LivingRoom => vec!["これが表示されることはないはず".to_string()],
