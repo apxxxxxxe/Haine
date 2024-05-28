@@ -1,10 +1,11 @@
 name: md5-CI-build
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
+    workflow_run:
+      workflows: ["cargo-test"]
+      types:
+        - completed
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +17,10 @@ env:
 
 jobs:
   build:
-    if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+    if: |
+      ${{ !startsWith(github.ref, 'refs/tags/') }} &&
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main'
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
