@@ -198,7 +198,7 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
 
 pub fn complete_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
-  const MAX_Y: i32 = -350;
+  const MAX_Y: i32 = -100;
   let vars = get_global_vars();
   if is_complete {
     let degree = if vars.volatility.talking_place() == TalkingPlace::Library {
