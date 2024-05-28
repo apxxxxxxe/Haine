@@ -2,10 +2,10 @@ name: md5-CI-build
 
 on:
   workflow_dispatch:
-    workflow_run:
-      workflows: ["cargo-test"]
-      types:
-        - completed
+  workflow_run:
+    workflows: ["cargo-test"]
+    types:
+      - completed
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
