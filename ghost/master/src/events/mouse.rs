@@ -23,6 +23,8 @@ pub fn new_mouse_response(info: String) -> Response {
   // 同一に扱う
   let i = if info == "0bustdoubleclick" {
     "0bustnade".to_string()
+  } else if info == "0handdoubleclick" {
+    "0handnade".to_string()
   } else {
     info
   };
@@ -106,11 +108,39 @@ pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<Str
   let touch_count = get_touch_info!(info.as_str()).count();
   match info.as_str() {
     "0headdoubleclick" => Some(head_hit_dialog(touch_count, vars)),
+    "0headnade" => Some(zero_head_nade(touch_count, vars)),
+    "0facenade" => Some(zero_face_nade(touch_count, vars)),
     "0handnade" => Some(zero_hand_nade(touch_count, vars)),
     "0bustnade" => Some(zero_bust_touch(touch_count, vars)),
     "0skirtup" => Some(zero_skirt_up(touch_count, vars)),
     "0shoulderdown" => Some(zero_shoulder_down(touch_count, vars)),
     _ => None,
+  }
+}
+
+fn zero_head_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
+  if vars.volatility.aroused() {
+    DIALOG_TOUCH_WHILE_HITTING.clone()
+  } else {
+    let dialogs = vec![vec![
+      "h1111205何のつもり？".to_string(),
+      "h1111304それ、あまり好きではないわ。".to_string(),
+      "h1111207軽んじられている気がするわ。".to_string(),
+    ]];
+    phased_talks(count, dialogs).0
+  }
+}
+
+fn zero_face_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
+  if vars.volatility.aroused() {
+    DIALOG_TOUCH_WHILE_HITTING.clone()
+  } else {
+    let dialogs = vec![vec![
+      "h1111204……気安いのね。".to_string(),
+      "h1111201\\1……冷たい。h1111304触れられるだけよ。\\n人間のような触れあいを求められても困るわ。".to_string(),
+      "h1111104\\1すべすべだ。h1111204……もういいかしら。".to_string(),
+    ]];
+    phased_talks(count, dialogs).0
   }
 }
 
