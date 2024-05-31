@@ -26,7 +26,7 @@ pub fn new_mouse_response(info: String) -> Response {
   } else if info == "0handdoubleclick" {
     "0handnade".to_string()
   } else {
-    info
+    info.clone()
   };
 
   if i != last_touch_info.as_str() {
@@ -39,16 +39,19 @@ pub fn new_mouse_response(info: String) -> Response {
     }
     vars.volatility.set_last_touch_info(i.clone());
   }
-  if i.as_str() == "0doubleclick"
-    || i.as_str() == "0headdoubleclick"
-      && !get_global_vars()
-        .flags()
-        .check(&EventFlag::FirstRandomTalkDone(
-          FIRST_RANDOMTALKS.len() as u32 - 1,
-        ))
+
+  if !get_global_vars()
+    .flags()
+    .check(&EventFlag::FirstRandomTalkDone(
+      FIRST_RANDOMTALKS.len() as u32 - 1,
+    ))
   {
-    let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
-    return on_menu_exec(&dummy_req);
+    if info.as_str().contains("doubleclick") {
+      let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
+      return on_menu_exec(&dummy_req);
+    } else {
+      return new_response_nocontent();
+    }
   }
 
   let response = match mouse_dialogs(i.clone(), vars) {
