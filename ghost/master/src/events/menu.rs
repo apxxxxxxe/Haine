@@ -301,38 +301,50 @@ pub fn on_talk_answer(req: &Request) -> Response {
 }
 
 pub fn on_check_talk_collection(_req: &Request) -> Response {
-  let mut s = String::new();
+  let mut lines = Vec::new();
   let mut sum = 0;
   let mut all_sum = 0;
+  const DIMMED_COLOR: &str = "\\f[color,150,150,130]";
   let talk_collection = get_global_vars().talk_collection_mut();
   let vars = get_global_vars();
-  for talk_type in TalkType::all()
+  let talk_types = TalkType::all();
+  let is_unlocked_checks = talk_types
     .iter()
-    .filter(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(**t)))
-    .collect::<Vec<_>>()
-  {
-    let len = talk_collection.get(talk_type).map_or(0, |v| v.len());
-    let all_len = random_talks(*talk_type).len();
-    let anal = if len < all_len {
-      format!(
-        "\\q[未読トーク再生,OnCheckUnseenTalks,{}]",
-        *talk_type as u32
-      )
+    .map(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(*t)))
+    .collect::<Vec<_>>();
+  for i in 0..talk_types.len() {
+    let talk_type = talk_types[i];
+    if !is_unlocked_checks[i] {
+      lines.push(format!(
+        "{}{}: 未解放\\f[default]",
+        DIMMED_COLOR, talk_type
+      ));
     } else {
-      "".to_string()
-    };
-    s.push_str(&format!("{}: {}/{} {}\\n", talk_type, len, all_len, anal));
-    sum += len;
-    all_sum += all_len;
+      let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
+      let all_len = random_talks(talk_type).len();
+      let anal = if len < all_len {
+        format!(
+          "\\n  \\f[height,13]\\q[未読トーク再生,OnCheckUnseenTalks,{}]\\f[default]",
+          talk_type as u32
+        )
+      } else {
+        "".to_string()
+      };
+      lines.push(format!("{}: {}/{}{}", talk_type, len, all_len, anal));
+      sum += len;
+      all_sum += all_len;
+    }
   }
 
   new_response_with_value(
     format!(
-      "\\_q{}\
-    ---\\n\
-    TOTAL: {}/{}\\n\
-    \\q[戻る,OnMenuExec]",
-      s, sum, all_sum
+      "\\_q{}\\n[150]\
+      ---\\n[150]\
+      TOTAL: {}/{}\\n[200]\
+      \\q[戻る,OnMenuExec]",
+      lines.join("\\n"),
+      sum,
+      all_sum
     ),
     TranslateOption::balloon_surface_only(),
   )
