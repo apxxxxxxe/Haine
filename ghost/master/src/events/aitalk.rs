@@ -187,6 +187,8 @@ mod test {
   fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
     let vars = get_global_vars();
     *vars = GlobalVariables::new();
+    vars.set_user_name(Some("test".to_string())); // 実際はOnNotifyUserInfoで設定される
+
     let req = Request {
       method: Method::GET,
       version: Version::V20,
