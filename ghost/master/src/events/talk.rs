@@ -78,11 +78,11 @@ impl Talk {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
 pub enum TalkType {
   SelfIntroduce,
-  Lore,
+  WithYou,
   Servant,
+  Lore,
   Past,
   Abstract,
-  WithYou,
 }
 
 impl Display for TalkType {
