@@ -93,7 +93,7 @@ impl GlobalVariables {
     let mut s = Self {
       total_time: Mutex::new(Some(0)),
       random_talk_interval: Mutex::new(Some(180)),
-      user_name: Mutex::new(Some("ユーザ".to_string())),
+      user_name: Mutex::new(None),
       talk_collection: Mutex::new(HashMap::new()),
       volatility: VolatilityVariables::default(),
       cumulative_talk_count: Mutex::new(0),
