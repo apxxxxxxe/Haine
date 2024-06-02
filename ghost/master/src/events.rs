@@ -1,6 +1,7 @@
 pub mod aitalk;
 mod bootend;
 pub mod common;
+mod input;
 mod key;
 mod menu;
 mod mouse;
@@ -14,6 +15,7 @@ mod webclap;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
 use crate::events::common::*;
+use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
 use crate::events::mouse::*;
@@ -128,6 +130,8 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnCheckUnseenTalks" => Some(on_check_unseen_talks),
     "OnHeadHit" => Some(on_head_hit),
     "OnHeadHitCancel" => Some(on_head_hit_cancel),
+    "OnUserInput" => Some(on_user_input),
+    "OnChangingUserName" => Some(on_changing_user_name),
     _ => None,
   }
 }

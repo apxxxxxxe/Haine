@@ -1,5 +1,6 @@
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::input::InputId;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::TalkType;
 use crate::events::tooltip::show_tooltip;
@@ -45,7 +46,12 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         (FIRST_RANDOMTALKS.len() - 1) as u32,
       ))
     {
-      "\\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n".to_string() + &close_button
+      "\
+      \\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n\
+      \\![*]\\q[その名前で呼ばれたくない,OnChangingUserName]\\n\
+      "
+      .to_string()
+        + &close_button
     } else {
       format!(
         "\
@@ -57,6 +63,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         \\_l[0,@1.75em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
         \\_l[0,@1.75em]\
+        \\![*]\\q[呼び名を変える,OnChangingUserName]\\n\
         {}\
         {}\
         \\_l[0,0]{}\
@@ -315,10 +322,7 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
   for i in 0..talk_types.len() {
     let talk_type = talk_types[i];
     if !is_unlocked_checks[i] {
-      lines.push(format!(
-        "{}{}: 未解放\\f[default]",
-        DIMMED_COLOR, talk_type
-      ));
+      lines.push(format!("{}{}: 未解放\\f[default]", DIMMED_COLOR, talk_type));
     } else {
       let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
       let all_len = random_talks(talk_type).len();
@@ -347,5 +351,23 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
       all_sum
     ),
     TranslateOption::balloon_surface_only(),
+  )
+}
+
+pub fn on_changing_user_name(_req: &Request) -> Response {
+  let vars = get_global_vars();
+  let user_name = if let Some(user_name) = vars.user_name() {
+    user_name
+  } else {
+    error!("User name is not set.");
+    return new_response_nocontent();
+  };
+  new_response_with_value(
+    format!(
+      "\\_q\\![open,inputbox,{},0]新しい呼び名を入力してください。\\n現在:{}",
+      InputId::UserName,
+      user_name,
+    ),
+    TranslateOption::with_shadow_completion(),
   )
 }
