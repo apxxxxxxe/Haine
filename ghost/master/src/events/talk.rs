@@ -145,8 +145,8 @@ pub fn on_check_unseen_talks(req: &Request) -> Response {
   let refs = get_references(req);
   let talk_type = TalkType::from_u32(refs[0].parse::<u32>().unwrap()).unwrap();
   let talk_collection = get_global_vars().talk_collection();
-  let seen_talks = talk_collection.get(&talk_type).unwrap();
-
+  let empty_hashset = HashSet::new();
+  let seen_talks = talk_collection.get(&talk_type).unwrap_or(&empty_hashset);
   let talks = Talk::get_unseen_talks(talk_type, seen_talks);
   let choosed_talk = talks.choose(&mut rand::thread_rng()).unwrap().to_owned();
 
