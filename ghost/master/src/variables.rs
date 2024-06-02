@@ -204,6 +204,7 @@ impl EventFlags {
     self.flags.get(flag).is_some()
   }
 
+  #[allow(dead_code)]
   pub fn delete(&mut self, flag: EventFlag) {
     self.flags.remove(&flag);
   }
@@ -261,6 +262,8 @@ pub struct VolatilityVariables {
   pub talking_place: Mutex<TalkingPlace>,
 
   pub aroused: Mutex<bool>,
+
+  pub last_anchor_id: Mutex<Option<String>>,
 }
 
 #[allow(dead_code)]
@@ -292,6 +295,7 @@ impl VolatilityVariables {
   generate_mut_getter!(touch_info, HashMap<String, TouchInfo>, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
   generate_getter_setter!(aroused, bool, cloneable);
+  generate_getter_setter!(last_anchor_id, Option<String>, cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -320,6 +324,7 @@ impl Default for VolatilityVariables {
       touch_info: Mutex::new(HashMap::new()),
       talking_place: Mutex::new(TalkingPlace::LivingRoom),
       aroused: Mutex::new(false),
+      last_anchor_id: Mutex::new(None),
     }
   }
 }

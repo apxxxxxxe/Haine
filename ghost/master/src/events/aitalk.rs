@@ -160,9 +160,14 @@ fn first_random_talk_response(text: String, i: usize, text_count: usize) -> Resp
 }
 
 pub fn on_anchor_select_ex(req: &Request) -> Response {
+  let vars = get_global_vars();
   let refs = get_references(req);
   let id = refs[1];
   let user_dialog = refs.get(2).unwrap_or(&"").to_string();
+
+  if vars.volatility.last_anchor_id() == Some(id.to_string()) {
+    return new_response_nocontent();
+  }
 
   let mut m = String::from("\\C");
   m += "\\0\\n\\f[align,center]\\_q─\\w1──\\w1───\\w1─────\\w1────\\w1──\\w1──\\w1─\\w1─\\n\\_w[750]\\_q\\_l[@0,]";
@@ -170,7 +175,10 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
     m += &format!("\\1『{}』\\_w[500]", user_dialog);
   }
   match anchor_talks(id) {
-    Some(t) => new_response_with_value(m + &t, TranslateOption::with_shadow_completion()),
+    Some(t) => {
+      vars.volatility.set_last_anchor_id(Some(id.to_string()));
+      new_response_with_value(m + &t, TranslateOption::with_shadow_completion())
+    }
     None => new_response_nocontent(),
   }
 }
