@@ -130,6 +130,7 @@ fn get_event(id: &str) -> Option<fn(&Request) -> Response> {
     "OnCheckUnseenTalks" => Some(on_check_unseen_talks),
     "OnHeadHit" => Some(on_head_hit),
     "OnHeadHitCancel" => Some(on_head_hit_cancel),
+    "OnWindowStateRestore" => Some(on_window_state_restore),
     "OnUserInput" => Some(on_user_input),
     "OnChangingUserName" => Some(on_changing_user_name),
     _ => None,

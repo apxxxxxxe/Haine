@@ -52,3 +52,12 @@ fn input_user_name(text: String) -> Response {
   );
   new_response_with_value(m, TranslateOption::simple_translate())
 }
+
+pub fn on_window_state_restore(_req: &Request) -> Response {
+  let vars = get_global_vars();
+  // トーク間隔をリセット
+  vars
+    .volatility
+    .set_last_random_talk_time(vars.volatility.ghost_up_time());
+  new_response_nocontent()
+}
