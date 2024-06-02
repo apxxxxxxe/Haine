@@ -81,6 +81,17 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     // ユーザが見ているときのみトークを消費&トークカウントを加算
     register_talk_collection(&choosed_talk);
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
+    match vars.cumulative_talk_count() {
+      5 => {
+        // 5回話したら従者関連のトークを解放
+        vars.flags_mut().done(EventFlag::ServantIntroduction);
+      }
+      10 => {
+        // 10回話したらロア解放
+        vars.flags_mut().done(EventFlag::LoreIntroduction);
+      }
+      _ => {}
+    }
   }
   let comment = if vars
     .flags()
