@@ -63,7 +63,14 @@ pub fn new_mouse_response(info: String) -> Response {
       ),
       TranslateOption::with_shadow_completion(),
     ),
-    None => new_response_nocontent(),
+    None => {
+      if info.contains("doubleclick") {
+        let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
+        on_menu_exec(&dummy_req)
+      } else {
+        new_response_nocontent()
+      }
+    }
   };
 
   // 一括で回数を増やす

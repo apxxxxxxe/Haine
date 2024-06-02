@@ -46,17 +46,6 @@ pub fn on_second_change(req: &Request) -> Response {
       .get("minimizing")
       .is_some_and(|v| v)
   {
-    match vars.cumulative_talk_count() {
-      5 => {
-        // 5回話したら従者関連のトークを解放
-        vars.flags_mut().done(EventFlag::ServantIntroduction);
-      }
-      10 => {
-        // 10回話したらロア解放
-        vars.flags_mut().done(EventFlag::LoreIntroduction);
-      }
-      _ => {}
-    }
     return on_ai_talk(req);
   }
 

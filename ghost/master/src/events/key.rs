@@ -1,8 +1,8 @@
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
-use crate::events::talk::{random_talks_analysis, TalkType};
-use crate::variables::{get_global_vars, EventFlag, GHOST_NAME};
+use crate::events::talk::random_talks_analysis;
+use crate::variables::{get_global_vars, EventFlag, GlobalVariables, GHOST_NAME};
 use shiorust::message::{Request, Response};
 
 pub fn on_key_press(req: &Request) -> Response {
@@ -33,21 +33,7 @@ pub fn on_key_press(req: &Request) -> Response {
     ),
     "d" => {
       let vars = get_global_vars();
-      vars.set_cumulative_talk_count(0);
-      vars.flags_mut().delete(EventFlag::FirstBoot);
-      vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(0));
-      vars.flags_mut().delete(EventFlag::FirstRandomTalkDone(1));
-      vars.flags_mut().delete(EventFlag::FirstClose);
-      vars.flags_mut().delete(EventFlag::FirstHitTalkDone);
-      vars.flags_mut().delete(EventFlag::FirstPlaceChange);
-      vars.flags_mut().delete(EventFlag::LoreIntroduction);
-      vars.flags_mut().delete(EventFlag::ServantIntroduction);
-      vars.flags_mut().delete(EventFlag::ImmersionUnlock);
-      for talk_type in TalkType::all() {
-        vars
-          .flags_mut()
-          .delete(EventFlag::TalkTypeUnlock(talk_type));
-      }
+      *vars = GlobalVariables::new();
       new_response_with_value(
         format!("\\![change,ghost,{}]", GHOST_NAME),
         TranslateOption::none(),
