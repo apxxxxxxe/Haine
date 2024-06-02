@@ -47,7 +47,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
       ))
     {
       "\
-      \\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n\
+      \\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n[150]\
       \\![*]\\q[その名前で呼ばれたくない,OnChangingUserName]\\n\
       "
       .to_string()
@@ -151,13 +151,10 @@ pub fn on_break_time(_req: &Request) -> Response {
 pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
   // 没入度を下げる
   let vars = get_global_vars();
-  let current_immersive_degrees = vars.volatility.immersive_degrees();
-  vars
-    .volatility
-    .set_immersive_degrees((current_immersive_degrees / 2).saturating_sub(1));
+  vars.volatility.set_immersive_degrees(0);
 
   let m = "\
-  \\Ch1111210\\1(没入度が半減した)\\x\\![raise,OnMenuExec]\
+  \\Ch1111210\\1(没入度が0になった)\\x\\![raise,OnMenuExec]\
   "
   .to_string();
 
