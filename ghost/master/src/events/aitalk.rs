@@ -76,7 +76,13 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     .filter(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(**t)))
     .flat_map(|t| random_talks(*t))
     .collect::<Vec<_>>();
-  let choosed_talk = talks[choose_one(&talks, if_consume_talk_bias).unwrap()].clone();
+  let index = choose_one(&talks, if_consume_talk_bias);
+  if index.is_none() {
+    let mut res = new_response_nocontent();
+    add_error_description(&mut res, "No talk found");
+    return res;
+  }
+  let choosed_talk = talks[index.unwrap()].clone();
   if if_consume_talk_bias {
     // ユーザが見ているときのみトークを消費&トークカウントを加算
     register_talk_collection(&choosed_talk);
