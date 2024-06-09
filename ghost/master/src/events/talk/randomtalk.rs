@@ -1,7 +1,7 @@
 use crate::events::common::*;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
-use crate::variables::{get_global_vars, EventFlag};
+use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
 
@@ -42,7 +42,7 @@ fn random_book_topic() -> (&'static str, &'static str) {
 struct RandomTalk {
   id: &'static str,
   text: String,
-  required_flags: Vec<EventFlag>,
+  required_condition: Option<fn(&mut GlobalVariables) -> bool>,
   callback: Option<fn()>,
 }
 
@@ -66,7 +66,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
             ),
-            required_flags: vec![EventFlag::LoreIntroduction],
+            required_condition: Some(|vars| vars.flags().check(&EventFlag::LoreIntroduction)),
             callback: Some(|| {
               get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
             }),
@@ -91,7 +91,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
           ),
-          required_flags: vec![EventFlag::ServantIntroduction],
+        required_condition: Some(|vars| vars.flags().check(&EventFlag::ServantIntroduction)),
           callback: Some(|| {
             get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
           }),
@@ -105,7 +105,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           h1111205それは今でも変わらない。\\n\
           h1111305どんな新しい発見があるのか、いつも楽しみにしているのよ。\
           ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -115,7 +115,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           h1111203服装にはどちらかというと無頓着なの。\\n\
           h1112305一度決めた「いつもの」を守り続けるのが楽で、いつもそうしているわ。\
           ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -127,7 +127,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           自分のものだという実感はもうなくなってしまって、\\n\
           h1123310今読んでも他人の伝記を読んでいるようだわ。\\n\
           ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -143,7 +143,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             なにせ、今のファッションについていける自信がないわ。\\n\
             ……h1123204ジーンズはまだ流行ってる？\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -158,7 +158,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ".to_string(),
             "h1111304……なに、その顔は。h1111310あいにく、私は生きていた頃から恋愛とは無縁よ。\\n\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -174,7 +174,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111203霊にも社会があってね。\\n\
             h1111515ノブレス・オブリージュというわけ。\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -186,7 +186,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1111210あなたがここに来たのも、\\n\
             偶然ではないのかもしれないわね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -196,9 +196,10 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210ここは私の生家なの。実際は別荘なのだけど。\\n\
             h1111206知っての通り、従者がいなければ掃除が行き届かないほど広いの。\\n\
             ".to_string(),
-            "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\
+            "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\\n\
+            h1111210くつろいで暮らすのにこれ以上の場所はないわ。\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -223,7 +224,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1113204技術の進歩ね。\\n\
             h1113205……十年ひと昔、このままでは置いていかれてしまいそうね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -234,7 +235,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111205印象的な光景を、いつでも手元に残しておける。\\n\
             ……h1111201あら、私？h1121204光栄だけれど、残念ながら写真には写らないわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -249,7 +250,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111205次も、霧の濃い日にいらっしゃい。\\n\
             そのほうが身体が楽なの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -262,7 +263,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111211羨ましいわ。\\n\
             h1111211私は\\_a[Fastened,どういうこと？]見ていることしかできない\\_aから、なおさら。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -279,7 +280,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1111206色眼鏡で見られたとして、気にする必要はないわ。\\n\
             自分に嘘をつかないことがいちばん大切だから。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -293,7 +294,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111205何かに没頭していると、食事をとる時間も惜しく思えてしまって。\\n\
             ……h1123310思えば、家政婦には随分と世話をかけたわね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -311,7 +312,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111205それに絵に描いてもらえるなんて、願ってもないことだもの。\\n\
             h1111210描きあげたら、また見せてね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
       ],
@@ -327,7 +328,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             彼らにとって、境界線といえばまず川が連想されたのかしら。\\n\
             h1111210あなたなら、あの世とこの世の間にはなにがあると思う？\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -342,7 +343,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1111201呆れるほどに多彩で、\\n\
             身近に根ざした感情の象徴だわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -360,7 +361,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204神が起こした奇跡として大切に扱われることもあるの。\\n\
             ……どちらにせよ、ふつうの葬送は望めなさそうね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -375,7 +376,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あるいは夢枕に立って生命を吸い取るという民話は、\\n\
             そんな様子に理由をつけるためのものじゃないかしら。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -387,7 +388,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             乾燥して縮むから、皮膚の下の髪や爪が露出する。\\n\
             それがまるで生長しているように見えたの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -400,7 +401,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210あなたも墓地を歩くときは気をつけて……って、\\n\
             h1111204あなたの住む場所にそんなところは少ないかしら。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -412,7 +413,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ときに命を落としていることもあるわね。\\n\
             ……h1113101求めるのは間違ったことなのかしら？\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -424,7 +425,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あの現象は、\\_a[Misemono,どんな見世物だったの？]死者の蘇りを謳う見世物\\_aに\\n\
             利用されたことがあったの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -436,7 +437,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             それ以上に、死を恐れる人々を抑えるためだったのかもしれないわね。\\n\
             h1113205罰ではあれど、必要以上に苦しませることはない、と。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -448,7 +449,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210……いつかその時が来るのかしら。霊体を観測し、干渉し……あるいは、消滅させる方法。\\n\
             h1111205ふふ。私、期待しているの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -462,7 +463,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1212210自分で出られない状態で、冷たい土の下へ。\\n\
             ……h1211506どんな心地がしたのかしらね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -479,7 +480,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             "h1111206……つまり、彼らのように霊力が弱ければ、\\n\
             誰かさんにべたべたと触られることもなかったということね。\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -494,7 +495,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ".to_string(),
             "\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -508,7 +509,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1113204少し形は違えど、あなたもその一人ね。\\n\
             h1113211期待しているわ、{user_name}。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -524,7 +525,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1121206……他人の魂を玩具になんてしないわよ。\\n\
             h1121301勘違いしているようだけど、私にそんな嗜好はないわ。\
             ".to_string()),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -538,7 +539,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204あなたの価値は、その自由意志。\\n\
             h1111210ここは予想通りなものばかりで退屈なの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -550,7 +551,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           text: "\
             h1111205みじめな人生の上に正気でいるには、\\n日々は長すぎたの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -562,7 +563,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1112205だからといって、他人に責をなすりつけるほど鈍くあることもできなかった。\\n\
             h1112210この気持ちには、どこにも行き場がなかったの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -575,7 +576,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1111110。いえ、死んだ後で報われようだなんて。\\n\
             h1121205……h1121305悪いわね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -586,7 +587,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             もう一度同じ人生を生きることができたとしても、私は同じことをすると断言できるわ。\\n\
             ……h1121210ただ、遺書くらいは書いたほうがよかったかしら。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -596,7 +597,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111205助けようとしてくれた人は沢山いたけれど、\\n\
             h1121210それが遂げられることはついぞなかったわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -606,7 +607,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210生きていて良かったと思えることは数えきれないほどあったわ。\\n\
             h1111205でも、死なない理由は一つも見つからなかった。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -617,7 +618,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             でも、私を救えはしなかった。\\n\
             理解と共感は、違う。h1112105……違うのよ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -631,7 +632,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             今ここにいる私は、私以外でいられない。\\n\
             h1122210だから、私として生きることができなかった私は、もうどこにもいられない。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -642,7 +643,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1121204もちろん、区別がつかないという意味ではなくて。\\n\
             ……h1111210人に期待するものがそれだけしか無かったの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -661,7 +662,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111204終わったら意見を交換しましょう。\
             ", topic.0, topic.1)
           },
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -673,7 +674,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……h1112305今度こそ、終わらせたいの。\\n\
             今度こそ、無へ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -685,25 +686,40 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111206多少の不純物が含まれようと、そのルールは変わらない。\\n\
             h1111205私は、それを待ち望んでいるの。\
             ".to_string(),
-          required_flags: vec![],
-          callback: None,
-        },
-
-        RandomTalk {
-          id: "月の満ち欠けのように",
-          text: "\
-            h1111205月の満ち欠けのように、私の心は移り変わる。\\n\
-            h1111210理解を得ることは難しかったわ。\\n\
-            そんな仕打ちも、納得はできる。自分ですら不可解なのだから。\\n\
-            ……h1121306少しでも自分で律することができたなら、\\n\
-            こんなに苦しむことはなかっただろうに。\
-            ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
       ],
       TalkType::Abstract => vec![
+
+        RandomTalk {
+          id: "ハイネの死",
+          text: {
+            let vars = get_global_vars();
+            let achieved_talk_types = [TalkType::Past];
+            achieved_talk_types.iter().for_each(|t| {
+              vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+            });
+            let achievements_messages = achieved_talk_types
+              .iter()
+              .map(|t| render_achievement_message(*t))
+              .collect::<Vec<_>>();
+            format!("\
+              h1111210…………幽霊にとって、自身の死の記憶はある種のタブーなの。\\n\
+              誰もが持つがゆえの共通認識。自身の死は恥部なのよ。\\n\
+              私も、彼らのそれには深く踏み込まない。\\n\
+              けれど、あなたは生者だから。\\n\
+              \\n\
+              ……私の死因は、自殺よ。\\n\
+              この家で死に、そしてここに縛り付けられたの。\\n\
+              {}", 
+              achievements_messages.join("\\n")
+            )
+          },
+          required_condition: Some(|vars| vars.flags().check(&EventFlag::InformationHaineSuicide)),
+          callback: None,
+        },
 
         RandomTalk {
           id: "自己理解、他者理解",
@@ -712,7 +728,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111206……私が知らない私がいる。\\n\
             h1112204なんだか不安になってきたわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -727,7 +743,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             まして、自分の中に秘めるものならなおさら。\\n\
             h1111506どちらか一方だけだなんて、勿体ないわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -739,7 +755,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             私は報いを受けたのだ。\\n\\n\
             ……h1111205それが、自分を納得させるための妄想だったとしたら？\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -749,7 +765,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111201怖いものだからこそ、見つめなければ戦えない。\\n\
             ……h1121205そんなもの、戦える人のためだけの論理だわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -762,7 +778,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1121210それはやがて、淀み、腐る。\\n\
             h1111205願わくば、せめて終わりがありますように。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -775,7 +791,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111201あなた、h1111205もしそうなったときは、多少無理にでも変化を取り入れるほうがいいわ。\\n\
             ……h1111210たとえなにかを破壊することになるとしても、何も出来ないよりはずっとましよ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -786,7 +802,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             命が命でなくなり、身体が陳腐な肉の塊になる、その一瞬が愛しくてたまらない。\\n\
             どうしようもなく、愛しいの。\\n\\n\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -795,7 +811,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           text: "\
             h1112110どうか、死の向こう側がありませんように。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -809,7 +825,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111110どうして。\\n\
             h1121205どうして、こうなってしまったのだろう。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -821,7 +837,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111105人という恐ろしく不可解な物の、どこにその根源があるのか。\\n\
             それを知るには、他に方法が思いつかないの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -832,7 +848,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             理解できなくても見ていてほしかったの。\\n\
             ……h1121205わがままかしら。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -846,7 +862,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111206もちろん、死を悼む者にとっての慰めよ。\\n\
             むくろに心はないもの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -856,7 +872,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210燃え殻がひとりでに崩れるように、心が静かに割れて戻らなくなった。\\n\
             h1111205だから、諦めたの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -866,7 +882,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210中途半端な助けは何もしないより残酷だわ。\\n\
             h1111205希望を持たせておいて、それを奪うのだもの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -877,7 +893,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             想定外だったのは、レンズが歪んでいたことと、それを取り替える方法がなかったこと。\\n\
             h1121310そうなればすべて台無し。h1121304諦めるしかなかったわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -889,7 +905,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1112305目先の手首を切り裂くほうが遥かに明瞭なのだ！\\n\
             ……h1111210なんてね。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -901,7 +917,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             あなたが見る世界を私が知ることはできないの。\\n\
             h1112210それって、この上なく残酷なことだわ。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -914,7 +930,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             曇る視界と引き換えにね。\\n\
             ……h1111204あなたには、私はどう見えているのかしら？\\n\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -929,7 +945,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             ……自己は最初から決定されている？\\n\
             h1111210それこそ、ね。\\n\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -940,7 +956,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111205答えは簡単。他人があなたではなく、あなたが他人でないからよ。\\n\
             畢竟、あなた以外にあなたを理解できるひとはいないの。\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -951,7 +967,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111206何かを得るとき、選択は慎重になさい。\\n\
             h1111205それは失うものをも左右するのだから。\\n\
             ".to_string(),
-          required_flags: vec![],
+          required_condition: None,
           callback: None,
         },
 
@@ -961,14 +977,17 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
   let vars = get_global_vars();
   let mut talks = Vec::new();
   for s in strings {
-    if s.required_flags.iter().all(|flag| vars.flags().check(flag)) {
-      talks.push(Talk::new(
-        Some(talk_type),
-        s.id,
-        s.text.to_string(),
-        s.callback,
-      ));
+    if let Some(expr) = s.required_condition {
+      if !expr(vars) {
+        continue;
+      }
     }
+    talks.push(Talk::new(
+      Some(talk_type),
+      s.id,
+      s.text.to_string(),
+      s.callback,
+    ));
   }
   talks
 }
@@ -976,6 +995,19 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
 #[allow(dead_code)]
 static BOTSU: Lazy<Vec<(&str, String)>> = Lazy::new(|| {
   vec![
+
+    // RandomTalk {
+    //   id: "月の満ち欠けのように",
+    //   text: "\
+    //     h1111205月の満ち欠けのように、私の心は移り変わる。\\n\
+    //     h1111210理解を得ることは難しかったわ。\\n\
+    //     そんな仕打ちも、納得はできる。自分ですら不可解なのだから。\\n\
+    //     ……h1121306少しでも自分で律することができたなら、\\n\
+    //     こんなに苦しむことはなかっただろうに。\
+    //     ".to_string(),
+    //   required_flags: None,
+    //   callback: None,
+    // },
 
     ("茶菓子は用意してね", "\
     h1111210茶葉や茶菓子はあなたが持ってきてね。\\n\
@@ -1095,7 +1127,7 @@ pub fn changing_place_talks(
       )],
       match current_talking_place {
         TalkingPlace::Library => {
-          let achieved_talk_types = [TalkType::Abstract, TalkType::Past];
+          let achieved_talk_types = [TalkType::Abstract];
           achieved_talk_types.iter().for_each(|t| {
             vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
           });

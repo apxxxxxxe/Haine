@@ -184,6 +184,7 @@ pub enum EventFlag {
   ServantIntroduction,
   LoreIntroduction,
   ImmersionUnlock,
+  InformationHaineSuicide,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
