@@ -196,7 +196,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111210ここは私の生家なの。実際は別荘なのだけど。\\n\
             h1111206知っての通り、従者がいなければ掃除が行き届かないほど広いの。\\n\
             ".to_string(),
-            "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\
+            "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\\n\
+            h1111210くつろいで暮らすのにこれ以上の場所はないわ。\
             ".to_string()),
           required_flags: vec![],
           callback: None,
@@ -689,21 +690,36 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           callback: None,
         },
 
-        RandomTalk {
-          id: "月の満ち欠けのように",
-          text: "\
-            h1111205月の満ち欠けのように、私の心は移り変わる。\\n\
-            h1111210理解を得ることは難しかったわ。\\n\
-            そんな仕打ちも、納得はできる。自分ですら不可解なのだから。\\n\
-            ……h1121306少しでも自分で律することができたなら、\\n\
-            こんなに苦しむことはなかっただろうに。\
-            ".to_string(),
-          required_flags: vec![],
-          callback: None,
-        },
-
       ],
       TalkType::Abstract => vec![
+
+        RandomTalk {
+          id: "ハイネの死",
+          text: {
+            let vars = get_global_vars();
+            let achieved_talk_types = [TalkType::Past];
+            achieved_talk_types.iter().for_each(|t| {
+              vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+            });
+            let achievements_messages = achieved_talk_types
+              .iter()
+              .map(|t| render_achievement_message(*t))
+              .collect::<Vec<_>>();
+            format!("\
+              h1111210…………幽霊にとって、自身の死の記憶はある種のタブーなの。\\n\
+              誰もが持つがゆえの共通認識。自身の死は恥部なのよ。\\n\
+              私も、彼らのそれには深く踏み込まない。\\n\
+              けれど、あなたは生者だから。\\n\
+              \\n\
+              ……私の死因は、自殺よ。\\n\
+              この家で死に、そしてここに縛り付けられたの。\\n\
+              {}", 
+              achievements_messages.join("\\n")
+            )
+          },
+          required_flags: vec![EventFlag::InformationHaineSuicide],
+          callback: None,
+        },
 
         RandomTalk {
           id: "自己理解、他者理解",
@@ -977,6 +993,19 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
 static BOTSU: Lazy<Vec<(&str, String)>> = Lazy::new(|| {
   vec![
 
+    // RandomTalk {
+    //   id: "月の満ち欠けのように",
+    //   text: "\
+    //     h1111205月の満ち欠けのように、私の心は移り変わる。\\n\
+    //     h1111210理解を得ることは難しかったわ。\\n\
+    //     そんな仕打ちも、納得はできる。自分ですら不可解なのだから。\\n\
+    //     ……h1121306少しでも自分で律することができたなら、\\n\
+    //     こんなに苦しむことはなかっただろうに。\
+    //     ".to_string(),
+    //   required_flags: vec![],
+    //   callback: None,
+    // },
+
     ("茶菓子は用意してね", "\
     h1111210茶葉や茶菓子はあなたが持ってきてね。\\n\
     h1111206ここにある分は限られているし、私一人では補充する手段がないから。\\n\
@@ -1095,7 +1124,7 @@ pub fn changing_place_talks(
       )],
       match current_talking_place {
         TalkingPlace::Library => {
-          let achieved_talk_types = [TalkType::Abstract, TalkType::Past];
+          let achieved_talk_types = [TalkType::Abstract];
           achieved_talk_types.iter().for_each(|t| {
             vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
           });
