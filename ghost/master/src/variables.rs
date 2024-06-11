@@ -186,8 +186,6 @@ pub enum EventFlag {
   FirstHitTalkStart,
   FirstHitTalkDone,
   TalkTypeUnlock(TalkType),
-  ServantIntroduction,
-  LoreIntroduction,
   ImmersionUnlock,
 }
 

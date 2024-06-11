@@ -5,6 +5,9 @@ use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
 
+pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
+pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
+
 pub const RANDOMTALK_COMMENTS: [&str; 15] = [
   "霧が濃い。",
   "「主に誉れあれ。」",
@@ -66,7 +69,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
             ),
-            required_condition: Some(|vars| vars.flags().check(&EventFlag::LoreIntroduction)),
+            required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_LORE),
             callback: Some(|| {
               get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
             }),
@@ -91,7 +94,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
           ),
-        required_condition: Some(|vars| vars.flags().check(&EventFlag::ServantIntroduction)),
+        required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT),
           callback: Some(|| {
             get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
           }),
