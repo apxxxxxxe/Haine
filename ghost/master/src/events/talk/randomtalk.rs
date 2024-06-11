@@ -5,7 +5,9 @@ use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
 
+pub const TALK_ID_SERVANT_INTRO: &str = "従者について：イントロ";
 pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
+pub const TALK_ID_LORE_INTRO: &str = "死に対する興味：イントロ";
 pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
 pub const RANDOMTALK_COMMENTS: [&str; 15] = [
@@ -54,7 +56,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       TalkType::SelfIntroduce => vec![
 
         RandomTalk {
-          id: "死に対する興味：イントロ",
+        id: TALK_ID_LORE_INTRO,
           text: format!("\
             h1111201死について。深く考えることはある？\\n\
             h1111206……あなたには聞くまでもないようね。\\n\
@@ -76,7 +78,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         },
 
         RandomTalk {
-          id: "従者について：イントロ",
+          id: TALK_ID_SERVANT_INTRO,
           text: format!("\
             \\1……h1111101\\1お茶がなくなってしまった。\\n\
             最初にハイネに言われたのを思いだし、\\n\
