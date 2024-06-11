@@ -8,6 +8,7 @@ use shiorust::message::{parts::HeaderName, Response, *};
 
 pub fn on_boot(_req: &Request) -> Response {
   let vars = get_global_vars();
+  vars.set_total_boot_count(vars.total_boot_count() + 1);
   if !vars.flags().check(&EventFlag::FirstBoot) {
     vars.flags_mut().done(EventFlag::FirstBoot);
     let mut res = new_response_with_value(
