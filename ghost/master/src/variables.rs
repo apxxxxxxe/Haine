@@ -68,6 +68,9 @@ macro_rules! generate_mut_getter {
 
 #[derive(Serialize, Deserialize)]
 pub struct GlobalVariables {
+  // ゴーストの累計起動回数
+  total_boot_count: Mutex<u64>,
+
   // ゴーストの累計起動時間(秒数)
   total_time: Mutex<Option<u64>>,
 
@@ -91,6 +94,7 @@ pub struct GlobalVariables {
 impl GlobalVariables {
   pub fn new() -> Self {
     let mut s = Self {
+      total_boot_count: Mutex::new(0),
       total_time: Mutex::new(Some(0)),
       random_talk_interval: Mutex::new(Some(180)),
       user_name: Mutex::new(None),
@@ -153,6 +157,7 @@ impl GlobalVariables {
     }
   }
 
+  generate_getter_setter!(total_boot_count, u64, cloneable);
   generate_getter_setter!(total_time, Option<u64>, cloneable);
   generate_getter_setter!(random_talk_interval, Option<u64>, cloneable);
   generate_getter_setter!(user_name, Option<String>, cloneable);
@@ -181,10 +186,7 @@ pub enum EventFlag {
   FirstHitTalkStart,
   FirstHitTalkDone,
   TalkTypeUnlock(TalkType),
-  ServantIntroduction,
-  LoreIntroduction,
   ImmersionUnlock,
-  InformationHaineSuicide,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]

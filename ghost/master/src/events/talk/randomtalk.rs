@@ -5,6 +5,11 @@ use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 use once_cell::sync::Lazy;
 use rand::prelude::*;
 
+pub const TALK_ID_SERVANT_INTRO: &str = "従者について：イントロ";
+pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
+pub const TALK_ID_LORE_INTRO: &str = "死に対する興味：イントロ";
+pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
+
 pub const RANDOMTALK_COMMENTS: [&str; 15] = [
   "霧が濃い。",
   "「主に誉れあれ。」",
@@ -51,7 +56,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       TalkType::SelfIntroduce => vec![
 
         RandomTalk {
-          id: "死に対する興味：イントロ",
+        id: TALK_ID_LORE_INTRO,
           text: format!("\
             h1111201死について。深く考えることはある？\\n\
             h1111206……あなたには聞くまでもないようね。\\n\
@@ -66,14 +71,14 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
             ),
-            required_condition: Some(|vars| vars.flags().check(&EventFlag::LoreIntroduction)),
+            required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_LORE),
             callback: Some(|| {
               get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
             }),
         },
 
         RandomTalk {
-          id: "従者について：イントロ",
+          id: TALK_ID_SERVANT_INTRO,
           text: format!("\
             \\1……h1111101\\1お茶がなくなってしまった。\\n\
             最初にハイネに言われたのを思いだし、\\n\
@@ -91,7 +96,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
           ),
-        required_condition: Some(|vars| vars.flags().check(&EventFlag::ServantIntroduction)),
+        required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT),
           callback: Some(|| {
             get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
           }),
@@ -717,7 +722,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               achievements_messages.join("\\n")
             )
           },
-          required_condition: Some(|vars| vars.flags().check(&EventFlag::InformationHaineSuicide)),
+          required_condition: Some(|vars| vars.total_boot_count() >= 3),
           callback: None,
         },
 

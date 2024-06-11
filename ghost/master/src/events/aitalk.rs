@@ -87,17 +87,6 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     // ユーザが見ているときのみトークを消費&トークカウントを加算
     register_talk_collection(&choosed_talk);
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
-    match vars.cumulative_talk_count() {
-      5 => {
-        // 5回話したら従者関連のトークを解放
-        vars.flags_mut().done(EventFlag::ServantIntroduction);
-      }
-      10 => {
-        // 10回話したらロア解放
-        vars.flags_mut().done(EventFlag::LoreIntroduction);
-      }
-      _ => {}
-    }
   }
   let comment = if vars
     .flags()
@@ -193,6 +182,10 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
 mod test {
   use super::*;
   use crate::events::on_boot;
+  use crate::events::talk::randomtalk::{
+    random_talks, TALK_ID_LORE_INTRO, TALK_ID_SERVANT_INTRO, TALK_UNLOCK_COUNT_LORE,
+    TALK_UNLOCK_COUNT_SERVANT,
+  };
   use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::parts::*;
   use shiorust::message::Request;
@@ -208,6 +201,9 @@ mod test {
       version: Version::V20,
       headers: Headers::new(),
     };
+
+    // テスト中は常に非アイドル状態
+    vars.volatility.set_idle_seconds(IDLE_THRESHOLD - 1);
 
     // 初回起動時のフラグチェック
     assert!(!vars.flags().check(&EventFlag::FirstBoot));
@@ -251,6 +247,34 @@ mod test {
       on_ai_talk(&req);
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
+
+    // 従者関連トークの開放確認
+    while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_SERVANT {
+      on_ai_talk(&req);
+    }
+    let r = random_talks(TalkType::SelfIntroduce);
+    let unlock_talk_servant = r.iter().find(|t| t.id == TALK_ID_SERVANT_INTRO);
+    if unlock_talk_servant.is_none() {
+      return Err("Failed to find unlock talk for servant".into());
+    }
+    unlock_talk_servant.unwrap().consume();
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)));
+
+    // ロア関連トークの開放確認
+    while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_LORE {
+      on_ai_talk(&req);
+    }
+    let r = random_talks(TalkType::SelfIntroduce);
+    let unlock_talk_lore = r.iter().find(|t| t.id == TALK_ID_LORE_INTRO);
+    if unlock_talk_lore.is_none() {
+      return Err("Failed to find unlock talk for lore".into());
+    }
+    unlock_talk_lore.unwrap().consume();
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
 
     Ok(())
   }
