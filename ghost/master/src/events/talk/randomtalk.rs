@@ -717,7 +717,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               achievements_messages.join("\\n")
             )
           },
-          required_condition: Some(|vars| vars.flags().check(&EventFlag::InformationHaineSuicide)),
+          required_condition: Some(|vars| vars.total_boot_count() >= 3),
           callback: None,
         },
 
