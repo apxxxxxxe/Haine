@@ -379,7 +379,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let delay = format!("\\_w[{}]", DELAY);
   let animation = cuts
     .iter()
-    .map(|s| format!("\\s[{}]{}", s, complete_shadow(is_complete)))
+    .map(|s| format!("\\0\\s[{}]{}", s, complete_shadow(is_complete)))
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
