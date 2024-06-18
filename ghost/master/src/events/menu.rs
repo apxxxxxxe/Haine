@@ -35,7 +35,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     selections.join("  ")
   );
 
-  let close_button = format!("\\_l[0,11em]\\__q[script:\\e]{}\\__q", Icon::Cross);
+  let close_button = format!("\\_l[0,0]\\f[align,right]\\__q[script:\\e]{}\\__q", Icon::Cross);
   let vars = get_global_vars();
   let m = format!(
     "\\_q{}{}",
