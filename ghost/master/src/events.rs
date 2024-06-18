@@ -39,14 +39,7 @@ pub fn handle_request(req: &Request) -> Response {
     Some(id) => id,
     None => return new_response_nocontent(),
   };
-
   debug!("event: {}", event_id);
-
-  let vars = get_global_vars();
-
-  if let Some(v) = req.headers.get("Status") {
-    vars.volatility.status_mut().set(v.to_string());
-  }
 
   let event = match get_event(event_id.as_str()) {
     Some(e) => e,

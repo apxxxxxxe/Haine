@@ -1,6 +1,7 @@
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::status::Status;
 use crate::variables::{get_global_vars, EventFlag};
 use chrono::Timelike;
 use rand::prelude::SliceRandom;
@@ -37,21 +38,18 @@ pub fn on_second_change(req: &Request) -> Response {
   let idle_secs = refs[4].parse::<i32>().unwrap();
   vars.volatility.set_idle_seconds(idle_secs);
 
+  let status = Status::from_request(req);
+
   if vars.random_talk_interval().unwrap() > 0
     && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time())
       > vars.random_talk_interval().unwrap()
-    && !vars
-      .volatility
-      .status()
-      .get("minimizing")
-      .is_some_and(|v| v)
+    && status.clone().is_some_and(|s| !s.minimizing)
   {
     return on_ai_talk(req);
   }
 
   let mut text = String::new();
-  if vars.volatility.ghost_up_time() % 60 == 0 && !vars.volatility.status().get("talking").unwrap()
-  {
+  if vars.volatility.ghost_up_time() % 60 == 0 && status.is_some_and(|s| !s.talking) {
     // 1分ごとにサーフェスを重ね直す
     text += STICK_SURFACE;
   }
