@@ -411,9 +411,9 @@ impl Display for Icon {
     write!(
       f,
       "\
-    \\f[height,14]\\f[name,icomoon.ttf]\\_l[,@-1]\
+    \\f[height,14]\\f[name,icomoon.ttf]\
     \\_u[0xE{}]\
-    \\f[name,default]\\f[height,default]\\_l[,@1]\
+    \\f[name,default]\\f[height,default]\
     ",
       self.to_code()
     )
