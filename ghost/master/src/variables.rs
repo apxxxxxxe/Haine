@@ -4,7 +4,6 @@ use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{TalkType, TalkingPlace};
 use crate::roulette::TalkBias;
-use crate::status::Status;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
@@ -250,8 +249,6 @@ pub struct VolatilityVariables {
 
   pub talk_bias: Mutex<TalkBias>,
 
-  pub status: Mutex<Status>,
-
   pub current_surface: Mutex<i32>,
 
   pub idle_seconds: Mutex<i32>,
@@ -285,8 +282,6 @@ impl VolatilityVariables {
   generate_getter_setter!(last_touch_info, String, cloneable);
   generate_mut_getter!(inserter, Inserter, non_cloneable);
   generate_mut_getter!(talk_bias, TalkBias, non_cloneable);
-  generate_getter_setter!(status, Status, non_cloneable);
-  generate_mut_getter!(status, Status, non_cloneable);
   generate_getter_setter!(current_surface, i32, cloneable);
   generate_getter_setter!(idle_seconds, i32, cloneable);
   generate_getter_setter!(immersive_degrees, u32, cloneable);
@@ -320,7 +315,6 @@ impl Default for VolatilityVariables {
       inserter: Mutex::new(Inserter::new(22.0)), // "霧の郊外にて"に合わせた値
       talk_bias: Mutex::new(TalkBias::new()),
       current_surface: Mutex::new(0),
-      status: Mutex::new(Status::new()),
       idle_seconds: Mutex::new(0),
       immersive_degrees: Mutex::new(0),
       waiting_talk: Mutex::new(None),

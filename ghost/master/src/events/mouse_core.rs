@@ -1,8 +1,8 @@
 use crate::events::common::*;
 use crate::events::mouse::*;
+use crate::status::Status;
 use crate::variables::get_global_vars;
-
-use shiorust::message::{Response, *};
+use shiorust::message::{Request, Response};
 use std::time::SystemTime;
 
 // 撫での蓄積値の閾値: この値を超えたら撫でイベントを発生させる
@@ -93,7 +93,8 @@ pub fn on_mouse_click_ex(req: &Request) -> Response {
 pub fn on_mouse_move(req: &Request) -> Response {
   let vars = get_global_vars();
   let refs = get_references(req);
-  if refs[4].is_empty() || vars.volatility.status_mut().get("talking").unwrap() {
+  let status = Status::from_request(req);
+  if refs[4].is_empty() || status.is_some_and(|s| s.talking) {
     new_response_nocontent()
   } else {
     let now = SystemTime::now();
