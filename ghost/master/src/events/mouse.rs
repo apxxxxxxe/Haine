@@ -92,7 +92,7 @@ static DIALOG_TOUCH_WHILE_HITTING: Lazy<Vec<String>> =
   Lazy::new(|| vec!["h1211104優しくしないで。退屈になるじゃない。".to_string()]);
 
 static DIALOG_SEXIAL_FIRST: Lazy<Vec<String>> =
-  Lazy::new(|| vec!["h1111205……会って早々、これ？\nなんというか……h1111204流石ね。".to_string()]);
+  Lazy::new(|| vec!["h1111205……会って早々これ？\nなんというか……h1111204流石ね。".to_string()]);
 
 static DIALOG_SEXIAL_SCOLD: Lazy<Vec<String>> = Lazy::new(|| {
   vec![
@@ -113,6 +113,12 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
     "h1111204…………退屈。".to_string(),
   ]
 });
+
+fn is_first_sexial_allowed(vars: &mut GlobalVariables) -> bool {
+  !vars.volatility.first_sexial_touch()
+    && vars.volatility.ghost_up_time() < 30
+    && vars.flags().check(&EventFlag::FirstClose)
+}
 
 pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
   let touch_count = get_touch_info!(info.as_str()).count();
@@ -185,7 +191,7 @@ fn zero_skirt_up(_count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   } else {
     let mut conbo_parts: Vec<Vec<String>> =
       vec![vec!["h2144402……！\\nh1141102\\_w[500]".to_string()]];
-    if !vars.volatility.first_sexial_touch() && vars.volatility.ghost_up_time() < 30 {
+    if is_first_sexial_allowed(vars) {
       vars.volatility.set_first_sexial_touch(true);
       conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
     } else {
@@ -228,10 +234,7 @@ fn zero_bust_touch(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   } else {
     let zero_bust_touch_threshold = 12;
     let mut zero_bust_touch = Vec::new();
-    if !vars.volatility.first_sexial_touch()
-      && vars.volatility.ghost_up_time() < 30
-      && vars.flags().check(&EventFlag::FirstClose)
-    {
+    if is_first_sexial_allowed(vars) {
       vars.volatility.set_first_sexial_touch(true);
       zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
     } else if count < zero_bust_touch_threshold / 3 {
