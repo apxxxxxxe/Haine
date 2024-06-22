@@ -340,6 +340,7 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let refs = get_references(req);
   let dest_surface = refs[0].parse::<i32>().unwrap();
   let is_complete = refs[1].parse::<i32>().unwrap() == 1;
+  let ignore_upper_completion = refs[2].parse::<i32>().unwrap() == 1;
   let dest_eyes = dest_surface % eye_index_digit_pow;
   let dest_remain = dest_surface - dest_eyes;
   let from_surface = get_global_vars().volatility.current_surface();
@@ -356,15 +357,18 @@ pub fn on_smooth_blink(req: &Request) -> Response {
     return new_response_nocontent();
   }
 
-  let mut cuts = vec![from_surface];
+  let mut cuts = vec![];
   if let Some(from) = transitions.iter().find(|t| t.base == from_eyes) {
     if let Some(dest) = transitions.iter().find(|t| t.base == dest_eyes) {
       if from.direction == dest.direction {
         return direct_res;
       }
-      cuts.extend(from.to_close.clone().iter().map(|i| dest_remain + i));
-      if !from.is_closed && !dest.is_closed {
-        cuts.push(dest_remain + CLOSE_EYES_INDEX);
+      if !ignore_upper_completion {
+        cuts.push(from_surface);
+        cuts.extend(from.to_close.clone().iter().map(|i| dest_remain + i));
+        if !from.is_closed && !dest.is_closed {
+          cuts.push(dest_remain + CLOSE_EYES_INDEX);
+        }
       }
       cuts.extend(dest.to_close.clone().iter().rev().map(|i| dest_remain + i));
     } else {

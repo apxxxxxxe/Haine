@@ -190,7 +190,7 @@ fn zero_skirt_up(_count: u32, vars: &mut GlobalVariables) -> Vec<String> {
     DIALOG_SEXIAL_WHILE_HITTING.clone()
   } else {
     let mut conbo_parts: Vec<Vec<String>> =
-      vec![vec!["h2144402……！\\nh1141102\\_w[500]".to_string()]];
+      vec![vec!["hr2144402……！\\nh1141102\\_w[500]".to_string()]];
     if is_first_sexial_allowed(vars) {
       vars.volatility.set_first_sexial_touch(true);
       conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());

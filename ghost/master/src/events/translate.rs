@@ -31,17 +31,17 @@ pub fn on_translate(text: String, complete_shadow: bool) -> String {
 }
 
 fn translate(text: String, complete_shadow: bool) -> String {
-  static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h([0-9]{7})").unwrap());
+  static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h(r)?([0-9]{7})").unwrap());
 
   let text = RE_SURFACE_SNIPPET
-    .replace_all(
-      &text,
+    .replace_all(&text, |caps: &regex::Captures| {
+      let use_half_blink = caps.get(1).is_some();
+      let surface_id = caps.get(2).unwrap().as_str();
       format!(
-        "\\0\\![embed,OnSmoothBlink,$1,{}]",
-        if complete_shadow { 1 } else { 0 }
+        "\\0\\![embed,OnSmoothBlink,{},{},{}]",
+        surface_id, complete_shadow as i32, use_half_blink as i32,
       )
-      .as_str(),
-    )
+    })
     .to_string();
 
   let mut dialogs = Dialog::from_text(&text);
