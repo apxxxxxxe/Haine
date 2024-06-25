@@ -151,9 +151,9 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1113205私もそう。結び付きが強すぎて、この家から離れられないのよ。\\n\
             ".to_string(),
             "\
-            h1123210……まあ、外に出たとしても問題は山積みでしょうけど。\\n\
-            なにせ、今のファッションについていける自信がないわ。\\n\
-            ……h1123204ジーンズはまだ流行ってる？\
+            h1111203たまに、それができる幽霊もいるわ。\\n\
+            街から街を渡り歩ける彼らの話は貴重よ。\\n\
+            h1111306自我がとても強いのでしょうね。偏屈な者が多いのよ。\
             ".to_string()),
           required_condition: None,
           callback: None,
@@ -559,6 +559,29 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       TalkType::Past => vec![
 
         RandomTalk {
+          id: "人ひとり",
+          text: "\
+            h1111210人ひとり、殺せるとしたら誰にする？という他愛ない問い。\\n\
+            h1111305だから私は私を殺したの。\\n\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "死体損壊",
+          text: "\
+            h1111210「死体の損壊は死者への冒涜だ」\\n\
+            という言説があるわね。\\n\
+            h1111205当事者の視点から言うと、別にそうでもなかったわ。\\n\
+            h1111310幽霊が元の身体に戻った例もない。\\n\
+            h1111306畢竟、それは生者の問題ということね。\\n\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
           id: "惨めな人生",
           text: "\
             h1111205みじめな人生の上に正気でいるには、\\n日々は長すぎたの。\
@@ -730,6 +753,20 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             )
           },
           required_condition: Some(|vars| vars.total_boot_count() >= 3),
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "今ここに立っていること",
+          text: "\
+            h1111310過去は記憶の中にしかない。\\n\
+            h1111305未来は想像の中にしかない。\\n\
+            h1112305我々が立っているのは今ここだけ。\\n\
+            私たちが感じられるのは現在だけ。\\n\
+            h1112310ひどい過去も、おぞましい未来も、\\n\
+            h1112305いま私が立つこの瞬間には存在しないの。\
+            ".to_string(),
+          required_condition: None,
           callback: None,
         },
 
