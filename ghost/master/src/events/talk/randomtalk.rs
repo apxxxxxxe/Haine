@@ -2,7 +2,6 @@ use crate::events::common::*;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
-use once_cell::sync::Lazy;
 use rand::prelude::*;
 
 pub const TALK_ID_SERVANT_INTRO: &str = "従者について：イントロ";
@@ -78,6 +77,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
               "".to_string()
             },
             ),
+            // FIXME: 開放条件見直し
             required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_LORE),
             callback: Some(|| {
               get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
@@ -95,15 +95,26 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             契約関係としては対等なのだけれど、彼ら自身がそう呼ぶのを好むのよ。\\n\
             \\n\
             h1111209耳を澄ませていれば、彼らの声が聞こえることもあるんじゃない？\\n\
-            私を通して彼らとも縁ができているはずだから。{}\
+            私を通して彼らとも縁ができているはずだから。{}{}\
             ",
+            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
+              let user_name = if let Some(name) = get_global_vars().user_name() {
+                name.to_string()
+              } else {
+                "お客".to_string()
+              };
+              format!("\\![set,balloonnum,おや、本当だ。よろしくね、{}さん。]", user_name)
+            } else {
+              "".to_string()
+            },
             if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
               render_achievement_message(TalkType::Servant)
             } else {
               "".to_string()
             },
           ),
-        required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT),
+          // FIXME: 開放条件見直し
+          required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT),
           callback: Some(|| {
             get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
           }),
@@ -125,7 +136,9 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           id: "服装へのこだわり",
           text: "\
           h1111203服装にはどちらかというと無頓着なの。\\n\
-          h1112305一度決めた「いつもの」を守り続けるのが楽で、いつもそうしているわ。\
+          h1112305一度決めた「いつもの」を守り続けるだけ。\\n\
+          h1112304そうすれば、余計なことを考えなくて良くなるわ。\\n\
+          h1111210そもそも私たちは着替える必要もないし、ね。\
           ".to_string(),
           required_condition: None,
           callback: None,
@@ -134,8 +147,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         RandomTalk {
           id: "生前の記録",
           text: "\
-          h1111206生前のこと、記録に残しているの。h1000000……h1111205このノートに。\\n\
-          ……h1123305まあ、ずいぶん昔のことよ。\\n\
+          h1111206生前のこと、記録に残しているの。\\n\
+          ……h1123305まあ、まる1世紀も昔のことよ。\\n\
           自分のものだという実感はもうなくなってしまって、\\n\
           h1123310今読んでも他人の伝記を読んでいるようだわ。\\n\
           ".to_string(),
@@ -151,9 +164,10 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1113205私もそう。結び付きが強すぎて、この家から離れられないのよ。\\n\
             ".to_string(),
             "\
-            h1123210……まあ、外に出たとしても問題は山積みでしょうけど。\\n\
-            なにせ、今のファッションについていける自信がないわ。\\n\
-            ……h1123204ジーンズはまだ流行ってる？\
+            h1111203たまに、それができる幽霊もいるわ。\\n\
+            街から街を渡り歩ける彼らの話は貴重よ。\\n\
+            h1111306それができるのは彼らの自我の強さゆえ。\\n\
+            h1111310こう言ってはなんだけど、偏屈な者が多いのよ。\
             ".to_string()),
           required_condition: None,
           callback: None,
@@ -176,16 +190,13 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
 
         RandomTalk {
           id: "霊力の多寡",
-          text: talk_with_punchline("\
+          text: "\
             h1111204霊力の多寡は年月や才能、特別な契約の有無などで変わるけれど、\\n\
             最も大きな要因は環境──つまり、その地との関わりの深さによるの。\\n\
             h1111310私のように生家に根付いた霊はいわずもがな。\\n\
-            h1111205……まあ、強いからといって良いことばかりでもないの。\\n\
+            h1111205……まあ、強いからといって良いことばかりでもないわ。\\n\
+            h1111203霊にも社会があるの。h1111206上位者の義務というものもね。\
             ".to_string(),
-            "\
-            h1111203霊にも社会があってね。\\n\
-            h1111515ノブレス・オブリージュというわけ。\
-            ".to_string()),
           required_condition: None,
           callback: None,
         },
@@ -204,41 +215,18 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
 
         RandomTalk {
           id: "生家の広さ",
-          text: talk_with_punchline("\
+          text: "\
             h1111210ここは私の生家なの。実際は別荘なのだけど。\\n\
             h1111206知っての通り、従者がいなければ掃除が行き届かないほど広いの。\\n\
-            ".to_string(),
-            "h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\\n\
+            h1111205……まあ、勝手知ったる場所なのは不幸中の幸い、といえなくもないかしらね。\\n\
             h1111210くつろいで暮らすのにこれ以上の場所はないわ。\
-            ".to_string()),
+            ".to_string(),
           required_condition: None,
           callback: None,
         },
 
       ],
       TalkType::WithYou => vec![
-
-        RandomTalk {
-          id: "紙の薄さ",
-          text: "\
-            h1111204\\1メモ帳を取り出す。\\n\
-            ハイネの語る話は情報量が多いものばかりだったから、\\n\
-            何かに書き留めて整理したかったのだ。\\n\
-            h1141201……あら、それが現代のノート？\\n\
-            \\1思いがけず、ハイネが興味を示した。\\n\
-            メモ帳を差し出す。\\n\
-            h1113205すごい。小さいし、すごく薄いわ。\\n\
-            罫線も正確だし、紙の質もいい。\\n\
-            意匠も美しいわ。印刷はここまでできるようになったのね。\\n\
-            \\n\
-            ……ええ、もういいわ。ありがとう。\\n\
-            \\1ひとしきり眺め、なで回した後、ハイネはメモ帳を返してくれた。\
-            h1113204技術の進歩ね。\\n\
-            h1113205……十年ひと昔、このままでは置いていかれてしまいそうね。\
-            ".to_string(),
-          required_condition: None,
-          callback: None,
-        },
 
         RandomTalk {
           id: "写真には写らない",
@@ -313,11 +301,9 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         RandomTalk {
           id: "スケッチ",
           text: "\
-            h1111205\\1本を読む彼女をスケッチしている。\\n\\n\
-            彼女は写真に写らないという。\\n\
-            それを聞いてから、彼女の姿を何かに残しておきたくなって描きはじめたのだ。\\n\
-            \\0……h1111201あら、絵を描いているの？見せて。\\n\
-            h1111202……これは、私？……h1111205ふうん。こんなふうに見えているのね。\\n\\n\
+            h1111205……h1111201あら、絵を描いているの？見せて。\\n\
+            h1111305あら、上手なのね。h1111202……これは、私？\\n\
+            ……h1111205ふうん。こんなふうに見えているのね。\\n\\n\
             h1111101…………h1111204いいえ、いいのよ。\\n\
             h1111204たしかにそういう除霊の方法もあるけれど、\\n\
             私には効かないから心配はいらないわ。\\n\
@@ -422,8 +408,8 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           text: "\
             h1113105恒久の平和、不死の身体、永劫の繁栄……。\\n\
             h1113204永遠を夢見た人物の多くは失敗していて、その代償を払っている。\\n\
-            ときに命を落としていることもあるわね。\\n\
-            ……h1113101求めるのは間違ったことなのかしら？\
+            h1113210寓話のモチーフとしての話よ。\\n\
+            ……h1113106求めるのは、ほんとうに間違ったことなのかしら？\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -517,8 +503,10 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             h1111203従者……と、私が呼ぶ幽霊たち。\\n\
             h1111210私の与えた役割を全うしてくれるものは多くいるわ。\\n\
             h1111205最も多いのは、自分の生前の経験を記録として私に提供してくれる者たち。\\n\
-            h1111210一つとして同じものはない。読んでいて退屈しないわ。\\n\
-            ……h1113204少し形は違えど、あなたもその一人ね。\\n\
+            h1111210紙に念写できる程度の力を分け与えているの。\\n\
+            h1111206彼らの記録に、一つとして同じものはない。\\n\
+            h1111210読んでいて退屈しないわ。\\n\
+            ……h1113204そういえば、少し形は違えど、あなたもその一人ね。\\n\
             h1113211期待しているわ、{user_name}。\
             ".to_string(),
           required_condition: None,
@@ -559,6 +547,29 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       TalkType::Past => vec![
 
         RandomTalk {
+          id: "人ひとり",
+          text: "\
+            h1111210人ひとり、殺せるとしたら誰にする？という他愛ない問い。\\n\
+            h1111305だから私は私を殺したの。\\n\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "死体損壊",
+          text: "\
+            h1111210「死体の損壊は死者への冒涜だ」\\n\
+            という言説があるわね。\\n\
+            h1111205当事者の視点から言うと、別にそうでもなかったわ。\\n\
+            h1111310幽霊が元の身体に戻った例もない。\\n\
+            h1111306畢竟、それは生者の問題ということね。\\n\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
           id: "惨めな人生",
           text: "\
             h1111205みじめな人生の上に正気でいるには、\\n日々は長すぎたの。\
@@ -574,19 +585,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             打ち明けたところで、的はずれな罪悪感を生むだけ。\\n\
             h1112205だからといって、他人に責をなすりつけるほど鈍くあることもできなかった。\\n\
             h1112210この気持ちには、どこにも行き場がなかったの。\
-            ".to_string(),
-          required_condition: None,
-          callback: None,
-        },
-
-        RandomTalk {
-          id: "後悔",
-          text: "\
-            h1111205私に救いは訪れなかった。\\n\
-            想いは、今もずっと、私の中にある。\\n\
-            あなたが、私を救える人だったら良かh1111101……。\\n\
-            ……h1111110。いえ、死んだ後で報われようだなんて。\\n\
-            h1121205……h1121305悪いわね。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -618,17 +616,6 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
           text: "\
             h1111210生きていて良かったと思えることは数えきれないほどあったわ。\\n\
             h1111205でも、死なない理由は一つも見つからなかった。\
-            ".to_string(),
-          required_condition: None,
-          callback: None,
-        },
-
-        RandomTalk {
-          id: "守ってくれた人",
-          text: "\
-            h1111105あの人は、私を守ってくれた。\\n\
-            でも、私を救えはしなかった。\\n\
-            理解と共感は、違う。h1112105……違うのよ。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -734,6 +721,20 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         },
 
         RandomTalk {
+          id: "今ここに立っていること",
+          text: "\
+            h1111310過去は記憶の中にしかない。\\n\
+            h1111305未来は想像の中にしかない。\\n\
+            h1112305我々が立っているのは今ここだけ。\\n\
+            私たちが感じられるのは現在だけ。\\n\
+            h1112310ひどい過去も、おぞましい未来も、\\n\
+            h1112305いま私が立つこの瞬間には存在しないの。\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
           id: "自己理解、他者理解",
           text: "\
             h1111205自分のことを本当に理解しているのは他人、って本当なのかしら。\\n\
@@ -788,7 +789,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
             身を損なう心配がなくなっては、美しさが心を打つこともない。\\n\
             h1121205ただただ平坦な、揺らがぬ水面があるだけ。\\n\
             h1121210それはやがて、淀み、腐る。\\n\
-            h1111205願わくば、せめて終わりがありますように。\
+            h1111205願わくば、せめて終わりがありますように、と。\
             ".to_string(),
           required_condition: None,
           callback: None,
