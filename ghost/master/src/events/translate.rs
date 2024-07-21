@@ -1,5 +1,7 @@
 use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
+use crate::error::ShioriError;
 use crate::events::common::*;
+use crate::lazy_regex;
 use crate::variables::get_global_vars;
 use core::fmt::{Display, Formatter};
 use once_cell::sync::Lazy;
@@ -8,30 +10,33 @@ use shiorust::message::{Request, Response};
 use std::thread;
 use std::time::Duration;
 
-pub fn on_wait_translater(_req: &Request) -> Response {
+pub fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
   while !get_global_vars().volatility.inserter_mut().is_ready() {
     thread::sleep(Duration::from_millis(100));
   }
-  let m = get_global_vars().volatility.waiting_talk().unwrap();
-  new_response_with_value(m.0, m.1)
+  let m = get_global_vars()
+    .volatility
+    .waiting_talk()
+    .ok_or(ShioriError::ArrayAccessError)?;
+  new_response_with_value_with_translate(m.0, m.1)
 }
 
-pub fn on_translate(text: String, complete_shadow: bool) -> String {
+pub fn on_translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   if text.is_empty() {
-    return text;
+    return Ok(text);
   }
 
-  let translated = translate(text, complete_shadow);
+  let translated = translate(text, complete_shadow)?;
 
   let vars = get_global_vars();
   if !vars.volatility.inserter_mut().is_ready() {
-    error!("on_translate: inserter is not ready");
+    return Err(ShioriError::TranslaterNotReadyError);
   }
-  vars.volatility.inserter_mut().run(translated)
+  Ok(vars.volatility.inserter_mut().run(translated)?)
 }
 
-fn translate(text: String, complete_shadow: bool) -> String {
-  static RE_SURFACE_SNIPPET: Lazy<Regex> = Lazy::new(|| Regex::new(r"h(r)?([0-9]{7})").unwrap());
+fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
+  static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
 
   let text = RE_SURFACE_SNIPPET
     .replace_all(&text, |caps: &regex::Captures| {
@@ -61,16 +66,16 @@ fn translate(text: String, complete_shadow: bool) -> String {
 }
 
 static QUICK_SECTION_START: Lazy<Regex> =
-  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,true|\\!\[quicksection,1)").unwrap());
+  lazy_regex!(r"^(\\!\[quicksection,true|\\!\[quicksection,1)");
 static QUICK_SECTION_END: Lazy<Regex> =
-  Lazy::new(|| Regex::new(r"^(\\!\[quicksection,false|\\!\[quicksection,0)").unwrap());
+  lazy_regex!(r"^(\\!\[quicksection,false|\\!\[quicksection,0)");
 
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
 fn translate_dialog(dialog: &mut Dialog) {
   // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-  static RE_TEXT_ONLY: Lazy<Regex> = Lazy::new(|| {
-    Regex::new(r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])").unwrap()
-  });
+  static RE_TEXT_ONLY: Lazy<Regex> = lazy_regex!(
+    r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])"
+  );
 
   let tags = RE_TEXT_ONLY
     .find_iter(&dialog.text)
@@ -120,17 +125,18 @@ fn translate_dialog(dialog: &mut Dialog) {
   dialog.text = result;
 }
 
-fn translate_whole(text: String) -> String {
-  static RE_LAST_WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"\\_w\[([0-9]+)\]$").unwrap());
+fn translate_whole(text: String) -> Result<String, ShioriError> {
+  static RE_LAST_WAIT: Lazy<Regex> = lazy_regex!(r"\\_w\[([0-9]+)\]$");
 
   let mut translated = text.clone();
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
   let vars = get_global_vars();
-  translated = translated.replace("{user_name}", &vars.user_name().clone().unwrap());
+  let user_name = vars.user_name().clone().ok_or(ShioriError::ArrayAccessError)?;
+  translated = translated.replace("{user_name}", &user_name);
 
-  translated
+  Ok(translated)
 }
 
 #[derive(Debug, Clone)]
@@ -250,7 +256,7 @@ fn replace_with_check(
   replaces: &[Replacee],
   in_quicksection: bool,
 ) -> String {
-  static WAIT: Lazy<Regex> = Lazy::new(|| Regex::new(r"(\\_w\[[0-9]+\]|\\w[1-9])").unwrap());
+  static WAIT: Lazy<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
 
   let mut translated = String::new();
 
@@ -270,8 +276,8 @@ fn replace_with_check(
         break;
       }
     }
-    if matched_replacee.is_some() {
-      let r = matched_replacee.unwrap();
+    if let Some(v) = matched_replacee {
+      let r = v;
       if in_quicksection {
         println!("removing wait and additional quicksection");
         let mut s = r.new.to_string();
@@ -292,7 +298,7 @@ fn replace_with_check(
 }
 
 #[test]
-fn test_translate() {
+fn test_translate() -> Result<(), ShioriError> {
   let text = "\
     \\_q\\0これは、0のセリフ。\\_qこれはウェイト付きで置換されるべき文章。\\0なお置換されるべき文章。\\n\
     \\1これは、1のセリフ。\\n\
@@ -300,5 +306,6 @@ fn test_translate() {
     "
   .to_string();
   let translated = translate(text, true);
-  println!("{}", translated);
+  println!("{}", translated?);
+  Ok(())
 }

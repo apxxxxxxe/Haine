@@ -1,4 +1,6 @@
 use crate::autobreakline::Inserter;
+use crate::check_error;
+use crate::error::ShioriError;
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::random_talks;
@@ -144,7 +146,12 @@ impl GlobalVariables {
   fn delete_undefined_talks(&mut self) {
     let mut talk_collection = self.talk_collection_mut();
     for (k, v) in talk_collection.iter_mut() {
-      let talk_ids = random_talks(*k)
+      let talks = if let Some(v) = random_talks(*k) {
+        v
+      } else {
+        continue;
+      };
+      let talk_ids = talks
         .iter()
         .map(|t| t.id.to_string())
         .collect::<HashSet<String>>();
@@ -349,18 +356,23 @@ impl TouchInfo {
     self.last_unixtime = SystemTime::UNIX_EPOCH;
   }
 
-  pub fn reset_if_timeover(&mut self) {
-    if self.last_unixtime.elapsed().unwrap() > TOUCH_RESET_DURATION {
+  pub fn reset_if_timeover(&mut self) -> Result<(), ShioriError> {
+    if check_error!(self.last_unixtime.elapsed(), ShioriError::SystemTimeError)
+      > TOUCH_RESET_DURATION
+    {
       self.reset();
     }
+    Ok(())
   }
 
-  pub fn count(&mut self) -> u32 {
-    if self.last_unixtime.elapsed().unwrap() > TOUCH_RESET_DURATION {
+  pub fn count(&mut self) -> Result<u32, ShioriError> {
+    if check_error!(self.last_unixtime.elapsed(), ShioriError::SystemTimeError)
+      > TOUCH_RESET_DURATION
+    {
       self.count = 0;
-      0
+      Ok(0)
     } else {
-      self.count
+      Ok(self.count)
     }
   }
 

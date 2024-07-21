@@ -53,7 +53,7 @@ impl TalkBias {
     i32::MAX / key_count as i32
   }
 
-  pub fn roulette(&mut self, cells: &[impl RouletteCell], is_consume: bool) -> usize {
+  pub fn roulette(&mut self, cells: &[impl RouletteCell], is_consume: bool) -> Option<usize> {
     let mut rng = rand::thread_rng();
 
     let counts_vec: Vec<u32> = cells.iter().map(|s| self.get(&s.key())).collect();
@@ -72,7 +72,11 @@ impl TalkBias {
       cumulative_sum.push(sum);
     }
 
-    let sum = *cumulative_sum.last().unwrap();
+    let sum = if let Some(v) = cumulative_sum.last() {
+      *v
+    } else {
+      return None;
+    };
     let first_non_zero = cumulative_sum.iter().find(|&&x| x != 0).unwrap_or(&-1);
 
     println!("talkslen: {}", cells.len());
@@ -102,7 +106,7 @@ impl TalkBias {
       }
     }
 
-    selected_index
+    Some(selected_index)
   }
 }
 
@@ -154,7 +158,7 @@ mod test {
     let mut select_count: Vec<i32> = vec![0; talks.len()];
 
     for _ in 0..100 {
-      let selected_index = bias.roulette(&talks, true);
+      let selected_index = bias.roulette(&talks, true).unwrap();
       if let Some(last) = indexes.last() {
         if last == &selected_index {
           println!("duplication: {}", selected_index);

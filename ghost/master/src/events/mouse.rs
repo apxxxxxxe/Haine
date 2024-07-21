@@ -1,3 +1,5 @@
+use crate::check_error;
+use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
@@ -16,7 +18,7 @@ macro_rules! get_touch_info {
   };
 }
 
-pub fn new_mouse_response(info: String) -> Response {
+pub fn new_mouse_response(info: String) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let last_touch_info = vars.volatility.last_touch_info();
 
@@ -35,7 +37,7 @@ pub fn new_mouse_response(info: String) -> Response {
       .touch_info_mut()
       .get_mut(last_touch_info.as_str())
     {
-      touch_info.reset_if_timeover();
+      touch_info.reset_if_timeover()?;
     }
     vars.volatility.set_last_touch_info(i.clone());
   }
@@ -47,28 +49,33 @@ pub fn new_mouse_response(info: String) -> Response {
     ))
   {
     if info.as_str().contains("doubleclick") {
-      let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
-      return on_menu_exec(&dummy_req);
+      let dummy_req = check_error!(
+        Request::parse(DUMMY_REQUEST),
+        ShioriError::ParseRequestError
+      );
+      return Ok(on_menu_exec(&dummy_req));
     } else {
-      return new_response_nocontent();
+      return Ok(new_response_nocontent());
     }
   }
 
-  let response = match mouse_dialogs(i.clone(), vars) {
-    Some(dialogs) => new_response_with_value(
-      format!(
-        "{}{}",
-        REMOVE_BALLOON_NUM,
-        dialogs[choose_one(&dialogs, true).unwrap()].clone()
-      ),
-      TranslateOption::with_shadow_completion(),
-    ),
+  let response = match mouse_dialogs(i.clone(), vars)? {
+    Some(dialogs) => {
+      let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
+      new_response_with_value_with_translate(
+        format!("{}{}", REMOVE_BALLOON_NUM, dialogs[index].clone()),
+        TranslateOption::with_shadow_completion(),
+      )
+    }
     None => {
       if info.contains("doubleclick") {
-        let dummy_req = Request::parse(DUMMY_REQUEST).unwrap();
-        on_menu_exec(&dummy_req)
+        let dummy_req = check_error!(
+          Request::parse(DUMMY_REQUEST),
+          ShioriError::ParseRequestError
+        );
+        Ok(on_menu_exec(&dummy_req))
       } else {
-        new_response_nocontent()
+        Ok(new_response_nocontent())
       }
     }
   };
@@ -120,17 +127,20 @@ fn is_first_sexial_allowed(vars: &mut GlobalVariables) -> bool {
     && vars.flags().check(&EventFlag::FirstClose)
 }
 
-pub fn mouse_dialogs(info: String, vars: &mut GlobalVariables) -> Option<Vec<String>> {
-  let touch_count = get_touch_info!(info.as_str()).count();
+pub fn mouse_dialogs(
+  info: String,
+  vars: &mut GlobalVariables,
+) -> Result<Option<Vec<String>>, ShioriError> {
+  let touch_count = get_touch_info!(info.as_str()).count()?;
   match info.as_str() {
-    "0headdoubleclick" => Some(head_hit_dialog(touch_count, vars)),
-    "0headnade" => Some(zero_head_nade(touch_count, vars)),
-    "0facenade" => Some(zero_face_nade(touch_count, vars)),
-    "0handnade" => Some(zero_hand_nade(touch_count, vars)),
-    "0bustnade" => Some(zero_bust_touch(touch_count, vars)),
-    "0skirtup" => Some(zero_skirt_up(touch_count, vars)),
-    "0shoulderdown" => Some(zero_shoulder_down(touch_count, vars)),
-    _ => None,
+    "0headdoubleclick" => Ok(Some(head_hit_dialog(touch_count, vars))),
+    "0headnade" => Ok(Some(zero_head_nade(touch_count, vars))),
+    "0facenade" => Ok(Some(zero_face_nade(touch_count, vars))),
+    "0handnade" => Ok(Some(zero_hand_nade(touch_count, vars))),
+    "0bustnade" => Ok(Some(zero_bust_touch(touch_count, vars))),
+    "0skirtup" => Ok(Some(zero_skirt_up(touch_count, vars))),
+    "0shoulderdown" => Ok(Some(zero_shoulder_down(touch_count, vars))),
+    _ => Ok(None),
   }
 }
 
@@ -267,12 +277,12 @@ fn zero_bust_touch(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
   }
 }
 
-pub fn on_head_hit_cancel(_req: &Request) -> Response {
+pub fn on_head_hit_cancel(_req: &Request) -> Result<Response, ShioriError> {
   let m = "\\1……踏みとどまった。".to_string();
-  new_response_with_value(m, TranslateOption::simple_translate())
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
-pub fn on_head_hit(_req: &Request) -> Response {
+pub fn on_head_hit(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   vars.flags_mut().done(EventFlag::FirstHitTalkStart);
   to_aroused();
@@ -294,7 +304,7 @@ pub fn on_head_hit(_req: &Request) -> Response {
     さあ。h1322813さあ！\\n\
     "
     .to_string();
-  new_response_with_value(m, TranslateOption::simple_translate())
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
 pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {

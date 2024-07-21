@@ -1,3 +1,4 @@
+use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS};
 use crate::events::randomtalk::{
@@ -14,7 +15,7 @@ use shiorust::message::{parts::HeaderName, Request, Response};
 const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
-pub fn on_ai_talk(_req: &Request) -> Response {
+pub fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
   vars
@@ -37,8 +38,12 @@ pub fn on_ai_talk(_req: &Request) -> Response {
     vars.volatility.set_aroused(false);
     get_touch_info!("0headdoubleclick").reset();
     let talks = finishing_aroused_talks();
-    let choosed_talk = talks[choose_one(&talks, if_consume_talk_bias).unwrap()].to_string();
-    return new_response_with_value(choosed_talk, TranslateOption::with_shadow_completion());
+    let index = choose_one(&talks, if_consume_talk_bias).ok_or(ShioriError::TalkNotFound)?;
+    let choosed_talk = talks[index].to_string();
+    return new_response_with_value_with_translate(
+      choosed_talk,
+      TranslateOption::with_shadow_completion(),
+    );
   }
 
   // 没入度を上げる
@@ -52,7 +57,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
       get_global_vars()
         .flags_mut()
         .done(EventFlag::ImmersionUnlock);
-      let response = new_response_with_value(
+      let response = new_response_with_value_with_translate(
         format!(
           "\\0\\s[1111204]{}{}",
           complete_shadow(true),
@@ -68,35 +73,42 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   vars.volatility.set_immersive_degrees(immersive_degrees);
 
   // 通常ランダムトーク
-  let talks = vars
-    .volatility
-    .talking_place()
-    .talk_types()
+  let talk_types = vars.volatility.talking_place().talk_types();
+  let talk_lists = talk_types
     .iter()
     .filter(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(**t)))
-    .flat_map(|t| random_talks(*t))
-    .collect::<Vec<_>>();
-  let index = choose_one(&talks, if_consume_talk_bias);
-  if index.is_none() {
+    .map(|t| random_talks(*t));
+  if talk_lists.clone().any(|t| t.is_none()) {
+    return Err(ShioriError::TalkNotFound);
+  };
+  let talks = talk_lists.flat_map(|t| t.unwrap()).collect::<Vec<_>>();
+  let len_after_flatten = talks.len();
+  let index = if let Some(v) = choose_one(&talks, if_consume_talk_bias) {
+    v
+  } else {
     let mut res = new_response_nocontent();
-    add_error_description(&mut res, "No talk found");
-    return res;
-  }
-  let choosed_talk = talks[index.unwrap()].clone();
+    add_error_description(
+      &mut res,
+      format!("No talk found: , {}", len_after_flatten).as_str(),
+    );
+    return Ok(res);
+  };
+  let choosed_talk = talks[index].clone();
   if if_consume_talk_bias {
     // ユーザが見ているときのみトークを消費&トークカウントを加算
-    register_talk_collection(&choosed_talk);
+    register_talk_collection(&choosed_talk)?;
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
   }
   let comment = if vars
     .flags()
     .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
   {
-    RANDOMTALK_COMMENTS[choose_one(&RANDOMTALK_COMMENTS, false).unwrap()]
+    let index = choose_one(&RANDOMTALK_COMMENTS, false).ok_or(ShioriError::TalkNotFound)?;
+    RANDOMTALK_COMMENTS[index]
   } else {
     ""
   };
-  new_response_with_value(
+  new_response_with_value_with_translate(
     format!(
       "\\0\\![set,balloonnum,{}]{}",
       comment,
@@ -106,7 +118,7 @@ pub fn on_ai_talk(_req: &Request) -> Response {
   )
 }
 
-fn change_talking_response() -> Response {
+fn change_talking_response() -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let (previous_talking_place, current_talking_place) = match vars.volatility.talking_place() {
     TalkingPlace::LivingRoom => (TalkingPlace::LivingRoom, TalkingPlace::Library),
@@ -118,13 +130,19 @@ fn change_talking_response() -> Response {
   vars.volatility.set_talking_place(current_talking_place);
   vars.volatility.set_immersive_degrees(0);
 
-  new_response_with_value(
-    messages[choose_one(&messages, true).unwrap()].to_owned(),
+  let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+
+  new_response_with_value_with_translate(
+    messages[index].to_owned(),
     TranslateOption::with_shadow_completion(),
   )
 }
 
-fn first_random_talk_response(text: String, i: usize, text_count: usize) -> Response {
+fn first_random_talk_response(
+  text: String,
+  i: usize,
+  text_count: usize,
+) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   vars
     .flags_mut()
@@ -146,22 +164,23 @@ fn first_random_talk_response(text: String, i: usize, text_count: usize) -> Resp
   } else {
     text.clone()
   };
-  let mut res = new_response_with_value(m, TranslateOption::with_shadow_completion());
+  let mut res =
+    new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())?;
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{}({}/{})", FIRST_BOOT_MARKER, i + 2, text_count + 1),
   );
-  res
+  Ok(res)
 }
 
-pub fn on_anchor_select_ex(req: &Request) -> Response {
+pub fn on_anchor_select_ex(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   let id = refs[1];
   let user_dialog = refs.get(2).unwrap_or(&"").to_string();
 
   if vars.volatility.last_anchor_id() == Some(id.to_string()) {
-    return new_response_nocontent();
+    return Ok(new_response_nocontent());
   }
 
   let mut m = String::from("\\C");
@@ -172,9 +191,9 @@ pub fn on_anchor_select_ex(req: &Request) -> Response {
   match anchor_talks(id) {
     Some(t) => {
       vars.volatility.set_last_anchor_id(Some(id.to_string()));
-      new_response_with_value(m + &t, TranslateOption::with_shadow_completion())
+      new_response_with_value_with_translate(m + &t, TranslateOption::with_shadow_completion())
     }
-    None => new_response_nocontent(),
+    None => Ok(new_response_nocontent()),
   }
 }
 
@@ -207,7 +226,7 @@ mod test {
 
     // 初回起動時のフラグチェック
     assert!(!vars.flags().check(&EventFlag::FirstBoot));
-    on_boot(&req);
+    on_boot(&req)?;
     assert!(vars.flags().check(&EventFlag::FirstBoot));
 
     // 初回ランダムトークのフラグチェック
@@ -218,7 +237,7 @@ mod test {
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
     for i in 0..FIRST_RANDOMTALKS.len() {
-      on_ai_talk(&req);
+      on_ai_talk(&req)?;
       assert!(vars
         .flags()
         .check(&EventFlag::FirstRandomTalkDone(i as u32)));
@@ -237,22 +256,22 @@ mod test {
     }
     assert!(!vars.flags().check(&EventFlag::ImmersionUnlock));
     for _i in 0..required_talk_count {
-      on_ai_talk(&req);
+      on_ai_talk(&req)?;
     }
     assert!(vars.flags().check(&EventFlag::ImmersionUnlock));
 
     // 初回没入度マックス時の場所変更
     assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
     for _i in 0..required_talk_count {
-      on_ai_talk(&req);
+      on_ai_talk(&req)?;
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
 
     // 従者関連トークの開放確認
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_SERVANT {
-      on_ai_talk(&req);
+      on_ai_talk(&req)?;
     }
-    let r = random_talks(TalkType::SelfIntroduce);
+    let r = random_talks(TalkType::SelfIntroduce).ok_or(Box::new(ShioriError::TalkNotFound))?;
     let unlock_talk_servant = r.iter().find(|t| t.id == TALK_ID_SERVANT_INTRO);
     if unlock_talk_servant.is_none() {
       return Err("Failed to find unlock talk for servant".into());
@@ -264,9 +283,9 @@ mod test {
 
     // ロア関連トークの開放確認
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_LORE {
-      on_ai_talk(&req);
+      on_ai_talk(&req)?;
     }
-    let r = random_talks(TalkType::SelfIntroduce);
+    let r = random_talks(TalkType::SelfIntroduce).ok_or(Box::new(ShioriError::TalkNotFound))?;
     let unlock_talk_lore = r.iter().find(|t| t.id == TALK_ID_LORE_INTRO);
     if unlock_talk_lore.is_none() {
       return Err("Failed to find unlock talk for lore".into());

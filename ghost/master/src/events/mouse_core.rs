@@ -1,3 +1,5 @@
+use crate::check_error;
+use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::mouse::*;
 use crate::status::Status;
@@ -35,19 +37,20 @@ impl Direction {
   }
 }
 
-pub fn on_mouse_wheel(req: &Request) -> Response {
+pub fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   if refs[4].is_empty() {
-    new_response_nocontent()
+    Ok(new_response_nocontent())
   } else {
     let now = SystemTime::now();
-    let dur = now
-      .duration_since(vars.volatility.last_wheel_count_unixtime())
-      .unwrap()
-      .as_millis();
+    let dur = check_error!(
+      now.duration_since(vars.volatility.last_wheel_count_unixtime()),
+      ShioriError::SystemTimeError
+    )
+    .as_millis();
 
-    let d: Direction = if refs[2].parse::<i32>().unwrap() > 0 {
+    let d: Direction = if check_error!(refs[2].parse::<i32>(), ShioriError::ParseIntError) > 0 {
       Direction::Up
     } else {
       Direction::Down
@@ -66,43 +69,49 @@ pub fn on_mouse_wheel(req: &Request) -> Response {
 
     if vars.volatility.wheel_counter() >= WHEEL_THRESHOLD {
       vars.volatility.set_wheel_counter(0);
-      new_mouse_response(format!("{}{}{}", refs[3], refs[4], d.to_str()))
+      new_mouse_response(format!(
+              "{}{}{}",
+              refs[3],
+              refs[4],
+              d.to_str()
+      ))
     } else {
       vars.volatility.set_last_wheel_count_unixtime(now);
       vars.volatility.set_last_wheel_part(refs[4].to_string());
       vars.volatility.set_wheel_direction(d);
-      new_response_nocontent()
+      Ok(new_response_nocontent())
     }
   }
 }
 
-pub fn on_mouse_double_click(req: &Request) -> Response {
+pub fn on_mouse_double_click(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   new_mouse_response(format!("{}{}doubleclick", refs[3], refs[4]))
 }
 
-pub fn on_mouse_click_ex(req: &Request) -> Response {
+pub fn on_mouse_click_ex(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   if refs[5] == "middle" {
     new_mouse_response(format!("{}{}middleclick", refs[3], refs[4]))
   } else {
-    new_response_nocontent()
+    Ok(new_response_nocontent())
   }
 }
 
-pub fn on_mouse_move(req: &Request) -> Response {
+pub fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   let status = Status::from_request(req);
   if refs[4].is_empty() || status.is_some_and(|s| s.talking) {
-    new_response_nocontent()
+    Ok(new_response_nocontent())
   } else {
     let now = SystemTime::now();
     if vars.volatility.last_nade_part() == refs[4] {
-      let dur = now
-        .duration_since(vars.volatility.last_nade_count_unixtime())
-        .unwrap()
-        .as_millis();
+      let dur = check_error!(
+        now.duration_since(vars.volatility.last_nade_count_unixtime()),
+        ShioriError::SystemTimeError
+      )
+      .as_millis();
       if dur > NADE_LIFETIME {
         vars.volatility.set_nade_counter(1);
         vars.volatility.set_last_nade_count_unixtime(now);
@@ -121,7 +130,7 @@ pub fn on_mouse_move(req: &Request) -> Response {
       vars.volatility.set_nade_counter(0);
       new_mouse_response(format!("{}{}nade", refs[3], refs[4]))
     } else {
-      new_response_nocontent()
+      Ok(new_response_nocontent())
     }
   }
 }

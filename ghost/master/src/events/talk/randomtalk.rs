@@ -46,8 +46,12 @@ static BOOK_TOPICS: [(&str, &str); 3] = [
   ("harmonio", "konsonanco"),                   // 調和, 一致
 ];
 
-fn random_book_topic() -> (&'static str, &'static str) {
-  *BOOK_TOPICS.choose(&mut rand::thread_rng()).unwrap()
+fn random_book_topic() -> Option<(&'static str, &'static str)> {
+  if let Some(v) = BOOK_TOPICS.choose(&mut rand::thread_rng()) {
+    Some(*v)
+  } else {
+    None
+  }
 }
 
 struct RandomTalk {
@@ -57,7 +61,7 @@ struct RandomTalk {
   callback: Option<fn()>,
 }
 
-pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
+pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   let strings: Vec<RandomTalk> = match talk_type {
       TalkType::SelfIntroduce => vec![
 
@@ -649,7 +653,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
         RandomTalk {
           id: "分厚い本",
           text: {
-            let topic = random_book_topic();
+            let topic = random_book_topic()?;
             format!("\
             h1111204……手持ち無沙汰のようね。\\n\
             h1111206なにか本を見繕ってあげましょうか。\\n\
@@ -1002,7 +1006,7 @@ pub fn random_talks(talk_type: TalkType) -> Vec<Talk> {
       s.callback,
     ));
   }
-  talks
+  Some(talks)
 }
 
 pub fn finishing_aroused_talks() -> Vec<String> {

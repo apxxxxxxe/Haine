@@ -1,3 +1,5 @@
+use crate::check_error;
+use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::input::InputId;
@@ -35,7 +37,10 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     selections.join("  ")
   );
 
-  let close_button = format!("\\_l[0,0]\\f[align,right]\\__q[script:\\e]{}\\__q", Icon::Cross);
+  let close_button = format!(
+    "\\_l[0,0]\\f[align,right]\\__q[script:\\e]{}\\__q",
+    Icon::Cross
+  );
   let vars = get_global_vars();
   let m = format!(
     "\\_q{}{}",
@@ -85,7 +90,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
     },
   );
 
-  new_response_with_value(m, TranslateOption::balloon_surface_only())
+  new_response_with_value_with_notranslate(m, TranslateOption::balloon_surface_only())
 }
 
 fn show_minute(m: &u64) -> String {
@@ -135,7 +140,7 @@ fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
   )
 }
 
-pub fn on_break_time(_req: &Request) -> Response {
+pub fn on_break_time(_req: &Request) -> Result<Response, ShioriError> {
   let m = "\
       h1111101\\1……少し話に集中しすぎていたようだ。\\n\
       h1111204\\1カップを傾け、一息つく。\\n\
@@ -145,10 +150,10 @@ pub fn on_break_time(_req: &Request) -> Response {
       "
   .to_string();
 
-  new_response_with_value(m, TranslateOption::with_shadow_completion())
+  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
 
-pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
+pub fn on_immersive_rate_reduced(_req: &Request) -> Result<Response, ShioriError> {
   // 没入度を下げる
   let vars = get_global_vars();
   vars.volatility.set_immersive_degrees(0);
@@ -158,15 +163,15 @@ pub fn on_immersive_rate_reduced(_req: &Request) -> Response {
   "
   .to_string();
 
-  new_response_with_value(m, TranslateOption::with_shadow_completion())
+  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
 
-pub fn on_talk_interval_changed(req: &Request) -> Response {
+pub fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let v = refs[0].parse::<u64>().unwrap();
+  let v = check_error!(refs[0].parse::<u64>(), ShioriError::ParseIntError);
   get_global_vars().set_random_talk_interval(Some(v));
 
-  on_menu_exec(req)
+  Ok(on_menu_exec(req))
 }
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
@@ -276,7 +281,7 @@ h1111210……。叔父がいたの。\\n\
 今となっては、ね。\
 */
 
-pub fn on_talk(_req: &Request) -> Response {
+pub fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
   let mut questions = [
     Question::ARE_YOU_MASTER,
     Question::FEELING_OF_DEATH,
@@ -295,13 +300,16 @@ pub fn on_talk(_req: &Request) -> Response {
   }
   m.push_str("\\q[戻る,OnMenuExec]");
 
-  new_response_with_value(m, TranslateOption::with_shadow_completion())
+  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
 
-pub fn on_talk_answer(req: &Request) -> Response {
+pub fn on_talk_answer(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let q = Question(refs[0].parse::<u32>().unwrap());
-  new_response_with_value(q.talk(), TranslateOption::with_shadow_completion())
+  let q = Question(check_error!(
+    refs[0].parse::<u32>(),
+    ShioriError::ParseIntError
+  ));
+  new_response_with_value_with_translate(q.talk(), TranslateOption::with_shadow_completion())
 }
 
 pub fn on_check_talk_collection(_req: &Request) -> Response {
@@ -322,7 +330,11 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
       lines.push(format!("{}{}: 未解放\\f[default]", DIMMED_COLOR, talk_type));
     } else {
       let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
-      let all_len = random_talks(talk_type).len();
+      let all_len = if let Some(v) = random_talks(talk_type) {
+        v.len()
+      } else {
+        0
+      };
       let anal = if len < all_len {
         format!(
           "\\n  \\f[height,13]\\q[未読トーク再生,OnCheckUnseenTalks,{}]\\f[default]",
@@ -337,7 +349,7 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
     }
   }
 
-  new_response_with_value(
+  new_response_with_value_with_notranslate(
     format!(
       "\\_q{}\\n[150]\
       ---\\n[150]\
@@ -351,15 +363,15 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
   )
 }
 
-pub fn on_changing_user_name(_req: &Request) -> Response {
+pub fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let user_name = if let Some(user_name) = vars.user_name() {
     user_name
   } else {
     error!("User name is not set.");
-    return new_response_nocontent();
+    return Ok(new_response_nocontent());
   };
-  new_response_with_value(
+  new_response_with_value_with_translate(
     format!(
       "\\_q\\![open,inputbox,{},0]新しい呼び名を入力してください。\\n現在:{}",
       InputId::UserName,

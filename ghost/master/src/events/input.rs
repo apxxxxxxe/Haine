@@ -1,3 +1,4 @@
+use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::variables::get_global_vars;
 use shiorust::message::{Request, Response};
@@ -25,13 +26,13 @@ impl InputId {
   }
 }
 
-pub fn on_user_input(req: &Request) -> Response {
+pub fn on_user_input(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let input_id = if let Some(input_id) = InputId::from_str(refs[0]) {
     input_id
   } else {
     error!("Unknown input id: {}", refs[0]);
-    return new_response_nocontent();
+    return Ok(new_response_nocontent());
   };
   let text = refs[1].to_string();
   let responser = match input_id {
@@ -40,7 +41,7 @@ pub fn on_user_input(req: &Request) -> Response {
   responser(text)
 }
 
-fn input_user_name(text: String) -> Response {
+fn input_user_name(text: String) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   vars.set_user_name(Some(text.clone()));
   let m = format!(
@@ -50,7 +51,7 @@ fn input_user_name(text: String) -> Response {
     ",
     text
   );
-  new_response_with_value(m, TranslateOption::simple_translate())
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
 pub fn on_window_state_restore(_req: &Request) -> Response {
