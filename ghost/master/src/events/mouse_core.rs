@@ -69,12 +69,7 @@ pub fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
 
     if vars.volatility.wheel_counter() >= WHEEL_THRESHOLD {
       vars.volatility.set_wheel_counter(0);
-      new_mouse_response(format!(
-              "{}{}{}",
-              refs[3],
-              refs[4],
-              d.to_str()
-      ))
+      new_mouse_response(req, format!("{}{}{}", refs[3], refs[4], d.to_str()))
     } else {
       vars.volatility.set_last_wheel_count_unixtime(now);
       vars.volatility.set_last_wheel_part(refs[4].to_string());
@@ -86,13 +81,13 @@ pub fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
 
 pub fn on_mouse_double_click(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  new_mouse_response(format!("{}{}doubleclick", refs[3], refs[4]))
+  new_mouse_response(req, format!("{}{}doubleclick", refs[3], refs[4]))
 }
 
 pub fn on_mouse_click_ex(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   if refs[5] == "middle" {
-    new_mouse_response(format!("{}{}middleclick", refs[3], refs[4]))
+    new_mouse_response(req, format!("{}{}middleclick", refs[3], refs[4]))
   } else {
     Ok(new_response_nocontent())
   }
@@ -128,7 +123,7 @@ pub fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
     vars.volatility.set_last_nade_part(refs[4].to_string());
     if vars.volatility.nade_counter() > NADE_THRESHOLD {
       vars.volatility.set_nade_counter(0);
-      new_mouse_response(format!("{}{}nade", refs[3], refs[4]))
+      new_mouse_response(req, format!("{}{}nade", refs[3], refs[4]))
     } else {
       Ok(new_response_nocontent())
     }

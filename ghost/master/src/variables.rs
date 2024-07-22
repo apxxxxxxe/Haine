@@ -210,7 +210,7 @@ impl EventFlags {
   }
 
   pub fn check(&self, flag: &EventFlag) -> bool {
-    self.flags.get(flag).is_some()
+    self.flags.contains(flag)
   }
 
   #[allow(dead_code)]

@@ -3,6 +3,9 @@ use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
+use crate::events::on_ai_talk;
+use crate::events::reset_immersion;
+use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -18,7 +21,7 @@ macro_rules! get_touch_info {
   };
 }
 
-pub fn new_mouse_response(info: String) -> Result<Response, ShioriError> {
+pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let last_touch_info = vars.volatility.last_touch_info();
 
@@ -59,26 +62,7 @@ pub fn new_mouse_response(info: String) -> Result<Response, ShioriError> {
     }
   }
 
-  let response = match mouse_dialogs(i.clone(), vars)? {
-    Some(dialogs) => {
-      let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
-      new_response_with_value_with_translate(
-        format!("{}{}", REMOVE_BALLOON_NUM, dialogs[index].clone()),
-        TranslateOption::with_shadow_completion(),
-      )
-    }
-    None => {
-      if info.contains("doubleclick") {
-        let dummy_req = check_error!(
-          Request::parse(DUMMY_REQUEST),
-          ShioriError::ParseRequestError
-        );
-        Ok(on_menu_exec(&dummy_req))
-      } else {
-        Ok(new_response_nocontent())
-      }
-    }
-  };
+  let response = mouse_dialogs(req, i.clone())?;
 
   // 一括で回数を増やす
   vars
@@ -88,7 +72,15 @@ pub fn new_mouse_response(info: String) -> Result<Response, ShioriError> {
     .or_insert(TouchInfo::new())
     .add();
 
-  response
+  Ok(response)
+}
+
+fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> {
+  let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
+  new_response_with_value_with_translate(
+    format!("{}{}", REMOVE_BALLOON_NUM, dialogs[index].clone()),
+    TranslateOption::with_shadow_completion(),
+  )
 }
 
 static DIALOG_SEXIAL_WHILE_HITTING: Lazy<Vec<String>> = Lazy::new(|| {
@@ -127,25 +119,45 @@ fn is_first_sexial_allowed(vars: &mut GlobalVariables) -> bool {
     && vars.flags().check(&EventFlag::FirstClose)
 }
 
-pub fn mouse_dialogs(
-  info: String,
-  vars: &mut GlobalVariables,
-) -> Result<Option<Vec<String>>, ShioriError> {
+pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriError> {
   let touch_count = get_touch_info!(info.as_str()).count()?;
-  match info.as_str() {
-    "0headdoubleclick" => Ok(Some(head_hit_dialog(touch_count, vars))),
-    "0headnade" => Ok(Some(zero_head_nade(touch_count, vars))),
-    "0facenade" => Ok(Some(zero_face_nade(touch_count, vars))),
-    "0handnade" => Ok(Some(zero_hand_nade(touch_count, vars))),
-    "0bustnade" => Ok(Some(zero_bust_touch(touch_count, vars))),
-    "0skirtup" => Ok(Some(zero_skirt_up(touch_count, vars))),
-    "0shoulderdown" => Ok(Some(zero_shoulder_down(touch_count, vars))),
-    _ => Ok(None),
-  }
+
+  // 通常の触り反応候補
+  let common_response = match info.as_str() {
+    "0headdoubleclick" => head_hit_dialog(req, touch_count),
+    "0headnade" => zero_head_nade(req, touch_count),
+    "0facenade" => zero_face_nade(req, touch_count),
+    "0handnade" => zero_hand_nade(req, touch_count),
+    "0bustnade" => zero_bust_touch(req, touch_count),
+    "0skirtup" => zero_skirt_up(req, touch_count),
+    "0shoulderdown" => zero_shoulder_down(req, touch_count),
+    _ => None,
+  };
+
+  // その他特殊な条件で発生する触り反応
+  let other_response = if info.starts_with('0') && info.contains("doubleclick") {
+    // 触り反応のない部分をダブルクリックでメニュー
+    Some(Ok(on_menu_exec(req)))
+  } else {
+    None
+  };
+
+  // 超特殊処理
+  // メニュー開き以外の\0への触りはリセットイベントを発生させる
+  if info.starts_with('0') && common_response.is_some() && other_response.is_none() {
+    if let Some(v) = reset_immersion() {
+      return v;
+    }
+  };
+
+  common_response
+    .or(other_response)
+    .unwrap_or_else(|| Ok(new_response_nocontent()))
 }
 
-fn zero_head_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
-  if vars.volatility.aroused() {
+fn zero_head_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
+  let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
     let dialogs = vec![vec![
@@ -154,11 +166,13 @@ fn zero_head_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
       "h1111207軽んじられている気がするわ。".to_string(),
     ]];
     phased_talks(count, dialogs).0
-  }
+  };
+  common_choice_process(results)
 }
 
-fn zero_face_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
-  if vars.volatility.aroused() {
+fn zero_face_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
+  let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
     let dialogs = vec![vec![
@@ -167,11 +181,13 @@ fn zero_face_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
       "h1111104\\1すべすべだ。h1111204……もういいかしら。".to_string(),
     ]];
     phased_talks(count, dialogs).0
-  }
+  };
+  common_choice_process(results)
 }
 
-fn zero_hand_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
-  if vars.volatility.aroused() {
+fn zero_hand_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
+  let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
     let dialogs = vec![vec![
@@ -192,11 +208,13 @@ fn zero_hand_nade(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
       .to_string(),
     ]];
     phased_talks(count, dialogs).0
-  }
+  };
+  common_choice_process(results)
 }
 
-fn zero_skirt_up(_count: u32, vars: &mut GlobalVariables) -> Vec<String> {
-  if vars.volatility.aroused() {
+fn zero_skirt_up(_req: &Request, _count: u32) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
+  let results = if vars.volatility.aroused() {
     DIALOG_SEXIAL_WHILE_HITTING.clone()
   } else {
     let mut conbo_parts: Vec<Vec<String>> =
@@ -212,10 +230,11 @@ fn zero_skirt_up(_count: u32, vars: &mut GlobalVariables) -> Vec<String> {
       ]);
     }
     all_combo(&conbo_parts)
-  }
+  };
+  common_choice_process(results)
 }
 
-fn zero_shoulder_down(count: u32, _vars: &mut GlobalVariables) -> Vec<String> {
+fn zero_shoulder_down(_req: &Request, count: u32) -> Result<Response, ShioriError> {
   let dialogs = vec![
     vec!["\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
@@ -235,11 +254,12 @@ fn zero_shoulder_down(count: u32, _vars: &mut GlobalVariables) -> Vec<String> {
       .to_string(),
     ],
   ];
-  phased_talks(count, dialogs).0
+  common_choice_process(phased_talks(count, dialogs).0)
 }
 
-fn zero_bust_touch(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
-  if vars.volatility.aroused() {
+fn zero_bust_touch(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
+  let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
     let zero_bust_touch_threshold = 12;
@@ -274,7 +294,8 @@ fn zero_bust_touch(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
       zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
     }
     zero_bust_touch
-  }
+  };
+  common_choice_process(results)
 }
 
 pub fn on_head_hit_cancel(_req: &Request) -> Result<Response, ShioriError> {
@@ -307,18 +328,23 @@ pub fn on_head_hit(_req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
-pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
+pub fn head_hit_dialog(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
   let is_aroused = vars.volatility.aroused();
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
     get_touch_info!("0headdoubleclick").reset(); // 選択肢だけなのでカウントしない
-    vec!["\
+    let dialogs = vec!["\
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
     "
-    .to_string()]
+    .to_string()];
+    common_choice_process(dialogs)
   } else if !is_aroused {
     get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
-    vec!["h1000000痛っ……\\n\\0\\![bind,ex,流血,1]h1311204あら、その気になってくれた？".to_string()]
+    let dialogs = vec![
+      "h1000000痛っ……\\n\\0\\![bind,ex,流血,1]h1311204あら、その気になってくれた？".to_string(),
+    ];
+    common_choice_process(dialogs)
   } else {
     // 各段階ごとのセリフ
     let suffixes_list = vec![
@@ -361,7 +387,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
     if is_last {
       vars.volatility.set_aroused(false);
       get_touch_info!("0headdoubleclick").reset();
-      return suffixes;
+      return common_choice_process(suffixes);
     }
 
     let prefixes = [
@@ -373,7 +399,7 @@ pub fn head_hit_dialog(count: u32, vars: &mut GlobalVariables) -> Vec<String> {
     for j in 0..suffixes.len() {
       result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixes[j]));
     }
-    result
+    common_choice_process(result)
   }
 }
 

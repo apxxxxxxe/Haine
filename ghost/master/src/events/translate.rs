@@ -32,7 +32,7 @@ pub fn on_translate(text: String, complete_shadow: bool) -> Result<String, Shior
   if !vars.volatility.inserter_mut().is_ready() {
     return Err(ShioriError::TranslaterNotReadyError);
   }
-  Ok(vars.volatility.inserter_mut().run(translated)?)
+  vars.volatility.inserter_mut().run(translated)
 }
 
 fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {

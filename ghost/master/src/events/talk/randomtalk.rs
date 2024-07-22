@@ -47,11 +47,7 @@ static BOOK_TOPICS: [(&str, &str); 3] = [
 ];
 
 fn random_book_topic() -> Option<(&'static str, &'static str)> {
-  if let Some(v) = BOOK_TOPICS.choose(&mut rand::thread_rng()) {
-    Some(*v)
-  } else {
-    None
-  }
+  BOOK_TOPICS.choose(&mut rand::thread_rng()).copied()
 }
 
 struct RandomTalk {
