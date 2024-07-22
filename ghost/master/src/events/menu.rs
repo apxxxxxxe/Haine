@@ -133,15 +133,27 @@ fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
   )
 }
 
-pub fn on_immersive_rate_reduced(_req: &Request) -> Result<Response, ShioriError> {
+pub fn on_immersive_rate_reduced(req: &Request) -> Result<Response, ShioriError> {
   // 没入度を下げる
+  let refs = get_references(req);
+  let degree = if let Some(r) = refs.first() {
+    r.parse::<u32>().unwrap_or(0)
+  } else {
+    0
+  };
+  let post_dialog = if let Some(r) = refs.get(1) {
+    r.to_string()
+  } else {
+    "".to_string()
+  };
   let vars = get_global_vars();
-  vars.volatility.set_immersive_degrees(0);
+  vars.volatility.set_immersive_degrees(degree);
 
-  let m = "\
-  \\Ch1111210\\1(没入度が0になった)\\x\\![raise,OnMenuExec]\
-  "
-  .to_string();
+  let m = format!(
+    "\\C\\0{}\\1(没入度が0になった){}",
+    render_shadow(true),
+    post_dialog
+  );
 
   new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
