@@ -62,7 +62,6 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         \\_l[0,1.5em]\
         \\![*]\\q[なにか話して,OnAiTalk]\\n\
         \\![*]\\q[話しかける,OnTalk]\\n\
-        {}\
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\
         \\_l[0,@1.75em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
@@ -72,11 +71,6 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         {}\
         \\_l[0,0]{}\
         ",
-        if vars.flags().check(&EventFlag::ImmersionUnlock) {
-          "\\![*]\\q[ひと息つく,OnBreakTime]\\n".to_string()
-        } else {
-          "".to_string()
-        },
         talk_interval_selector,
         close_button,
         show_bar(
@@ -137,19 +131,6 @@ fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
     BAR_HEIGHT,
     make_bar_chips(bar_width * rate / 100).join(&format!("\\_w[{}]\\_l[@-0.5em,]", bar_chip_wait)),
   )
-}
-
-pub fn on_break_time(_req: &Request) -> Result<Response, ShioriError> {
-  let m = "\
-      h1111101\\1……少し話に集中しすぎていたようだ。\\n\
-      h1111204\\1カップを傾け、一息つく。\\n\
-      h1113705\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
-      \\n\
-      \\![embed,OnImmersiveRateReduced]\
-      "
-  .to_string();
-
-  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
 
 pub fn on_immersive_rate_reduced(_req: &Request) -> Result<Response, ShioriError> {
