@@ -4,7 +4,6 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::random_talks;
-use crate::events::talk::TalkType;
 use crate::events::tooltip::show_tooltip;
 use crate::variables::{get_global_vars, EventFlag};
 use shiorust::message::{Request, Response};
@@ -319,7 +318,9 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
   const DIMMED_COLOR: &str = "\\f[color,150,150,130]";
   let talk_collection = get_global_vars().talk_collection_mut();
   let vars = get_global_vars();
-  let talk_types = TalkType::all();
+  let talking_place = vars.volatility.talking_place();
+  lines.push(format!("[トーク統計: {}]\\n", talking_place));
+  let talk_types = talking_place.talk_types();
   let is_unlocked_checks = talk_types
     .iter()
     .map(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(*t)))
