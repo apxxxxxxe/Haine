@@ -224,7 +224,7 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   format!("\\1{}\\n", v.join("\\n"))
 }
 
-pub fn complete_shadow(is_complete: bool) -> String {
+pub fn render_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -100;
   let vars = get_global_vars();
@@ -375,7 +375,7 @@ pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   let from_surface = get_global_vars().volatility.current_surface();
   let from_eyes = from_surface % eye_index_digit_pow;
   let direct_res = new_response_with_value_with_notranslate(
-    format!("\\s[{}]{}", dest_surface, complete_shadow(is_complete)),
+    format!("\\s[{}]{}", dest_surface, render_shadow(is_complete)),
     TranslateOption::none(),
   );
 
@@ -412,7 +412,7 @@ pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   let delay = format!("\\_w[{}]", DELAY);
   let animation = cuts
     .iter()
-    .map(|s| format!("\\0\\s[{}]{}", s, complete_shadow(is_complete)))
+    .map(|s| format!("\\0\\s[{}]{}", s, render_shadow(is_complete)))
     .collect::<Vec<String>>()
     .join(delay.as_str());
 

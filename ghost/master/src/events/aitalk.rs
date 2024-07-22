@@ -60,7 +60,7 @@ pub fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
       let response = new_response_with_value_with_translate(
         format!(
           "\\0\\s[1111204]{}{}",
-          complete_shadow(true),
+          render_shadow(true),
           IMMERSION_INTRODUCTION_TALK
         ),
         TranslateOption::simple_translate(),
