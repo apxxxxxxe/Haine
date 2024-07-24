@@ -1,4 +1,6 @@
+use crate::error::ShioriError;
 use crate::events::common::*;
+use crate::events::replace_dialog_for_nomouthmove;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
@@ -549,7 +551,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "人ひとり",
           text: "\
-            h1111210人ひとり、殺せるとしたら誰にする？という他愛ない問い。\\n\
+            h1111110人ひとり、殺せるとしたら誰にする？という他愛ない問い。\\n\
             h1111305だから私は私を殺したの。\\n\
             ".to_string(),
           required_condition: None,
@@ -559,9 +561,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "死体損壊",
           text: "\
-            h1111210「死体の損壊は死者への冒涜だ」\\n\
+            h1111110「死体の損壊は死者への冒涜だ」\\n\
             という言説があるわね。\\n\
-            h1111205当事者の視点から言うと、別にそうでもなかったわ。\\n\
+            h1111105当事者の視点から言うと、別にそうでもなかったわ。\\n\
             h1111310幽霊が元の身体に戻った例もない。\\n\
             h1111306畢竟、それは生者の問題ということね。\\n\
             ".to_string(),
@@ -572,7 +574,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "惨めな人生",
           text: "\
-            h1111205みじめな人生の上に正気でいるには、\\n日々は長すぎたの。\
+            h1111105みじめな人生の上に正気でいるには、\\n日々は長すぎたの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -581,10 +583,10 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "行き場のない苦しみ",
           text: "\
-            h1112202誰が悪い？いいえ、誰も悪くない。\\n\
+            h1112102誰が悪い？いいえ、誰も悪くない。\\n\
             打ち明けたところで、的はずれな罪悪感を生むだけ。\\n\
-            h1112205だからといって、他人に責をなすりつけるほど鈍くあることもできなかった。\\n\
-            h1112210この気持ちには、どこにも行き場がなかったの。\
+            h1112105だからといって、他人に責をなすりつけるほど鈍くあることもできなかった。\\n\
+            h1112110この気持ちには、どこにも行き場がなかったの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -593,9 +595,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "死の瞬間",
           text: "\
-            h1111205死ぬ瞬間、後悔はなかった。\\n\\n\
+            h1111105死ぬ瞬間、後悔はなかった。\\n\\n\
             もう一度同じ人生を生きることができたとしても、私は同じことをすると断言できるわ。\\n\
-            ……h1121210ただ、遺書くらいは書いたほうがよかったかしら。\
+            ……h1111110ただ、遺書くらいは書いたほうがよかったかしら。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -604,8 +606,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "助けは遂げられず",
           text: "\
-            h1111205助けようとしてくれた人は沢山いたけれど、\\n\
-            h1121210それが遂げられることはついぞなかったわ。\
+            h1111105助けようとしてくれた人は沢山いたけれど、\\n\
+            h1111110それが遂げられることはついぞなかったわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -614,8 +616,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "死なない理由",
           text: "\
-            h1111210生きていて良かったと思えることは数えきれないほどあったわ。\\n\
-            h1111205でも、死なない理由は一つも見つからなかった。\
+            h1111110生きていて良かったと思えることは数えきれないほどあったわ。\\n\
+            h1111105でも、死なない理由は一つも見つからなかった。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -624,12 +626,12 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "ふつうになりたかった",
           text: "\
-            h1122210ふつうになりたかった。\\n\
-            ……h1122205でも、ふつうだったら、もう私じゃないとも思う。\\n\
+            h1112110ふつうになりたかった。\\n\
+            ……h1112105でも、ふつうだったら、もう私じゃないとも思う。\\n\
             それは私の顔をした別のだれかで、\\n\
             私は私の性質と不可分で、\\n\
             今ここにいる私は、私以外でいられない。\\n\
-            h1122210だから、私として生きることができなかった私は、もうどこにもいられない。\
+            h1112110だから、私として生きることができなかった私は、もうどこにもいられない。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -638,9 +640,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "人と本",
           text: "\
-            h1111205昔から、人と本の違いがわからなかったの。\\n\
-            h1121204もちろん、区別がつかないという意味ではなくて。\\n\
-            ……h1111210人に期待するものがそれだけしか無かったの。\
+            h1111105昔から、人と本の違いがわからなかったの。\\n\
+            h1111105もちろん、区別がつかないという意味ではなくて。\\n\
+            ……h1111110人に期待するものがそれだけしか無かったの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -651,14 +653,14 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           text: {
             let topic = random_book_topic()?;
             format!("\
-            h1111204……手持ち無沙汰のようね。\\n\
-            h1111206なにか本を見繕ってあげましょうか。\\n\
-            h1111203……h1111201これはどうかしら。\\n\
+            h1111105……手持ち無沙汰のようね。\\n\
+            h1111106なにか本を見繕ってあげましょうか。\\n\
+            h1111103……h1111102これはどうかしら。\\n\
             \\1……ずいぶん分厚い本を手渡された。\\n\
-            h1111202{}の構成要素について論じられているの。\\n\
+            h1111102{}の構成要素について論じられているの。\\n\
             {}についての項が特に興味深いわ。\
-            h1111205要点だけなら半日もあれば読み終わると思うから、\\n\
-            h1111204終わったら意見を交換しましょう。\
+            h1111105要点だけなら半日もあれば読み終わると思うから、\\n\
+            h1111105終わったら意見を交換しましょう。\
             ", topic.0, topic.1)
           },
           required_condition: None,
@@ -668,10 +670,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "今度こそ無へ",
           text: "\
-            h1111205死にぞこなったものだから、\\n\
+            h1111105死にぞこなったものだから、\\n\
             次の手段を求めている。\\n\
-            ……h1112305今度こそ、終わらせたいの。\\n\
-            今度こそ、無へ。\
+            ……h1112305今度こそ、終わらせたいものね。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -682,8 +683,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           text: "\
             h1111110未練もなく、しかし現世に留まっている魂。\\n\
             h1111105あるべきでないものはやがて消滅する。\\n\
-            h1111206多少の不純物が含まれようと、そのルールは変わらない。\\n\
-            h1111205私は、それを待ち望んでいるの。\
+            h1111106多少の不純物が含まれようと、そのルールは変わらない。\\n\
+            h1111105私は、それを待ち望んでいるの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -705,7 +706,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
               .map(|t| render_achievement_message(*t))
               .collect::<Vec<_>>();
             format!("\
-              h1111210…………幽霊にとって、自身の死の記憶はある種のタブーなの。\\n\
+              h1111110…………幽霊にとって、自身の死の記憶はある種のタブーなの。\\n\
               誰もが持つがゆえの共通認識。自身の死は恥部なのよ。\\n\
               私も、彼らのそれには深く踏み込まない。\\n\
               けれど、あなたは生者だから。\\n\
@@ -737,9 +738,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "自己理解、他者理解",
           text: "\
-            h1111205自分のことを本当に理解しているのは他人、って本当なのかしら。\\n\
-            h1111206……私が知らない私がいる。\\n\
-            h1112204なんだか不安になってきたわ。\
+            h1111105自分のことを本当に理解しているのは他人、って本当なのかしら。\\n\
+            h1111106……私が知らない私がいる。\\n\
+            h1112105なんだか不安になってきたわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -748,11 +749,11 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "感動と倦み",
           text: "\
-            h1111205ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
+            h1111105ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
             どちらがその本の真の印象かしら。\\n\\n\
-            h1111210私はどちらも正しいと思うの。\\n\
-            ……h1111504卑怯だと思った？\\n\
-            h1111210印象なんてその時々で変わるもので、h1111205一つに定まることなんて稀だもの。\\n\\n\
+            h1111110私はどちらも正しいと思うの。\\n\
+            ……h1111505卑怯だと思った？\\n\
+            h1111110印象なんてその時々で変わるもので、h1111105一つに定まることなんて稀だもの。\\n\\n\
             まして、自分の中に秘めるものならなおさら。\\n\
             h1111506どちらか一方だけだなんて、勿体ないわ。\
             ".to_string(),
@@ -763,10 +764,10 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "納得のための因果",
           text: "\
-            h1111210因果が巡ってきた。\\n\
+            h1111110因果が巡ってきた。\\n\
             過去が現在を刈り取りに来た。\\n\
             私は報いを受けたのだ。\\n\\n\
-            ……h1111205それが、自分を納得させるための妄想だったとしたら？\
+            ……h1111105それが、自分を納得させるための妄想だったとしたら？\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -775,8 +776,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "怖いものを見るということ",
           text: "\
-            h1111201怖いものだからこそ、見つめなければ戦えない。\\n\
-            ……h1121205そんなもの、戦える人のためだけの論理だわ。\
+            h1111102怖いものだからこそ、見つめなければ戦えない。\\n\
+            ……h1111105そんなもの、戦える人のためだけの論理だわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -785,11 +786,11 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "停滞を終わらせるために",
           text: "\
-            h1111205危険と隣り合わせだからこそ、世界は美しいの。\\n\
+            h1111105危険と隣り合わせだからこそ、世界は美しいの。\\n\
             身を損なう心配がなくなっては、美しさが心を打つこともない。\\n\
-            h1121205ただただ平坦な、揺らがぬ水面があるだけ。\\n\
-            h1121210それはやがて、淀み、腐る。\\n\
-            h1111205願わくば、せめて終わりがありますように、と。\
+            h1111105ただただ平坦な、揺らがぬ水面があるだけ。\\n\
+            h1111110それはやがて、淀み、腐る。\\n\
+            h1111105願わくば、せめて終わりがありますように、と。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -801,8 +802,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             h1111105人生に変化は付きもの……けれどh1111110停滞はそれ以上。\\n\
             一度立ち止まってしまうと、空気は一瞬で淀んで、身動きがとれなくなってしまう。\\n\
             それは倦怠とも違う、鈍い痛み。\\n\
-            h1111201あなた、h1111205もしそうなったときは、多少無理にでも変化を取り入れるほうがいいわ。\\n\
-            ……h1111210たとえなにかを破壊することになるとしても、何も出来ないよりはずっとましよ。\
+            h1111105もしそうなったときは、多少無理にでも変化を取り入れるほうがいいわ。\\n\
+            ……h1111110たとえなにかを破壊することになるとしても、何も出来ないよりはずっとましよ。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -811,7 +812,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "極限の変化としての死",
           text: "\
-            h1111205死の瞬間の、極限に振れた変化。\\n\
+            h1111105死の瞬間の、極限に振れた変化。\\n\
             命が命でなくなり、身体が陳腐な肉の塊になる、その一瞬が愛しくてたまらない。\\n\
             どうしようもなく、愛しいの。\\n\\n\
             ".to_string(),
@@ -836,7 +837,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             身体が重い。浅い呼吸のなかで、沈んでいく自分の身体を感じていることしかできない。\\n\
             私は、私を救うことを諦めているみたい。\\n\
             h1111110どうして。\\n\
-            h1121205どうして、こうなってしまったのだろう。\
+            h1111105どうして、こうなってしまったのだろう。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -857,9 +858,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "わがままな祈り",
           text: "\
-            h1111210がんばっているってこと、\\n\
+            h1111110がんばっているってこと、\\n\
             理解できなくても見ていてほしかったの。\\n\
-            ……h1121205わがままかしら。\
+            ……h1111105わがままかしら。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -868,11 +869,11 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "生者にとっての慰め",
           text: "\
-            h1111210枯れ木に水をあげましょう。\\n\
+            h1111110枯れ木に水をあげましょう。\\n\
             もはや花は見れずとも、それが慰めとなるのなら。\\n\
             \\n\
-            h1111205それは誰にとって？\\n\
-            h1111206もちろん、死を悼む者にとっての慰めよ。\\n\
+            h1111105それは誰にとって？\\n\
+            h1111106もちろん、死を悼む者にとっての慰めよ。\\n\
             むくろに心はないもの。\
             ".to_string(),
           required_condition: None,
@@ -882,8 +883,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "不可逆な崩壊",
           text: "\
-            h1111210燃え殻がひとりでに崩れるように、心が静かに割れて戻らなくなった。\\n\
-            h1111205だから、諦めたの。\
+            h1111110燃え殻がひとりでに崩れるように、心が静かに割れて戻らなくなった。\\n\
+            h1111105だから、諦めたの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -892,8 +893,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "中途半端な助け",
           text: "\
-            h1111210中途半端な助けは何もしないより残酷だわ。\\n\
-            h1111205希望を持たせておいて、それを奪うのだもの。\
+            h1111110中途半端な助けは何もしないより残酷だわ。\\n\
+            h1111105希望を持たせておいて、それを奪うのだもの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -902,9 +903,10 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "レンズの歪み",
           text: "\
-            h1111205観察と模倣を続ければ、完全に近づけると思っていた。\\n\
+            h1111105観察と模倣を続ければ、完全に近づけると思っていた。\\n\
             想定外だったのは、レンズが歪んでいたことと、それを取り替える方法がなかったこと。\\n\
-            h1121310そうなればすべて台無し。h1121304諦めるしかなかったわ。\
+            h1111310そうなればすべてが台無し。\\n\
+            h1111305望みが絶えるとはこのことね。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -913,10 +915,10 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "先の見えない苦しみ",
           text: "\
-            h1111205一寸先は暗く、扉は閉ざされている。\\n\
+            h1111105一寸先は暗く、扉は閉ざされている。\\n\
             不明な道のりを諸手で探るよりも、\\n\
             h1112305目先の手首を切り裂くほうが遥かに明瞭なのだ！\\n\
-            ……h1111210なんてね。\
+            ……h1111110なんてね。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -925,10 +927,10 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "唯一の視点",
           text: "\
-            h1111206私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
-            h1111204あなたは目の前にいるのに、\\n\
-            あなたが見る世界を私が知ることはできないの。\\n\
-            h1112210それって、この上なく残酷なことだわ。\
+            h1111106私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
+            h1111105あの子は目の前にいるのに、\\n\
+            あの子が見る世界を私が知ることはできないの。\\n\
+            h1112110それって、この上なく残酷なことだわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -937,11 +939,11 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "一つの個としての限界",
           text: "\
-            h1111203世界が複雑で曖昧すぎるから、\\n\
+            h1111103世界が複雑で曖昧すぎるから、\\n\
             私たちは認識したものを理解できる形に歪めてしまう。\\n\
-            h1111210既存の分類に当て嵌めて、安心を優先するの。\\n\
-            曇る視界と引き換えにね。\\n\
-            ……h1111204あなたには、私はどう見えているのかしら？\\n\
+            h1111110既存の分類に当て嵌めて、安心を優先するの。\\n\
+            それは曇る視界と引き換えに。\\n\
+            ……h1111105あの子には、私はどう見えているのかしら？\\n\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -950,13 +952,13 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "自己同一性の仮定",
           text: "\
-            h1111205環境と経験の総体こそが、\\n\
+            h1111105環境と経験の総体こそが、\\n\
             自己であるような気がするの。\\n\
             自己同一性すら偶然の産物？\\n\
-            h1111210執着しているのが馬鹿馬鹿しく思えてくるわ。\\n\
-            h1111205仮にそうでなければ。\\n\
+            h1111110執着しているのが馬鹿馬鹿しく思えてくるわ。\\n\
+            h1111105仮にそうでなければ。\\n\
             ……自己は最初から決定されている？\\n\
-            h1111210それこそ、ね。\\n\
+            h1111110それこそ、ね。\\n\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -965,9 +967,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "自分の理解者は自分だけ",
           text: "\
-            h1111210「なぜみんな私をわかってくれないの？」と誰もが思う。\\n\
-            h1111205答えは簡単。他人があなたではなく、あなたが他人でないからよ。\\n\
-            畢竟、あなた以外にあなたを理解できるひとはいないの。\
+            h1111110「なぜみんな私をわかってくれないの？」と誰もが思う。\\n\
+            h1111105答えは簡単。他人があなたではなく、あなたが他人でないからよ。\\n\
+            畢竟、あなた以外にあなたを理解できるひとはいない。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -976,9 +978,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "得ることは失うこと",
           text: "\
-            h1111210あまねく変化は表裏一体。\\n\
-            h1111206何かを得るとき、選択は慎重になさい。\\n\
-            h1111205それは失うものをも左右するのだから。\\n\
+            h1111110あまねく変化は表裏一体。\\n\
+            h1111106何かを得るとき、選択は慎重になさい。\\n\
+            h1111105それは失うものをも左右するのだから。\\n\
             ".to_string(),
           required_condition: None,
           callback: None,
