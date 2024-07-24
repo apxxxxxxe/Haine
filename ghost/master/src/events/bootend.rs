@@ -3,6 +3,7 @@ use crate::events::common::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
+use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
@@ -44,25 +45,47 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
 
 pub fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
+  let mut parts = vec![vec![RESET_BINDS.to_string()]];
+  let is_immersing = vars.volatility.talking_place() == TalkingPlace::Library;
+
+  if is_immersing {
+    parts.push(vec![format!(
+      "\\0\\b[{}]h1111705……。\
+      \\1ネ……\\n\
+      イネ……。\
+      \\0\\b[{}]hr1141112φ！\
+      \\1\\nハイネ！\
+      \\0…………\\n\\n\
+      h1111101……h1111204あら、{{user_name}}。\\n\
+      \\1\\n\\n……戻ってきたようだ。\\n\
+      \\0h1111210……そう、帰るのね。\\c\\1\\b[-1]",
+      TalkingPlace::Library.balloon_surface(),
+      TalkingPlace::LivingRoom.balloon_surface(),
+    )]);
+  }
   if !vars.flags().check(&EventFlag::FirstClose) {
     vars.flags_mut().done(EventFlag::FirstClose);
-    return new_response_with_value_with_translate(
-      FIRST_CLOSE_TALK.to_string(),
-      TranslateOption::simple_translate(),
-    );
+    if !is_immersing {
+      parts.push(vec![
+        "h1111201あら、今日はやめるの？h1111204そう。\\n".to_string()
+      ]);
+    }
+    parts.push(vec![FIRST_CLOSE_TALK.to_string()]);
+  } else {
+    parts.extend(vec![
+      vec!["h1111210".to_string(), "h1111211".to_string()],
+      vec!["あなたに".to_string()],
+      vec![
+        "すばらしき朝".to_string(),
+        "蜜のようなまどろみ".to_string(),
+        "暗くて静かな安らぎ".to_string(),
+        "良き終わり".to_string(),
+        "孤独と救い".to_string(),
+      ],
+      vec!["がありますように。\\nh1111204またね、{user_name}。\\_w[1200]".to_string()],
+    ]);
   }
-  let talks = all_combo(&vec![
-    vec!["h1111210".to_string(), "h1111211".to_string()],
-    vec!["あなたに".to_string()],
-    vec![
-      "すばらしき朝".to_string(),
-      "蜜のようなまどろみ".to_string(),
-      "暗くて静かな安らぎ".to_string(),
-      "良き終わり".to_string(),
-      "孤独と救い".to_string(),
-    ],
-    vec!["がありますように。\\nh1111204またね、{user_name}。\\_w[1200]".to_string()],
-  ]);
+  let talks = all_combo(&parts);
   let index = choose_one(&talks, true).ok_or(ShioriError::ArrayAccessError)?;
   new_response_with_value_with_translate(
     format!("{}{}\\-", RESET_BINDS, talks[index].clone()),
