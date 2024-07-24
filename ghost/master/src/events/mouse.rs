@@ -155,8 +155,13 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     .unwrap_or_else(|| Ok(new_response_nocontent()))
 }
 
-fn zero_head_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    return Some(on_ai_talk(req));
+  }
+
   let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
@@ -167,11 +172,16 @@ fn zero_head_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
     ]];
     phased_talks(count, dialogs).0
   };
-  common_choice_process(results)
+  Some(common_choice_process(results))
 }
 
-fn zero_face_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    return Some(on_ai_talk(req));
+  }
+
   let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
@@ -182,11 +192,16 @@ fn zero_face_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
     ]];
     phased_talks(count, dialogs).0
   };
-  common_choice_process(results)
+  Some(common_choice_process(results))
 }
 
-fn zero_hand_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    return Some(on_ai_talk(req));
+  }
+
   let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
@@ -209,11 +224,16 @@ fn zero_hand_nade(_req: &Request, count: u32) -> Result<Response, ShioriError> {
     ]];
     phased_talks(count, dialogs).0
   };
-  common_choice_process(results)
+  Some(common_choice_process(results))
 }
 
-fn zero_skirt_up(_req: &Request, _count: u32) -> Result<Response, ShioriError> {
+fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    return None;
+  }
+
   let results = if vars.volatility.aroused() {
     DIALOG_SEXIAL_WHILE_HITTING.clone()
   } else {
@@ -231,10 +251,10 @@ fn zero_skirt_up(_req: &Request, _count: u32) -> Result<Response, ShioriError> {
     }
     all_combo(&conbo_parts)
   };
-  common_choice_process(results)
+  Some(common_choice_process(results))
 }
 
-fn zero_shoulder_down(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
   let dialogs = vec![
     vec!["\
       h1141601φ！\\_w[250]h1000000\\_w[1200]\\n\
@@ -254,11 +274,16 @@ fn zero_shoulder_down(_req: &Request, count: u32) -> Result<Response, ShioriErro
       .to_string(),
     ],
   ];
-  common_choice_process(phased_talks(count, dialogs).0)
+  Some(common_choice_process(phased_talks(count, dialogs).0))
 }
 
-fn zero_bust_touch(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    return Some(on_ai_talk(req));
+  }
+
   let results = if vars.volatility.aroused() {
     DIALOG_TOUCH_WHILE_HITTING.clone()
   } else {
@@ -295,7 +320,7 @@ fn zero_bust_touch(_req: &Request, count: u32) -> Result<Response, ShioriError> 
     }
     zero_bust_touch
   };
-  common_choice_process(results)
+  Some(common_choice_process(results))
 }
 
 pub fn on_head_hit_cancel(_req: &Request) -> Result<Response, ShioriError> {
@@ -328,8 +353,13 @@ pub fn on_head_hit(_req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
-pub fn head_hit_dialog(_req: &Request, count: u32) -> Result<Response, ShioriError> {
+pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    return Some(on_ai_talk(req));
+  }
+
   let is_aroused = vars.volatility.aroused();
   to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
@@ -338,13 +368,13 @@ pub fn head_hit_dialog(_req: &Request, count: u32) -> Result<Response, ShioriErr
     \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
     "
     .to_string()];
-    common_choice_process(dialogs)
+    Some(common_choice_process(dialogs))
   } else if !is_aroused {
     get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
     let dialogs = vec![
       "h1000000痛っ……\\n\\0\\![bind,ex,流血,1]h1311204あら、その気になってくれた？".to_string(),
     ];
-    common_choice_process(dialogs)
+    Some(common_choice_process(dialogs))
   } else {
     // 各段階ごとのセリフ
     let suffixes_list = vec![
@@ -387,7 +417,7 @@ pub fn head_hit_dialog(_req: &Request, count: u32) -> Result<Response, ShioriErr
     if is_last {
       vars.volatility.set_aroused(false);
       get_touch_info!("0headdoubleclick").reset();
-      return common_choice_process(suffixes);
+      return Some(common_choice_process(suffixes));
     }
 
     let prefixes = [
@@ -399,7 +429,7 @@ pub fn head_hit_dialog(_req: &Request, count: u32) -> Result<Response, ShioriErr
     for j in 0..suffixes.len() {
       result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixes[j]));
     }
-    common_choice_process(result)
+    Some(common_choice_process(result))
   }
 }
 

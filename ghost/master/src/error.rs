@@ -11,6 +11,7 @@ pub enum ShioriError {
   TranslaterNotReadyError,
   TalkNotFound,
   ParseRequestError,
+  NotSetScopeError(String),
 }
 
 impl fmt::Display for ShioriError {
@@ -38,6 +39,11 @@ impl fmt::Display for ShioriError {
       ShioriError::ParseRequestError => write!(
         f,
         "[ParseRequestError]SHIORIリクエストのパースに失敗しました"
+      ),
+      ShioriError::NotSetScopeError(v) => write!(
+        f,
+        "[NotSetScopeError]次のスクリプトの頭にスコープ指定がありません: {}",
+        v
       ),
     }
   }

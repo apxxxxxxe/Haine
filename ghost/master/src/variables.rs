@@ -192,7 +192,6 @@ pub enum EventFlag {
   FirstHitTalkStart,
   FirstHitTalkDone,
   TalkTypeUnlock(TalkType),
-  ImmersionUnlock,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]

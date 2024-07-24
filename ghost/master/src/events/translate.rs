@@ -1,9 +1,10 @@
 use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::lazy_regex;
 use crate::variables::get_global_vars;
+use crate::{lazy_fancy_regex, lazy_regex};
 use core::fmt::{Display, Formatter};
+use fancy_regex::Regex as FancyRegex;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use shiorust::message::{Request, Response};
@@ -28,14 +29,51 @@ pub fn on_translate(text: String, complete_shadow: bool) -> Result<String, Shior
 
   let translated = translate(text, complete_shadow)?;
 
+  let balloonnum_reset = format!("{}{}", REMOVE_BALLOON_NUM, translated);
+
   let vars = get_global_vars();
   if !vars.volatility.inserter_mut().is_ready() {
     return Err(ShioriError::TranslaterNotReadyError);
   }
-  vars.volatility.inserter_mut().run(translated)
+  vars.volatility.inserter_mut().run(balloonnum_reset)
 }
 
 fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
+  static IGNORING_TRANSLATE_RANGE: Lazy<Regex> = lazy_regex!(r"@@@@@(.*?)@@@@@");
+  static CHANGE_SCOPE_RE_PREFIX: Lazy<FancyRegex> =
+    lazy_fancy_regex!(r"^(\\[01])(?!w)|(\\p\[\d+\])");
+
+  let translate_targets = IGNORING_TRANSLATE_RANGE.split(&text).collect::<Vec<&str>>();
+  let ignoring_ranges = IGNORING_TRANSLATE_RANGE
+    .captures_iter(&text)
+    .map(|c| c.get(1).unwrap().as_str())
+    .collect::<Vec<&str>>();
+
+  if translate_targets.len() != 1 || !ignoring_ranges.is_empty() {
+    // スコープがわかるように、各テキストの先頭にスコープがついているかチェック
+    for v in translate_targets.clone() {
+      if !v.is_empty() && !CHANGE_SCOPE_RE_PREFIX.is_match(v).is_ok_and(|v| v) {
+        return Err(ShioriError::NotSetScopeError(v.to_string()));
+      }
+    }
+    for v in ignoring_ranges.clone() {
+      if !v.is_empty() && !CHANGE_SCOPE_RE_PREFIX.is_match(v).is_ok_and(|v| v) {
+        return Err(ShioriError::NotSetScopeError(v.to_string()));
+      }
+    }
+  }
+
+  let mut results = String::new();
+  for (i, target) in translate_targets.iter().enumerate() {
+    results.push_str(&translate_core(target.to_string(), complete_shadow)?);
+    if let Some(v) = ignoring_ranges.get(i) {
+      results.push_str(&v.replace("@@@@@", ""));
+    }
+  }
+  Ok(results)
+}
+
+fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
 
   let text = RE_SURFACE_SNIPPET
@@ -66,17 +104,17 @@ fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError>
 }
 
 static QUICK_SECTION_START: Lazy<Regex> =
-  lazy_regex!(r"^(\\!\[quicksection,true|\\!\[quicksection,1)");
+  lazy_regex!(r"^(\\!\[quicksection,true]|\\!\[quicksection,1])");
 static QUICK_SECTION_END: Lazy<Regex> =
-  lazy_regex!(r"^(\\!\[quicksection,false|\\!\[quicksection,0)");
+  lazy_regex!(r"^(\\!\[quicksection,false]|\\!\[quicksection,0])");
+
+// 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
+static RE_TEXT_ONLY: Lazy<Regex> = lazy_regex!(
+  r"\\(\\|q\[.*?\]\[.*?\]|[!&8bcfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])"
+);
 
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
 fn translate_dialog(dialog: &mut Dialog) {
-  // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-  static RE_TEXT_ONLY: Lazy<Regex> = lazy_regex!(
-    r"\\(\\|q\[.*?\]\[.*?\]|[!&8cfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])"
-  );
-
   let tags = RE_TEXT_ONLY
     .find_iter(&dialog.text)
     .map(|m| m.as_str())
@@ -133,7 +171,10 @@ fn translate_whole(text: String) -> Result<String, ShioriError> {
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
   let vars = get_global_vars();
-  let user_name = vars.user_name().clone().ok_or(ShioriError::ArrayAccessError)?;
+  let user_name = vars
+    .user_name()
+    .clone()
+    .ok_or(ShioriError::ArrayAccessError)?;
   translated = translated.replace("{user_name}", &user_name);
 
   Ok(translated)
@@ -250,14 +291,14 @@ impl Replacee {
   }
 }
 
+static WAIT: Lazy<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
+
 fn replace_with_check(
   text_part: &str,
   scope: usize,
   replaces: &[Replacee],
   in_quicksection: bool,
 ) -> String {
-  static WAIT: Lazy<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
-
   let mut translated = String::new();
 
   let text_chars_vec = text_part.char_indices().collect::<Vec<(usize, char)>>();
@@ -297,15 +338,31 @@ fn replace_with_check(
   translated
 }
 
-#[test]
-fn test_translate() -> Result<(), ShioriError> {
-  let text = "\
-    \\_q\\0これは、0のセリフ。\\_qこれはウェイト付きで置換されるべき文章。\\0なお置換されるべき文章。\\n\
-    \\1これは、1のセリフ。\\n\
-    \\0そして、0のセリフ。\\n\
-    "
-  .to_string();
-  let translated = translate(text, true);
-  println!("{}", translated?);
-  Ok(())
+// 1文字ずつ\\_qで囲めば口パクしなくなる
+pub fn replace_dialog_for_nomouthmove(text: String) -> Result<String, ShioriError> {
+  let text = translate(text, true)?;
+  let split_parts: Vec<&str> = RE_TEXT_ONLY.split(&text).collect();
+  let mut matches: Vec<String> = Vec::new();
+  for cap in RE_TEXT_ONLY.find_iter(&text) {
+    matches.push(cap.as_str().to_string());
+  }
+
+  let mut result = String::new();
+  for (i, splitted) in split_parts.iter().enumerate() {
+    result.push_str(
+      splitted
+        .chars()
+        .map(|c| c.to_string())
+        .collect::<Vec<_>>()
+        .join("\\_w[50]\\![quicksection,0]\\![quicksection,1]")
+        .as_str(),
+    );
+    if let Some(m) = matches.get(i) {
+      result.push_str(m);
+    }
+  }
+  Ok(format!(
+    "\\![quicksection,1]@@@@@{}\\![quicksection,0]@@@@@",
+    result
+  ))
 }

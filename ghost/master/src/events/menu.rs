@@ -5,6 +5,7 @@ use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::tooltip::show_tooltip;
+use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag};
 use shiorust::message::{Request, Response};
 
@@ -62,7 +63,6 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         \\_l[0,1.5em]\
         \\![*]\\q[なにか話して,OnAiTalk]\\n\
         \\![*]\\q[話しかける,OnTalk]\\n\
-        {}\
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\
         \\_l[0,@1.75em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
@@ -72,19 +72,22 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         {}\
         \\_l[0,0]{}\
         ",
-        if vars.flags().check(&EventFlag::ImmersionUnlock) {
-          "\\![*]\\q[ひと息つく,OnBreakTime]\\n".to_string()
-        } else {
-          "".to_string()
-        },
         talk_interval_selector,
         close_button,
-        show_bar(
-          100,
-          vars.volatility.immersive_degrees(),
-          "没入度",
-          "WhatIsImersiveDegree",
-        ),
+        if vars.volatility.talking_place() == TalkingPlace::Library {
+          show_bar_with_simple_label(
+            100,
+            vars.volatility.immersive_degrees(),
+            "ハイネは応えない。",
+          )
+        } else {
+          show_bar_with_caption(
+            100,
+            vars.volatility.immersive_degrees(),
+            "没入度",
+            "WhatIsImersiveDegree",
+          )
+        },
       )
     },
   );
@@ -112,7 +115,7 @@ fn make_bar_chips(length: u32) -> Vec<String> {
   v
 }
 
-fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
+fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
   const SPEED: u32 = 10; // 何文字分の表示時間でバーを描画するか
   const BAR_WIDTH: u32 = 16; // バーの長さを何文字分で描画するか
   const BAR_HEIGHT: u32 = 10;
@@ -139,28 +142,51 @@ fn show_bar(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
   )
 }
 
-pub fn on_break_time(_req: &Request) -> Result<Response, ShioriError> {
-  let m = "\
-      h1111101\\1……少し話に集中しすぎていたようだ。\\n\
-      h1111204\\1カップを傾け、一息つく。\\n\
-      h1113705\\1ハイネはこちらの意図を察して、同じように一口飲んだ。\\n\
-      \\n\
-      \\![embed,OnImmersiveRateReduced]\
-      "
-  .to_string();
+fn show_bar_with_simple_label(max: u32, current: u32, label: &str) -> String {
+  const SPEED: u32 = 10; // 何文字分の表示時間でバーを描画するか
+  const BAR_WIDTH: u32 = 16; // バーの長さを何文字分で描画するか
+  const BAR_HEIGHT: u32 = 10;
+  let rate = ((current * 100) as f32 / max as f32) as u32;
+  let bar_width = BAR_WIDTH * 2; // 重ねながら描画するので2倍
+  let bar_chip_wait = (50.0 * ((SPEED as f32) / (BAR_WIDTH as f32))) as u32; // 1文字分の表示時間
 
-  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
+  format!(
+    "\
+    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\f[height,-1]\\![quicksection,true]{}\
+    \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
+    \\f[height,{}]\\_l[0,]\\f[color,120,0,0]{}\
+    ",
+    BAR_HEIGHT,
+    BAR_WIDTH + 1,
+    label,
+    BAR_HEIGHT,
+    make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
+    BAR_HEIGHT,
+    make_bar_chips(bar_width * rate / 100).join(&format!("\\_w[{}]\\_l[@-0.5em,]", bar_chip_wait)),
+  )
 }
 
-pub fn on_immersive_rate_reduced(_req: &Request) -> Result<Response, ShioriError> {
+pub fn on_immersive_rate_reduced(req: &Request) -> Result<Response, ShioriError> {
   // 没入度を下げる
+  let refs = get_references(req);
+  let degree = if let Some(r) = refs.first() {
+    r.parse::<u32>().unwrap_or(0)
+  } else {
+    0
+  };
+  let post_dialog = if let Some(r) = refs.get(1) {
+    r.to_string()
+  } else {
+    "".to_string()
+  };
   let vars = get_global_vars();
-  vars.volatility.set_immersive_degrees(0);
+  vars.volatility.set_immersive_degrees(degree);
 
-  let m = "\
-  \\Ch1111210\\1(没入度が0になった)\\x\\![raise,OnMenuExec]\
-  "
-  .to_string();
+  let m = format!(
+    "\\C\\0{}\\1(没入度が0になった){}",
+    render_shadow(true),
+    post_dialog
+  );
 
   new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
