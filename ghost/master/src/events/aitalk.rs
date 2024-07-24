@@ -65,16 +65,6 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
         TranslateOption::with_shadow_completion(),
       );
     }
-  } else if vars.volatility.immersive_degrees() == 0 {
-    // 書斎で没入度が0になったら居間に移動
-    vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
-
-    let messages = moving_to_living_room_talk()?;
-    let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-    return new_response_with_value_with_translate(
-      messages[index].to_owned(),
-      TranslateOption::with_shadow_completion(),
-    );
   }
 
   // 通常ランダムトーク
@@ -113,6 +103,19 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index]
     } else {
       sub_immsersive_degree(IMMERSIVE_RATE);
+
+      // 書斎で没入度が0になったら居間に移動
+      if vars.volatility.immersive_degrees() == 0 {
+        vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
+
+        let messages = moving_to_living_room_talk()?;
+        let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+        return new_response_with_value_with_translate(
+          messages[index].to_owned(),
+          TranslateOption::with_shadow_completion(),
+        );
+      }
+
       let index =
         choose_one(&RANDOMTALK_COMMENTS_LIBRARY_ACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
       RANDOMTALK_COMMENTS_LIBRARY_ACTIVE[index]
@@ -128,6 +131,7 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   } else {
     ""
   };
+
   new_response_with_value_with_translate(
     format!(
       "\\0\\![set,balloonnum,{}]{}",
