@@ -16,8 +16,8 @@ pub fn balloon_tooltip(req: &Request) -> Response {
   }
   match refs[2] {
     "WhatIsImersiveDegree" => new_response_with_value_with_notranslate(
-      "没入度は、ハイネとあなたがどれだけ深い内容の会話をしているかを表します。\\n\
-                                  没入度が高いほど、より抽象的でクリティカルな話題を扱います。"
+      "ハイネがどれだけ思索に没頭しているかを表す指標です。\\n\
+      最大になったとき、彼女は極度の集中状態に陥るでしょう。"
         .to_string(),
       TranslateOption::none(),
     ),
