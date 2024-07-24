@@ -7,7 +7,6 @@ edition = "2021"
 
 [dependencies]
 shiorust = { git = "https://github.com/Narazaka/shiorust", version = "0.1.0" }
-serenity = "0.11"
 tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
