@@ -1,3 +1,4 @@
+use crate::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
@@ -17,11 +18,15 @@ pub fn on_notify_user_info(req: &Request) -> Response {
   new_response_nocontent()
 }
 
-pub fn on_second_change(req: &Request) -> Response {
+pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
 
   // 最小化中かどうかに関わらず実行する処理
-  let total_time = vars.total_time().unwrap();
+  let total_time = if let Some(v) = vars.total_time() {
+    v
+  } else {
+    return Err(ShioriError::UndefinedVariable);
+  };
   vars.set_total_time(Some(total_time + 1));
   vars
     .volatility
@@ -31,22 +36,28 @@ pub fn on_second_change(req: &Request) -> Response {
   if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
     FIRST_RANDOMTALKS.len() as u32 - 1,
   )) {
-    return new_response_nocontent();
+    return Ok(new_response_nocontent());
   }
 
   let refs = get_references(req);
-  let idle_secs = refs[4].parse::<i32>().unwrap();
+  let idle_secs = match refs[4].parse::<i32>() {
+    Ok(v) => v,
+    Err(_) => return Err(ShioriError::ParseIntError),
+  };
   vars.volatility.set_idle_seconds(idle_secs);
 
   let status = Status::from_request(req);
 
-  if vars.random_talk_interval().unwrap() > 0
-    && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time())
-      > vars.random_talk_interval().unwrap()
-    && status.clone().is_some_and(|s| !s.minimizing)
-  {
-    return on_ai_talk(req);
-  }
+  if let Some(v) = vars.random_talk_interval() {
+    if v > 0
+      && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time()) > v
+      && status.clone().is_some_and(|s| !s.minimizing)
+    {
+      return on_ai_talk(req);
+    }
+  } else {
+    return Err(ShioriError::UndefinedVariable);
+  };
 
   let mut text = String::new();
   if vars.volatility.ghost_up_time() % 60 == 0 && status.is_some_and(|s| !s.talking) {
@@ -107,17 +118,19 @@ pub fn on_second_change(req: &Request) -> Response {
       ),
     ];
 
-    text += &format!(
-      "\\1\\_q{}時\\n{}",
-      now.hour(),
-      tanka_list.choose(&mut rand::thread_rng()).unwrap()
-    );
+    let tanka = if let Some(v) = tanka_list.choose(&mut rand::thread_rng()) {
+      v
+    } else {
+      return Err(ShioriError::ArrayAccessError);
+    };
+
+    text += &format!("\\1\\_q{}時\\n{}", now.hour(), tanka);
   }
 
   if text.is_empty() {
-    new_response_nocontent()
+    Ok(new_response_nocontent())
   } else {
-    new_response_with_value(text, TranslateOption::simple_translate())
+    new_response_with_value_with_translate(text, TranslateOption::simple_translate())
   }
 }
 
@@ -125,11 +138,14 @@ fn tanka(text: &str, author: &str) -> String {
   format!("{}\\n\\f[align,right]({})", text, author)
 }
 
-pub fn on_surface_change(req: &Request) -> Response {
+pub fn on_surface_change(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let surface = refs[0].parse::<i32>().unwrap();
+  let surface = match refs[0].parse::<i32>() {
+    Ok(v) => v,
+    Err(_) => return Err(ShioriError::ParseIntError),
+  };
 
   get_global_vars().volatility.set_current_surface(surface);
 
-  new_response_nocontent()
+  Ok(new_response_nocontent())
 }
