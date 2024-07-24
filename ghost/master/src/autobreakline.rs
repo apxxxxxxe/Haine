@@ -1,3 +1,5 @@
+use crate::error::ShioriError;
+use crate::{lazy_fancy_regex, lazy_regex};
 use core::cmp::Ord;
 use fancy_regex::Regex as FancyRegex;
 use once_cell::sync::Lazy;
@@ -6,12 +8,10 @@ use std::sync::{Arc, Mutex};
 use std::thread::JoinHandle;
 use vibrato::{Dictionary, Tokenizer};
 
-static SAKURA_SCRIPT_RE: Lazy<Regex> = Lazy::new(|| {
-  Regex::new(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###).unwrap()
-});
+static SAKURA_SCRIPT_RE: Lazy<Regex> =
+  lazy_regex!(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###);
 
-pub static CHANGE_SCOPE_RE: Lazy<FancyRegex> =
-  Lazy::new(|| FancyRegex::new(r"(\\[01])(?!w)|(\\p\[\d+\])").unwrap());
+pub static CHANGE_SCOPE_RE: Lazy<FancyRegex> = lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
 
 fn find_change_scope(text: &str) -> Option<String> {
   if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {
@@ -26,7 +26,7 @@ fn find_change_scope(text: &str) -> Option<String> {
 }
 
 pub fn extract_scope(text: &str) -> Option<usize> {
-  static RE_NOT_NUMBER: Lazy<Regex> = Lazy::new(|| Regex::new(r"[^\d]").unwrap());
+  static RE_NOT_NUMBER: Lazy<Regex> = lazy_regex!(r"[^\d]");
 
   if let Some(scope_tag) = find_change_scope(text) {
     debug!("scope_tag: {}", scope_tag);
@@ -62,7 +62,11 @@ impl Inserter {
 
   pub fn is_ready(&mut self) -> bool {
     let tokenizer_clone = self.tokenizer.clone();
-    let tokenizer = tokenizer_clone.lock().unwrap();
+    let tokenizer = if let Ok(v) = tokenizer_clone.lock() {
+      v
+    } else {
+      return false;
+    };
     tokenizer.is_some()
   }
 
@@ -82,15 +86,15 @@ impl Inserter {
     Self::new(24.0) // 24文字で改行: SSPデフォルト+に合わせた値
   }
 
-  pub fn run(&mut self, src: String) -> String {
-    let parts = self.wakachi(src);
+  pub fn run(&mut self, src: String) -> Result<String, ShioriError> {
+    let parts = self.wakachi(src)?;
     let mut lines = self
       .render(parts)
       .split("\\n")
       .map(|s| s.to_string())
       .collect::<Vec<String>>();
     self.remove_last_whitespace(lines.as_mut());
-    lines.join("\\n")
+    Ok(lines.join("\\n"))
   }
 
   #[allow(dead_code)]
@@ -106,9 +110,8 @@ impl Inserter {
     }
   }
 
-  fn wakachi(&mut self, src: String) -> Vec<String> {
-    static RE_LINE_SPLITTER: Lazy<Regex> =
-      Lazy::new(|| Regex::new(r"(\\n|\\_l\[0|\\x|\\c|\\[01]|\\p\[\d+\])").unwrap());
+  fn wakachi(&mut self, src: String) -> Result<Vec<String>, ShioriError> {
+    static RE_LINE_SPLITTER: Lazy<Regex> = lazy_regex!(r"(\\n|\\_l\[0|\\x|\\c)");
 
     let tokenizer_clone = self.tokenizer.clone();
     let tokenizer = tokenizer_clone.lock().unwrap();
@@ -206,7 +209,6 @@ impl Inserter {
             Rank::Append => {
               if !results.is_empty() {
                 let last = results.iter().rposition(|r| !r.is_empty()).unwrap();
-                // results[last].text += &format!("#({})", token.surface());
                 println!("append: {}", &result);
                 results[last] += &result;
                 result = "".to_string();
@@ -250,7 +252,7 @@ impl Inserter {
       println!("{}: {}", i, r);
     }
 
-    results
+    Ok(results)
   }
 
   fn remove_last_whitespace(&mut self, parts: &mut [String]) {
@@ -276,13 +278,11 @@ impl Inserter {
   }
 
   fn render(&mut self, parts: Vec<String>) -> String {
-    static RE_OPEN_BRACKET: Lazy<Regex> = Lazy::new(|| Regex::new(r"[「『（【]").unwrap());
-    static RE_CLOSE_BRACKET: Lazy<Regex> = Lazy::new(|| Regex::new(r"[」』）】]").unwrap());
-    static RE_PERIODS: Lazy<Regex> = Lazy::new(|| Regex::new(r"[、。！？]").unwrap());
-    static RE_CHANGE_LINE: Lazy<Regex> =
-      Lazy::new(|| Regex::new(r"(\\n|\\_l\[0[,0-9em%]+\]|\\c)").unwrap());
-    static RE_NEW_PAGE: Lazy<FancyRegex> =
-      Lazy::new(|| FancyRegex::new(r"\\x(?!\[noclear\])").unwrap());
+    static RE_OPEN_BRACKET: Lazy<Regex> = lazy_regex!(r"[「『（【]");
+    static RE_CLOSE_BRACKET: Lazy<Regex> = lazy_regex!(r"[」』）】]");
+    static RE_PERIODS: Lazy<Regex> = lazy_regex!(r"[、。！？]");
+    static RE_CHANGE_LINE: Lazy<Regex> = lazy_regex!(r"(\\n|\\_l\[0[,0-9em%]+\]|\\c)");
+    static RE_NEW_PAGE: Lazy<FancyRegex> = lazy_fancy_regex!(r"\\x(?!\[noclear\])");
 
     let mut result = String::new();
     let mut counts = [0.0; 10]; // 外部スクリプトを見越して多めに10個用意しておく

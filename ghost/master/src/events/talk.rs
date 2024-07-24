@@ -2,6 +2,8 @@ pub mod anchor;
 pub mod first_boot;
 pub mod randomtalk;
 
+use crate::check_error;
+use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::talk::randomtalk::random_talks;
 use crate::get_global_vars;
@@ -59,19 +61,18 @@ impl Talk {
     }
   }
 
-  pub fn all_talks() -> Vec<Talk> {
+  pub fn all_talks() -> Option<Vec<Talk>> {
     let mut v = Vec::new();
     for t in TalkType::all() {
-      v.extend(random_talks(t));
+      let talks = random_talks(t)?;
+      v.extend(talks);
     }
-    v
+    Some(v)
   }
 
-  pub fn get_unseen_talks(talk_type: TalkType, seen: &HashSet<String>) -> Vec<Talk> {
-    random_talks(talk_type)
-      .into_iter()
-      .filter(|t| !seen.contains(t.id))
-      .collect()
+  pub fn get_unseen_talks(talk_type: TalkType, seen: &HashSet<String>) -> Option<Vec<Talk>> {
+    let talks = random_talks(talk_type)?;
+    Some(talks.into_iter().filter(|t| !seen.contains(t.id)).collect())
   }
 }
 
@@ -141,26 +142,30 @@ impl TalkingPlace {
   }
 }
 
-pub fn on_check_unseen_talks(req: &Request) -> Response {
+pub fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let talk_type = TalkType::from_u32(refs[0].parse::<u32>().unwrap()).unwrap();
+  let talk_type_num = check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError);
+  let talk_type = TalkType::from_u32(talk_type_num).unwrap();
   let talk_collection = get_global_vars().talk_collection();
   let empty_hashset = HashSet::new();
   let seen_talks = talk_collection.get(&talk_type).unwrap_or(&empty_hashset);
-  let talks = Talk::get_unseen_talks(talk_type, seen_talks);
-  let choosed_talk = talks.choose(&mut rand::thread_rng()).unwrap().to_owned();
+  let talks = Talk::get_unseen_talks(talk_type, seen_talks).ok_or(ShioriError::TalkNotFound)?;
+  let choosed_talk = talks
+    .choose(&mut rand::thread_rng())
+    .ok_or(ShioriError::TalkNotFound)?
+    .to_owned();
 
-  register_talk_collection(&choosed_talk);
+  register_talk_collection(&choosed_talk)?;
 
-  new_response_with_value(
+  new_response_with_value_with_translate(
     choosed_talk.consume(),
     TranslateOption::with_shadow_completion(),
   )
 }
 
-pub fn register_talk_collection(talk: &Talk) {
+pub fn register_talk_collection(talk: &Talk) -> Result<(), ShioriError> {
   let mut talk_collection = get_global_vars().talk_collection_mut();
-  match talk_collection.get_mut(&talk.talk_type.unwrap()) {
+  match talk_collection.get_mut(&(talk.talk_type.ok_or(ShioriError::FieldAccessError)?)) {
     Some(t) => {
       let key = talk.id.to_string();
       if !t.contains(&key) {
@@ -174,13 +179,18 @@ pub fn register_talk_collection(talk: &Talk) {
       );
     }
   }
+  Ok(())
 }
 
 pub fn random_talks_analysis() -> String {
   let mut s = String::new();
   let mut sum = 0;
   for talk_type in TalkType::all() {
-    let len = random_talks(talk_type).len();
+    let len = if let Some(v) = random_talks(talk_type) {
+      v.len()
+    } else {
+      0
+    };
     s.push_str(&format!("{:?}: {}\\n", talk_type, len,));
     sum += len;
   }

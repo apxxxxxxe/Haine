@@ -1,5 +1,7 @@
+use crate::check_error;
+use crate::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_RATE_MAX;
-use crate::events::talk::{TalkType, TalkingPlace};
+use crate::events::talk::TalkType;
 use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
@@ -22,7 +24,7 @@ pub const STICK_SURFACE: &str = "\
 
 pub fn on_stick_surface(_req: &Request) -> Response {
   // \1のサーフェスを\0に重ねて固定する
-  new_response_with_value(STICK_SURFACE.to_string(), TranslateOption::none())
+  new_response_with_value_with_notranslate(STICK_SURFACE.to_string(), TranslateOption::none())
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -89,7 +91,33 @@ pub fn new_response_nocontent() -> Response {
   r
 }
 
-pub fn new_response_with_value(value: String, option: HashSet<TranslateOption>) -> Response {
+pub fn new_response_with_value_with_notranslate(
+  value: String,
+  option: HashSet<TranslateOption>,
+) -> Response {
+  let vars = get_global_vars();
+
+  let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
+    format!("\\b[{}]", vars.volatility.talking_place().balloon_surface(),)
+  } else {
+    String::new()
+  };
+
+  let mut v = balloon_completion + value.as_str();
+  // \\Cが含まれているなら文頭に\\Cを補完
+  if v.contains("\\C") {
+    v = format!("\\C{}", v.replace("\\C", ""));
+  }
+
+  let mut r = new_response();
+  r.headers.insert(HeaderName::from("Value"), v);
+  r
+}
+
+pub fn new_response_with_value_with_translate(
+  value: String,
+  option: HashSet<TranslateOption>,
+) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
 
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
@@ -100,7 +128,7 @@ pub fn new_response_with_value(value: String, option: HashSet<TranslateOption>) 
 
   let v = if option.contains(&TranslateOption::DoTranslate) {
     if vars.volatility.inserter_mut().is_ready() {
-      on_translate(value, option.contains(&TranslateOption::CompleteShadow))
+      on_translate(value, option.contains(&TranslateOption::CompleteShadow))?
     } else {
       vars.volatility.set_waiting_talk(Some((value, option)));
       "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
@@ -117,7 +145,7 @@ pub fn new_response_with_value(value: String, option: HashSet<TranslateOption>) 
 
   let mut r = new_response();
   r.headers.insert(HeaderName::from("Value"), v);
-  r
+  Ok(r)
 }
 
 pub fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> Option<usize> {
@@ -129,7 +157,7 @@ pub fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> Option<u
     .volatility
     .talk_bias_mut()
     .roulette(values, update_weight);
-  Some(u)
+  u
 }
 
 // return all combinations of values
@@ -196,16 +224,12 @@ pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
   format!("\\1{}\\n", v.join("\\n"))
 }
 
-pub fn complete_shadow(is_complete: bool) -> String {
+pub fn render_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
-  const MAX_Y: i32 = -100;
+  const MAX_Y: i32 = -200;
   let vars = get_global_vars();
   if is_complete {
-    let degree = if vars.volatility.talking_place() == TalkingPlace::Library {
-      100 - vars.volatility.immersive_degrees()
-    } else {
-      vars.volatility.immersive_degrees()
-    };
+    let degree = vars.volatility.immersive_degrees();
     format!(
       "\\0\\![bind,ex,没入度用,1]\\![anim,offset,800100,0,{}]",
       ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32
@@ -329,7 +353,7 @@ impl BlinkTransition {
 }
 
 // サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
-pub fn on_smooth_blink(req: &Request) -> Response {
+pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   let transitions = BlinkTransition::all();
   const DELAY: i32 = 100;
   const CLOSE_EYES_INDEX: i32 = 10;
@@ -338,30 +362,31 @@ pub fn on_smooth_blink(req: &Request) -> Response {
 
   let mut err = String::new();
   let refs = get_references(req);
-  let dest_surface = refs[0].parse::<i32>().unwrap();
-  let is_complete = refs[1].parse::<i32>().unwrap() == 1;
-  let ignore_upper_completion = refs[2].parse::<i32>().unwrap() == 1;
+  let dest_surface = check_error!(refs[0].parse::<i32>(), ShioriError::ParseIntError);
+  let is_complete = check_error!(refs[1].parse::<i32>(), ShioriError::ParseIntError) == 1;
+  let ignore_upper_completion =
+    check_error!(refs[2].parse::<i32>(), ShioriError::ParseIntError) == 1;
   let dest_eyes = dest_surface % eye_index_digit_pow;
   let dest_remain = dest_surface - dest_eyes;
   let from_surface = get_global_vars().volatility.current_surface();
   let from_eyes = from_surface % eye_index_digit_pow;
-  let direct_res = new_response_with_value(
-    format!("\\s[{}]{}", dest_surface, complete_shadow(is_complete)),
+  let direct_res = new_response_with_value_with_notranslate(
+    format!("\\s[{}]{}", dest_surface, render_shadow(is_complete)),
     TranslateOption::none(),
   );
 
   if from_eyes == 0 || dest_eyes == 0 {
-    return direct_res;
+    return Ok(direct_res);
   }
   if from_surface == dest_surface {
-    return new_response_nocontent();
+    return Ok(new_response_nocontent());
   }
 
   let mut cuts = vec![];
   if let Some(from) = transitions.iter().find(|t| t.base == from_eyes) {
     if let Some(dest) = transitions.iter().find(|t| t.base == dest_eyes) {
       if from.direction == dest.direction {
-        return direct_res;
+        return Ok(direct_res);
       }
       if !ignore_upper_completion {
         cuts.push(from_surface);
@@ -383,18 +408,18 @@ pub fn on_smooth_blink(req: &Request) -> Response {
   let delay = format!("\\_w[{}]", DELAY);
   let animation = cuts
     .iter()
-    .map(|s| format!("\\0\\s[{}]{}", s, complete_shadow(is_complete)))
+    .map(|s| format!("\\0\\s[{}]{}", s, render_shadow(is_complete)))
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
-  let mut res = new_response_with_value(animation, TranslateOption::none());
+  let mut res = new_response_with_value_with_notranslate(animation, TranslateOption::none());
   if !err.is_empty() {
     add_error_description(
       &mut res,
       format!("まばたき補完中にエラーが発生しました: {}", err).as_str(),
     );
   }
-  res
+  Ok(res)
 }
 
 pub fn to_aroused() {
@@ -441,6 +466,21 @@ pub fn render_achievement_message(talk_type: TalkType) -> String {
     \\f[default]",
     talk_type
   )
+}
+
+pub fn add_immsersive_degree(degree: u32) {
+  let vars = get_global_vars();
+  let new_degree = std::cmp::min(
+    vars.volatility.immersive_degrees() + degree,
+    IMMERSIVE_RATE_MAX,
+  );
+  vars.volatility.set_immersive_degrees(new_degree);
+}
+
+pub fn sub_immsersive_degree(degree: u32) {
+  let vars = get_global_vars();
+  let new_degree = vars.volatility.immersive_degrees().saturating_sub(degree);
+  vars.volatility.set_immersive_degrees(new_degree);
 }
 
 #[cfg(test)]

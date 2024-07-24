@@ -6,7 +6,7 @@ pub fn show_tooltip(id: &str) -> String {
 }
 
 pub fn on_balloon_tooltip(_req: &Request) -> Response {
-  new_response_with_value("\\C\\_l[0,0] ".to_string(), TranslateOption::none())
+  new_response_with_value_with_notranslate("\\C\\_l[0,0] ".to_string(), TranslateOption::none())
 }
 
 pub fn balloon_tooltip(req: &Request) -> Response {
@@ -15,9 +15,9 @@ pub fn balloon_tooltip(req: &Request) -> Response {
     return new_response_nocontent();
   }
   match refs[2] {
-    "WhatIsImersiveDegree" => new_response_with_value(
-      "没入度は、ハイネとあなたがどれだけ深い内容の会話をしているかを表します。\\n\
-                                  没入度が高いほど、より抽象的でクリティカルな話題を扱います。"
+    "WhatIsImersiveDegree" => new_response_with_value_with_notranslate(
+      "ハイネがどれだけ思索に没頭しているかを表す指標です。\\n\
+      最大になったとき、彼女は極度の集中状態に陥るでしょう。"
         .to_string(),
       TranslateOption::none(),
     ),
