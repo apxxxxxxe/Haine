@@ -1,7 +1,7 @@
 use crate::check_error;
 use crate::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_RATE_MAX;
-use crate::events::talk::{TalkType, TalkingPlace};
+use crate::events::talk::TalkType;
 use crate::events::translate::on_translate;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
@@ -229,11 +229,7 @@ pub fn render_shadow(is_complete: bool) -> String {
   const MAX_Y: i32 = -200;
   let vars = get_global_vars();
   if is_complete {
-    let degree = if vars.volatility.talking_place() == TalkingPlace::Library {
-      100 - vars.volatility.immersive_degrees()
-    } else {
-      vars.volatility.immersive_degrees()
-    };
+    let degree = vars.volatility.immersive_degrees();
     format!(
       "\\0\\![bind,ex,没入度用,1]\\![anim,offset,800100,0,{}]",
       ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32
