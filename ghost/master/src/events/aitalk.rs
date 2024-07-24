@@ -1,21 +1,26 @@
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::events::first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS};
 use crate::events::randomtalk::{
-  changing_place_talks, finishing_aroused_talks, RANDOMTALK_COMMENTS,
+  finishing_aroused_talks, moving_to_library_talk, moving_to_living_room_talk,
+  RANDOMTALK_COMMENTS_LIVING_ROOM,
 };
 use crate::events::talk::anchor::anchor_talks;
-use crate::events::talk::randomtalk::{random_talks, IMMERSION_INTRODUCTION_TALK};
+use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
+use crate::events::{
+  first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS},
+  randomtalk::RANDOMTALK_COMMENTS_LIBRARY_ACTIVE,
+  randomtalk::RANDOMTALK_COMMENTS_LIBRARY_INACTIVE,
+};
 use crate::get_touch_info;
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
-use shiorust::message::{parts::HeaderName, Request, Response};
+use shiorust::message::{parts::*, traits::*, Request, Response};
 
 // トーク1回あたりに上昇する没入度の割合(%)
-const IMMERSIVE_RATE: u32 = 5;
+pub const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
-pub fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
+pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
   vars
@@ -46,31 +51,31 @@ pub fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
     );
   }
 
-  // 没入度を上げる
-  let immersive_degrees = std::cmp::min(
-    vars.volatility.immersive_degrees() + IMMERSIVE_RATE,
-    IMMERSIVE_RATE_MAX,
-  );
-  if immersive_degrees >= IMMERSIVE_RATE_MAX {
-    // 没入度が最大に達したら、場所を変える
-    if !vars.flags().check(&EventFlag::ImmersionUnlock) {
-      get_global_vars()
-        .flags_mut()
-        .done(EventFlag::ImmersionUnlock);
-      let response = new_response_with_value_with_translate(
-        format!(
-          "\\0\\s[1111204]{}{}",
-          render_shadow(true),
-          IMMERSION_INTRODUCTION_TALK
-        ),
-        TranslateOption::simple_translate(),
+  if vars.volatility.talking_place() == TalkingPlace::LivingRoom {
+    // 居間にいるときは没入度を上げる
+    add_immsersive_degree(IMMERSIVE_RATE);
+    // 没入度が最大に達したら書斎に移動
+    if vars.volatility.immersive_degrees() == IMMERSIVE_RATE_MAX {
+      vars.volatility.set_talking_place(TalkingPlace::Library);
+
+      let messages = moving_to_library_talk()?;
+      let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+      return new_response_with_value_with_translate(
+        messages[index].to_owned(),
+        TranslateOption::with_shadow_completion(),
       );
-      vars.volatility.set_immersive_degrees(0);
-      return response;
     }
-    return change_talking_response();
+  } else if vars.volatility.immersive_degrees() == 0 {
+    // 書斎で没入度が0になったら居間に移動
+    vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
+
+    let messages = moving_to_living_room_talk()?;
+    let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+    return new_response_with_value_with_translate(
+      messages[index].to_owned(),
+      TranslateOption::with_shadow_completion(),
+    );
   }
-  vars.volatility.set_immersive_degrees(immersive_degrees);
 
   // 通常ランダムトーク
   let talk_types = vars.volatility.talking_place().talk_types();
@@ -99,12 +104,27 @@ pub fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
     register_talk_collection(&choosed_talk)?;
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
   }
-  let comment = if vars
+
+  let comment = if vars.volatility.talking_place() == TalkingPlace::Library {
+    // 書斎では能動的に話しかけた場合のみ没入度低下&コメントを表示
+    if req.headers.get("ID").is_some_and(|v| v == "OnSecondChange") {
+      let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false)
+        .ok_or(ShioriError::TalkNotFound)?;
+      RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index]
+    } else {
+      sub_immsersive_degree(IMMERSIVE_RATE);
+      let index =
+        choose_one(&RANDOMTALK_COMMENTS_LIBRARY_ACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
+      RANDOMTALK_COMMENTS_LIBRARY_ACTIVE[index]
+    }
+  } else if vars
     .flags()
     .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
   {
-    let index = choose_one(&RANDOMTALK_COMMENTS, false).ok_or(ShioriError::TalkNotFound)?;
-    RANDOMTALK_COMMENTS[index]
+    // 居間では従者トーク解禁済みの場合コメントを表示
+    let index =
+      choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
+    RANDOMTALK_COMMENTS_LIVING_ROOM[index]
   } else {
     ""
   };
@@ -114,26 +134,6 @@ pub fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
       comment,
       choosed_talk.consume()
     ),
-    TranslateOption::with_shadow_completion(),
-  )
-}
-
-fn change_talking_response() -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-  let (previous_talking_place, current_talking_place) = match vars.volatility.talking_place() {
-    TalkingPlace::LivingRoom => (TalkingPlace::LivingRoom, TalkingPlace::Library),
-    TalkingPlace::Library => (TalkingPlace::Library, TalkingPlace::LivingRoom),
-  };
-
-  let messages = changing_place_talks(&previous_talking_place, &current_talking_place);
-
-  vars.volatility.set_talking_place(current_talking_place);
-  vars.volatility.set_immersive_degrees(0);
-
-  let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-
-  new_response_with_value_with_translate(
-    messages[index].to_owned(),
     TranslateOption::with_shadow_completion(),
   )
 }
@@ -231,7 +231,6 @@ mod test {
     TALK_UNLOCK_COUNT_SERVANT,
   };
   use crate::variables::{get_global_vars, GlobalVariables};
-  use shiorust::message::parts::*;
   use shiorust::message::Request;
 
   #[test]

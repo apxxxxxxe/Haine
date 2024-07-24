@@ -15,7 +15,7 @@ pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 // 僕/主様: 30代のおとなしい男
 // わたし/主さま: 20代の活発な女
 // ぼく/ご主人さま: 10代の男の子
-pub const RANDOMTALK_COMMENTS: [&str; 18] = [
+pub const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 18] = [
   "霧が濃い。",
   "彼女の声は低いがよく通る。",
   "彼女の赤い瞳の奥の思考は伺い知れない。",
@@ -34,6 +34,25 @@ pub const RANDOMTALK_COMMENTS: [&str; 18] = [
   "「館近くのパン屋は絶品だった。」",
   "「街角の喫茶店は素晴らしいコーヒーを出していた。」",
   "「街の端にある花屋は色とりどりの花で溢れていた。」",
+];
+
+// 上の空のハイネに対するユーザの行動を一人称視点で
+pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 6] = [
+  "目の前で手を振っても、彼女には見えていないようだ。",
+  "肩を叩いても、反応はない。",
+  "常軌を逸した集中力だ。……幽霊だからというより、彼女の才能だろう。",
+  "これが彼女の言っていた思索だとしても、真似できる気はしない。",
+  "放置するとこうなってしまうらしい。……次はもっと話しかけようか。",
+  "無駄かもしれないが、呼び掛け続ける。",
+];
+
+pub const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
+  "ハイネの口からは不明瞭な呟きが漏れている。",
+  "おとなしく待つだけでは、彼女は我に返らないだろう。",
+  "",
+  "",
+  "",
+  "",
 ];
 
 pub fn talk_with_punchline(text: String, funny_punchline: String) -> String {
@@ -1025,85 +1044,63 @@ pub fn finishing_aroused_talks() -> Vec<String> {
   all_combo(&talk_parts)
 }
 
-pub fn changing_place_talks(
-  previous_talking_place: &TalkingPlace,
-  current_talking_place: &TalkingPlace,
-) -> Vec<String> {
+pub fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
   let vars = get_global_vars();
-  let parts: Vec<Vec<String>> = if !vars.flags().check(&EventFlag::FirstPlaceChange) {
+  let mut parts: Vec<Vec<String>> = vec![vec![format!(
+    "\\0\\b[{}]h1113705……。\\1ハイネ……？\\0\\n…………。\\1\\n反応が鈍い……。\\n思考に没頭してる……？\\0\\b[{}]",
+    TalkingPlace::LivingRoom.balloon_surface(),
+    TalkingPlace::Library.balloon_surface(),
+  )]];
+  parts.push(vec![replace_dialog_for_nomouthmove(
+    "\
+      \\0\\c\\1\\b[-1]h1111705(……ふわふわした気持ち……。\\n\
+       ……h1111706誰か呼んでる？\\n\
+       ……音がくぐもって、水の中にいるみたい。\\n\
+       h1111705外のことは……h1111110どうでもいい。\\n\
+       今は、この流れに身を任せていたい……)\
+      "
+    .to_string(),
+  )?]);
+  parts.push(vec!["\\1\\c(没入モードに入りました)".to_string()]);
+
+  // 初回は抽象・過去トークの開放を通知
+  if !vars.flags().check(&EventFlag::FirstPlaceChange) {
     vars.flags_mut().done(EventFlag::FirstPlaceChange);
-    vec![
-      vec![format!(
-        "\\0\\b[{}]h1000000……。\\1ふと目を離した間に、ハイネは姿を消していた。\\n\
-            \\0\\c\\1\\c…………。\
-            他の部屋を探し、\\0\\b[{}]\\1{}に入ったとき、彼女はそこにいた。\\n\
-            ",
-        previous_talking_place.balloon_surface(),
-        current_talking_place.balloon_surface(),
-        current_talking_place
-      )],
-      match current_talking_place {
-        TalkingPlace::Library => {
-          let achieved_talk_types = [TalkType::Abstract];
-          achieved_talk_types.iter().for_each(|t| {
-            vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
-          });
-          let achievements_messages = achieved_talk_types
-            .iter()
-            .map(|t| render_achievement_message(*t))
-            .collect::<Vec<_>>();
-          vec![format!(
-            "h1111204あなた、書斎は初めてね。\\n\
-            \\1……客間より少し狭い程度の間取りに、所狭しと本棚が設置されている。\\n\
-            窓すら本棚に覆われていて、ハイネは蝋燭の灯りで本を読んでいるようだった。\\n\
-            h1111210ここは私の私室でもあるの。\\n\
-            h1111204……あなたは、本を読むのは好き？\\n\
-            h1111306私は好きよ。巨人の肩に乗って遠くが見える。\\n\
-            h1111305あるいは、ここではないどこかへ、遠くへ行ける。\
-            h1111204あなたも自由に読み、そして考えなさい。\\n\
-            h1111310ここはそういう場所よ。{}\
-            ",
-            achievements_messages.join("\\n")
-          )]
-        }
-        TalkingPlace::LivingRoom => vec!["これが表示されることはないはず".to_string()],
-      },
-    ]
-  } else {
-    vec![
-      vec![format!(
-        "\\0\\b[{}]h1000000……。\\n\\n\\1また、ハイネが姿を消してしまった。\\n\
-            \\0\\b[{}]\\1前回のように{}を探しに行くと、彼女はそこにいた。\\n\
-          ",
-        previous_talking_place.balloon_surface(),
-        current_talking_place.balloon_surface(),
-        current_talking_place
-      )],
-      match current_talking_place {
-        TalkingPlace::Library => vec!["\
-            h1111210さて、仕切り直しましょう。\\n\
-            ……h1111206もちろん、読みたい本があれば御自由にどうぞ。\
-            "
-        .to_string()],
-        TalkingPlace::LivingRoom => vec!["\
-            h1111206さあ、お茶を淹れ直させましょう。\\n\
-            h1111204お席にどうぞ、お客人。\
-            "
-        .to_string()],
-      },
-    ]
-  };
-  all_combo(&parts)
+    let achieved_talk_types = [TalkType::Abstract];
+    achieved_talk_types.iter().for_each(|t| {
+      vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+    });
+    let achievements_messages = achieved_talk_types
+      .iter()
+      .map(|t| render_achievement_message(*t))
+      .collect::<Vec<_>>();
+    parts.push(vec![format!(
+      "\\1\\n\\n{}",
+      achievements_messages.join("\\n")
+    )]);
+  }
+  Ok(all_combo(&parts))
 }
 
-pub const IMMERSION_INTRODUCTION_TALK: &str = "\
-  \\1……気付けば、辺りが暗くなっていた。\\n\
-  そんなに長く話していただろうか。腕時計を見ると、まだ昼間だった。\\n\
-  \\0少し話し込んでいたようね。\\n\
-  \\1ハイネは呟き、しばらく手をつけていなかった\\0\\![bind,ex,没入度用,0]\\1カップを傾けた。\\n\
-  h1111210\\1……？あたりが再び明るくなっている。\\n\
-  h1111205明かりは、私の霊力で灯しているの。\\n\
-  特別な灯。そちらに注意を払えなくなると、すぐに消えてしまうのよ。\\n\
-  h1121210我ながら不便だけれど、従者に頼むにも難しい仕事でね。\\n\
-  h1121204悪いけれど、そういうものだと思ってちょうだい。\\n\
-  ";
+pub fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
+  let mut parts: Vec<Vec<String>> = vec![];
+  parts.push(vec![format!(
+    "\\0\\b[{}]h1111705……。\
+    \\1ネ……\\n\
+    イネ……。\
+    \\0\\b[{}]hr1141112φ！\
+    \\1\\nハイネ！\
+    \\0…………\\n\\n\
+    h1111101……h1111204あら、{{user_name}}。\\n\
+    \\1\\n\\n……戻ってきたようだ。\\n",
+    TalkingPlace::Library.balloon_surface(),
+    TalkingPlace::LivingRoom.balloon_surface(),
+  )]);
+  parts.push(vec![
+    "\\0\\n……h1111210そんなに心配しないで。いつものことだから。\
+    \\1\\n……それは無理があると思う……。"
+      .to_string(),
+  ]);
+  parts.push(vec!["\\1\\n\\n(没入モードが解除されました)".to_string()]);
+  Ok(all_combo(&parts))
+}
