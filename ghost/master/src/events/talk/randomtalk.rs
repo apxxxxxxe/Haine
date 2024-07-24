@@ -59,18 +59,6 @@ pub fn talk_with_punchline(text: String, funny_punchline: String) -> String {
   text + "\\n" + &funny_punchline
 }
 
-// esperantoで本のジャンルを記述
-// それっぽければよし
-static BOOK_TOPICS: [(&str, &str); 3] = [
-  ("funkcia lingvo", "referenca travidebleco"), // 関数型言語, 参照透過性
-  ("metafiziko", "ontologio"),                  // 形而上学, 存在論
-  ("harmonio", "konsonanco"),                   // 調和, 一致
-];
-
-fn random_book_topic() -> Option<(&'static str, &'static str)> {
-  BOOK_TOPICS.choose(&mut rand::thread_rng()).copied()
-}
-
 struct RandomTalk {
   id: &'static str,
   text: String,
@@ -216,7 +204,8 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             最も大きな要因は環境──つまり、その地との関わりの深さによるの。\\n\
             h1111310私のように生家に根付いた霊はいわずもがな。\\n\
             h1111205……まあ、強いからといって良いことばかりでもないわ。\\n\
-            h1111203霊にも社会があるの。h1111206上位者の義務というものもね。\
+            h1111203霊にも社会があるの。\\n\
+            h1111206上位者の義務というものもね。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -668,25 +657,6 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         },
 
         RandomTalk {
-          id: "分厚い本",
-          text: {
-            let topic = random_book_topic()?;
-            format!("\
-            h1111105……手持ち無沙汰のようね。\\n\
-            h1111106なにか本を見繕ってあげましょうか。\\n\
-            h1111103……h1111102これはどうかしら。\\n\
-            \\1……ずいぶん分厚い本を手渡された。\\n\
-            h1111102{}の構成要素について論じられているの。\\n\
-            {}についての項が特に興味深いわ。\
-            h1111105要点だけなら半日もあれば読み終わると思うから、\\n\
-            h1111105終わったら意見を交換しましょう。\
-            ", topic.0, topic.1)
-          },
-          required_condition: None,
-          callback: None,
-        },
-
-        RandomTalk {
           id: "今度こそ無へ",
           text: "\
             h1111105死にぞこなったものだから、\\n\
@@ -769,12 +739,11 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           id: "感動と倦み",
           text: "\
             h1111105ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
-            どちらがその本の真の印象かしら。\\n\\n\
-            h1111110私はどちらも正しいと思うの。\\n\
-            ……h1111505卑怯だと思った？\\n\
+            どちらがその本の真の印象か。\\n\\n\
+            h1111110どちらも正しいと思う。\\n\
             h1111110印象なんてその時々で変わるもので、h1111105一つに定まることなんて稀だもの。\\n\\n\
             まして、自分の中に秘めるものならなおさら。\\n\
-            h1111506どちらか一方だけだなんて、勿体ないわ。\
+r           h1111306どちらか一方だけだなんて、勿体ないわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
