@@ -4,7 +4,6 @@ use crate::events::replace_dialog_for_nomouthmove;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
-use rand::prelude::*;
 
 pub const TALK_ID_SERVANT_INTRO: &str = "従者について：イントロ";
 pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
