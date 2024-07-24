@@ -16,14 +16,29 @@ pub enum ShioriError {
 impl fmt::Display for ShioriError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self {
-      ShioriError::UndefinedVariable => write!(f, "Undefined Variable"),
-      ShioriError::ParseIntError => write!(f, "Parse Int Error"),
-      ShioriError::SystemTimeError => write!(f, "SystemTime Error"),
-      ShioriError::FieldAccessError => write!(f, "Field Access Error"),
-      ShioriError::ArrayAccessError => write!(f, "Access Vec Error"),
-      ShioriError::TranslaterNotReadyError => write!(f, "Translater Not Ready Error"),
-      ShioriError::TalkNotFound => write!(f, "Talk Not Found"),
-      ShioriError::ParseRequestError => write!(f, "Parse Request Error"),
+      ShioriError::UndefinedVariable => {
+        write!(f, "[UndefinedVariable]未定義の変数にアクセスしました")
+      }
+      ShioriError::ParseIntError => write!(f, "[ParseIntError]文字列のパースに失敗しました"),
+      ShioriError::SystemTimeError => {
+        write!(f, "[SystemTimeError]システム時刻の取得に失敗しました")
+      }
+      ShioriError::FieldAccessError => write!(
+        f,
+        "[FieldAccessError]変数フィールドへのアクセスに失敗しました"
+      ),
+      ShioriError::ArrayAccessError => {
+        write!(f, "[ArrayAccessError]配列の範囲外アクセスが発生しました")
+      }
+      ShioriError::TranslaterNotReadyError => write!(
+        f,
+        "[TranslaterNotReadyError]トランスレータのセットアップが完了していません"
+      ),
+      ShioriError::TalkNotFound => write!(f, "[TalkNotFound]指定されたトークが見つかりません"),
+      ShioriError::ParseRequestError => write!(
+        f,
+        "[ParseRequestError]SHIORIリクエストのパースに失敗しました"
+      ),
     }
   }
 }
