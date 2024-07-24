@@ -201,31 +201,6 @@ pub fn on_anchor_select_ex(req: &Request) -> Result<Response, ShioriError> {
   }
 }
 
-pub fn reset_immersion() -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-  let immersive_degrees = vars.volatility.immersive_degrees();
-  if immersive_degrees < IMMERSIVE_RATE_MAX / 2 {
-    None
-  } else {
-    vars.volatility.set_immersive_degrees(0);
-    let parts = vec![vec!["hr1111705……。\
-        \\1ハイネ……hr1111101\\1ハイネ！\
-        h1111204ええ、ええ。えっと……何だったかしら？\
-        \\1\\n\\n(没入度がリセットされました)"
-      .to_string()]];
-    let dialogs = all_combo(&parts);
-    let index = if let Some(v) = choose_one(&dialogs, true) {
-      v
-    } else {
-      return Some(Err(ShioriError::TalkNotFound));
-    };
-    Some(new_response_with_value_with_translate(
-      dialogs[index].to_owned(),
-      TranslateOption::with_shadow_completion(),
-    ))
-  }
-}
-
 #[cfg(test)]
 mod test {
   use super::*;
