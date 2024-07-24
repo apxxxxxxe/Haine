@@ -239,10 +239,22 @@ mod test {
     *vars = GlobalVariables::new();
     vars.set_user_name(Some("test".to_string())); // 実際はOnNotifyUserInfoで設定される
 
-    let req = Request {
+    let mut headers = Headers::new();
+    headers.insert("ID", "OnSecondChange".to_string());
+
+    let on_second_change_req = Request {
       method: Method::GET,
       version: Version::V20,
-      headers: Headers::new(),
+      headers,
+    };
+
+    let mut headers = Headers::new();
+    headers.insert("ID", "OnKeyPress".to_string());
+
+    let on_key_press_req = Request {
+      method: Method::GET,
+      version: Version::V20,
+      headers,
     };
 
     // テスト中は常に非アイドル状態
@@ -250,7 +262,7 @@ mod test {
 
     // 初回起動時のフラグチェック
     assert!(!vars.flags().check(&EventFlag::FirstBoot));
-    on_boot(&req)?;
+    on_boot(&on_second_change_req)?;
     assert!(vars.flags().check(&EventFlag::FirstBoot));
 
     // 初回ランダムトークのフラグチェック
@@ -261,7 +273,7 @@ mod test {
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
     for i in 0..FIRST_RANDOMTALKS.len() {
-      on_ai_talk(&req)?;
+      on_ai_talk(&on_second_change_req)?;
       assert!(vars
         .flags()
         .check(&EventFlag::FirstRandomTalkDone(i as u32)));
@@ -273,27 +285,28 @@ mod test {
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
 
-    // 没入度の開放確認
-    let mut required_talk_count = IMMERSIVE_RATE_MAX / IMMERSIVE_RATE;
-    if IMMERSIVE_RATE_MAX % IMMERSIVE_RATE != 0 {
-      required_talk_count += 1;
-    }
-    assert!(!vars.flags().check(&EventFlag::ImmersionUnlock));
-    for _i in 0..required_talk_count {
-      on_ai_talk(&req)?;
-    }
-    assert!(vars.flags().check(&EventFlag::ImmersionUnlock));
-
     // 初回没入度マックス時の場所変更
+    let required_talk_count = IMMERSIVE_RATE_MAX / IMMERSIVE_RATE;
     assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
     for _i in 0..required_talk_count {
-      on_ai_talk(&req)?;
+      on_ai_talk(&on_second_change_req)?;
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
 
+    // 書斎から正しく戻れるかのテスト
+    assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
+    for _i in 0..required_talk_count {
+      on_ai_talk(&on_second_change_req)?; // 自動ランダムトークでは没入度が下がらない
+    }
+    assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
+    for _i in 0..required_talk_count {
+      on_ai_talk(&on_key_press_req)?; // 手動ランダムトークでは没入度が下がる
+    }
+    assert_eq!(vars.volatility.talking_place(), TalkingPlace::LivingRoom);
+
     // 従者関連トークの開放確認
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_SERVANT {
-      on_ai_talk(&req)?;
+      on_ai_talk(&on_second_change_req)?;
     }
     let r = random_talks(TalkType::SelfIntroduce).ok_or(Box::new(ShioriError::TalkNotFound))?;
     let unlock_talk_servant = r.iter().find(|t| t.id == TALK_ID_SERVANT_INTRO);
@@ -307,7 +320,7 @@ mod test {
 
     // ロア関連トークの開放確認
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_LORE {
-      on_ai_talk(&req)?;
+      on_ai_talk(&on_second_change_req)?;
     }
     let r = random_talks(TalkType::SelfIntroduce).ok_or(Box::new(ShioriError::TalkNotFound))?;
     let unlock_talk_lore = r.iter().find(|t| t.id == TALK_ID_LORE_INTRO);
