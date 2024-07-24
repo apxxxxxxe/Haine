@@ -308,4 +308,31 @@ fn test_translate() -> Result<(), ShioriError> {
   let translated = translate(text, true);
   println!("{}", translated?);
   Ok(())
+// 1文字ずつ\\_qで囲めば口パクしなくなる
+pub fn replace_dialog_for_nomouthmove(text: String) -> Result<String, ShioriError> {
+  let text = translate(text, true)?;
+  let split_parts: Vec<&str> = RE_TEXT_ONLY.split(&text).collect();
+  let mut matches: Vec<String> = Vec::new();
+  for cap in RE_TEXT_ONLY.find_iter(&text) {
+    matches.push(cap.as_str().to_string());
+  }
+
+  let mut result = String::new();
+  for (i, splitted) in split_parts.iter().enumerate() {
+    result.push_str(
+      splitted
+        .chars()
+        .map(|c| c.to_string())
+        .collect::<Vec<_>>()
+        .join("\\_w[50]\\![quicksection,0]\\![quicksection,1]")
+        .as_str(),
+    );
+    if let Some(m) = matches.get(i) {
+      result.push_str(m);
+    }
+  }
+  Ok(format!(
+    "\\![quicksection,1]@@@@@{}\\![quicksection,0]@@@@@",
+    result
+  ))
 }
