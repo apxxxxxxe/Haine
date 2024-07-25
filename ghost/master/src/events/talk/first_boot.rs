@@ -1,4 +1,3 @@
-use crate::events::common::RESET_BINDS;
 use once_cell::sync::Lazy;
 
 pub const FIRST_BOOT_MARKER: &str = "邂逅";
@@ -287,11 +286,7 @@ pub static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
-pub static FIRST_CLOSE_TALK: Lazy<String> = Lazy::new(|| {
-  format!(
-    "\
-    {}\
-    h1111201あら、今日はやめるの？h1111204そう。\\n\
+pub static FIRST_CLOSE_TALK: &str = "\
     ならば、送っていきましょう。\\n\
     h1111210安心しなさい、他意などないわ。\\n\
     \\n\
@@ -302,11 +297,7 @@ pub static FIRST_CLOSE_TALK: Lazy<String> = Lazy::new(|| {
     \\n\
     h1111204さあ、もう行きなさい。\\n\
     h1111210終わりの時が遠いのならば、せめて、良い夢を。\\n\
-    また会いましょう、{{user_name}}。\\n\
-    \\-",
-    RESET_BINDS
-  )
-});
+    また会いましょう、{user_name}。\\n";
 
 fn shake(text: &str) -> String {
   let mut s = String::new();
