@@ -222,6 +222,8 @@ pub const TRANSPARENT_SURFACE: i32 = 1000000;
 
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
 pub struct VolatilityVariables {
+  pub debug_mode: Mutex<bool>,
+
   // ログファイルのフルパス
   pub log_path: Mutex<String>,
 
@@ -274,6 +276,7 @@ pub struct VolatilityVariables {
 
 #[allow(dead_code)]
 impl VolatilityVariables {
+  generate_getter_setter!(debug_mode, bool, cloneable);
   generate_getter_setter!(log_path, String, cloneable);
   generate_getter_setter!(ghost_up_time, u64, cloneable);
   generate_getter_setter!(last_random_talk_time, u64, cloneable);
@@ -305,6 +308,7 @@ impl VolatilityVariables {
 impl Default for VolatilityVariables {
   fn default() -> Self {
     Self {
+      debug_mode: Mutex::new(false),
       log_path: Mutex::new("".to_string()),
       ghost_up_time: Mutex::new(0),
       last_random_talk_time: Mutex::new(0),

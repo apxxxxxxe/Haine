@@ -7,6 +7,7 @@ use crate::variables::{get_global_vars, EventFlag, GlobalVariables, GHOST_NAME};
 use shiorust::message::{Request, Response};
 
 pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
+  let vars = get_global_vars();
   let refs = get_references(req);
   match refs[0] {
     "r" => Ok(new_response_with_value_with_notranslate(
@@ -14,7 +15,6 @@ pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
       TranslateOption::balloon_surface_only(),
     )),
     "t" => {
-      let vars = get_global_vars();
       if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
         FIRST_RANDOMTALKS.len() as u32 - 1,
       )) {
@@ -28,17 +28,27 @@ pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
         on_ai_talk(req)
       }
     }
-    "c" => Ok(new_response_with_value_with_notranslate(
-      random_talks_analysis(),
-      TranslateOption::balloon_surface_only(),
-    )),
+    "c" => {
+      if vars.volatility.debug_mode() {
+        Ok(new_response_with_value_with_notranslate(
+          random_talks_analysis(),
+          TranslateOption::balloon_surface_only(),
+        ))
+      } else {
+        Ok(new_response_nocontent())
+      }
+    }
+
     "d" => {
-      let vars = get_global_vars();
-      *vars = GlobalVariables::new();
-      Ok(new_response_with_value_with_notranslate(
-        format!("\\![change,ghost,{}]", GHOST_NAME),
-        TranslateOption::none(),
-      ))
+      if vars.volatility.debug_mode() {
+        *vars = GlobalVariables::new();
+        Ok(new_response_with_value_with_notranslate(
+          format!("\\![change,ghost,{}]", GHOST_NAME),
+          TranslateOption::none(),
+        ))
+      } else {
+        Ok(new_response_nocontent())
+      }
     }
     _ => Ok(new_response_nocontent()),
   }
