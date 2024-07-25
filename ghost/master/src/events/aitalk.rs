@@ -215,6 +215,10 @@ mod test {
 
   #[test]
   fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
+    const FIRST_CLOSE_TALK_PART: &str = "逃がして良いのかって？";
+    const SECOND_CLOSE_TALK_PART: &str = "がありますように";
+    const CLOSE_TALK_IN_LIBRARY_PART: &str = "戻ってきたようだ。";
+
     let vars = get_global_vars();
     *vars = GlobalVariables::new();
     vars.set_user_name(Some("test".to_string())); // 実際はOnNotifyUserInfoで設定される
@@ -282,8 +286,8 @@ mod test {
     assert!(!vars.flags().check(&EventFlag::FirstClose));
     let res = on_close(&on_second_change_req)?;
     let value = res.headers.get("Value").ok_or("Failed to get value")?;
-    assert!(value.contains("戻ってきたようだ。")); // 独白モード終了トークが含まれていることの確認
-    assert!(value.contains("逃がして良いのかって？")); // 初回終了トークが含まれていることの確認
+    assert!(value.contains(CLOSE_TALK_IN_LIBRARY_PART)); // 独白モード終了トークが含まれていることの確認
+    assert!(value.contains(FIRST_CLOSE_TALK_PART)); // 初回終了トークが含まれていることの確認
     assert!(vars.flags().check(&EventFlag::FirstClose));
 
     // 書斎から正しく戻れるかのテスト
@@ -325,10 +329,17 @@ mod test {
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
 
+    // 初回終了時に通常モードだったときのトークが再生されるかのテスト
+    vars.flags_mut().delete(EventFlag::FirstClose);
+    assert!(!vars.flags().check(&EventFlag::FirstClose));
+    let res = on_close(&on_second_change_req)?;
+    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    assert!(value.contains(FIRST_CLOSE_TALK_PART)); // 初回終了トークが含まれていることの確認
+
     // 2回目以降の終了時トークが再生されることの確認
     let res = on_close(&on_second_change_req)?;
     let value = res.headers.get("Value").ok_or("Failed to get value")?;
-    assert!(value.contains("がありますように")); // 2回目以降の終了トークが含まれていることの確認
+    assert!(value.contains(SECOND_CLOSE_TALK_PART)); // 2回目以降の終了トークが含まれていることの確認
 
     Ok(())
   }
