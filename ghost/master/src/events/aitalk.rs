@@ -205,6 +205,7 @@ pub fn on_anchor_select_ex(req: &Request) -> Result<Response, ShioriError> {
 mod test {
   use super::*;
   use crate::events::on_boot;
+  use crate::events::on_close;
   use crate::events::talk::randomtalk::{
     random_talks, TALK_ID_LORE_INTRO, TALK_ID_SERVANT_INTRO, TALK_UNLOCK_COUNT_LORE,
     TALK_UNLOCK_COUNT_SERVANT,
@@ -239,6 +240,11 @@ mod test {
     // テスト中は常に非アイドル状態
     vars.volatility.set_idle_seconds(IDLE_THRESHOLD - 1);
 
+    // translatorの初期化を待つ
+    while !vars.volatility.inserter_mut().is_ready() {
+      std::thread::sleep(std::time::Duration::from_millis(100));
+    }
+
     // 初回起動時のフラグチェック
     assert!(!vars.flags().check(&EventFlag::FirstBoot));
     on_boot(&on_second_change_req)?;
@@ -271,6 +277,14 @@ mod test {
       on_ai_talk(&on_second_change_req)?;
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
+
+    // 初回終了時に独白モードだったときトークが特別なものになるかのテスト
+    assert!(!vars.flags().check(&EventFlag::FirstClose));
+    let res = on_close(&on_second_change_req)?;
+    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    assert!(value.contains("戻ってきたようだ。")); // 独白モード終了トークが含まれていることの確認
+    assert!(value.contains("逃がして良いのかって？")); // 初回終了トークが含まれていることの確認
+    assert!(vars.flags().check(&EventFlag::FirstClose));
 
     // 書斎から正しく戻れるかのテスト
     assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
@@ -310,6 +324,11 @@ mod test {
     assert!(vars
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
+
+    // 2回目以降の終了時トークが再生されることの確認
+    let res = on_close(&on_second_change_req)?;
+    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    assert!(value.contains("がありますように")); // 2回目以降の終了トークが含まれていることの確認
 
     Ok(())
   }
