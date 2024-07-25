@@ -358,7 +358,6 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
   }
 
   let is_aroused = vars.volatility.aroused();
-  to_aroused();
   if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
     get_touch_info!("0headdoubleclick").reset(); // 選択肢だけなのでカウントしない
     let dialogs = vec!["\
