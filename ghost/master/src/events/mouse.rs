@@ -4,8 +4,8 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
-use crate::events::reset_immersion;
 use crate::events::TalkingPlace;
+use crate::events::IMMERSIVE_RATE;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -134,20 +134,17 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     _ => None,
   };
 
+  // 通常の触り反応があった場合、没入度を下げる
+  if common_response.is_some() {
+    sub_immsersive_degree(IMMERSIVE_RATE);
+  }
+
   // その他特殊な条件で発生する触り反応
   let other_response = if info.starts_with('0') && info.contains("doubleclick") {
     // 触り反応のない部分をダブルクリックでメニュー
     Some(Ok(on_menu_exec(req)))
   } else {
     None
-  };
-
-  // 超特殊処理
-  // メニュー開き以外の\0への触りはリセットイベントを発生させる
-  if info.starts_with('0') && common_response.is_some() && other_response.is_none() {
-    if let Some(v) = reset_immersion() {
-      return v;
-    }
   };
 
   common_response
