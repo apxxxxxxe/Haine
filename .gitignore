@@ -24,3 +24,4 @@ ghost_bak/
 
 ghost/master/target/
 vars.json
+ghost/master/debug

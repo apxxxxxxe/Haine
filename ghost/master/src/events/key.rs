@@ -10,10 +10,6 @@ pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   match refs[0] {
-    "r" => Ok(new_response_with_value_with_notranslate(
-      "unload:10秒後にリロード\\![unload,shiori]\\_w[10000]\\![reload,ghost]".to_string(),
-      TranslateOption::balloon_surface_only(),
-    )),
     "t" => {
       if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
         FIRST_RANDOMTALKS.len() as u32 - 1,
