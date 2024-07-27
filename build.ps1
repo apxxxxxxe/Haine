@@ -21,6 +21,12 @@ function Send-SSTP {
   $writer.Flush()
 }
 
+# check if magick is installed
+if (!(Get-Command "magick" -ErrorAction SilentlyContinue)) {
+    Write-Host "cargo is not installed"
+    $isRequirementsInstalled = $false
+}
+
 # check if cargo is installed
 if (!(Get-Command "cargo" -ErrorAction SilentlyContinue)) {
     Write-Host "cargo is not installed"
@@ -72,5 +78,30 @@ $arg = (($files | Select-Object -Unique) -join ',')
 echo $arg
 
 surfaces-mixer -f -w $arg -i $PSScriptRoot\shell\master\surfaces.yaml -o  $PSScriptRoot\shell\master\surfaces.txt
+
+# 没入度用の画像を作成
+$max_count = 7
+$prefix = "$PSScriptRoot\shell\master"
+$aImage = "$prefix\immersive_degree_filled.png"
+$bImage = "$prefix\immersive_degree_empty.png"
+$outputPrefix = "$prefix\surface70"
+
+for ($i = 0; $i -le 7; $i++) {
+    $aCount = $i
+    $bCount = $max_count - $aCount
+
+    $bCombined = @()
+    for ($j = 0; $j -lt $bCount; $j++) {
+        $bCombined += $bImage
+    }
+
+    $aCombined = @()
+    for ($j = 0; $j -lt $aCount; $j++) {
+        $aCombined += $aImage
+    }
+
+    $combinedImages = $bCombined + $aCombined
+    magick convert $combinedImages -append "${outputPrefix}$(('{0:D3}' -f $i)).png"
+}
 
 Send-SSTP "\1\_qビルド完了\![reload,ghost]\e" $uniqueid

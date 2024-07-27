@@ -241,9 +241,12 @@ fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriE
       conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
     } else {
       conbo_parts.push(vec![
-        "h1111204……いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
-        "h1111205……ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
-        "h1111304……悪餓鬼。".to_string(),
+        "h1111204いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
+        "h1111205ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
+        "h1111211秘されたものほど暴きたくなるものね。\\n\
+        h1111204ところで、相応の代償を払う用意はあるのでしょうね。"
+          .to_string(),
+        "h1111304悪餓鬼。".to_string(),
       ]);
     }
     all_combo(&conbo_parts)

@@ -20,6 +20,12 @@ use shiorust::message::{parts::*, traits::*, Request, Response};
 pub const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
+fn render_immersive_icon(immersive_degrees: u32) -> String {
+  const IMMERSIVE_ICON_COUNT: u32 = 7;
+  let icon_count = immersive_degrees * IMMERSIVE_ICON_COUNT / IMMERSIVE_RATE_MAX;
+  format!("\\![bind,icon,没入度{},1]", icon_count)
+}
+
 pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
@@ -61,7 +67,11 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       let messages = moving_to_library_talk()?;
       let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
       return new_response_with_value_with_translate(
-        messages[index].to_owned(),
+        format!(
+          "\\0{}{}",
+          render_immersive_icon(vars.volatility.immersive_degrees()),
+          messages[index].to_owned()
+        ),
         TranslateOption::with_shadow_completion(),
       );
     }
@@ -134,7 +144,8 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 
   new_response_with_value_with_translate(
     format!(
-      "\\0\\![set,balloonnum,{}]{}",
+      "\\0{}\\![set,balloonnum,{}]{}",
+      render_immersive_icon(vars.volatility.immersive_degrees()),
       comment,
       choosed_talk.consume()
     ),

@@ -729,3 +729,20 @@ characters:
       animation801000.pattern0,overlayfast,2,0,0
       animation500601.interval,bind
       animation500601.pattern0,overlay,110,0,0,0
+
+      animation900000.interval,bind
+      animation900000.pattern0,overlay,70000,0,100,650
+      animation900001.interval,bind
+      animation900001.pattern0,overlay,70001,0,100,650
+      animation900002.interval,bind
+      animation900002.pattern0,overlay,70002,0,100,650
+      animation900003.interval,bind
+      animation900003.pattern0,overlay,70003,0,100,650
+      animation900004.interval,bind
+      animation900004.pattern0,overlay,70004,0,100,650
+      animation900005.interval,bind
+      animation900005.pattern0,overlay,70005,0,100,650
+      animation900006.interval,bind
+      animation900006.pattern0,overlay,70006,0,100,650
+      animation900007.interval,bind
+      animation900007.pattern0,overlay,70007,0,100,650
