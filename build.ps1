@@ -21,6 +21,12 @@ function Send-SSTP {
   $writer.Flush()
 }
 
+# check if magick is installed
+if (!(Get-Command "magick" -ErrorAction SilentlyContinue)) {
+    Write-Host "magick is not installed"
+    $isRequirementsInstalled = $false
+}
+
 # check if cargo is installed
 if (!(Get-Command "cargo" -ErrorAction SilentlyContinue)) {
     Write-Host "cargo is not installed"
@@ -72,5 +78,18 @@ $arg = (($files | Select-Object -Unique) -join ',')
 echo $arg
 
 surfaces-mixer -f -w $arg -i $PSScriptRoot\shell\master\surfaces.yaml -o  $PSScriptRoot\shell\master\surfaces.txt
+
+# ろうそく画像をリサイズしてサーフェス画像としてリネーム
+$prefix = "$PSScriptRoot\shell\master"
+$size = 250
+$surface_number_original = 10000000
+magick convert -resize ${size}x${size} "$prefix\immersion_candle_base.png" "$prefix\surface$surface_number_original.png"
+for ($i = 1; $i -le 5; $i++) {
+  for ($j = 1; $j -le 2; $j++) {
+    $surface_number = $surface_number_original + $i + 10 * ($j - 1)
+    echo $surface_number $i $j
+    magick convert -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_${j}.png" "$prefix\surface$surface_number.png"
+  }
+}
 
 Send-SSTP "\1\_qビルド完了\![reload,ghost]\e" $uniqueid

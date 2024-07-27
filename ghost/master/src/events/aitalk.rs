@@ -20,6 +20,28 @@ use shiorust::message::{parts::*, traits::*, Request, Response};
 pub const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
+fn render_immersive_icon(immersive_degrees: u32, inverse: bool) -> String {
+  const IMMERSIVE_ICON_COUNT: u32 = 5;
+  let icon_count_float =
+    immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
+  let icon_count = if inverse {
+    // 繰り上げ
+    icon_count_float.ceil() as u32
+  } else {
+    // 切り捨て
+    icon_count_float.floor() as u32
+  };
+  let mut v = String::new();
+  for i in 1..=IMMERSIVE_ICON_COUNT {
+    v.push_str(&format!(
+      "\\![bind,icon,没入度{},{}]",
+      i,
+      if i <= icon_count { 0 } else { 1 }
+    ));
+  }
+  format!("\\p[2]{}\\0", v)
+}
+
 pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
@@ -61,7 +83,14 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       let messages = moving_to_library_talk()?;
       let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
       return new_response_with_value_with_translate(
-        messages[index].to_owned(),
+        format!(
+          "\\0{}{}",
+          render_immersive_icon(
+            vars.volatility.immersive_degrees(),
+            vars.volatility.talking_place() == TalkingPlace::Library
+          ),
+          messages[index].to_owned()
+        ),
         TranslateOption::with_shadow_completion(),
       );
     }
@@ -111,7 +140,14 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
         let messages = moving_to_living_room_talk()?;
         let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
         return new_response_with_value_with_translate(
-          messages[index].to_owned(),
+          format!(
+            "\\0{}{}",
+            render_immersive_icon(
+              vars.volatility.immersive_degrees(),
+              vars.volatility.talking_place() == TalkingPlace::Library
+            ),
+            messages[index].to_owned()
+          ),
           TranslateOption::with_shadow_completion(),
         );
       }
@@ -134,7 +170,11 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 
   new_response_with_value_with_translate(
     format!(
-      "\\0\\![set,balloonnum,{}]{}",
+      "\\0{}\\![set,balloonnum,{}]{}",
+      render_immersive_icon(
+        vars.volatility.immersive_degrees(),
+        vars.volatility.talking_place() == TalkingPlace::Library
+      ),
       comment,
       choosed_talk.consume()
     ),

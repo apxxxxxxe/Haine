@@ -6,6 +6,7 @@ craftmanurl,https://apxxxxxxe.github.io/Haine
 
 sakura.seriko.alignmenttodesktop,free
 kero.seriko.alignmenttodesktop,free
+char2.seriko.alignmenttodesktop,free
 
 seriko.use_self_alpha,1
 sakura.balloon.offsetx,150
@@ -186,6 +187,13 @@ sakura.bindgroup700000.name,ex,霧消え
 sakura.bindgroup750000.name,ex,霧覆い
 sakura.bindgroup800100.name,ex,没入度用
 sakura.bindgroup500601.name,ex,流血
+
+char2.bindoption.group,icon,multiple
+char2.bindgroup500201.name,icon,没入度1
+char2.bindgroup500202.name,icon,没入度2
+char2.bindgroup500203.name,icon,没入度3
+char2.bindgroup500204.name,icon,没入度4
+char2.bindgroup500205.name,icon,没入度5
 
 sakura.menuitemex1,頭,507001
 sakura.menuitemex2,頭,507005

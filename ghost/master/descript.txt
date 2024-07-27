@@ -23,3 +23,5 @@ shiori,haine.dll
 
 sakura.seriko.defaultsurface,1000000
 kero.seriko.defaultsurface,1000000
+char2.seriko.defaultsurface,10000000
+
