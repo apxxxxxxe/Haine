@@ -1,6 +1,7 @@
 use crate::autobreakline::Inserter;
 use crate::check_error;
 use crate::error::ShioriError;
+use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::random_talks;
@@ -272,6 +273,8 @@ pub struct VolatilityVariables {
   pub aroused: Mutex<bool>,
 
   pub last_anchor_id: Mutex<Option<String>>,
+
+  pub candles: Mutex<[bool; IMMERSIVE_ICON_COUNT as usize]>,
 }
 
 #[allow(dead_code)]
@@ -303,6 +306,11 @@ impl VolatilityVariables {
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
   generate_getter_setter!(aroused, bool, cloneable);
   generate_getter_setter!(last_anchor_id, Option<String>, cloneable);
+  generate_mut_getter!(
+    candles,
+    [bool; IMMERSIVE_ICON_COUNT as usize],
+    non_cloneable
+  );
 }
 
 impl Default for VolatilityVariables {
@@ -332,6 +340,7 @@ impl Default for VolatilityVariables {
       talking_place: Mutex::new(TalkingPlace::LivingRoom),
       aroused: Mutex::new(false),
       last_anchor_id: Mutex::new(None),
+      candles: Mutex::new([false; IMMERSIVE_ICON_COUNT as usize]),
     }
   }
 }

@@ -194,6 +194,11 @@ char2.bindgroup500202.name,icon,没入度2
 char2.bindgroup500203.name,icon,没入度3
 char2.bindgroup500204.name,icon,没入度4
 char2.bindgroup500205.name,icon,没入度5
+char2.bindgroup500301.name,icon,消え1
+char2.bindgroup500302.name,icon,消え2
+char2.bindgroup500303.name,icon,消え3
+char2.bindgroup500304.name,icon,消え4
+char2.bindgroup500305.name,icon,消え5
 
 sakura.menuitemex1,頭,507001
 sakura.menuitemex2,頭,507005

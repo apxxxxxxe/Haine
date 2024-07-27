@@ -75,8 +75,6 @@ $files = Get-ChildItem -Path $PSScriptRoot\ghost\master\src -Filter *.rs -Recurs
 # 重複を除去して、該当の7文字数列をカンマ区切りで標準出力する
 $arg = (($files | Select-Object -Unique) -join ',')
 
-echo $arg
-
 surfaces-mixer -f -w $arg -i $PSScriptRoot\shell\master\surfaces.yaml -o  $PSScriptRoot\shell\master\surfaces.txt
 
 # ろうそく画像をリサイズしてサーフェス画像としてリネーム
@@ -87,9 +85,14 @@ magick convert -resize ${size}x${size} "$prefix\immersion_candle_base.png" "$pre
 for ($i = 1; $i -le 5; $i++) {
   for ($j = 1; $j -le 2; $j++) {
     $surface_number = $surface_number_original + $i + 10 * ($j - 1)
-    echo $surface_number $i $j
     magick convert -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_${j}.png" "$prefix\surface$surface_number.png"
   }
+}
+
+# 消えるろうそく画像をリサイズしてサーフェス画像としてリネーム
+for ($i = 1; $i -le 5; $i++) {
+  $surface_number = $surface_number_original + $i + 100
+  magick convert -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_0.png" "$prefix\surface$surface_number.png"
 }
 
 Send-SSTP "\1\_qビルド完了\![reload,ghost]\e" $uniqueid

@@ -20,8 +20,11 @@ use shiorust::message::{parts::*, traits::*, Request, Response};
 pub const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
-fn render_immersive_icon(immersive_degrees: u32, inverse: bool) -> String {
-  const IMMERSIVE_ICON_COUNT: u32 = 5;
+pub const IMMERSIVE_ICON_COUNT: u32 = 5;
+
+fn render_immersive_icon(inverse: bool) -> String {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
   let icon_count_float =
     immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
   let icon_count = if inverse {
@@ -31,13 +34,24 @@ fn render_immersive_icon(immersive_degrees: u32, inverse: bool) -> String {
     // 切り捨て
     icon_count_float.floor() as u32
   };
+  let mut candles = vars.volatility.candles_mut();
   let mut v = String::new();
   for i in 1..=IMMERSIVE_ICON_COUNT {
-    v.push_str(&format!(
-      "\\![bind,icon,没入度{},{}]",
-      i,
-      if i <= icon_count { 0 } else { 1 }
-    ));
+    let enabled = i <= icon_count;
+    let a = if enabled != candles[i as usize - 1] {
+      // 煙のアニメーションを再生
+      format!(
+        "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
+        i,
+        if enabled { 0 } else { 1 },
+        i,
+        if !enabled { 0 } else { 1 }
+      )
+    } else {
+      format!("\\![bind,icon,没入度{},{}]", i, if enabled { 0 } else { 1 })
+    };
+    v.push_str(&a);
+    candles[i as usize - 1] = enabled;
   }
   format!("\\p[2]{}\\0", v)
 }
@@ -85,10 +99,7 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       return new_response_with_value_with_translate(
         format!(
           "\\0{}{}",
-          render_immersive_icon(
-            vars.volatility.immersive_degrees(),
-            vars.volatility.talking_place() == TalkingPlace::Library
-          ),
+          render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
           messages[index].to_owned()
         ),
         TranslateOption::with_shadow_completion(),
@@ -142,10 +153,7 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
         return new_response_with_value_with_translate(
           format!(
             "\\0{}{}",
-            render_immersive_icon(
-              vars.volatility.immersive_degrees(),
-              vars.volatility.talking_place() == TalkingPlace::Library
-            ),
+            render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
             messages[index].to_owned()
           ),
           TranslateOption::with_shadow_completion(),
@@ -171,10 +179,7 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(
     format!(
       "\\0{}\\![set,balloonnum,{}]{}",
-      render_immersive_icon(
-        vars.volatility.immersive_degrees(),
-        vars.volatility.talking_place() == TalkingPlace::Library
-      ),
+      render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
       comment,
       choosed_talk.consume()
     ),
