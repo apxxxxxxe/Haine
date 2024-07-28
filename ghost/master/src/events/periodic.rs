@@ -48,10 +48,11 @@ pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
 
   let status = Status::from_request(req);
 
+  debug!("status: {}", status);
   if let Some(v) = vars.random_talk_interval() {
     if v > 0
       && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time()) > v
-      && status.clone().is_some_and(|s| !s.minimizing)
+      && !status.minimizing
     {
       return on_ai_talk(req);
     }
@@ -60,7 +61,7 @@ pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   };
 
   let mut text = String::new();
-  if vars.volatility.ghost_up_time() % 60 == 0 && status.is_some_and(|s| !s.talking) {
+  if vars.volatility.ghost_up_time() % 60 == 0 && !status.talking {
     // 1分ごとにサーフェスを重ね直す
     text += STICK_SURFACE;
   }
