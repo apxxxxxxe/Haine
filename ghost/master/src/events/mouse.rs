@@ -220,12 +220,12 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
     let dialogs = vec![vec![
       "\
         h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
-        ……手が冷えるわよ。h1111204興味があるのは分かるけど、ほどほどにね。\
+        \\0……手が冷えるわよ。h1111204ほどほどにね。\
         "
       .to_string(),
       "\
         h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
-        ……それは不毛というものよ。\
+        ……h1111204それは不毛というものよ。\
         "
       .to_string(),
       "\
@@ -249,16 +249,18 @@ fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriE
   let results = if vars.volatility.aroused() {
     DIALOG_SEXIAL_WHILE_HITTING.clone()
   } else {
-    let mut conbo_parts: Vec<Vec<String>> =
-      vec![vec!["hr2144402……！\\nh1141102\\_w[500]".to_string()]];
+    let mut conbo_parts: Vec<Vec<String>> = vec![vec!["hr2144402……！h1141102\\n".to_string()]];
     if is_first_sexial_allowed(vars) {
       vars.volatility.set_first_sexial_touch(true);
       conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
     } else {
       conbo_parts.push(vec![
-        "h1111204……いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
-        "h1111205……ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
-        "h1111304……悪餓鬼。".to_string(),
+        "h1111204いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
+        "h1111205ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
+        "h1111211秘されたものほど暴きたくなるものね。\\n\
+        h1111204ところで、相応の代償を払う用意はあるのでしょうね。"
+          .to_string(),
+        "h1111304悪餓鬼。".to_string(),
       ]);
     }
     all_combo(&conbo_parts)
@@ -345,23 +347,23 @@ pub fn on_head_hit(_req: &Request) -> Result<Response, ShioriError> {
   vars.flags_mut().done(EventFlag::FirstHitTalkStart);
   to_aroused();
   let m = "\\t\\*\
-    h1111201あら、話す気に……h1000000っ！？\\n\
+    h1111201あら、どうし…h1111112…h1000000っ！？\\n\
     \\1半ば衝動的に、彼女を突き飛ばした。\\n\
-    \\0\\![bind,ex,流血,1]h1112401\\1それは嫌悪からだ。\\n\
-    私を受け入れるようなそぶりを見せながら、\\n\
-    同時に私を助けないと嘯く傲慢さ。\\n\
-    そして何よりも、理性的な物言いをしておきながら一欠片も倫理の匂いを感じさせない態度に、毒虫にも似た嫌悪感を感じたのだ。\\n\
-    \\0……。\\1立ち上がったハイネは呆けたように私を見つめ…………h1222804\\1笑った。\\n\
+    \\0\\![bind,ex,流血,1]h1112401……。\\n\
+    \\1立ち上がったハイネ。頭から血が流れている。\\n\
+    彼女は呆けたように私を見つめ…………h1222804\\1笑った。\\n\
     \\0……殴られるなんて、ずいぶん久しぶりだわ。\\n\
-    h1222310ウフ、あなたのせいで思い出しちゃった。\\n\
-    痛いってこういうものだったわね。\\n\
-    h1222506アハハ、素敵だわ、とても。\\n\
-    h1222204ねえ、もっとやってみて。\\n\
-    嫌悪したから突き飛ばしたのでしょう？あなた。\\n\
-    双方に得があるのよ、遠慮はいらないわ。\\n\
-    さあ。h1322813さあ！\\n\
+    h1222310フフ、あなたのせいで思い出しちゃった。\\n\
+    痛みってこういうものだったわね。\\n\
+    ……h1222505脳天が痺れてる。素敵だわ、とても。\\n\
+    h1222204ねえ、せっかくの機会だわ。もっとやってみて。\\n\
+    私に悪感情を抱いたから突き飛ばしたのでしょう？\\n\
+    h1222208こんなにしておいて、わざとじゃなかったなんて言わせないわ。\\n\
+    h1222204遠慮はいらない。あなたの気が済むまで殴って。\\n\
+    さあ。h1322813さあ！\
+    \\1……！\
     "
-    .to_string();
+  .to_string();
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
