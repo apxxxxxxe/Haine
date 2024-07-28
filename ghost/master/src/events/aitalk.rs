@@ -22,7 +22,7 @@ pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
 pub const IMMERSIVE_ICON_COUNT: u32 = 5;
 
-fn render_immersive_icon(inverse: bool) -> String {
+pub fn render_immersive_icon(inverse: bool) -> String {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   let icon_count_float =

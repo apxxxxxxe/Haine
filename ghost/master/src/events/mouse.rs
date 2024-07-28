@@ -4,8 +4,12 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
+use crate::events::randomtalk::moving_to_library_talk;
+use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
+use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE;
+use crate::events::IMMERSIVE_RATE_MAX;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -77,8 +81,17 @@ pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, Shior
 
 fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> {
   let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
+
+  // 通常の触り反応があった場合、没入度を下げる
+  sub_immsersive_degree(IMMERSIVE_RATE);
+
   new_response_with_value_with_translate(
-    format!("{}{}", REMOVE_BALLOON_NUM, dialogs[index].clone()),
+    format!(
+      "{}{}{}",
+      REMOVE_BALLOON_NUM,
+      render_immersive_icon(get_global_vars().volatility.talking_place() == TalkingPlace::Library),
+      dialogs[index].clone()
+    ),
     TranslateOption::with_shadow_completion(),
   )
 }
@@ -133,11 +146,6 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
     _ => None,
   };
-
-  // 通常の触り反応があった場合、没入度を下げる
-  if common_response.is_some() {
-    sub_immsersive_degree(IMMERSIVE_RATE);
-  }
 
   // その他特殊な条件で発生する触り反応
   let other_response = if info.starts_with('0') && info.contains("doubleclick") {
