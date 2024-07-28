@@ -51,7 +51,7 @@ pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   debug!("status: {}", status);
   if let Some(v) = vars.random_talk_interval() {
     if v > 0
-      && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time()) > v
+      && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time()) >= v
       && !status.minimizing
     {
       return on_ai_talk(req);
