@@ -4,9 +4,11 @@ use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
 use crate::events::TalkingPlace;
+use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
+use std::fmt::Write;
 
 pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
@@ -23,7 +25,12 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     );
     Ok(res)
   } else {
+    let light_candles = (1..=IMMERSIVE_ICON_COUNT).fold("".to_string(), |mut f, i| {
+      write!(f, "\\![bind,icon,没入度{},1]", i).unwrap();
+      f
+    });
     let talks = all_combo(&vec![
+      vec![format!("\\p[2]\\![bind,icon,,0]{}", light_candles)],
       vec!["h1113105\\1今日も、霧が濃い。".to_string()],
       vec!["\
       h1113105……h1113101\\_w[300]h1113201あら。\\n\
