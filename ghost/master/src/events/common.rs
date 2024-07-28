@@ -371,7 +371,11 @@ pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   let from_surface = get_global_vars().volatility.current_surface();
   let from_eyes = from_surface % eye_index_digit_pow;
   let direct_res = new_response_with_value_with_notranslate(
-    format!("\\s[{}]{}", dest_surface, render_shadow(is_complete)),
+    format!(
+      "\\![lock,repaint]\\s[{}]{}\\![unlock,repaint]",
+      dest_surface,
+      render_shadow(is_complete)
+    ),
     TranslateOption::none(),
   );
 
@@ -408,7 +412,13 @@ pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   let delay = format!("\\_w[{}]", DELAY);
   let animation = cuts
     .iter()
-    .map(|s| format!("\\0\\s[{}]{}", s, render_shadow(is_complete)))
+    .map(|s| {
+      format!(
+        "\\0\\![lock,repaint]\\s[{}]{}\\![unlock,repaint]",
+        s,
+        render_shadow(is_complete)
+      )
+    })
     .collect::<Vec<String>>()
     .join(delay.as_str());
 
@@ -481,6 +491,15 @@ pub fn sub_immsersive_degree(degree: u32) {
   let vars = get_global_vars();
   let new_degree = vars.volatility.immersive_degrees().saturating_sub(degree);
   vars.volatility.set_immersive_degrees(new_degree);
+}
+
+pub fn shake_with_notext() -> String {
+  let shakes = [(10, 10), (-14, -14), (4, 4)];
+  shakes
+    .iter()
+    .map(|(x, y)| format!("\\![move,--X={},--Y={},--time=50,--base=me]", x, y))
+    .collect::<Vec<String>>()
+    .join("")
 }
 
 #[cfg(test)]

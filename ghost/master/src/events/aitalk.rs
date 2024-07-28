@@ -20,6 +20,42 @@ use shiorust::message::{parts::*, traits::*, Request, Response};
 pub const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
+pub const IMMERSIVE_ICON_COUNT: u32 = 5;
+
+pub fn render_immersive_icon(inverse: bool) -> String {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
+  let icon_count_float =
+    immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
+  let icon_count = if inverse {
+    // 繰り上げ
+    icon_count_float.ceil() as u32
+  } else {
+    // 切り捨て
+    icon_count_float.floor() as u32
+  };
+  let mut candles = vars.volatility.candles_mut();
+  let mut v = String::new();
+  for i in 1..=IMMERSIVE_ICON_COUNT {
+    let enabled = i <= icon_count;
+    let a = if enabled != candles[i as usize - 1] {
+      // 煙のアニメーションを再生
+      format!(
+        "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
+        i,
+        if enabled { 0 } else { 1 },
+        i,
+        if !enabled { 0 } else { 1 }
+      )
+    } else {
+      format!("\\![bind,icon,没入度{},{}]", i, if enabled { 0 } else { 1 })
+    };
+    v.push_str(&a);
+    candles[i as usize - 1] = enabled;
+  }
+  format!("\\p[2]{}\\0", v)
+}
+
 pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
@@ -51,22 +87,6 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     );
   }
 
-  if vars.volatility.talking_place() == TalkingPlace::LivingRoom {
-    // 居間にいるときは没入度を上げる
-    add_immsersive_degree(IMMERSIVE_RATE);
-    // 没入度が最大に達したら書斎に移動
-    if vars.volatility.immersive_degrees() == IMMERSIVE_RATE_MAX {
-      vars.volatility.set_talking_place(TalkingPlace::Library);
-
-      let messages = moving_to_library_talk()?;
-      let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-      return new_response_with_value_with_translate(
-        messages[index].to_owned(),
-        TranslateOption::with_shadow_completion(),
-      );
-    }
-  }
-
   // 通常ランダムトーク
   let talk_types = vars.volatility.talking_place().talk_types();
   let talk_lists = talk_types
@@ -95,46 +115,81 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
   }
 
+  // 書斎でのトーク時にマウスやメニューからのトークの場合は没入度を減少させる
+  if !req.headers.get("ID").is_some_and(|v| v == "OnSecondChange")
+    && vars.volatility.talking_place() == TalkingPlace::Library
+  {
+    sub_immsersive_degree(IMMERSIVE_RATE);
+
+    // 書斎で没入度が0になったら居間に移動
+    if vars.volatility.immersive_degrees() == 0 {
+      vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
+
+      let messages = moving_to_living_room_talk()?;
+      let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+      return new_response_with_value_with_translate(
+        format!(
+          "\\0{}{}",
+          render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
+          messages[index].to_owned()
+        ),
+        TranslateOption::with_shadow_completion(),
+      );
+    }
+  }
+
+  // 居間でのトーク時に自然発生したトークの場合は没入度を増加させる
+  if req.headers.get("ID").is_some_and(|v| v == "OnSecondChange")
+    && vars.volatility.talking_place() == TalkingPlace::LivingRoom
+  {
+    add_immsersive_degree(IMMERSIVE_RATE);
+    // 没入度が最大に達したら書斎に移動
+    if vars.volatility.immersive_degrees() == IMMERSIVE_RATE_MAX {
+      vars.volatility.set_talking_place(TalkingPlace::Library);
+
+      let messages = moving_to_library_talk()?;
+      let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+      return new_response_with_value_with_translate(
+        format!(
+          "\\0{}{}",
+          render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
+          messages[index].to_owned()
+        ),
+        TranslateOption::with_shadow_completion(),
+      );
+    }
+  }
+
+  // バルーン右下に表示するコメントを取得
   let comment = if vars.volatility.talking_place() == TalkingPlace::Library {
-    // 書斎では能動的に話しかけた場合のみ没入度低下&コメントを表示
+    // 書斎では能動的に話しかけたかどうかで異なるコメントを表示
     if req.headers.get("ID").is_some_and(|v| v == "OnSecondChange") {
       let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false)
         .ok_or(ShioriError::TalkNotFound)?;
       RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index]
     } else {
-      sub_immsersive_degree(IMMERSIVE_RATE);
-
-      // 書斎で没入度が0になったら居間に移動
-      if vars.volatility.immersive_degrees() == 0 {
-        vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
-
-        let messages = moving_to_living_room_talk()?;
-        let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-        return new_response_with_value_with_translate(
-          messages[index].to_owned(),
-          TranslateOption::with_shadow_completion(),
-        );
-      }
-
       let index =
         choose_one(&RANDOMTALK_COMMENTS_LIBRARY_ACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
       RANDOMTALK_COMMENTS_LIBRARY_ACTIVE[index]
     }
-  } else if vars
-    .flags()
-    .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
-  {
-    // 居間では従者トーク解禁済みの場合コメントを表示
-    let index =
-      choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
-    RANDOMTALK_COMMENTS_LIVING_ROOM[index]
   } else {
-    ""
+    // 居間では従者トーク解禁済みの場合コメントを表示
+    if vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
+    {
+      let index =
+        choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
+      RANDOMTALK_COMMENTS_LIVING_ROOM[index]
+    } else {
+      ""
+    }
   };
 
   new_response_with_value_with_translate(
     format!(
-      "\\0\\![set,balloonnum,{}]{}",
+      "\\0{}\\![set,balloonnum,{}]{}",
+      render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
       comment,
       choosed_talk.consume()
     ),

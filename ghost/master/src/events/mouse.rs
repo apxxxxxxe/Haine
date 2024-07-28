@@ -4,8 +4,12 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
+use crate::events::randomtalk::moving_to_library_talk;
+use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
+use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE;
+use crate::events::IMMERSIVE_RATE_MAX;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -77,8 +81,17 @@ pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, Shior
 
 fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> {
   let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
+
+  // 通常の触り反応があった場合、没入度を下げる
+  sub_immsersive_degree(IMMERSIVE_RATE);
+
   new_response_with_value_with_translate(
-    format!("{}{}", REMOVE_BALLOON_NUM, dialogs[index].clone()),
+    format!(
+      "{}{}{}",
+      REMOVE_BALLOON_NUM,
+      render_immersive_icon(get_global_vars().volatility.talking_place() == TalkingPlace::Library),
+      dialogs[index].clone()
+    ),
     TranslateOption::with_shadow_completion(),
   )
 }
@@ -131,13 +144,9 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0bustnade" => zero_bust_touch(req, touch_count),
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
+    "2doubleclick" => two_double_click(req, touch_count),
     _ => None,
   };
-
-  // 通常の触り反応があった場合、没入度を下げる
-  if common_response.is_some() {
-    sub_immsersive_degree(IMMERSIVE_RATE);
-  }
 
   // その他特殊な条件で発生する触り反応
   let other_response = if info.starts_with('0') && info.contains("doubleclick") {
@@ -427,6 +436,50 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
     }
     Some(common_choice_process(result))
   }
+}
+
+fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
+  // すでに書斎へ移動しているとき、没入度が最大のとき、まだ場所移動していないときは何もしない
+  if immersive_degrees == IMMERSIVE_RATE_MAX
+    || vars.volatility.talking_place() == TalkingPlace::Library
+    || !vars.flags().check(&EventFlag::FirstPlaceChange)
+  {
+    return None;
+  }
+  for i in 0..=IMMERSIVE_ICON_COUNT {
+    let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
+    if immersive_degrees < threshold {
+      vars.volatility.set_immersive_degrees(threshold);
+      // 没入度最大なら書斎へ移動
+      let m = if threshold == IMMERSIVE_RATE_MAX {
+        vars.volatility.set_talking_place(TalkingPlace::Library);
+        let messages = match moving_to_library_talk() {
+          Ok(v) => v,
+          Err(e) => return Some(Err(e)),
+        };
+        let index = match choose_one(&messages, true).ok_or(ShioriError::TalkNotFound) {
+          Ok(v) => v,
+          Err(e) => return Some(Err(e)),
+        };
+        messages[index].to_owned()
+      } else {
+        "".to_string()
+      };
+      return Some(new_response_with_value_with_translate(
+        format!(
+          "\\0{}{}\\p[2]{}{}",
+          render_shadow(true),
+          render_immersive_icon(false),
+          shake_with_notext(),
+          m
+        ),
+        TranslateOption::with_shadow_completion(),
+      ));
+    }
+  }
+  None
 }
 
 pub fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (Vec<String>, bool) {
