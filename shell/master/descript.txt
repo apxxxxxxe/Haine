@@ -200,6 +200,8 @@ char2.bindgroup500303.name,icon,消え3
 char2.bindgroup500304.name,icon,消え4
 char2.bindgroup500305.name,icon,消え5
 
+char2.menu,hidden
+
 sakura.menuitemex1,頭,507001
 sakura.menuitemex2,頭,507005
 sakura.menuitemex3,頭,507006
