@@ -469,7 +469,8 @@ fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, Shio
       };
       return Some(new_response_with_value_with_translate(
         format!(
-          "{}\\p[2]{}{}",
+          "\\0{}{}\\p[2]{}{}",
+          render_shadow(true),
           render_immersive_icon(false),
           shake_with_notext(),
           m
