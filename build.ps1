@@ -79,7 +79,7 @@ surfaces-mixer -f -w $arg -i $PSScriptRoot\shell\master\surfaces.yaml -o  $PSScr
 
 # ろうそく画像をリサイズしてサーフェス画像としてリネーム
 $prefix = "$PSScriptRoot\shell\master"
-$size = 250
+$size = 300
 $surface_number_original = 10000000
 magick convert -resize ${size}x${size} "$prefix\immersion_candle_base.png" "$prefix\surface$surface_number_original.png"
 for ($i = 1; $i -le 5; $i++) {

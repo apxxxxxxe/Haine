@@ -31,7 +31,7 @@ raw: |
     // ろうそく消え1
     animation500301.interval,bind+runonce
     animation500301.pattern0,overlay,10000101,0,0,0
-    animation500301.pattern1,overlay,-1,500,0,0
+    animation500301.pattern1,overlay,-1,1000,0,0
 
     // ろうそく2
     animation500202.interval,bind+always
@@ -41,7 +41,7 @@ raw: |
     // ろうそく消え2
     animation500302.interval,bind+runonce
     animation500302.pattern0,overlay,10000102,0,0,0
-    animation500302.pattern1,overlay,-1,500,0,0
+    animation500302.pattern1,overlay,-1,1000,0,0
 
     // ろうそく3
     animation500203.interval,bind+always
@@ -51,7 +51,7 @@ raw: |
     // ろうそく消え3
     animation500303.interval,bind+runonce
     animation500303.pattern0,overlay,10000103,0,0,0
-    animation500303.pattern1,overlay,-1,500,0,0
+    animation500303.pattern1,overlay,-1,1000,0,0
 
     // ろうそく4
     animation500204.interval,bind+always
@@ -61,7 +61,7 @@ raw: |
     // ろうそく消え4
     animation500304.interval,bind+runonce
     animation500304.pattern0,overlay,10000104,0,0,0
-    animation500304.pattern1,overlay,-1,500,0,0
+    animation500304.pattern1,overlay,-1,1000,0,0
 
     // ろうそく5
     animation500205.interval,bind+always
@@ -71,7 +71,7 @@ raw: |
     // ろうそく消え5
     animation500305.interval,bind+runonce
     animation500305.pattern0,overlay,10000105,0,0,0
-    animation500305.pattern1,overlay,-1,500,0,0
+    animation500305.pattern1,overlay,-1,1000,0,0
   }
 
 characters:
