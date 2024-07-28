@@ -6,6 +6,7 @@ on:
     workflows: ["cargo-test"]
     types:
       - completed
+    branches: ["main"]
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
