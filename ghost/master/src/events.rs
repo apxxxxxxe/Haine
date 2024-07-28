@@ -28,6 +28,7 @@ use crate::events::translate::*;
 use crate::events::webclap::*;
 use crate::variables::get_global_vars;
 use shiorust::message::{parts::*, traits::*, Request, Response};
+use std::fs;
 
 pub fn handle_request(req: &Request) -> Result<Response, ShioriError> {
   match req.method {
@@ -86,6 +87,18 @@ fn log_path(_req: &Request) -> Response {
   new_response_with_value_with_notranslate(log_path, TranslateOption::none())
 }
 
+fn uniqueid(req: &Request) -> Result<Response, ShioriError> {
+  let id = req
+    .headers
+    .get("Reference0")
+    .ok_or(ShioriError::BadRequest)?;
+  // ローカルファイル`./debug`が存在しているなら上書きする
+  if fs::metadata("./debug").is_ok() {
+    fs::write("./debug", id).map_err(|_| ShioriError::FileWriteError)?;
+  }
+  Ok(new_response_nocontent())
+}
+
 pub enum EventHandler {
   AlwaysSuccess(fn(&Request) -> Response),
   MayFailure(fn(&Request) -> Result<Response, ShioriError>),
@@ -98,6 +111,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "craftmanw" => Some(EventHandler::AlwaysSuccess(craftmanw)),
     "name" => Some(EventHandler::AlwaysSuccess(name)),
     "log_path" => Some(EventHandler::AlwaysSuccess(log_path)),
+    "uniqueid" => Some(EventHandler::MayFailure(uniqueid)),
     "OnBoot" => Some(EventHandler::MayFailure(on_boot)),
     "OnClose" => Some(EventHandler::MayFailure(on_close)),
     "OnVanishSelected" => Some(EventHandler::AlwaysSuccess(on_vanish_selected)),

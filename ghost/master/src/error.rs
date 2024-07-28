@@ -12,6 +12,8 @@ pub enum ShioriError {
   TalkNotFound,
   ParseRequestError,
   NotSetScopeError(String),
+  BadRequest,
+  FileWriteError,
 }
 
 impl fmt::Display for ShioriError {
@@ -45,6 +47,8 @@ impl fmt::Display for ShioriError {
         "[NotSetScopeError]次のスクリプトの頭にスコープ指定がありません: {}",
         v
       ),
+      ShioriError::BadRequest => write!(f, "[BadRequest]リクエストが不正です"),
+      ShioriError::FileWriteError => write!(f, "[FileWriteError]ファイルの書き込みに失敗しました"),
     }
   }
 }

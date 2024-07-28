@@ -10,7 +10,7 @@ mod variables;
 use crate::events::common::{add_error_description, new_response_nocontent};
 use crate::variables::get_global_vars;
 
-use std::fs::File;
+use std::fs::{metadata, File};
 use std::panic;
 use std::path::Path;
 
@@ -45,6 +45,11 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
 
   if let Err(e) = vars.load() {
     error!("{}", e);
+  }
+
+  // ./debugが存在するならデバッグモード
+  if metadata("./debug").is_ok() {
+    vars.volatility.set_debug_mode(true);
   }
 
   // ログの設定

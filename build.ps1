@@ -1,5 +1,25 @@
-
 $isRequirementsInstalled = $true
+
+function Send-SSTP {
+  param(
+    [string]$message,
+    [string]$uniqueid
+  )
+
+  $tcpClient = New-Object System.Net.Sockets.TcpClient("localhost", 9801)
+  $stream = $tcpClient.GetStream()
+  $writer = New-Object System.IO.StreamWriter($stream)
+  $writer.WriteLine("SEND SSTP/1.0")
+  $writer.WriteLine("Charset: UTF-8")
+  $writer.WriteLine("Sender: Haine Builder")
+  $writer.WriteLine("Script: $message")
+  $writer.WriteLine("Option: notranslate")
+  if ($uniqueid) {
+    $writer.WriteLine("ID: $uniqueid")
+  }
+  $writer.WriteLine()
+  $writer.Flush()
+}
 
 # check if cargo is installed
 if (!(Get-Command "cargo" -ErrorAction SilentlyContinue)) {
@@ -19,6 +39,15 @@ if (!$isRequirementsInstalled) {
     Write-Host "Requirements are not installed. Please install the requirements and try again."
     exit 1
 }
+
+# ./ghost/master/debug が存在するか確認し、存在するなら内容を読み込む
+if (Test-Path $PSScriptRoot\ghost\master\debug) {
+  $uniqueid = Get-Content $PSScriptRoot\ghost\master\debug
+}
+
+Send-SSTP "\1\_qビルド中\![unload,shiori]\e" $uniqueid
+
+Start-Sleep -Seconds 1
 
 cd $PSScriptRoot\ghost\master
 cargo build --release
@@ -43,3 +72,5 @@ $arg = (($files | Select-Object -Unique) -join ',')
 echo $arg
 
 surfaces-mixer -f -w $arg -i $PSScriptRoot\shell\master\surfaces.yaml -o  $PSScriptRoot\shell\master\surfaces.txt
+
+Send-SSTP "\1\_qビルド完了\![reload,ghost]\e" $uniqueid
