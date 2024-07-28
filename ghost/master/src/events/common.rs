@@ -483,6 +483,15 @@ pub fn sub_immsersive_degree(degree: u32) {
   vars.volatility.set_immersive_degrees(new_degree);
 }
 
+pub fn shake_with_notext() -> String {
+  let shakes = [(10, 10), (-14, -14), (4, 4)];
+  shakes
+    .iter()
+    .map(|(x, y)| format!("\\![move,--X={},--Y={},--time=50,--base=me]", x, y))
+    .collect::<Vec<String>>()
+    .join("")
+}
+
 #[cfg(test)]
 mod tests {
   use super::*;

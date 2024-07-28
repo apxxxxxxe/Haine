@@ -144,6 +144,7 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0bustnade" => zero_bust_touch(req, touch_count),
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
+    "2doubleclick" => two_double_click(req, touch_count),
     _ => None,
   };
 
@@ -435,6 +436,49 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
     }
     Some(common_choice_process(result))
   }
+}
+
+fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
+  // すでに書斎へ移動しているとき、没入度が最大のとき、まだ場所移動していないときは何もしない
+  if immersive_degrees == IMMERSIVE_RATE_MAX
+    || vars.volatility.talking_place() == TalkingPlace::Library
+    || !vars.flags().check(&EventFlag::FirstPlaceChange)
+  {
+    return None;
+  }
+  for i in 0..=IMMERSIVE_ICON_COUNT {
+    let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
+    if immersive_degrees < threshold {
+      vars.volatility.set_immersive_degrees(threshold);
+      // 没入度最大なら書斎へ移動
+      let m = if threshold == IMMERSIVE_RATE_MAX {
+        vars.volatility.set_talking_place(TalkingPlace::Library);
+        let messages = match moving_to_library_talk() {
+          Ok(v) => v,
+          Err(e) => return Some(Err(e)),
+        };
+        let index = match choose_one(&messages, true).ok_or(ShioriError::TalkNotFound) {
+          Ok(v) => v,
+          Err(e) => return Some(Err(e)),
+        };
+        messages[index].to_owned()
+      } else {
+        "".to_string()
+      };
+      return Some(new_response_with_value_with_translate(
+        format!(
+          "{}\\p[2]{}{}",
+          render_immersive_icon(false),
+          shake_with_notext(),
+          m
+        ),
+        TranslateOption::with_shadow_completion(),
+      ));
+    }
+  }
+  None
 }
 
 pub fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (Vec<String>, bool) {
