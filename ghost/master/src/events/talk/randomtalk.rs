@@ -682,34 +682,6 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       TalkType::Abstract => vec![
 
         RandomTalk {
-          id: "ハイネの死",
-          text: {
-            let vars = get_global_vars();
-            let achieved_talk_types = [TalkType::Past];
-            achieved_talk_types.iter().for_each(|t| {
-              vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
-            });
-            let achievements_messages = achieved_talk_types
-              .iter()
-              .map(|t| render_achievement_message(*t))
-              .collect::<Vec<_>>();
-            format!("\
-              h1111110…………幽霊にとって、自身の死の記憶はある種のタブーなの。\\n\
-              誰もが持つがゆえの共通認識。自身の死は恥部なのよ。\\n\
-              私も、彼らのそれには深く踏み込まない。\\n\
-              けれど、あなたは生者だから。\\n\
-              \\n\
-              ……私の死因は、自殺よ。\\n\
-              この家で死に、そしてここに縛り付けられたの。\\n\
-              {}", 
-              achievements_messages.join("\\n")
-            )
-          },
-          required_condition: Some(|vars| vars.total_boot_count() >= 3),
-          callback: None,
-        },
-
-        RandomTalk {
           id: "今ここに立っていること",
           text: "\
             h1111310過去は記憶の中にしかない。\\n\

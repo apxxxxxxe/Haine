@@ -3,16 +3,21 @@ use crate::events::common::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
+use crate::events::TalkType;
 use crate::events::TalkingPlace;
-use crate::events::IMMERSIVE_ICON_COUNT;
+use crate::events::{IMMERSIVE_ICON_COUNT, IMMERSIVE_RATE_MAX};
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 use std::fmt::Write;
 
+pub const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
+
 pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   vars.set_total_boot_count(vars.total_boot_count() + 1);
+
+  // 初回起動
   if !vars.flags().check(&EventFlag::FirstBoot) {
     vars.flags_mut().done(EventFlag::FirstBoot);
     let mut res = new_response_with_value_with_translate(
@@ -23,31 +28,67 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
       HeaderName::from("Marker"),
       format!("{}(1/{})", FIRST_BOOT_MARKER, FIRST_RANDOMTALKS.len() + 1),
     );
-    Ok(res)
-  } else {
-    let light_candles = (1..=IMMERSIVE_ICON_COUNT).fold("".to_string(), |mut f, i| {
-      write!(f, "\\![bind,icon,没入度{},1]", i).unwrap();
-      f
-    });
-    let talks = all_combo(&vec![
-      vec![format!("\\p[2]\\![bind,icon,,0]{}", light_candles)],
-      vec!["h1113105\\1今日も、霧が濃い。".to_string()],
-      vec!["\
+    return Ok(res);
+  }
+
+  // 情報解禁&過去トーク開放
+  if !vars
+    .flags()
+    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Past))
+    && vars.total_boot_count() >= UNLOCK_PAST_BOOT_COUNT
+    && vars.flags().check(&EventFlag::FirstPlaceChange)
+  {
+    vars.volatility.set_immersive_degrees(IMMERSIVE_RATE_MAX);
+    vars.volatility.set_talking_place(TalkingPlace::Library);
+    vars
+      .flags_mut()
+      .done(EventFlag::TalkTypeUnlock(TalkType::Past));
+    let achievements_message = render_achievement_message(TalkType::Past);
+    let m = format!(
+      "\
+      h1111105\\b[{}]……。\\1ハイネ……？\\n\
+      ……いつもの出迎えがないのを不思議に思っていたのだが、\\n\
+      彼女が思索に耽っているときに来てしまったようだ。\\n\
+      ……しばらくそっとしておこう……。\
+      \\0\\c\\1\\b[-1]h1000000───────────────\\_w[1200]\\c\
+      h1111110\\b[{}]…………幽霊にとって、自身の死の記憶はある種のタブー。\\n\
+      誰もが持つがゆえの共通認識。自身の死は恥部。\\n\
+      私も、彼らのそれには深く踏み込まない。\\n\
+      けれど、あの子は生者だから。\\n\
+      \\n\
+      ……私の死因が自殺であると。\\n\
+      この家で死に、そしてここに縛り付けられたと、\\n\
+      打ち明けてもよいのかもしれない。\\n\
+      {}",
+      TalkingPlace::LivingRoom.balloon_surface(),
+      TalkingPlace::Library.balloon_surface(),
+      achievements_message
+    );
+    return new_response_with_value_with_translate(m, TranslateOption::simple_translate());
+  }
+
+  let light_candles = (1..=IMMERSIVE_ICON_COUNT).fold("".to_string(), |mut f, i| {
+    write!(f, "\\![bind,icon,没入度{},1]", i).unwrap();
+    f
+  });
+  let talks = all_combo(&vec![
+    vec![format!("\\p[2]\\![bind,icon,,0]{}", light_candles)],
+    vec!["h1113105\\1今日も、霧が濃い。".to_string()],
+    vec!["\
       h1113105……h1113101\\_w[300]h1113201あら。\\n\
       h1111204いらっしゃい、{user_name}。\
       "
-      .to_string()],
-    ]);
-    let index = choose_one(&talks, false).ok_or(ShioriError::ArrayAccessError)?;
-    let v = format!(
-      "\\0\\s[{}]{}\\![embed,OnStickSurface]{}{}",
-      TRANSPARENT_SURFACE,
-      RESET_BINDS,
-      randomize_underwear(),
-      talks[index],
-    );
-    new_response_with_value_with_translate(v, TranslateOption::simple_translate())
-  }
+    .to_string()],
+  ]);
+  let index = choose_one(&talks, false).ok_or(ShioriError::ArrayAccessError)?;
+  let v = format!(
+    "\\0\\s[{}]{}\\![embed,OnStickSurface]{}{}",
+    TRANSPARENT_SURFACE,
+    RESET_BINDS,
+    randomize_underwear(),
+    talks[index],
+  );
+  new_response_with_value_with_translate(v, TranslateOption::simple_translate())
 }
 
 pub fn on_close(_req: &Request) -> Result<Response, ShioriError> {
