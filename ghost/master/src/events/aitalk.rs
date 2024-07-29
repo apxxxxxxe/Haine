@@ -265,6 +265,7 @@ mod test {
     random_talks, TALK_ID_LORE_INTRO, TALK_ID_SERVANT_INTRO, TALK_UNLOCK_COUNT_LORE,
     TALK_UNLOCK_COUNT_SERVANT,
   };
+  use crate::events::UNLOCK_PAST_BOOT_COUNT;
   use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::Request;
 
@@ -273,6 +274,7 @@ mod test {
     const FIRST_CLOSE_TALK_PART: &str = "逃がして良いのかって？";
     const SECOND_CLOSE_TALK_PART: &str = "がありますように";
     const CLOSE_TALK_IN_LIBRARY_PART: &str = "戻ってきたようだ。";
+    const PAST_TALK_UNLOCK_TALK_PART: &str = "あの子は生者だから";
 
     let vars = get_global_vars();
     *vars = GlobalVariables::new();
@@ -395,6 +397,23 @@ mod test {
     let res = on_close(&on_second_change_req)?;
     let value = res.headers.get("Value").ok_or("Failed to get value")?;
     assert!(value.contains(SECOND_CLOSE_TALK_PART)); // 2回目以降の終了トークが含まれていることの確認
+
+    assert!(!vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Past)));
+    assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
+    assert!(vars.total_boot_count() < UNLOCK_PAST_BOOT_COUNT - 1);
+    while vars.total_boot_count() < UNLOCK_PAST_BOOT_COUNT - 1 {
+      on_boot(&on_second_change_req)?;
+    }
+    let res = on_boot(&on_second_change_req)?;
+    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    assert!(value.contains(PAST_TALK_UNLOCK_TALK_PART)); // 過去トーク開放トークの内容が含まれていることの確認
+    assert!(vars
+      .flags()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Past)));
+    assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
+    assert_eq!(vars.volatility.immersive_degrees(), IMMERSIVE_RATE_MAX);
 
     Ok(())
   }
