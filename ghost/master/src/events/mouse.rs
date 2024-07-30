@@ -376,6 +376,7 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
     Some(common_choice_process(dialogs))
   } else if !is_aroused {
     get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
+    to_aroused();
     let dialogs = vec![
       "h1000000痛っ……\\n\\0\\![bind,ex,流血,1]h1311204あら、その気になってくれた？".to_string(),
     ];
