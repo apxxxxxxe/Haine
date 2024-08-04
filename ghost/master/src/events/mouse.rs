@@ -145,6 +145,7 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
     "2doubleclick" => two_double_click(req, touch_count),
+    "2up" => two_up(req, touch_count),
     _ => None,
   };
 
@@ -475,6 +476,31 @@ fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, Shio
           render_immersive_icon(false),
           shake_with_notext(),
           m
+        ),
+        TranslateOption::with_shadow_completion(),
+      ));
+    }
+  }
+  None
+}
+
+// 没入度を下げ、ろうそくを点ける
+fn two_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
+  if immersive_degrees == 0 {
+    return None;
+  }
+  for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
+    let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
+    if immersive_degrees > threshold {
+      vars.volatility.set_immersive_degrees(threshold);
+      return Some(new_response_with_value_with_translate(
+        format!(
+          "\\0{}{}\\p[2]{}",
+          render_shadow(false),
+          render_immersive_icon(true),
+          shake_with_notext()
         ),
         TranslateOption::with_shadow_completion(),
       ));
