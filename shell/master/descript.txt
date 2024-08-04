@@ -199,6 +199,7 @@ char2.bindgroup500302.name,icon,消え2
 char2.bindgroup500303.name,icon,消え3
 char2.bindgroup500304.name,icon,消え4
 char2.bindgroup500305.name,icon,消え5
+char2.bindgroup500400.name,icon,マッチ箱
 
 char2.menu,hidden
 

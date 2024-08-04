@@ -5,14 +5,19 @@ use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
 use crate::events::randomtalk::moving_to_library_talk;
+use crate::events::randomtalk::moving_to_living_room_talk;
 use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE;
 use crate::events::IMMERSIVE_RATE_MAX;
+use crate::sound::play_sound;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
+
+const SOUND_LIGHT_CANDLE: &str = "マッチで火をつける.mp3";
+const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
 
 #[macro_export]
 macro_rules! get_touch_info {
@@ -144,8 +149,8 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0bustnade" => zero_bust_touch(req, touch_count),
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
-    "2doubleclick" => two_double_click(req, touch_count),
-    "2up" => two_up(req, touch_count),
+    "2candledoubleclick" => two_candle_double_click(req, touch_count),
+    "2matchboxdoubleclick" => two_matchbox_double_click(req, touch_count),
     _ => None,
   };
 
@@ -440,7 +445,7 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
   }
 }
 
-fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   // すでに書斎へ移動しているとき、没入度が最大のとき、まだ場所移動していないときは何もしない
@@ -455,8 +460,13 @@ fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, Shio
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if immersive_degrees < threshold {
       vars.volatility.set_immersive_degrees(threshold);
+      if play_sound(SOUND_BLOW_CANDLE).is_err() {
+        return Some(Err(ShioriError::PlaySoundError));
+      }
       // 没入度最大なら書斎へ移動
-      let m = if threshold == IMMERSIVE_RATE_MAX {
+      let m = if threshold == IMMERSIVE_RATE_MAX
+        && vars.volatility.talking_place() == TalkingPlace::LivingRoom
+      {
         vars.volatility.set_talking_place(TalkingPlace::Library);
         let messages = match moving_to_library_talk() {
           Ok(v) => v,
@@ -486,7 +496,7 @@ fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, Shio
 }
 
 // 没入度を下げ、ろうそくを点ける
-fn two_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+fn two_matchbox_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   if immersive_degrees == 0 || vars.volatility.is_immersive_degrees_fixed() {
@@ -495,13 +505,32 @@ fn two_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> 
   for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if immersive_degrees > threshold {
+      if play_sound(SOUND_LIGHT_CANDLE).is_err() {
+        return Some(Err(ShioriError::PlaySoundError));
+      }
+      // 没入度0なら居間へ移動
+      let m = if threshold == 0 && vars.volatility.talking_place() == TalkingPlace::Library {
+        vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
+        let messages = match moving_to_living_room_talk() {
+          Ok(v) => v,
+          Err(e) => return Some(Err(e)),
+        };
+        let index = match choose_one(&messages, true).ok_or(ShioriError::TalkNotFound) {
+          Ok(v) => v,
+          Err(e) => return Some(Err(e)),
+        };
+        messages[index].to_owned()
+      } else {
+        "".to_string()
+      };
       vars.volatility.set_immersive_degrees(threshold);
       return Some(new_response_with_value_with_translate(
         format!(
-          "\\0{}{}\\p[2]{}",
+          "\\0{}{}\\p[2]{}{}",
           render_shadow(false),
           render_immersive_icon(true),
-          shake_with_notext()
+          shake_with_notext(),
+          m
         ),
         TranslateOption::with_shadow_completion(),
       ));

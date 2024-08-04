@@ -72,6 +72,12 @@ raw: |
     animation500305.interval,bind+runonce
     animation500305.pattern0,overlay,10000105,0,0,0
     animation500305.pattern1,overlay,-1,1000,0,0
+
+    animation500400.interval,bind
+    animation500400.pattern0,overlay,10000200,0,0,0
+
+    collisionex16,candle,region,immersion_candle_master_collision.png,0,255,0
+    collisionex17,matchbox,region,immersion_candle_master_collision.png,255,0,0
   }
 
 characters:
@@ -373,6 +379,11 @@ characters:
           text: |
             animation500399.interval,runonce
             animation500399.pattern0,overlay,367,0,0,0
+
+        - name: わはは口
+          text: |
+            animation500399.interval,runonce
+            animation500399.pattern0,overlay,303,0,0,0
 
     - group: 目
       details:
