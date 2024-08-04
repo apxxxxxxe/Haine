@@ -234,9 +234,6 @@ pub struct VolatilityVariables {
 
   pub last_random_talk_time: Mutex<u64>,
 
-  // ゴーストの起動日時
-  pub ghost_boot_time: Mutex<SystemTime>,
-
   pub nade_counter: Mutex<i32>,
 
   pub last_nade_count_unixtime: Mutex<SystemTime>,
@@ -324,7 +321,6 @@ impl Default for VolatilityVariables {
       log_path: Mutex::new("".to_string()),
       ghost_up_time: Mutex::new(0),
       last_random_talk_time: Mutex::new(0),
-      ghost_boot_time: Mutex::new(SystemTime::now()),
       nade_counter: Mutex::new(0),
       last_nade_count_unixtime: Mutex::new(UNIX_EPOCH),
       last_nade_part: Mutex::new("".to_string()),
