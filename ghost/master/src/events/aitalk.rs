@@ -120,22 +120,36 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     && vars.volatility.talking_place() == TalkingPlace::Library
   {
     sub_immsersive_degree(IMMERSIVE_RATE);
+  }
 
-    // 書斎で没入度が0になったら居間に移動
-    if vars.volatility.immersive_degrees() == 0 {
-      vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
+  // 書斎で没入度が0になったら居間に移動
+  if vars.volatility.immersive_degrees() == 0
+    && vars.volatility.talking_place() == TalkingPlace::Library
+  {
+    vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
 
-      let messages = moving_to_living_room_talk()?;
-      let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-      return new_response_with_value_with_translate(
-        format!(
-          "\\0{}{}",
-          render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
-          messages[index].to_owned()
-        ),
-        TranslateOption::with_shadow_completion(),
-      );
-    }
+    let messages = moving_to_living_room_talk()?;
+    let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+
+    let achievevment_text = if !vars.flags().check(&EventFlag::FirstLibraryEnd) {
+      vars.flags_mut().done(EventFlag::FirstLibraryEnd);
+      "\\1\\![quicksection,1]\
+        \\f[align,center]\\f[valign,center]\\f[bold,1]\
+        没入度の増減を一時停止できるようになりました。\
+        \\f[default]"
+    } else {
+      ""
+    };
+
+    return new_response_with_value_with_translate(
+      format!(
+        "\\0{}{}{}",
+        render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
+        messages[index].to_owned(),
+        achievevment_text,
+      ),
+      TranslateOption::with_shadow_completion(),
+    );
   }
 
   // 居間でのトーク時に自然発生したトークの場合は没入度を増加させる
@@ -143,21 +157,24 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     && vars.volatility.talking_place() == TalkingPlace::LivingRoom
   {
     add_immsersive_degree(IMMERSIVE_RATE);
-    // 没入度が最大に達したら書斎に移動
-    if vars.volatility.immersive_degrees() == IMMERSIVE_RATE_MAX {
-      vars.volatility.set_talking_place(TalkingPlace::Library);
+  }
 
-      let messages = moving_to_library_talk()?;
-      let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-      return new_response_with_value_with_translate(
-        format!(
-          "\\0{}{}",
-          render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
-          messages[index].to_owned()
-        ),
-        TranslateOption::with_shadow_completion(),
-      );
-    }
+  // 没入度が最大に達したら書斎に移動
+  if vars.volatility.immersive_degrees() == IMMERSIVE_RATE_MAX
+    && vars.volatility.talking_place() == TalkingPlace::LivingRoom
+  {
+    vars.volatility.set_talking_place(TalkingPlace::Library);
+
+    let messages = moving_to_library_talk()?;
+    let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
+    return new_response_with_value_with_translate(
+      format!(
+        "\\0{}{}",
+        render_immersive_icon(vars.volatility.talking_place() == TalkingPlace::Library),
+        messages[index].to_owned()
+      ),
+      TranslateOption::with_shadow_completion(),
+    );
   }
 
   // バルーン右下に表示するコメントを取得
