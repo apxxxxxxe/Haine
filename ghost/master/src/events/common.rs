@@ -3,8 +3,11 @@ use crate::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_RATE_MAX;
 use crate::events::talk::TalkType;
 use crate::events::translate::on_translate;
+use crate::events::TalkingPlace;
+use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
+use crate::variables::EventFlag;
 use core::fmt::{Display, Formatter};
 use std::collections::HashSet;
 
@@ -197,31 +200,6 @@ pub fn get_references(req: &Request) -> Vec<&str> {
     i += 1;
   }
   references
-}
-
-pub fn user_talk(dialog: &str, text: &str, text_first: bool) -> String {
-  let mut d = String::new();
-  if !dialog.is_empty() {
-    d = format!("『{}』", dialog);
-  }
-  let mut t = String::new();
-  if !text.is_empty() {
-    t = text.to_string();
-  }
-
-  let mut v: Vec<String>;
-  if text_first {
-    v = vec![t, d];
-  } else {
-    v = vec![d, t];
-  }
-  v = v
-    .iter()
-    .filter(|s| !s.is_empty())
-    .map(|s| s.to_string())
-    .collect();
-
-  format!("\\1{}\\n", v.join("\\n"))
 }
 
 pub fn render_shadow(is_complete: bool) -> String {
@@ -508,18 +486,44 @@ pub fn shake_with_notext() -> String {
     .join("")
 }
 
-#[cfg(test)]
-mod tests {
-  use super::*;
-
-  #[test]
-  fn test_all_combo() {
-    let values = vec![
-      vec!["a".to_string(), "b".to_string()],
-      vec!["c".to_string(), "d".to_string()],
-      vec!["e".to_string(), "f".to_string()],
-    ];
-    let result = all_combo(&values);
-    println!("{:?}", result);
+pub fn render_immersive_icon() -> String {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
+  let icon_count_float =
+    immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
+  let icon_count = if vars.volatility.talking_place() == TalkingPlace::Library {
+    // 繰り上げ
+    icon_count_float.ceil() as u32
+  } else {
+    // 切り捨て
+    icon_count_float.floor() as u32
+  };
+  let mut candles = vars.volatility.candles_mut();
+  let mut v = String::new();
+  for i in 1..=IMMERSIVE_ICON_COUNT {
+    let enabled = i <= icon_count;
+    let a = if enabled != candles[i as usize - 1] {
+      // 煙のアニメーションを再生
+      format!(
+        "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
+        i,
+        if enabled { 0 } else { 1 },
+        i,
+        if !enabled { 0 } else { 1 }
+      )
+    } else {
+      format!("\\![bind,icon,没入度{},{}]", i, if enabled { 0 } else { 1 })
+    };
+    v.push_str(&a);
+    candles[i as usize - 1] = enabled;
   }
+  let show_matchbox = format!(
+    "\\![bind,icon,マッチ箱,{}]",
+    if get_global_vars().flags().check(&EventFlag::FirstLibraryEnd) {
+      "1"
+    } else {
+      "0"
+    }
+  );
+  format!("\\p[2]{}{}\\0", v, show_matchbox)
 }

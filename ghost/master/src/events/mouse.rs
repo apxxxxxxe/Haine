@@ -94,7 +94,7 @@ fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> 
     format!(
       "{}{}{}",
       REMOVE_BALLOON_NUM,
-      render_immersive_icon(get_global_vars().volatility.talking_place() == TalkingPlace::Library),
+      render_immersive_icon(),
       dialogs[index].clone()
     ),
     TranslateOption::with_shadow_completion(),
@@ -484,7 +484,7 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
         format!(
           "\\0{}{}\\p[2]{}{}",
           render_shadow(true),
-          render_immersive_icon(false),
+          render_immersive_icon(),
           shake_with_notext(),
           m
         ),
@@ -528,7 +528,7 @@ fn two_matchbox_double_click(_req: &Request, _count: u32) -> Option<Result<Respo
         format!(
           "\\0{}{}\\p[2]{}{}",
           render_shadow(false),
-          render_immersive_icon(true),
+          render_immersive_icon(),
           shake_with_notext(),
           m
         ),
