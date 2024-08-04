@@ -4,6 +4,7 @@ mod events;
 mod autobreakline;
 mod error;
 mod roulette;
+mod sound;
 mod status;
 mod variables;
 
