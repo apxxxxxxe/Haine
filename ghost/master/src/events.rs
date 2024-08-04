@@ -145,6 +145,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnWindowStateRestore" => Some(EventHandler::AlwaysSuccess(on_window_state_restore)),
     "OnUserInput" => Some(EventHandler::MayFailure(on_user_input)),
     "OnChangingUserName" => Some(EventHandler::MayFailure(on_changing_user_name)),
+    "OnImmersiveDegreeToggled" => Some(EventHandler::AlwaysSuccess(on_immersive_degree_toggled)),
     _ => None,
   }
 }

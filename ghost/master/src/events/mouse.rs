@@ -447,6 +447,7 @@ fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, Shio
   if immersive_degrees == IMMERSIVE_RATE_MAX
     || vars.volatility.talking_place() == TalkingPlace::Library
     || !vars.flags().check(&EventFlag::FirstPlaceChange)
+    || vars.volatility.is_immersive_degrees_fixed()
   {
     return None;
   }
@@ -488,7 +489,7 @@ fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, Shio
 fn two_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
-  if immersive_degrees == 0 {
+  if immersive_degrees == 0 || vars.volatility.is_immersive_degrees_fixed() {
     return None;
   }
   for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
