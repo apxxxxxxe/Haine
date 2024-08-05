@@ -7,6 +7,7 @@ use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_RATE_MAX;
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
+use chrono::Timelike;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
@@ -69,11 +70,22 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   let talks = all_combo(&vec![
     vec![render_immersive_icon()],
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
-    vec!["\
+    vec![format!(
+      "\
       h1113105……h1113101\\_w[300]h1113201あら。\\n\
-      h1111204いらっしゃい、{user_name}。\
-      "
-    .to_string()],
+      h1111204{}、{{user_name}}。\
+      ",
+      {
+        let hour = chrono::Local::now().hour();
+        if hour <= 3 || hour >= 19 {
+          "こんばんは"
+        } else if hour < 11 {
+          "おはよう"
+        } else {
+          "こんにちは"
+        }
+      }
+    )],
   ]);
   let index = choose_one(&talks, false).ok_or(ShioriError::ArrayAccessError)?;
   let v = format!(
@@ -101,7 +113,7 @@ pub fn on_close(_req: &Request) -> Result<Response, ShioriError> {
       \\0…………\\n\\n\
       h1111101……h1111204あら、{{user_name}}。\\n\
       \\1\\n\\n……戻ってきたようだ。\\n\
-      \\0h1111210……そう、帰るのね。\\c\\1\\b[-1]",
+      \\0h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
       TalkingPlace::Library.balloon_surface(),
       TalkingPlace::LivingRoom.balloon_surface(),
     )]);

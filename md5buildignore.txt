@@ -1,6 +1,7 @@
 .git
 .github
 .gitignore
+.gitmessage
 .gitmodules
 .gitattributes
 readme.md

@@ -16,7 +16,7 @@ jobs:
       uses: actions/checkout@v4
     - name: Zip output
       run: |
-        zip -r release.zip * -x .git/\* -x .github/\* -x release.zip -x Cargo\* -x src/\* -x ipadic\*/ -x md5buildignore.txt -x build\*
+        zip -r release.zip * -x .git/\* -x .github/\* -x .git* -x release.zip -x Cargo\* -x src/\* -x ipadic\*/ -x md5buildignore.txt -x build\*
     - name: Create release
       id: create_release
       uses: actions/create-release@v1.0.0
