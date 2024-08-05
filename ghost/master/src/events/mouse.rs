@@ -529,7 +529,7 @@ fn two_matchbox_double_click(_req: &Request, _count: u32) -> Option<Result<Respo
       return Some(new_response_with_value_with_translate(
         format!(
           "\\0{}{}\\p[2]{}{}",
-          render_shadow(false),
+          render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m
