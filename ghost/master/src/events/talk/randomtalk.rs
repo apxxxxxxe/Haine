@@ -36,9 +36,8 @@ pub const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 18] = [
 ];
 
 // 上の空のハイネに対するユーザの行動を一人称視点で
-pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 6] = [
+pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
   "目の前で手を振っても、彼女には見えていないようだ。",
-  "肩を叩いても、反応はない。",
   "常軌を逸した集中力だ。……幽霊だからというより、彼女の才能だろう。",
   "これが彼女の言っていた思索だとしても、真似できる気はしない。",
   "放置するとこうなってしまうらしい。……次はもっと話しかけようか。",

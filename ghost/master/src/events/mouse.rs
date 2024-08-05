@@ -19,6 +19,45 @@ use shiorust::message::{Parser, Request, Response};
 const SOUND_LIGHT_CANDLE: &str = "マッチで火をつける.mp3";
 const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
 
+pub enum BodyPart {
+  Head,
+  Face,
+  Mouth,
+  Bust,
+  Shoulder,
+  Skirt,
+  Hand,
+}
+
+impl BodyPart {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "head" => Some(BodyPart::Head),
+      "face" => Some(BodyPart::Face),
+      "mouth" => Some(BodyPart::Mouth),
+      "bust" => Some(BodyPart::Bust),
+      "shoulder" => Some(BodyPart::Shoulder),
+      "skirt" => Some(BodyPart::Skirt),
+      "hand" => Some(BodyPart::Hand),
+      _ => None,
+    }
+  }
+}
+
+impl std::fmt::Display for BodyPart {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    match self {
+      BodyPart::Head => write!(f, "頭"),
+      BodyPart::Face => write!(f, "顔"),
+      BodyPart::Mouth => write!(f, "口"),
+      BodyPart::Bust => write!(f, "胸"),
+      BodyPart::Shoulder => write!(f, "肩"),
+      BodyPart::Skirt => write!(f, "スカート"),
+      BodyPart::Hand => write!(f, "手"),
+    }
+  }
+}
+
 #[macro_export]
 macro_rules! get_touch_info {
   ($info:expr) => {
