@@ -141,9 +141,10 @@ fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) 
   let bar_width = BAR_WIDTH * 2; // 重ねながら描画するので2倍
   let bar_chip_wait = (50.0 * ((SPEED as f32) / (BAR_WIDTH as f32))) as u32; // 1文字分の表示時間
 
+  let vars = get_global_vars();
   format!(
     "\
-    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}%\\_l[@5,]{}\
+    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}\\_l[@5,]{}\
     \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
     \\f[height,{}]\\_l[0,]\\f[color,{}]{}\
     \\![quicksection,false]\\f[color,default]\\f[height,default]\
@@ -151,12 +152,16 @@ fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) 
     BAR_HEIGHT,
     BAR_WIDTH + 1,
     label,
-    rate,
+    if vars.volatility.is_immersive_degrees_fixed() {
+      "固定中".to_string()
+    } else {
+      format!("{}%", rate)
+    },
     show_tooltip(tooltip_id),
     BAR_HEIGHT,
     make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
     BAR_HEIGHT,
-    if get_global_vars().volatility.is_immersive_degrees_fixed() {
+    if vars.volatility.is_immersive_degrees_fixed() {
       "50,50,50"
     } else {
       "120,0,0"
