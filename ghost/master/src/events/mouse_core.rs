@@ -97,7 +97,7 @@ pub fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   let status = Status::from_request(req);
-  if refs[4].is_empty() || status.is_some_and(|s| s.talking) {
+  if refs[4].is_empty() || status.talking {
     Ok(new_response_nocontent())
   } else {
     let now = SystemTime::now();

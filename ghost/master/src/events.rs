@@ -122,7 +122,6 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnSurfaceChange" => Some(EventHandler::MayFailure(on_surface_change)),
     "OnSmoothBlink" => Some(EventHandler::MayFailure(on_smooth_blink)),
     "OnMenuExec" => Some(EventHandler::AlwaysSuccess(on_menu_exec)),
-    "OnImmersiveRateReduced" => Some(EventHandler::MayFailure(on_immersive_rate_reduced)),
     "OnTalkIntervalChanged" => Some(EventHandler::MayFailure(on_talk_interval_changed)),
     "OnMouseClickEx" => Some(EventHandler::MayFailure(on_mouse_click_ex)),
     "OnMouseDoubleClick" => Some(EventHandler::MayFailure(on_mouse_double_click)),

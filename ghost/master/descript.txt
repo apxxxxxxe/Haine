@@ -8,7 +8,7 @@ craftmanw,日野つみ
 craftmanurl,https://apxxxxxxe.dev
 
 sakura.name,ハイネ
-kero.name,霧
+kero.name,あなた
 
 homeurl,https://raw.githubusercontent.com/apxxxxxxe/Haine/main/
 

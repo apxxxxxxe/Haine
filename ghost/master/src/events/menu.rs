@@ -166,31 +166,6 @@ fn show_bar_with_simple_label(max: u32, current: u32, label: &str) -> String {
   )
 }
 
-pub fn on_immersive_rate_reduced(req: &Request) -> Result<Response, ShioriError> {
-  // 没入度を下げる
-  let refs = get_references(req);
-  let degree = if let Some(r) = refs.first() {
-    r.parse::<u32>().unwrap_or(0)
-  } else {
-    0
-  };
-  let post_dialog = if let Some(r) = refs.get(1) {
-    r.to_string()
-  } else {
-    "".to_string()
-  };
-  let vars = get_global_vars();
-  vars.volatility.set_immersive_degrees(degree);
-
-  let m = format!(
-    "\\C\\0{}\\1(没入度が0になった){}",
-    render_shadow(true),
-    post_dialog
-  );
-
-  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
-}
-
 pub fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let v = check_error!(refs[0].parse::<u64>(), ShioriError::ParseIntError);

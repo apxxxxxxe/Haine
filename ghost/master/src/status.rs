@@ -1,6 +1,7 @@
 use shiorust::message::{traits::*, Request};
+use std::fmt::Display;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Status {
   pub talking: bool,
   pub choosing: bool,
@@ -12,6 +13,37 @@ pub struct Status {
   pub online: bool,
   // opening
   // balloon
+}
+
+impl Display for Status {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    let mut status = Vec::new();
+    if self.talking {
+      status.push("talking");
+    }
+    if self.choosing {
+      status.push("choosing");
+    }
+    if self.minimizing {
+      status.push("minimizing");
+    }
+    if self.induction {
+      status.push("induction");
+    }
+    if self.passive {
+      status.push("passive");
+    }
+    if self.timecritical {
+      status.push("timecritical");
+    }
+    if self.nouserbreak {
+      status.push("nouserbreak");
+    }
+    if self.online {
+      status.push("online");
+    }
+    write!(f, "{}", status.join(","))
+  }
 }
 
 impl Status {
@@ -28,10 +60,11 @@ impl Status {
     }
   }
 
-  pub fn from_request(req: &Request) -> Option<Self> {
+  pub fn from_request(req: &Request) -> Self {
     if let Some(status) = req.headers.get("Status") {
-      return Some(Self::from_str(status));
+      Self::from_str(status)
+    } else {
+      Self::default()
     }
-    None
   }
 }
