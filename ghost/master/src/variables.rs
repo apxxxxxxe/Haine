@@ -193,6 +193,7 @@ pub enum EventFlag {
   FirstHitTalkStart,
   FirstHitTalkDone,
   TalkTypeUnlock(TalkType),
+  FirstLibraryEnd,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -275,6 +276,8 @@ pub struct VolatilityVariables {
   pub last_anchor_id: Mutex<Option<String>>,
 
   pub candles: Mutex<[bool; IMMERSIVE_ICON_COUNT as usize]>,
+
+  pub is_immersive_degrees_fixed: Mutex<bool>,
 }
 
 #[allow(dead_code)]
@@ -311,6 +314,7 @@ impl VolatilityVariables {
     [bool; IMMERSIVE_ICON_COUNT as usize],
     non_cloneable
   );
+  generate_getter_setter!(is_immersive_degrees_fixed, bool, cloneable);
 }
 
 impl Default for VolatilityVariables {
@@ -341,6 +345,7 @@ impl Default for VolatilityVariables {
       aroused: Mutex::new(false),
       last_anchor_id: Mutex::new(None),
       candles: Mutex::new([false; IMMERSIVE_ICON_COUNT as usize]),
+      is_immersive_degrees_fixed: Mutex::new(false),
     }
   }
 }

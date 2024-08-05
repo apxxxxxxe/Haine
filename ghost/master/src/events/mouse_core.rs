@@ -40,42 +40,38 @@ impl Direction {
 pub fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
-  if refs[4].is_empty() {
-    Ok(new_response_nocontent())
+  let now = SystemTime::now();
+  let dur = check_error!(
+    now.duration_since(vars.volatility.last_wheel_count_unixtime()),
+    ShioriError::SystemTimeError
+  )
+  .as_millis();
+
+  let d: Direction = if check_error!(refs[2].parse::<i32>(), ShioriError::ParseIntError) > 0 {
+    Direction::Up
   } else {
-    let now = SystemTime::now();
-    let dur = check_error!(
-      now.duration_since(vars.volatility.last_wheel_count_unixtime()),
-      ShioriError::SystemTimeError
-    )
-    .as_millis();
+    Direction::Down
+  };
 
-    let d: Direction = if check_error!(refs[2].parse::<i32>(), ShioriError::ParseIntError) > 0 {
-      Direction::Up
-    } else {
-      Direction::Down
-    };
+  if vars.volatility.last_wheel_part() != refs[4]
+    || vars.volatility.wheel_direction() != d
+    || dur > WHEEL_LIFETIME
+  {
+    vars.volatility.set_wheel_counter(1);
+  } else {
+    vars
+      .volatility
+      .set_wheel_counter(vars.volatility.wheel_counter() + 1);
+  }
 
-    if vars.volatility.last_wheel_part() != refs[4]
-      || vars.volatility.wheel_direction() != d
-      || dur > WHEEL_LIFETIME
-    {
-      vars.volatility.set_wheel_counter(1);
-    } else {
-      vars
-        .volatility
-        .set_wheel_counter(vars.volatility.wheel_counter() + 1);
-    }
-
-    if vars.volatility.wheel_counter() >= WHEEL_THRESHOLD {
-      vars.volatility.set_wheel_counter(0);
-      new_mouse_response(req, format!("{}{}{}", refs[3], refs[4], d.to_str()))
-    } else {
-      vars.volatility.set_last_wheel_count_unixtime(now);
-      vars.volatility.set_last_wheel_part(refs[4].to_string());
-      vars.volatility.set_wheel_direction(d);
-      Ok(new_response_nocontent())
-    }
+  if vars.volatility.wheel_counter() >= WHEEL_THRESHOLD {
+    vars.volatility.set_wheel_counter(0);
+    new_mouse_response(req, format!("{}{}{}", refs[3], refs[4], d.to_str()))
+  } else {
+    vars.volatility.set_last_wheel_count_unixtime(now);
+    vars.volatility.set_last_wheel_part(refs[4].to_string());
+    vars.volatility.set_wheel_direction(d);
+    Ok(new_response_nocontent())
   }
 }
 

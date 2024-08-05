@@ -62,8 +62,9 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         "\
         \\_l[0,1.5em]\
         \\![*]\\q[なにか話して,OnAiTalk]\\n\
-        \\![*]\\q[話しかける,OnTalk]\\n\
-        \\![*]\\q[トーク統計,OnCheckTalkCollection]\
+        {}\
+        \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
+        \\![*]{}\
         \\_l[0,@1.75em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
         \\_l[0,@1.75em]\
@@ -72,6 +73,23 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         {}\
         \\_l[0,0]{}\
         ",
+        if vars.volatility.talking_place() == TalkingPlace::Library {
+          "".to_string()
+        } else {
+          "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
+        },
+        if vars.flags().check(&EventFlag::FirstLibraryEnd) {
+          format!(
+            "\\q[没入度{},OnImmersiveDegreeToggled]",
+            if vars.volatility.is_immersive_degrees_fixed() {
+              "の固定を解除する"
+            } else {
+              "を固定する"
+            }
+          )
+        } else {
+          "？？？".to_string()
+        },
         talk_interval_selector,
         close_button,
         if vars.volatility.talking_place() == TalkingPlace::Library {
@@ -127,7 +145,7 @@ fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) 
     "\
     \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}%\\_l[@5,]{}\
     \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
-    \\f[height,{}]\\_l[0,]\\f[color,120,0,0]{}\
+    \\f[height,{}]\\_l[0,]\\f[color,{}]{}\
     \\![quicksection,false]\\f[color,default]\\f[height,default]\
     ",
     BAR_HEIGHT,
@@ -138,6 +156,11 @@ fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) 
     BAR_HEIGHT,
     make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
     BAR_HEIGHT,
+    if get_global_vars().volatility.is_immersive_degrees_fixed() {
+      "50,50,50"
+    } else {
+      "120,0,0"
+    },
     make_bar_chips(bar_width * rate / 100).join(&format!("\\_w[{}]\\_l[@-0.5em,]", bar_chip_wait)),
   )
 }
@@ -381,4 +404,12 @@ pub fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {
     ),
     TranslateOption::with_shadow_completion(),
   )
+}
+
+pub fn on_immersive_degree_toggled(req: &Request) -> Response {
+  let vars = get_global_vars();
+  vars
+    .volatility
+    .set_is_immersive_degrees_fixed(!vars.volatility.is_immersive_degrees_fixed());
+  on_menu_exec(req)
 }

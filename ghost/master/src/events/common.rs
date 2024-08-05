@@ -480,6 +480,9 @@ pub fn render_achievement_message(talk_type: TalkType) -> String {
 
 pub fn add_immsersive_degree(degree: u32) {
   let vars = get_global_vars();
+  if vars.volatility.is_immersive_degrees_fixed() {
+    return;
+  }
   let new_degree = std::cmp::min(
     vars.volatility.immersive_degrees() + degree,
     IMMERSIVE_RATE_MAX,
@@ -489,6 +492,9 @@ pub fn add_immsersive_degree(degree: u32) {
 
 pub fn sub_immsersive_degree(degree: u32) {
   let vars = get_global_vars();
+  if vars.volatility.is_immersive_degrees_fixed() {
+    return;
+  }
   let new_degree = vars.volatility.immersive_degrees().saturating_sub(degree);
   vars.volatility.set_immersive_degrees(new_degree);
 }
