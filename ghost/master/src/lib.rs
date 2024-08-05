@@ -4,10 +4,12 @@ mod events;
 mod autobreakline;
 mod error;
 mod roulette;
+mod sound;
 mod status;
 mod variables;
 
 use crate::events::common::{add_error_description, new_response_nocontent};
+use crate::sound::cooperative_free_player;
 use crate::variables::get_global_vars;
 
 use std::fs::{metadata, File};
@@ -83,6 +85,8 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
 #[no_mangle]
 pub extern "cdecl" fn unload() -> BOOL {
   debug!("unload");
+
+  cooperative_free_player();
 
   if let Err(e) = get_global_vars().save() {
     error!("{}", e);

@@ -5,11 +5,10 @@ use crate::events::first_boot::{
 };
 use crate::events::TalkType;
 use crate::events::TalkingPlace;
-use crate::events::{IMMERSIVE_ICON_COUNT, IMMERSIVE_RATE_MAX};
+use crate::events::IMMERSIVE_RATE_MAX;
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
-use std::fmt::Write;
 
 pub const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
 
@@ -67,12 +66,8 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     return new_response_with_value_with_translate(m, TranslateOption::simple_translate());
   }
 
-  let light_candles = (1..=IMMERSIVE_ICON_COUNT).fold("".to_string(), |mut f, i| {
-    write!(f, "\\![bind,icon,没入度{},1]", i).unwrap();
-    f
-  });
   let talks = all_combo(&vec![
-    vec![format!("\\p[2]\\![bind,icon,,0]{}", light_candles)],
+    vec![render_immersive_icon()],
     vec!["h1113105\\1今日も、霧が濃い。".to_string()],
     vec!["\
       h1113105……h1113101\\_w[300]h1113201あら。\\n\
