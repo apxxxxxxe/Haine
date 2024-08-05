@@ -25,6 +25,13 @@ jobs:
         key: ${{ runner.os }}-cargo-dev-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
           ${{ runner.os }}-cargo-dev-
+
+    - name: Install latest stable
+      uses: actions-rs/toolchain@v1
+      with:
+          toolchain: stable
+          override: true
+
     - name: Run tests
       run: |
         cd ghost/master
