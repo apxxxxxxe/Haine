@@ -210,7 +210,6 @@ impl Question {
   const HOW_TALL_ARE_YOU: Self = Self(1);
   const HOW_WEIGHT_ARE_YOU: Self = Self(2);
   const HOW_MUCH_IS_YOUR_BWH: Self = Self(3);
-  const ARE_YOU_MASTER: Self = Self(4);
   const FEELING_OF_DEATH: Self = Self(5);
   const FATIGUE_OF_LIFE: Self = Self(6);
 
@@ -220,7 +219,6 @@ impl Question {
       Question::HOW_TALL_ARE_YOU => "身長はどれくらい？".to_string(),
       Question::HOW_WEIGHT_ARE_YOU => "体重は？".to_string(),
       Question::HOW_MUCH_IS_YOUR_BWH => "スリーサイズを教えて".to_string(),
-      Question::ARE_YOU_MASTER => "あなたはここの主なの？".to_string(),
       Question::FEELING_OF_DEATH => "死んだ感想は？".to_string(),
       Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
       _ => unreachable!(),
@@ -233,12 +231,6 @@ impl Question {
 
   fn talk(&self) -> String {
     let m = match *self {
-      Question::ARE_YOU_MASTER => "\
-      \\1幽霊なのに、あなたはここの主なの？\\n\
-      h1111204ええ、そうよ。\\n\
-      私が、私だけが、この家の主なの。\
-      "
-      .to_string(),
       Question::FEELING_OF_DEATH => "\
       h1111104\\1幽霊ということは、一度死んだんだよね？\\n\
       どんな感じだった？何か思うことはある？\
@@ -293,25 +285,8 @@ impl Question {
   }
 }
 
-/*
-\\1どうして"主"になったの？\\n\
-h1111210……。叔父がいたの。\\n\
-祖父に似て学問が好きでね、私もずいぶんと可愛がってもらったわ。\\n\
-身内の中では私が一番のお気に入りだったみたい。\\n\
-私も、何でも教えてくれる叔父のことが大好きだった。\\n\
-\\n\
-叔父が変わったのは、彼の肺に病が見つかった時。\\n\
-死の影に耐えられなかったのでしょう。\\n\
-科学の徒だった彼は、次第にオカルトに傾倒していった。\\n\
-私も頑固だったわ。彼の気持ちを理解しないまま、ひどくあたってしまった。\\n\
-……彼は、意趣返しのつもりだったのでしょうね。\\n\
-それとも、本気でこの結末を想像していたのかしら。\\n\
-今となっては、ね。\
-*/
-
 pub fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
   let mut questions = [
-    Question::ARE_YOU_MASTER,
     Question::FEELING_OF_DEATH,
     Question::FATIGUE_OF_LIFE,
     Question::HOW_TALL_ARE_YOU,
