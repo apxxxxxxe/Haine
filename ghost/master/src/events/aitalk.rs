@@ -100,7 +100,8 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 
     let achievevment_text = if !vars.flags().check(&EventFlag::FirstLibraryEnd) {
       vars.flags_mut().done(EventFlag::FirstLibraryEnd);
-      "\\1\\![quicksection,1]\
+      "\\1\\n\
+        \\![quicksection,1]\
         \\f[align,center]\\f[valign,center]\\f[bold,1]\
         没入度の増減を一時停止できるようになりました。\
         \\f[default]"
