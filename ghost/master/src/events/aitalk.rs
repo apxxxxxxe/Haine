@@ -103,7 +103,8 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       "\\1\\n\
         \\![quicksection,1]\
         \\f[align,center]\\f[valign,center]\\f[bold,1]\
-        没入度の増減を一時停止できるようになりました。\
+        メニューから没入度の増減を一時停止できるようになりました。\\n\
+        燭台をクリックして没入度の増減ができるようになりました。\
         \\f[default]"
     } else {
       ""
