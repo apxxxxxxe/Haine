@@ -7,6 +7,7 @@ use crate::events::randomtalk::{
 use crate::events::talk::anchor::anchor_talks;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
+use crate::events::BodyPart;
 use crate::events::{
   first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS},
   randomtalk::RANDOMTALK_COMMENTS_LIBRARY_ACTIVE,
@@ -99,9 +100,11 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 
     let achievevment_text = if !vars.flags().check(&EventFlag::FirstLibraryEnd) {
       vars.flags_mut().done(EventFlag::FirstLibraryEnd);
-      "\\1\\![quicksection,1]\
+      "\\1\\n\
+        \\![quicksection,1]\
         \\f[align,center]\\f[valign,center]\\f[bold,1]\
-        没入度の増減を一時停止できるようになりました。\
+        メニューから没入度の増減を一時停止できるようになりました。\\n\
+        燭台をクリックして没入度の増減ができるようになりました。\
         \\f[default]"
     } else {
       ""
@@ -146,14 +149,31 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   // バルーン右下に表示するコメントを取得
   let comment = if vars.volatility.talking_place() == TalkingPlace::Library {
     // 書斎では能動的に話しかけたかどうかで異なるコメントを表示
-    if req.headers.get("ID").is_some_and(|v| v == "OnSecondChange") {
-      let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false)
-        .ok_or(ShioriError::TalkNotFound)?;
-      RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index]
+    if let Some(id) = req.headers.get("ID") {
+      match id.as_str() {
+        "OnSecondChange" => {
+          let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false)
+            .ok_or(ShioriError::TalkNotFound)?;
+          RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index].to_string()
+        }
+        "OnMouseDoubleClick" | "OnMouseMove" | "OnMouseWheel" | "OnMouseClickEx" => {
+          let refs = get_references(req);
+          if let Some(r) = refs.get(4) {
+            let part = BodyPart::from_str(r).ok_or(ShioriError::TalkNotFound)?;
+            format!("{}に触れても、反応はない。", part)
+          } else {
+            "".to_string()
+          }
+        }
+        "OnKeyPress" => {
+          let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_ACTIVE, false)
+            .ok_or(ShioriError::TalkNotFound)?;
+          RANDOMTALK_COMMENTS_LIBRARY_ACTIVE[index].to_string()
+        }
+        _ => "".to_string(),
+      }
     } else {
-      let index =
-        choose_one(&RANDOMTALK_COMMENTS_LIBRARY_ACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
-      RANDOMTALK_COMMENTS_LIBRARY_ACTIVE[index]
+      "".to_string()
     }
   } else {
     // 居間では従者トーク解禁済みの場合コメントを表示
@@ -163,9 +183,9 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     {
       let index =
         choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
-      RANDOMTALK_COMMENTS_LIVING_ROOM[index]
+      RANDOMTALK_COMMENTS_LIVING_ROOM[index].to_string()
     } else {
-      ""
+      "".to_string()
     }
   };
 

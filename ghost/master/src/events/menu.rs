@@ -141,9 +141,10 @@ fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) 
   let bar_width = BAR_WIDTH * 2; // 重ねながら描画するので2倍
   let bar_chip_wait = (50.0 * ((SPEED as f32) / (BAR_WIDTH as f32))) as u32; // 1文字分の表示時間
 
+  let vars = get_global_vars();
   format!(
     "\
-    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}%\\_l[@5,]{}\
+    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}\\_l[@5,]{}\
     \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
     \\f[height,{}]\\_l[0,]\\f[color,{}]{}\
     \\![quicksection,false]\\f[color,default]\\f[height,default]\
@@ -151,12 +152,16 @@ fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) 
     BAR_HEIGHT,
     BAR_WIDTH + 1,
     label,
-    rate,
+    if vars.volatility.is_immersive_degrees_fixed() {
+      "固定中".to_string()
+    } else {
+      format!("{}%", rate)
+    },
     show_tooltip(tooltip_id),
     BAR_HEIGHT,
     make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
     BAR_HEIGHT,
-    if get_global_vars().volatility.is_immersive_degrees_fixed() {
+    if vars.volatility.is_immersive_degrees_fixed() {
       "50,50,50"
     } else {
       "120,0,0"
@@ -205,7 +210,6 @@ impl Question {
   const HOW_TALL_ARE_YOU: Self = Self(1);
   const HOW_WEIGHT_ARE_YOU: Self = Self(2);
   const HOW_MUCH_IS_YOUR_BWH: Self = Self(3);
-  const ARE_YOU_MASTER: Self = Self(4);
   const FEELING_OF_DEATH: Self = Self(5);
   const FATIGUE_OF_LIFE: Self = Self(6);
 
@@ -215,7 +219,6 @@ impl Question {
       Question::HOW_TALL_ARE_YOU => "身長はどれくらい？".to_string(),
       Question::HOW_WEIGHT_ARE_YOU => "体重は？".to_string(),
       Question::HOW_MUCH_IS_YOUR_BWH => "スリーサイズを教えて".to_string(),
-      Question::ARE_YOU_MASTER => "あなたはここの主なの？".to_string(),
       Question::FEELING_OF_DEATH => "死んだ感想は？".to_string(),
       Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
       _ => unreachable!(),
@@ -228,12 +231,6 @@ impl Question {
 
   fn talk(&self) -> String {
     let m = match *self {
-      Question::ARE_YOU_MASTER => "\
-      \\1幽霊なのに、あなたはここの主なの？\\n\
-      h1111204ええ、そうよ。\\n\
-      私が、私だけが、この家の主なの。\
-      "
-      .to_string(),
       Question::FEELING_OF_DEATH => "\
       h1111104\\1幽霊ということは、一度死んだんだよね？\\n\
       どんな感じだった？何か思うことはある？\
@@ -288,25 +285,8 @@ impl Question {
   }
 }
 
-/*
-\\1どうして"主"になったの？\\n\
-h1111210……。叔父がいたの。\\n\
-祖父に似て学問が好きでね、私もずいぶんと可愛がってもらったわ。\\n\
-身内の中では私が一番のお気に入りだったみたい。\\n\
-私も、何でも教えてくれる叔父のことが大好きだった。\\n\
-\\n\
-叔父が変わったのは、彼の肺に病が見つかった時。\\n\
-死の影に耐えられなかったのでしょう。\\n\
-科学の徒だった彼は、次第にオカルトに傾倒していった。\\n\
-私も頑固だったわ。彼の気持ちを理解しないまま、ひどくあたってしまった。\\n\
-……彼は、意趣返しのつもりだったのでしょうね。\\n\
-それとも、本気でこの結末を想像していたのかしら。\\n\
-今となっては、ね。\
-*/
-
 pub fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
   let mut questions = [
-    Question::ARE_YOU_MASTER,
     Question::FEELING_OF_DEATH,
     Question::FATIGUE_OF_LIFE,
     Question::HOW_TALL_ARE_YOU,

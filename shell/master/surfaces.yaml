@@ -511,7 +511,7 @@ characters:
       collisionex12,bust,polygon,228,327,271,304,316,325,318,347,311,378,231,375,225,349
       collisionex10,shoulder,polygon,205,319,206,309,214,301,229,299,251,293,248,312
       collisionex11,shoulder,polygon,292,293,309,299,332,302,339,315,301,315
-      collisionex7,mouse,ellipse,260,259,283,268
+      collisionex7,mouth,ellipse,260,259,283,268
       collisionex8,head,polygon,292,134,319,151,340,176,339,192,292,190,240,192,201,187,213,158,230,140,259,127
       collisionex6,face,polygon,270,285,239,267,227,246,220,214,222,189,227,173,315,170,320,189,321,210,315,245,305,268
       //collision1,152,114,384,326,hair

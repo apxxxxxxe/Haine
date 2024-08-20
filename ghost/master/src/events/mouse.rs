@@ -19,6 +19,45 @@ use shiorust::message::{Parser, Request, Response};
 const SOUND_LIGHT_CANDLE: &str = "マッチで火をつける.mp3";
 const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
 
+pub enum BodyPart {
+  Head,
+  Face,
+  Mouth,
+  Bust,
+  Shoulder,
+  Skirt,
+  Hand,
+}
+
+impl BodyPart {
+  pub fn from_str(s: &str) -> Option<Self> {
+    match s {
+      "head" => Some(BodyPart::Head),
+      "face" => Some(BodyPart::Face),
+      "mouth" => Some(BodyPart::Mouth),
+      "bust" => Some(BodyPart::Bust),
+      "shoulder" => Some(BodyPart::Shoulder),
+      "skirt" => Some(BodyPart::Skirt),
+      "hand" => Some(BodyPart::Hand),
+      _ => None,
+    }
+  }
+}
+
+impl std::fmt::Display for BodyPart {
+  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    match self {
+      BodyPart::Head => write!(f, "頭"),
+      BodyPart::Face => write!(f, "顔"),
+      BodyPart::Mouth => write!(f, "口"),
+      BodyPart::Bust => write!(f, "胸"),
+      BodyPart::Shoulder => write!(f, "肩"),
+      BodyPart::Skirt => write!(f, "スカート"),
+      BodyPart::Hand => write!(f, "手"),
+    }
+  }
+}
+
 #[macro_export]
 macro_rules! get_touch_info {
   ($info:expr) => {
@@ -87,8 +126,13 @@ pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, Shior
 fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> {
   let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
 
-  // 通常の触り反応があった場合、没入度を下げる
-  sub_immsersive_degree(IMMERSIVE_RATE);
+  // 通常の触り反応があった場合、場所移動を経験済みであれば没入度を下げる
+  if get_global_vars()
+    .flags()
+    .check(&EventFlag::FirstPlaceChange)
+  {
+    sub_immsersive_degree(IMMERSIVE_RATE);
+  }
 
   new_response_with_value_with_translate(
     format!(
@@ -529,7 +573,7 @@ fn two_matchbox_double_click(_req: &Request, _count: u32) -> Option<Result<Respo
       return Some(new_response_with_value_with_translate(
         format!(
           "\\0{}{}\\p[2]{}{}",
-          render_shadow(false),
+          render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m

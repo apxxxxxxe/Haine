@@ -36,9 +36,8 @@ pub const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 18] = [
 ];
 
 // 上の空のハイネに対するユーザの行動を一人称視点で
-pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 6] = [
+pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
   "目の前で手を振っても、彼女には見えていないようだ。",
-  "肩を叩いても、反応はない。",
   "常軌を逸した集中力だ。……幽霊だからというより、彼女の才能だろう。",
   "これが彼女の言っていた思索だとしても、真似できる気はしない。",
   "放置するとこうなってしまうらしい。……次はもっと話しかけようか。",
@@ -1045,8 +1044,10 @@ pub fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
     TalkingPlace::LivingRoom.balloon_surface(),
     TalkingPlace::Library.balloon_surface(),
   )]];
-  parts.push(vec![replace_dialog_for_nomouthmove(
-    "\
+  if !vars.flags().check(&EventFlag::FirstPlaceChange) {
+    // 初回
+    parts.push(vec![replace_dialog_for_nomouthmove(
+      "\
       \\0\\c\\1\\b[-1]h1000000───────────────\\_w[1200]\\c\
       h1111705(……ふわふわした気持ち……。\\n\
        ……h1111706{user_name}が……呼んでる？\\n\
@@ -1054,8 +1055,13 @@ pub fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
        h1111705外のことは……h1111110今は放っておこう。\\n\
        この瞬間は、この流れに身を任せていたい……)\\_w[1200]\
       "
-    .to_string(),
-  )?]);
+      .to_string(),
+    )?]);
+  } else {
+    parts.push(vec![
+      "\\0\\c\\1\\b[-1]h1000000───────────────\\_w[1200]\\ch1111705".to_string(),
+    ]);
+  }
   parts.push(vec!["\\1\\c(没入モードに入りました)".to_string()]);
 
   // 初回は抽象・過去トークの開放を通知
