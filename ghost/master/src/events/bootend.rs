@@ -120,11 +120,6 @@ pub fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   }
   if !vars.flags().check(&EventFlag::FirstClose) {
     vars.flags_mut().done(EventFlag::FirstClose);
-    if !is_immersing {
-      parts.push(vec![
-        "h1111201あら、今日はやめるの？h1111204そう。\\n".to_string()
-      ]);
-    }
     parts.push(vec![FIRST_CLOSE_TALK.to_string()]);
   } else {
     parts.extend(vec![
