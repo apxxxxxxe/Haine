@@ -767,7 +767,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             h1111110どちらも正しいと思う。\\n\
             h1111110印象なんてその時々で変わるもので、h1111105一つに定まることなんて稀だもの。\\n\\n\
             まして、自分の中に秘めるものならなおさら。\\n\
-r           h1111306どちらか一方だけだなんて、勿体ないわ。\
+            h1111306どちらか一方だけだなんて、勿体ないわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
