@@ -194,7 +194,6 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
     "2candledoubleclick" => two_candle_double_click(req, touch_count),
-    "2matchboxdoubleclick" => two_matchbox_double_click(req, touch_count),
     _ => None,
   };
 
@@ -493,6 +492,15 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    light_candle_fire()
+  } else {
+    blow_candle_fire()
+  }
+}
+
+fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
+  let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   // すでに書斎へ移動しているとき、没入度が最大のとき、まだ場所移動していないときは何もしない
   if immersive_degrees == IMMERSIVE_RATE_MAX
@@ -542,7 +550,7 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
 }
 
 // 没入度を下げ、ろうそくを点ける
-fn two_matchbox_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   if immersive_degrees == 0 || vars.volatility.is_immersive_degrees_fixed() {

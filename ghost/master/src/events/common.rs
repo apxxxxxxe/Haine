@@ -7,7 +7,6 @@ use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::roulette::RouletteCell;
 use crate::variables::get_global_vars;
-use crate::variables::EventFlag;
 use core::fmt::{Display, Formatter};
 use std::collections::HashSet;
 
@@ -517,13 +516,5 @@ pub fn render_immersive_icon() -> String {
     v.push_str(&a);
     candles[i as usize - 1] = enabled;
   }
-  let show_matchbox = format!(
-    "\\![bind,icon,マッチ箱,{}]",
-    if get_global_vars().flags().check(&EventFlag::FirstLibraryEnd) {
-      "1"
-    } else {
-      "0"
-    }
-  );
-  format!("\\p[2]{}{}\\0", v, show_matchbox)
+  format!("\\p[2]{}\\0", v)
 }

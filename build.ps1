@@ -99,12 +99,6 @@ for ($i = 1; $i -le 5; $i++) {
   magick convert -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_0.png" "$prefix\surface$surface_number.png"
 }
 
-# マッチ箱画像をリサイズしてサーフェス画像としてリネーム
-$collision_image = "$prefix\immersion_candle_matches_collision.png"
-$collision_images += $collision_image
-magick convert -resize ${size}x${size} "$prefix\immersion_candle_matches.png" "$prefix\surface$($surface_number_original + 200).png"
-magick convert -fill "rgb(255,0,0)" -colorize 100 "$prefix\surface$($surface_number_original + 200).png" $collision_image
-
 # $collision_imagesを重ねて出力
 $collision_image_name = "$prefix\immersion_candle_master_collision.png"
 magick convert $collision_images -composite $collision_image_name
