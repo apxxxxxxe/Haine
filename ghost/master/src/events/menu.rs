@@ -61,7 +61,7 @@ pub fn on_menu_exec(_req: &Request) -> Response {
       format!(
         "\
         \\_l[0,1.5em]\
-        \\![*]\\q[なにか話して,OnAiTalk]\\n\
+        \\![*]\\q[{},OnAiTalk]\\n\
         {}\
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
         \\![*]{}\
@@ -73,6 +73,11 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         {}\
         \\_l[0,0]{}\
         ",
+        if vars.volatility.talking_place() == TalkingPlace::Library {
+          "耳を澄ます"
+        } else {
+          "なにか話して"
+        },
         if vars.volatility.talking_place() == TalkingPlace::Library {
           "".to_string()
         } else {
