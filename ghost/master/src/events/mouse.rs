@@ -492,6 +492,10 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
+  // 没入度固定時は何もしない
+  if vars.volatility.is_immersive_degrees_fixed() {
+    return None;
+  }
   if vars.volatility.talking_place() == TalkingPlace::Library {
     light_candle_fire()
   } else {
@@ -502,14 +506,6 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
 fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
-  // すでに書斎へ移動しているとき、没入度が最大のとき、まだ場所移動していないときは何もしない
-  if immersive_degrees == IMMERSIVE_RATE_MAX
-    || vars.volatility.talking_place() == TalkingPlace::Library
-    || !vars.flags().check(&EventFlag::FirstPlaceChange)
-    || vars.volatility.is_immersive_degrees_fixed()
-  {
-    return None;
-  }
   for i in 0..=IMMERSIVE_ICON_COUNT {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if immersive_degrees < threshold {
@@ -518,9 +514,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
         return Some(Err(ShioriError::PlaySoundError));
       }
       // 没入度最大なら書斎へ移動
-      let m = if threshold == IMMERSIVE_RATE_MAX
-        && vars.volatility.talking_place() == TalkingPlace::LivingRoom
-      {
+      let m = if threshold == IMMERSIVE_RATE_MAX {
         vars.volatility.set_talking_place(TalkingPlace::Library);
         let messages = match moving_to_library_talk() {
           Ok(v) => v,
@@ -531,6 +525,13 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
           Err(e) => return Some(Err(e)),
         };
         messages[index].to_owned()
+      } else if !vars.flags().check(&EventFlag::FirstPlaceChange) {
+        match i {
+          1 => "\\1火を消した。\\nなんだか胸騒ぎがする。".to_string(),
+          2 => "h1111105\\1ハイネの目線が虚ろになってきている気がする。".to_string(),
+          4 => "h1111105\\1残り一本だ……".to_string(),
+          _ => "".to_string(),
+        }
       } else {
         "".to_string()
       };
