@@ -12,6 +12,7 @@ use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE;
 use crate::events::IMMERSIVE_RATE_MAX;
 use crate::sound::play_sound;
+use crate::status::Status;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -72,6 +73,7 @@ macro_rules! get_touch_info {
 pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let last_touch_info = vars.volatility.last_touch_info();
+  let status = Status::from_request(req);
 
   // 同一に扱う
   let i = if info == "0bustdoubleclick" {
@@ -99,7 +101,7 @@ pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, Shior
       FIRST_RANDOMTALKS.len() as u32 - 1,
     ))
   {
-    if info.as_str().contains("doubleclick") {
+    if info.as_str().contains("doubleclick") && !status.talking {
       let dummy_req = check_error!(
         Request::parse(DUMMY_REQUEST),
         ShioriError::ParseRequestError
@@ -194,7 +196,6 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
     "2candledoubleclick" => two_candle_double_click(req, touch_count),
-    "2matchboxdoubleclick" => two_matchbox_double_click(req, touch_count),
     _ => None,
   };
 
@@ -493,15 +494,20 @@ pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, Shi
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
-  let immersive_degrees = vars.volatility.immersive_degrees();
-  // すでに書斎へ移動しているとき、没入度が最大のとき、まだ場所移動していないときは何もしない
-  if immersive_degrees == IMMERSIVE_RATE_MAX
-    || vars.volatility.talking_place() == TalkingPlace::Library
-    || !vars.flags().check(&EventFlag::FirstPlaceChange)
-    || vars.volatility.is_immersive_degrees_fixed()
-  {
+  // 没入度固定時は何もしない
+  if vars.volatility.is_immersive_degrees_fixed() {
     return None;
   }
+  if vars.volatility.talking_place() == TalkingPlace::Library {
+    light_candle_fire()
+  } else {
+    blow_candle_fire()
+  }
+}
+
+fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
+  let vars = get_global_vars();
+  let immersive_degrees = vars.volatility.immersive_degrees();
   for i in 0..=IMMERSIVE_ICON_COUNT {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if immersive_degrees < threshold {
@@ -510,9 +516,7 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
         return Some(Err(ShioriError::PlaySoundError));
       }
       // 没入度最大なら書斎へ移動
-      let m = if threshold == IMMERSIVE_RATE_MAX
-        && vars.volatility.talking_place() == TalkingPlace::LivingRoom
-      {
+      let m = if threshold == IMMERSIVE_RATE_MAX {
         vars.volatility.set_talking_place(TalkingPlace::Library);
         let messages = match moving_to_library_talk() {
           Ok(v) => v,
@@ -523,6 +527,13 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
           Err(e) => return Some(Err(e)),
         };
         messages[index].to_owned()
+      } else if !vars.flags().check(&EventFlag::FirstPlaceChange) {
+        match i {
+          1 => "\\1火を消した。\\nなんだか胸騒ぎがする。".to_string(),
+          2 => "h1111105\\1ハイネの目線が虚ろになってきている気がする。".to_string(),
+          4 => "h1111105\\1残り一本だ……".to_string(),
+          _ => "".to_string(),
+        }
       } else {
         "".to_string()
       };
@@ -542,7 +553,7 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
 }
 
 // 没入度を下げ、ろうそくを点ける
-fn two_matchbox_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   if immersive_degrees == 0 || vars.volatility.is_immersive_degrees_fixed() {
