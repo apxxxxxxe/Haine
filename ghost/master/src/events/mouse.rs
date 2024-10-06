@@ -12,6 +12,7 @@ use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE;
 use crate::events::IMMERSIVE_RATE_MAX;
 use crate::sound::play_sound;
+use crate::status::Status;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -72,6 +73,7 @@ macro_rules! get_touch_info {
 pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let last_touch_info = vars.volatility.last_touch_info();
+  let status = Status::from_request(req);
 
   // 同一に扱う
   let i = if info == "0bustdoubleclick" {
@@ -99,7 +101,7 @@ pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, Shior
       FIRST_RANDOMTALKS.len() as u32 - 1,
     ))
   {
-    if info.as_str().contains("doubleclick") {
+    if info.as_str().contains("doubleclick") && !status.talking {
       let dummy_req = check_error!(
         Request::parse(DUMMY_REQUEST),
         ShioriError::ParseRequestError
