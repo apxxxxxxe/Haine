@@ -9,7 +9,6 @@ use crate::events::randomtalk::moving_to_living_room_talk;
 use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
-use crate::events::IMMERSIVE_RATE;
 use crate::events::IMMERSIVE_RATE_MAX;
 use crate::sound::play_sound;
 use crate::status::Status;
@@ -127,15 +126,6 @@ pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, Shior
 
 fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> {
   let index = choose_one(&dialogs, true).ok_or(ShioriError::ArrayAccessError)?;
-
-  // 通常の触り反応があった場合、場所移動を経験済みであれば没入度を下げる
-  if get_global_vars()
-    .flags()
-    .check(&EventFlag::FirstPlaceChange)
-  {
-    sub_immsersive_degree(IMMERSIVE_RATE);
-  }
-
   new_response_with_value_with_translate(
     format!(
       "{}{}{}",

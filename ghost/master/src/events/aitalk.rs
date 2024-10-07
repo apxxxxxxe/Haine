@@ -1,9 +1,6 @@
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::events::randomtalk::{
-  finishing_aroused_talks, moving_to_library_talk, moving_to_living_room_talk,
-  RANDOMTALK_COMMENTS_LIVING_ROOM,
-};
+use crate::events::randomtalk::{finishing_aroused_talks, RANDOMTALK_COMMENTS_LIVING_ROOM};
 use crate::events::talk::anchor::anchor_talks;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
@@ -18,7 +15,6 @@ use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
 // トーク1回あたりに上昇する没入度の割合(%)
-pub const IMMERSIVE_RATE: u32 = 5;
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
 
 pub const IMMERSIVE_ICON_COUNT: u32 = 5;
@@ -80,70 +76,6 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     // ユーザが見ているときのみトークを消費&トークカウントを加算
     register_talk_collection(&choosed_talk)?;
     vars.set_cumulative_talk_count(vars.cumulative_talk_count() + 1);
-  }
-
-  // 書斎でのトーク時にマウスやメニューからのトークの場合は没入度を減少させる
-  if !req.headers.get("ID").is_some_and(|v| v == "OnSecondChange")
-    && vars.volatility.talking_place() == TalkingPlace::Library
-  {
-    sub_immsersive_degree(IMMERSIVE_RATE);
-  }
-
-  // 書斎で没入度が0になったら居間に移動
-  if vars.volatility.immersive_degrees() == 0
-    && vars.volatility.talking_place() == TalkingPlace::Library
-  {
-    vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
-
-    let messages = moving_to_living_room_talk()?;
-    let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-
-    let achievevment_text = if !vars.flags().check(&EventFlag::FirstLibraryEnd) {
-      vars.flags_mut().done(EventFlag::FirstLibraryEnd);
-      "\\1\\n\
-        \\![quicksection,1]\
-        \\f[align,center]\\f[valign,center]\\f[bold,1]\
-        メニューから没入度の増減を一時停止できるようになりました。\\n\
-        燭台をクリックして没入度の増減ができるようになりました。\
-        \\f[default]"
-    } else {
-      ""
-    };
-
-    return new_response_with_value_with_translate(
-      format!(
-        "\\0{}{}{}",
-        render_immersive_icon(),
-        messages[index].to_owned(),
-        achievevment_text,
-      ),
-      TranslateOption::with_shadow_completion(),
-    );
-  }
-
-  // 居間でのトーク時に自然発生したトークの場合は没入度を増加させる
-  if req.headers.get("ID").is_some_and(|v| v == "OnSecondChange")
-    && vars.volatility.talking_place() == TalkingPlace::LivingRoom
-  {
-    add_immersive_degree(IMMERSIVE_RATE);
-  }
-
-  // 没入度が最大に達したら書斎に移動
-  if vars.volatility.immersive_degrees() == IMMERSIVE_RATE_MAX
-    && vars.volatility.talking_place() == TalkingPlace::LivingRoom
-  {
-    vars.volatility.set_talking_place(TalkingPlace::Library);
-
-    let messages = moving_to_library_talk()?;
-    let index = choose_one(&messages, true).ok_or(ShioriError::TalkNotFound)?;
-    return new_response_with_value_with_translate(
-      format!(
-        "\\0{}{}",
-        render_immersive_icon(),
-        messages[index].to_owned()
-      ),
-      TranslateOption::with_shadow_completion(),
-    );
   }
 
   // バルーン右下に表示するコメントを取得
@@ -264,6 +196,7 @@ mod test {
   use super::*;
   use crate::events::on_boot;
   use crate::events::on_close;
+  use crate::events::on_mouse_double_click;
   use crate::events::talk::randomtalk::{
     random_talks, TALK_ID_LORE_INTRO, TALK_ID_SERVANT_INTRO, TALK_UNLOCK_COUNT_LORE,
     TALK_UNLOCK_COUNT_SERVANT,
@@ -293,9 +226,14 @@ mod test {
     };
 
     let mut headers = Headers::new();
-    headers.insert("ID", "OnKeyPress".to_string());
+    headers.insert("ID", "OnMouseDoubleClick".to_string());
+    headers.insert("Reference0", "0".to_string());
+    headers.insert("Reference1", "0".to_string());
+    headers.insert("Reference2", "0".to_string());
+    headers.insert("Reference3", "2".to_string());
+    headers.insert("Reference4", "candle".to_string());
 
-    let on_key_press_req = Request {
+    let on_mouse_double_click_req = Request {
       method: Method::GET,
       version: Version::V20,
       headers,
@@ -335,10 +273,9 @@ mod test {
       .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
 
     // 初回没入度マックス時の場所変更
-    let required_talk_count = IMMERSIVE_RATE_MAX / IMMERSIVE_RATE;
     assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
-    for _i in 0..required_talk_count {
-      on_ai_talk(&on_second_change_req)?;
+    for _i in 0..IMMERSIVE_ICON_COUNT  {
+      on_mouse_double_click(&on_mouse_double_click_req)?;
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
 
@@ -352,12 +289,8 @@ mod test {
 
     // 書斎から正しく戻れるかのテスト
     assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
-    for _i in 0..required_talk_count {
-      on_ai_talk(&on_second_change_req)?; // 自動ランダムトークでは没入度が下がらない
-    }
-    assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
-    for _i in 0..required_talk_count {
-      on_ai_talk(&on_key_press_req)?; // 手動ランダムトークでは没入度が下がる
+    for _i in 0..IMMERSIVE_ICON_COUNT {
+      on_mouse_double_click(&on_mouse_double_click_req)?;
     }
     assert_eq!(vars.volatility.talking_place(), TalkingPlace::LivingRoom);
 
