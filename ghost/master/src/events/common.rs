@@ -455,7 +455,7 @@ pub fn render_achievement_message(talk_type: TalkType) -> String {
   )
 }
 
-pub fn add_immsersive_degree(degree: u32) {
+pub fn add_immersive_degree(degree: u32) {
   let vars = get_global_vars();
   if vars.volatility.is_immersive_degrees_fixed() {
     return;

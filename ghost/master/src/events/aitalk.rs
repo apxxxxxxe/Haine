@@ -125,7 +125,7 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   if req.headers.get("ID").is_some_and(|v| v == "OnSecondChange")
     && vars.volatility.talking_place() == TalkingPlace::LivingRoom
   {
-    add_immsersive_degree(IMMERSIVE_RATE);
+    add_immersive_degree(IMMERSIVE_RATE);
   }
 
   // 没入度が最大に達したら書斎に移動
