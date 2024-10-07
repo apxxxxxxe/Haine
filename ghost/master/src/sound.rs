@@ -16,29 +16,34 @@ pub struct Player {
 }
 
 impl Player {
-  pub fn new() -> Self {
-    let (stream, stream_handle) = OutputStream::try_default().unwrap();
-    Player {
+  pub fn new() -> Option<Self> {
+    let (stream, stream_handle) = match OutputStream::try_default() {
+      Ok(v) => v,
+      Err(_) => return None,
+    };
+    Some(Player {
       stream,
       stream_handle,
       handler: Some(std::thread::spawn(move || loop {
-        if *get_player().stop_flag.lock().unwrap() {
-          break;
-        }
         let player = get_player();
-        player.sinks.retain(|sink| {
-          if sink.empty() {
-            sink.stop();
-            false
-          } else {
-            true
+        if let Some(p) = player {
+          if *p.stop_flag.lock().unwrap() {
+            break;
           }
-        });
+          p.sinks.retain(|sink| {
+            if sink.empty() {
+              sink.stop();
+              false
+            } else {
+              true
+            }
+          });
+        }
         std::thread::sleep(std::time::Duration::from_millis(100));
       })),
       stop_flag: Arc::new(Mutex::new(false)),
       sinks: Vec::new(),
-    }
+    })
   }
 
   fn reset_device(&mut self) {
@@ -52,14 +57,16 @@ impl Player {
 pub fn force_free_player() {
   debug!("free_player");
   let player = get_player();
-  *player.stop_flag.lock().unwrap() = true;
-  player.handler.take().unwrap().join().unwrap();
-  while let Some(sink) = player.sinks.pop() {
-    sink.pause();
-    sink.stop();
-  }
-  unsafe {
-    PLAYER = None;
+  if let Some(p) = player {
+    *p.stop_flag.lock().unwrap() = true;
+    p.handler.take().unwrap().join().unwrap();
+    while let Some(sink) = p.sinks.pop() {
+      sink.pause();
+      sink.stop();
+    }
+    unsafe {
+      PLAYER = None;
+    }
   }
   debug!("force_free_player done");
 }
@@ -67,32 +74,39 @@ pub fn force_free_player() {
 pub fn cooperative_free_player() {
   debug!("sleep until end");
   let player = get_player();
-  *player.stop_flag.lock().unwrap() = true;
-  player.handler.take().unwrap().join().unwrap();
-  while let Some(sink) = player.sinks.pop() {
-    while !sink.empty() {
-      std::thread::sleep(std::time::Duration::from_millis(100));
+  if let Some(p) = player {
+    *p.stop_flag.lock().unwrap() = true;
+    p.handler.take().unwrap().join().unwrap();
+    while let Some(sink) = p.sinks.pop() {
+      while !sink.empty() {
+        std::thread::sleep(std::time::Duration::from_millis(100));
+      }
+      sink.pause();
+      sink.stop();
     }
-    sink.pause();
-    sink.stop();
-  }
-  unsafe {
-    PLAYER = None;
+    unsafe {
+      PLAYER = None;
+    }
   }
   debug!("cooperative_free_player done");
 }
 
-pub fn get_player() -> &'static mut Player {
+pub fn get_player() -> Option<&'static mut Player> {
   if unsafe { PLAYER.is_none() } {
     unsafe {
-      PLAYER = Some(Player::new());
+      PLAYER = Player::new();
     }
   }
-  unsafe { PLAYER.as_mut().unwrap() }
+  unsafe { PLAYER.as_mut() }
 }
 
 pub fn play_sound(file: &str) -> Result<(), Box<dyn std::error::Error>> {
-  let player = get_player();
+  let player = if let Some(p) = get_player() {
+    p
+  } else {
+    // プレイヤーが存在しない場合は何もしない
+    return Ok(());
+  };
   if player.sinks.len() >= 10 {
     // 再生する前に、一度デバイスをリセットする
     // 再生デバイスが変更されていた場合に対応するため
