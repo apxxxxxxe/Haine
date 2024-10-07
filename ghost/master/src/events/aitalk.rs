@@ -207,7 +207,7 @@ mod test {
 
   #[test]
   fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
-    const FIRST_CLOSE_TALK_PART: &str = "私の側にいてほしい";
+    const FIRST_CLOSE_TALK_PART: &str = "生きたあなたと話していたい";
     const SECOND_CLOSE_TALK_PART: &str = "がありますように";
     const CLOSE_TALK_IN_LIBRARY_PART: &str = "戻ってきたようだ。";
     const PAST_TALK_UNLOCK_TALK_PART: &str = "あの子は生者だから";
