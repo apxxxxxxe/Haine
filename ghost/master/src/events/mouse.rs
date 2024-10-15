@@ -137,13 +137,6 @@ fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> 
   )
 }
 
-static DIALOG_SEXIAL_WHILE_HITTING: Lazy<Vec<String>> = Lazy::new(|| {
-  vec!["h1221204ねえ、焦らさないで。\\nもっと叩いて。\\n死を、感じさせて。".to_string()]
-});
-
-static DIALOG_TOUCH_WHILE_HITTING: Lazy<Vec<String>> =
-  Lazy::new(|| vec!["h1211104優しくしないで。退屈になるじゃない。".to_string()]);
-
 static DIALOG_SEXIAL_FIRST: Lazy<Vec<String>> =
   Lazy::new(|| vec!["h1111205……会って早々これ？\nなんというか……h1111204流石ね。".to_string()]);
 
@@ -178,7 +171,6 @@ pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriErro
 
   // 通常の触り反応候補
   let common_response = match info.as_str() {
-    "0headdoubleclick" => head_hit_dialog(req, touch_count),
     "0headnade" => zero_head_nade(req, touch_count),
     "0facenade" => zero_face_nade(req, touch_count),
     "0handnade" => zero_hand_nade(req, touch_count),
@@ -209,17 +201,12 @@ fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
     return Some(on_ai_talk(req));
   }
 
-  let results = if vars.volatility.aroused() {
-    DIALOG_TOUCH_WHILE_HITTING.clone()
-  } else {
-    let dialogs = vec![vec![
-      "h1111205何のつもり？".to_string(),
-      "h1111304それ、あまり好きではないわ。".to_string(),
-      "h1111207軽んじられている気がするわ。".to_string(),
-    ]];
-    phased_talks(count, dialogs).0
-  };
-  Some(common_choice_process(results))
+  let dialogs = vec![vec![
+    "h1111205何のつもり？".to_string(),
+    "h1111304それ、あまり好きではないわ。".to_string(),
+    "h1111207軽んじられている気がするわ。".to_string(),
+  ]];
+  Some(common_choice_process(phased_talks(count, dialogs).0))
 }
 
 fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
@@ -229,17 +216,13 @@ fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
     return Some(on_ai_talk(req));
   }
 
-  let results = if vars.volatility.aroused() {
-    DIALOG_TOUCH_WHILE_HITTING.clone()
-  } else {
-    let dialogs = vec![vec![
-      "h1111204……気安いのね。".to_string(),
-      "h1111201\\1……冷たい。h1111304触れられるだけよ。\\n人間のような触れあいを求められても困るわ。".to_string(),
-      "h1111104\\1すべすべだ。h1111204……もういいかしら。".to_string(),
-    ]];
-    phased_talks(count, dialogs).0
-  };
-  Some(common_choice_process(results))
+  let dialogs = vec![vec![
+    "h1111204……気安いのね。".to_string(),
+    "h1111201\\1……冷たい。h1111304触れられるだけよ。\\n人間のような触れあいを求められても困るわ。"
+      .to_string(),
+    "h1111104\\1すべすべだ。h1111204……もういいかしら。".to_string(),
+  ]];
+  Some(common_choice_process(phased_talks(count, dialogs).0))
 }
 
 fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
@@ -249,29 +232,24 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
     return Some(on_ai_talk(req));
   }
 
-  let results = if vars.volatility.aroused() {
-    DIALOG_TOUCH_WHILE_HITTING.clone()
-  } else {
-    let dialogs = vec![vec![
-      "\
-        h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
-        \\0……手が冷えるわよ。h1111204ほどほどにね。\
-        "
-      .to_string(),
-      "\
-        h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
-        ……h1111204それは不毛というものよ。\
-        "
-      .to_string(),
-      "\
-        h1111205\\1彼女の指は長い。
-        h1111210……うん。\\n\
-        "
-      .to_string(),
-    ]];
-    phased_talks(count, dialogs).0
-  };
-  Some(common_choice_process(results))
+  let dialogs = vec![vec![
+    "\
+    h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
+    \\0……手が冷えるわよ。h1111204ほどほどにね。\
+    "
+    .to_string(),
+    "\
+    h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+    ……h1111204それは不毛というものよ。\
+    "
+    .to_string(),
+    "\
+    h1111205\\1彼女の指は長い。
+    h1111210……うん。\\n\
+    "
+    .to_string(),
+  ]];
+  Some(common_choice_process(phased_talks(count, dialogs).0))
 }
 
 fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
@@ -281,26 +259,21 @@ fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriE
     return None;
   }
 
-  let results = if vars.volatility.aroused() {
-    DIALOG_SEXIAL_WHILE_HITTING.clone()
+  let mut conbo_parts: Vec<Vec<String>> = vec![vec!["hr2144402……！h1141102\\n".to_string()]];
+  if is_first_sexial_allowed(vars) {
+    vars.volatility.set_first_sexial_touch(true);
+    conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
   } else {
-    let mut conbo_parts: Vec<Vec<String>> = vec![vec!["hr2144402……！h1141102\\n".to_string()]];
-    if is_first_sexial_allowed(vars) {
-      vars.volatility.set_first_sexial_touch(true);
-      conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
-    } else {
-      conbo_parts.push(vec![
-        "h1111204いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
-        "h1111205ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
-        "h1111211秘されたものほど暴きたくなるものね。\\n\
-        h1111204ところで、相応の代償を払う用意はあるのでしょうね。"
-          .to_string(),
-        "h1111304悪餓鬼。".to_string(),
-      ]);
-    }
-    all_combo(&conbo_parts)
-  };
-  Some(common_choice_process(results))
+    conbo_parts.push(vec![
+      "h1111204いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
+      "h1111205ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
+      "h1111211秘されたものほど暴きたくなるものね。\\n\
+      h1111204ところで、相応の代償を払う用意はあるのでしょうね。"
+        .to_string(),
+      "h1111304悪餓鬼。".to_string(),
+    ]);
+  }
+  Some(common_choice_process(all_combo(&conbo_parts)))
 }
 
 fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
@@ -333,153 +306,38 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
     return Some(on_ai_talk(req));
   }
 
-  let results = if vars.volatility.aroused() {
-    DIALOG_TOUCH_WHILE_HITTING.clone()
+  let zero_bust_touch_threshold = 12;
+  let mut zero_bust_touch = Vec::new();
+  if is_first_sexial_allowed(vars) {
+    vars.volatility.set_first_sexial_touch(true);
+    zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
+  } else if count < zero_bust_touch_threshold / 3 {
+    zero_bust_touch.extend(vec![
+      "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
+      "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
+      "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
+      "h1111205気安いのね。あまり好きではないわ。".to_string(),
+      "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。"
+        .to_string(),
+    ]);
+  } else if count < zero_bust_touch_threshold / 3 * 2 {
+    zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
+  } else if count < zero_bust_touch_threshold {
+    zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
+  } else if count == zero_bust_touch_threshold {
+    zero_bust_touch.push(
+    "\
+    h1111205\\1触れようとした手先が、霧に溶けた。\\n\
+    慌てて引っ込めると、手は元通りになった。\
+    h1111201許されていると思ったの？\\n\
+    h1111304残念だけど、それほど気は長くないの。\\n\
+    h1111310わきまえなさい。"
+    .to_string(),
+    );
   } else {
-    let zero_bust_touch_threshold = 12;
-    let mut zero_bust_touch = Vec::new();
-    if is_first_sexial_allowed(vars) {
-      vars.volatility.set_first_sexial_touch(true);
-      zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
-    } else if count < zero_bust_touch_threshold / 3 {
-      zero_bust_touch.extend(vec![
-        "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
-        "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
-        "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
-        "h1111205気安いのね。あまり好きではないわ。".to_string(),
-        "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。"
-          .to_string(),
-      ]);
-    } else if count < zero_bust_touch_threshold / 3 * 2 {
-      zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
-    } else if count < zero_bust_touch_threshold {
-      zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
-    } else if count == zero_bust_touch_threshold {
-      zero_bust_touch.push(
-        "\
-      h1111205\\1触れようとした手先が、霧に溶けた。\\n\
-      慌てて引っ込めると、手は元通りになった。\
-      h1111201許されていると思ったの？\\n\
-      h1111304残念だけど、それほど気は長くないの。\\n\
-      h1111310わきまえなさい。"
-          .to_string(),
-      );
-    } else {
-      zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
-    }
-    zero_bust_touch
-  };
-  Some(common_choice_process(results))
-}
-
-pub fn on_head_hit_cancel(_req: &Request) -> Result<Response, ShioriError> {
-  let m = "\\1……踏みとどまった。".to_string();
-  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
-}
-
-pub fn on_head_hit(_req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-  vars.flags_mut().done(EventFlag::FirstHitTalkStart);
-  to_aroused();
-  let m = "\\t\\*\
-    h1111201あら、どうし…h1111112…h1000000っ！？\\n\
-    \\1半ば衝動的に、彼女を突き飛ばした。\\n\
-    \\0\\![bind,ex,流血,1]h1112401……。\\n\
-    \\1立ち上がったハイネ。頭から血が流れている。\\n\
-    彼女は呆けたように私を見つめ…………h1222804\\1笑った。\\n\
-    \\0……殴られるなんて、ずいぶん久しぶりだわ。\\n\
-    h1222310フフ、あなたのせいで思い出しちゃった。\\n\
-    痛みってこういうものだったわね。\\n\
-    ……h1222505脳天が痺れてる。素敵だわ、とても。\\n\
-    h1222204ねえ、せっかくの機会だわ。もっとやってみて。\\n\
-    私に悪感情を抱いたから突き飛ばしたのでしょう？\\n\
-    h1222208こんなにしておいて、わざとじゃなかったなんて言わせないわ。\\n\
-    h1222204遠慮はいらない。あなたの気が済むまで殴って。\\n\
-    さあ。h1322813さあ！\
-    \\1……！\
-    "
-  .to_string();
-  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
-}
-
-pub fn head_hit_dialog(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-
-  if vars.volatility.talking_place() == TalkingPlace::Library {
-    return Some(on_ai_talk(req));
+    zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());
   }
-
-  let is_aroused = vars.volatility.aroused();
-  if !vars.flags().check(&EventFlag::FirstHitTalkStart) {
-    get_touch_info!("0headdoubleclick").reset(); // 選択肢だけなのでカウントしない
-    let dialogs = vec!["\
-    \\s[1111101]\\![*]\\q[突き飛ばす,OnHeadHit]\\n\\![*]\\q[やめておく,OnHeadHitCancel]\
-    "
-    .to_string()];
-    Some(common_choice_process(dialogs))
-  } else if !is_aroused {
-    get_touch_info!("0headdoubleclick").reset(); // 初回はカウントしない
-    to_aroused();
-    let dialogs = vec![
-      "h1000000痛っ……\\n\\0\\![bind,ex,流血,1]h1311204あら、その気になってくれた？".to_string(),
-    ];
-    Some(common_choice_process(dialogs))
-  } else {
-    // 各段階ごとのセリフ
-    let suffixes_list = vec![
-      vec![
-        "h1311204すてき。h1311207もっとして。".to_string(),
-        "h1311206ああ、星が舞っているわ。\\nh1311215痛くて苦しくて、死んでしまいそう。".to_string(),
-        "h1221104ひどい。h1221110ひどいわ。\\nh1322513癖になってしまったらどうするの？".to_string(),
-      ],
-      vec![
-        "h1311204あは、ずきずきする。\\nh1311307もはや血は通っていないはずなのに、脈打ってる。"
-          .to_string(),
-        "h1311104ああ、痛い。h1321407痛いのがいいの。".to_string(),
-        "h1321104目の奥が痛むわ。\\nh1321207容赦がないの、好きよ。".to_string(),
-      ],
-      vec![
-        "h1311308あぁ……こんなに幸せでいいのかしら。".to_string(),
-        "h1321304だめな、だめなことなのに、\\n求める気持ちが止まらないの。".to_string(),
-        "h1321408んう……h1322304もう少し、もう少しなの。".to_string(),
-      ],
-      vec![
-        "h1311308……ん、ぐっ".to_string(),
-        "h1321208……あは、あは、は……".to_string(),
-        "h1321808ひゅー、ひゅ……んん、あ、は……".to_string(),
-      ],
-      vec!["\\t\\*\
-      h1322808っ、～～h1000000～～～……！\\n\
-      \\1ひときわ大きく震えて、彼女はへたりこんだ。\\n\
-      \\0………………。\\n\
-      うふ、ふふふ。\\n\
-      h1211308よかったわ、とても。\\n\
-      \\n\
-      h1211310………………\\0\\![bind,ex,流血,0]h1111310ふー。\\n\
-      h1111205\\1……落ち着いたようだ。\\n\
-      "
-      .to_string()],
-    ];
-
-    let (suffixes, is_last) = phased_talks(count, suffixes_list);
-
-    if is_last {
-      vars.volatility.set_aroused(false);
-      get_touch_info!("0headdoubleclick").reset();
-      return Some(common_choice_process(suffixes));
-    }
-
-    let prefixes = [
-      "h1221410ぐっ……\\n".to_string(),
-      "h1221714づっ……\\n".to_string(),
-      "h1221710うぅっ……\\n".to_string(),
-    ];
-    let mut result = Vec::new();
-    for j in 0..suffixes.len() {
-      result.push(format!("{}{}", prefixes[j % prefixes.len()], suffixes[j]));
-    }
-    Some(common_choice_process(result))
-  }
+  Some(common_choice_process(zero_bust_touch))
 }
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {

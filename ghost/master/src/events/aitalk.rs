@@ -1,6 +1,6 @@
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::events::randomtalk::{finishing_aroused_talks, RANDOMTALK_COMMENTS_LIVING_ROOM};
+use crate::events::randomtalk::RANDOMTALK_COMMENTS_LIVING_ROOM;
 use crate::events::talk::anchor::anchor_talks;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
@@ -10,7 +10,6 @@ use crate::events::{
   randomtalk::RANDOMTALK_COMMENTS_LIBRARY_ACTIVE,
   randomtalk::RANDOMTALK_COMMENTS_LIBRARY_INACTIVE,
 };
-use crate::get_touch_info;
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
@@ -35,19 +34,6 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     {
       return first_random_talk_response(text.to_string(), i, text_count);
     }
-  }
-
-  // 興奮状態の終了
-  if vars.volatility.aroused() {
-    vars.volatility.set_aroused(false);
-    get_touch_info!("0headdoubleclick").reset();
-    let talks = finishing_aroused_talks();
-    let index = choose_one(&talks, if_consume_talk_bias).ok_or(ShioriError::TalkNotFound)?;
-    let choosed_talk = talks[index].to_string();
-    return new_response_with_value_with_translate(
-      choosed_talk,
-      TranslateOption::with_shadow_completion(),
-    );
   }
 
   // 通常ランダムトーク

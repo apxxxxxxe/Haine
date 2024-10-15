@@ -409,14 +409,6 @@ pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   Ok(res)
 }
 
-pub fn to_aroused() {
-  let vars = get_global_vars();
-  vars.volatility.set_aroused(true);
-  vars
-    .volatility
-    .set_last_random_talk_time(vars.volatility.ghost_up_time());
-}
-
 pub enum Icon {
   Info,
   Cross,
