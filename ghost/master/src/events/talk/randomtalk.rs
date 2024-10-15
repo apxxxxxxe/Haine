@@ -1019,24 +1019,6 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   Some(talks)
 }
 
-pub fn finishing_aroused_talks() -> Vec<String> {
-  let vars = get_global_vars();
-  let mut talk_parts = vec![vec![
-    "\\0\\![bind,ex,流血,0]h1111705ふー…………。\\n\\1ハイネは深く息を吐いた。……落ち着いたようだ。"
-      .to_string(),
-  ]];
-  talk_parts.push(if !vars.flags().check(&EventFlag::FirstHitTalkDone) {
-    vars.flags_mut().done(EventFlag::FirstHitTalkDone);
-    vec!["\\0……h1111204これで終わり？そう。\\n\
-        では今回は、終わりにしましょう。\\n\
-        h1111211次に期待しているわ、{user_name}。"
-      .to_string()]
-  } else {
-    vec!["\\0……h1111204もっと殴ってもよかったのに。".to_string()]
-  });
-  all_combo(&talk_parts)
-}
-
 pub fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
   let vars = get_global_vars();
   let mut parts: Vec<Vec<String>> = vec![vec![format!(

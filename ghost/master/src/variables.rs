@@ -268,8 +268,6 @@ pub struct VolatilityVariables {
 
   pub talking_place: Mutex<TalkingPlace>,
 
-  pub aroused: Mutex<bool>,
-
   pub last_anchor_id: Mutex<Option<String>>,
 
   pub candles: Mutex<[bool; IMMERSIVE_ICON_COUNT as usize]>,
@@ -304,7 +302,6 @@ impl VolatilityVariables {
   );
   generate_mut_getter!(touch_info, HashMap<String, TouchInfo>, non_cloneable);
   generate_getter_setter!(talking_place, TalkingPlace, cloneable);
-  generate_getter_setter!(aroused, bool, cloneable);
   generate_getter_setter!(last_anchor_id, Option<String>, cloneable);
   generate_mut_getter!(
     candles,
@@ -338,7 +335,6 @@ impl Default for VolatilityVariables {
       waiting_talk: Mutex::new(None),
       touch_info: Mutex::new(HashMap::new()),
       talking_place: Mutex::new(TalkingPlace::LivingRoom),
-      aroused: Mutex::new(false),
       last_anchor_id: Mutex::new(None),
       candles: Mutex::new([false; IMMERSIVE_ICON_COUNT as usize]),
       is_immersive_degrees_fixed: Mutex::new(false),

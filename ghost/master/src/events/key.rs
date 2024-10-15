@@ -15,11 +15,6 @@ pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
         FIRST_RANDOMTALKS.len() as u32 - 1,
       )) {
         Ok(new_response_nocontent())
-      } else if vars.volatility.aroused() {
-        Ok(new_response_with_value_with_notranslate(
-          "\\![raise,OnMouseDoubleClick,dummy,dummy,dummy,0,head]".to_string(),
-          TranslateOption::none(),
-        ))
       } else {
         on_ai_talk(req)
       }
