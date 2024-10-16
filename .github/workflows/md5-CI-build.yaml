@@ -40,7 +40,7 @@ jobs:
           go-version: 1.21
 
       - name: Install Go dependencies
-        run: go install github.com/apxxxxxxe/surfaces-mixer@${{ env.SM_VERSION }}
+        run: go install github.com/apxxxxxxe/surfaces-mixer@latest
 
       - name: Install latest stable
         uses: actions-rs/toolchain@v1

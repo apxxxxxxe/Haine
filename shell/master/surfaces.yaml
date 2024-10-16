@@ -16,6 +16,13 @@
 #                 text: ...  # そのパーツのサーフェス定義。
 
 raw: |
+  descript
+  {
+    version,1
+    animation-sort,descend
+    collision-sort,descend // 効いてなさそう
+  }
+
   surface1000000 {
     // 無
     animation500200.interval,runonce
@@ -78,37 +85,6 @@ raw: |
 
 characters:
   - parts:
-    - group: スカート
-      details:
-        - name: 通常スカート
-          text: |
-            animation504370.interval,bind
-            animation504370.pattern0,overlay,1300,0,0,0
-            animation504370.collisionex13,skirt,polygon,141,613,213,463,337,463,407,613,336,650,281,652,191,638
-            animation504371.interval,bind
-            animation504371.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
-            animation504371.pattern0,overlay,1301,0,0,0
-            animation504372.interval,bind
-            animation504372.pattern0,overlay,1302,0,0,0
-            animation504373.interval,bind
-            animation504373.pattern0,overlay,1303,0,0,0
-            animation504374.interval,bind
-            animation504374.pattern0,overlay,1304,0,0,0
-            animation504375.interval,bind
-            animation504375.pattern0,overlay,1305,0,0,0
-            animation504376.interval,bind
-            animation504376.pattern0,overlay,1308,0,0,0
-            animation504376.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
-
-        - name: めくれスカート
-          text: |
-            animation508000.interval,bind
-            animation508000.pattern0,overlay,1350,0,0,0
-            animation508001.interval,bind
-            animation508001.pattern0,overlay,1351,0,0,0
-            animation508002.interval,bind
-            animation508002.pattern0,overlay,1352,0,0,0
-
     - group: 顔色
       details:
         - name: 通常顔
@@ -187,8 +163,7 @@ characters:
             animation505319.interval,bind
             animation505319.pattern0,overlay,1439,0,0,0
 
-            collisionex14,hand,polygon,288,423,330,410,336,414,341,422,328,446,317,436,288,442
-            collisionex15,hand,polygon,282,501,262,536,261,550,285,556,299,549,294,521,295,512
+            collisionex14,hand,polygon,247,508,250,540,277,538,285,529,295,508,283,501,271,513,259,504
 
         - name: 胸に手
           text: |
@@ -228,6 +203,8 @@ characters:
             animation585319.interval,bind
             animation585319.pattern0,overlay,2509,0,0,0
 
+            collisionex14,hand,polygon,252,355,239,351,236,325,246,306,262,302,280,303,298,313,304,336,304,349,283,360,273,342,261,358
+
         - name: 考える手
           text: |
             animation500201.interval,runonce
@@ -266,8 +243,8 @@ characters:
             animation585319.interval,bind
             animation585319.pattern0,overlay,3509,0,0,0
 
-            collisionex14,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
-            collisionex15,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
+            collisionex14,hand,polygon,256,331,252,324,253,303,258,288,270,284,285,313,274,319,265,334
+            collisionex15,hand,polygon,243,432,225,432,216,424,212,412,224,400,237,400,243,410,244,425
 
         - name: 後ろ手
           text: |
@@ -297,6 +274,37 @@ characters:
             animation500168.pattern1,overlay,1438,0,0,0
             animation500169.interval,bind
             animation500169.pattern0,overlay,1439,0,0,0
+
+    - group: スカート
+      details:
+        - name: 通常スカート
+          text: |
+            animation504370.interval,bind
+            animation504370.pattern0,overlay,1300,0,0,0
+            animation504370.collisionex13,skirt,polygon,141,613,213,463,337,463,407,613,336,650,281,652,191,638
+            animation504371.interval,bind
+            animation504371.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
+            animation504371.pattern0,overlay,1301,0,0,0
+            animation504372.interval,bind
+            animation504372.pattern0,overlay,1302,0,0,0
+            animation504373.interval,bind
+            animation504373.pattern0,overlay,1303,0,0,0
+            animation504374.interval,bind
+            animation504374.pattern0,overlay,1304,0,0,0
+            animation504375.interval,bind
+            animation504375.pattern0,overlay,1305,0,0,0
+            animation504376.interval,bind
+            animation504376.pattern0,overlay,1308,0,0,0
+            animation504376.collisionex13,skirt,polygon,141,813,213,463,337,463,407,813,336,830,281,842,191,818
+
+        - name: めくれスカート
+          text: |
+            animation508000.interval,bind
+            animation508000.pattern0,overlay,1350,0,0,0
+            animation508001.interval,bind
+            animation508001.pattern0,overlay,1351,0,0,0
+            animation508002.interval,bind
+            animation508002.pattern0,overlay,1352,0,0,0
 
     - group: 口
       details:
