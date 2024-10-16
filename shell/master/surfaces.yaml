@@ -228,6 +228,8 @@ characters:
             animation585319.interval,bind
             animation585319.pattern0,overlay,2509,0,0,0
 
+            collisionex14,hand,polygon,252,355,239,351,236,325,246,306,262,302,280,303,298,313,304,336,304,349,283,360,273,342,261,358
+
         - name: 考える手
           text: |
             animation500201.interval,runonce
@@ -266,8 +268,8 @@ characters:
             animation585319.interval,bind
             animation585319.pattern0,overlay,3509,0,0,0
 
-            collisionex14,hand,polygon,271,281,258,294,253,325,256,335,269,331,284,316,284,308
-            collisionex15,hand,polygon,247,417,238,400,214,404,213,412,215,423,223,433,244,433
+            collisionex14,hand,polygon,256,331,252,324,253,303,258,288,270,284,285,313,274,319,265,334
+            collisionex15,hand,polygon,243,432,225,432,216,424,212,412,224,400,237,400,243,410,244,425
 
         - name: 後ろ手
           text: |
