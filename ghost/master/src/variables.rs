@@ -112,9 +112,36 @@ impl GlobalVariables {
     s
   }
 
+  // vars_20060102150405.json の形式にリネーム
+  fn backup(&mut self) -> Result<(), Box<dyn Error>> {
+    if !std::path::Path::new(VAR_PATH).exists() {
+      return Ok(());
+    }
+    let now = chrono::Local::now();
+    let backup_path = format!("vars_{}.json", now.format("%Y%m%d%H%M%S"));
+    std::fs::copy(VAR_PATH, &backup_path)?;
+    Ok(())
+  }
+
   pub fn load(&mut self) -> Result<(), Box<dyn Error>> {
-    let json_str = std::fs::read_to_string(VAR_PATH)?;
-    let vars: GlobalVariables = serde_json::from_str(&json_str)?;
+    if !std::path::Path::new(VAR_PATH).exists() {
+      return Ok(());
+    }
+
+    let json_str = match std::fs::read_to_string(VAR_PATH) {
+      Ok(v) => v,
+      Err(e) => {
+        self.backup()?;
+        return Err(Box::new(e));
+      }
+    };
+    let vars: GlobalVariables = match serde_json::from_str(&json_str) {
+      Ok(v) => v,
+      Err(e) => {
+        self.backup()?;
+        return Err(Box::new(e));
+      }
+    };
 
     // TODO: 変数追加時はここに追加することを忘れない
     if let Some(t) = vars.total_time() {
