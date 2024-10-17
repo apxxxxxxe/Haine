@@ -24,8 +24,6 @@ jobs:
       github.event.workflow_run.head_branch == 'main'
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-
       - name: cache
         uses: actions/cache@v4
         with:
@@ -41,13 +39,18 @@ jobs:
           check-latest: true
 
       - name: Install Go dependencies
-        run: go install github.com/apxxxxxxe/surfaces-mixer@${{ env.SM_VERSION }}
+        uses: actions/checkout@v4
+        with:
+          repository: apxxxxxxe/surfaces-mixer
+      - run: go install
 
-      - name: Install latest stable
+      - name: Install latest stable rust
         uses: actions-rs/toolchain@v1
         with:
             toolchain: stable
             override: true
+
+      - uses: actions/checkout@v4
 
       - name: release-build
         shell: pwsh
