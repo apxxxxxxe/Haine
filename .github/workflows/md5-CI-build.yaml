@@ -14,7 +14,7 @@ concurrency:
 
 env:
   DLL_NAME: haine
-  SM_VERSION: v0.3.0
+  SM_VERSION: v2.0.1
 
 jobs:
   build:
