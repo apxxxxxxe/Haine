@@ -520,18 +520,6 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         },
 
         RandomTalk {
-          id: "死後の存在",
-          text: "\
-            h1111210幽霊、霊体、死後の存在。人類の科学は、そういったものにまだ答えを出していない。\\n\
-            h1111205存在する、しないの議論は、h1112205まあ、私たちには必要ないわね。\\n\
-            h1111210……いつかその時が来るのかしら。霊体を観測し、干渉し……あるいは、消滅させる方法。\\n\
-            h1111205ふふ。私、期待しているの。\
-            ".to_string(),
-          required_condition: None,
-          callback: None,
-        },
-
-        RandomTalk {
           id: "黒死病",
           text: "\
             h1111210黒死病が蔓延していたとき、問題になっていたのがいわゆる「早すぎた埋葬」。\\n\
