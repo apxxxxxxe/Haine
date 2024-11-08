@@ -766,17 +766,6 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         },
 
         RandomTalk {
-          id: "自己理解、他者理解",
-          text: "\
-            h1111105自分のことを本当に理解しているのは他人、って本当なのかしら。\\n\
-            h1111106……私が知らない私がいる。\\n\
-            h1112105なんだか不安になってきたわ。\
-            ".to_string(),
-          required_condition: None,
-          callback: None,
-        },
-
-        RandomTalk {
           id: "感動と倦み",
           text: "\
             h1111105ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
