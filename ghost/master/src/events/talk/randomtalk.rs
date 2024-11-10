@@ -69,7 +69,8 @@ fn new_randomtalks(
   callback: Option<fn()>,
 ) -> Vec<RandomTalk> {
   texts
-    .into_iter().enumerate()
+    .into_iter()
+    .enumerate()
     .map(|(idx, text)| RandomTalk {
       id: format!("{}-{}", id, idx),
       text,
@@ -249,19 +250,19 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         // - ハイネは強い霊
         // - ハイネは霊たちに慕われている
         RandomTalkType::Single(RandomTalk {
-          id: "霊力の多寡".to_string(),
-          text: "\
+            id: "霊力の多寡".to_string(),
+            text: "\
             h1111204霊力の多寡は年月や才能、特別な契約の有無などで変わるけれど、\\n\
             最も大きな要因は環境──つまり、その地との関わりの深さによるの。\\n\
-            h1111310私のように生家に根付いた霊はいわずもがな。\\n\
+            h1111310私のように生家に根付いた霊は言わずもがな。\\n\
             h1111205……まあ、強いからといって良いことばかりでもないわ。\\n\
-            h1111203霊にも社会がある。h1111205上位者の義務というものも。\\n\
+            h1111203霊にも社会がある。h1111205\\_a[NoblesseOblige,義務ってどんなこと？]上位者の義務\\_aというものも。\\n\
             \\n\
             h1111210……はじめは億劫だと思っていたのだけどね。\\n\
             h1111206悪くないものよ。感謝され、慕われるというのは。\
             ".to_string(),
-          required_condition: None,
-          callback: None,
+            required_condition: None,
+            callback: None,
         }),
 
         // - この街には霊が集まりやすい
