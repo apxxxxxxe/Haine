@@ -68,7 +68,7 @@ macro_rules! generate_mut_getter {
   };
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub enum PendingEvent {
   ConfessionOfSuicide,
   UnlockingLoreTalks,

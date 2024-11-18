@@ -9,9 +9,9 @@ use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
-const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
-const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
-const TALK_UNLOCK_COUNT_LORE: u64 = 10;
+pub const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
+pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
+pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
 pub fn on_notify_user_info(req: &Request) -> Response {
   let vars = get_global_vars();
@@ -23,9 +23,9 @@ pub fn on_notify_user_info(req: &Request) -> Response {
   new_response_nocontent()
 }
 
-pub fn on_minute_change(_req: &Request) -> Result<Response, ShioriError> {
+pub fn on_minute_change(_req: &Request) -> Response {
   check_story_events();
-  Ok(new_response_nocontent())
+  new_response_nocontent()
 }
 
 pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
