@@ -1,4 +1,3 @@
-use crate::events::suicide_coming_out;
 use crate::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
@@ -42,18 +41,6 @@ pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
         Ok(new_response_nocontent())
       }
     }
-
-    "s" => {
-      if vars.volatility.debug_mode() {
-        new_response_with_value_with_translate(
-          suicide_coming_out(),
-          TranslateOption::simple_translate(),
-        )
-      } else {
-        Ok(new_response_nocontent())
-      }
-    }
-
     _ => Ok(new_response_nocontent()),
   }
 }
