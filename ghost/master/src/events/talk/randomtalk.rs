@@ -5,9 +5,6 @@ use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 
-pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
-pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
-
 // 私/主: 50代の身綺麗な男
 // 僕/主様: 30代のおとなしい男
 // わたし/主さま: 20代の活発な女

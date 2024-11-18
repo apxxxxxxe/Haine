@@ -118,6 +118,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnAiTalk" => Some(EventHandler::MayFailure(on_ai_talk)),
     "OnAnchorSelectEx" => Some(EventHandler::MayFailure(on_anchor_select_ex)),
     "OnNotifyUserInfo" => Some(EventHandler::AlwaysSuccess(on_notify_user_info)),
+    "OnMinuteChange" => Some(EventHandler::AlwaysSuccess(on_minute_change)),
     "OnSecondChange" => Some(EventHandler::MayFailure(on_second_change)),
     "OnSurfaceChange" => Some(EventHandler::MayFailure(on_surface_change)),
     "OnSmoothBlink" => Some(EventHandler::MayFailure(on_smooth_blink)),

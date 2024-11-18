@@ -1,3 +1,4 @@
+use crate::events::check_story_events;
 use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::first_boot::{
@@ -8,8 +9,6 @@ use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use chrono::Timelike;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
-
-pub const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
 
 pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
@@ -28,6 +27,8 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     );
     return Ok(res);
   }
+
+  check_story_events();
 
   let talks = all_combo(&vec![
     vec![render_immersive_icon()],

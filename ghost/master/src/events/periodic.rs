@@ -3,10 +3,15 @@ use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::status::Status;
+use crate::variables::PendingEvent;
 use crate::variables::{get_global_vars, EventFlag};
 use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
+
+const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
+const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
+const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
 pub fn on_notify_user_info(req: &Request) -> Response {
   let vars = get_global_vars();
@@ -16,6 +21,11 @@ pub fn on_notify_user_info(req: &Request) -> Response {
     vars.set_user_name(Some(user_name));
   }
   new_response_nocontent()
+}
+
+pub fn on_minute_change(_req: &Request) -> Result<Response, ShioriError> {
+  check_story_events();
+  Ok(new_response_nocontent())
 }
 
 pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
@@ -149,4 +159,31 @@ pub fn on_surface_change(req: &Request) -> Result<Response, ShioriError> {
   get_global_vars().volatility.set_current_surface(surface);
 
   Ok(new_response_nocontent())
+}
+
+pub fn check_story_events() {
+  let vars = get_global_vars();
+  if !vars
+    .flags()
+    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
+    && vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT
+  {
+    // 従者コメント開放
+    vars.set_pending_event_talk(Some(PendingEvent::UnlockingServantsComments));
+  } else if !vars
+    .flags()
+    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
+    && vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_LORE
+  {
+    // ロアトーク開放
+    vars.set_pending_event_talk(Some(PendingEvent::UnlockingLoreTalks));
+  } else if !vars
+    .flags()
+    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Past))
+    && vars.total_boot_count() >= UNLOCK_PAST_BOOT_COUNT
+    && vars.flags().check(&EventFlag::FirstPlaceChange)
+  {
+    // 情報解禁&過去トーク開放
+    vars.set_pending_event_talk(Some(PendingEvent::ConfessionOfSuicide));
+  }
 }
