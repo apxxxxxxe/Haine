@@ -75,6 +75,12 @@ pub enum PendingEvent {
   UnlockingServantsComments,
 }
 
+impl std::fmt::Display for PendingEvent {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.title())
+  }
+}
+
 impl PendingEvent {
   const SUICIDE: &'static str = "ハイネの様子を観察する";
   const LORE_TALKS: &'static str = "新しい話";

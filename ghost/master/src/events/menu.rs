@@ -74,7 +74,8 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         \\![*]\\q[呼び名を変える,OnChangingUserName]\\n\
         {}\
         {}\
-        \\_l[0,0]{}\
+        \\1{}\
+        \\0\\_l[0,0]{}\
         ",
         if vars.volatility.talking_place() == TalkingPlace::Library {
           "耳を澄ます"
@@ -100,6 +101,11 @@ pub fn on_menu_exec(_req: &Request) -> Response {
         },
         talk_interval_selector,
         close_button,
+        if let Some(event) = vars.pending_event_talk() {
+          format!("\\![*]\\q[{},OnStoryEvent,{}]", event, event)
+        } else {
+          "".to_string()
+        },
         if vars.volatility.talking_place() == TalkingPlace::Library {
           show_bar_with_simple_label(
             100,
