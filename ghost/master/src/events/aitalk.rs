@@ -13,8 +13,9 @@ use crate::events::{
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
-// トーク1回あたりに上昇する没入度の割合(%)
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
+// トーク1回あたりに増減する没入度の割合(%)
+pub const IMMERSIVE_RATE: u32 = 5;
 
 pub const IMMERSIVE_ICON_COUNT: u32 = 5;
 
@@ -106,6 +107,22 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       "".to_string()
     }
   };
+
+  // 没入度を増減
+  // トークのたび燭台への干渉を修復する方へ没入度が増減する
+  if vars.volatility.talking_place() == TalkingPlace::LivingRoom {
+    vars.volatility.set_immersive_degrees(
+      vars
+        .volatility
+        .immersive_degrees()
+        .saturating_sub(IMMERSIVE_RATE),
+    );
+  } else {
+    let new_rate = vars.volatility.immersive_degrees() + IMMERSIVE_RATE;
+    vars
+      .volatility
+      .set_immersive_degrees(new_rate.min(IMMERSIVE_RATE_MAX));
+  }
 
   new_response_with_value_with_translate(
     format!(
@@ -260,7 +277,7 @@ mod test {
 
     // 初回没入度マックス時の場所変更
     assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
-    for _i in 0..IMMERSIVE_ICON_COUNT  {
+    for _i in 0..IMMERSIVE_ICON_COUNT {
       on_mouse_double_click(&on_mouse_double_click_req)?;
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
