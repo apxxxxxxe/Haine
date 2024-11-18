@@ -5,9 +5,7 @@ use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 
-pub const TALK_ID_SERVANT_INTRO: &str = "従者について：イントロ";
 pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
-pub const TALK_ID_LORE_INTRO: &str = "死に対する興味：イントロ";
 pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
 // 私/主: 50代の身綺麗な男
@@ -100,65 +98,6 @@ struct RandomTalk {
 pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   let strings: Vec<RandomTalkType> = match talk_type {
       TalkType::SelfIntroduce => vec![
-
-        RandomTalkType::Single(RandomTalk {
-        id: TALK_ID_LORE_INTRO.to_string(),
-          text: format!("\
-            h1111201死について。深く考えることはある？\\n\
-            h1111206……あなたには聞くまでもないようね。\\n\
-            h1111205私もそう。\\n\
-            生きていたころから、なぜ生きるのか、死ぬとはどういうことかをずっと考えていたわ。\\n\
-            いくつか不思議な話を知っているの。\\n\
-            話の種に、いくつか語ってみましょうか。{}\
-            ",
-            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Lore)) {
-              render_achievement_message(TalkType::Lore)
-            } else {
-              "".to_string()
-            },
-            ),
-            // FIXME: 開放条件見直し
-            required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_LORE),
-            callback: Some(|| {
-              get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Lore));
-            }),
-        }),
-
-        RandomTalkType::Single(RandomTalk {
-          id: TALK_ID_SERVANT_INTRO.to_string(),
-          text: format!("\
-            \\1……h1111101\\1お茶がなくなってしまった。\\n\
-            最初にハイネに言われたのを思いだし、\\n\
-            部屋の隅に向って手を上げてみせる。\\n\
-            h1111204\\1するとポットが浮き上がり、空になっていたカップにお茶が注がれた。\\n\
-            \\0……h1111206彼らは私のことを「主」と呼ぶの。\\n\
-            契約関係としては対等なのだけれど、彼ら自身がそう呼ぶのを好むのよ。\\n\
-            \\n\
-            h1111209耳を澄ませていれば、彼らの声が聞こえることもあるんじゃない？\\n\
-            私を通して彼らとも縁ができているはずだから。{}{}\
-            ",
-            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
-              let user_name = if let Some(name) = get_global_vars().user_name() {
-                name.to_string()
-              } else {
-                "お客".to_string()
-              };
-              format!("\\![set,balloonnum,おや、本当だ。よろしくね、{}さん。]", user_name)
-            } else {
-              "".to_string()
-            },
-            if !get_global_vars().flags().check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
-              render_achievement_message(TalkType::Servant)
-            } else {
-              "".to_string()
-            },
-          ),
-          // FIXME: 開放条件見直し
-          required_condition: Some(|vars| vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT),
-          callback: Some(|| {
-            get_global_vars().flags_mut().done(EventFlag::TalkTypeUnlock(TalkType::Servant));
-          }),
-        }),
 
         // - 霊は姿を変えることはできない
         // - ハイネは人目を気にして外出を避けている
@@ -327,6 +266,21 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       ],
 
       TalkType::WithYou => vec![
+
+        // - ハイネは人間観察を人一倍好む
+        RandomTalkType::Single(RandomTalk {
+          id: "人間観察".to_string(),
+          text: "\
+            h1111104\\1ハイネはこちらをじっと観察している……\\n\
+            \\0……h1111201あら、気に障ったかしら。\\n\
+            \\1『何かあった？』\\n\
+            h1111204いえ、ただあなたを見ていただけ。\\n\
+            h1111211気にせず続けてちょうだい。\\n\
+            \\1……落ち着かない……。\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
 
         // - 幽霊は写真に写らない
         // - ハイネは現代の知識を持っている

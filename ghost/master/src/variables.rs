@@ -68,9 +68,37 @@ macro_rules! generate_mut_getter {
   };
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum PendingEvent {
+  ConfessionOfSuicide,
+  UnlockingLoreTalks,
+  UnlockingServantsComments,
+}
+
+impl PendingEvent {
+  const SUICIDE: &'static str = "ハイネの様子を観察する";
+  const LORE_TALKS: &'static str = "新しい話";
+  const SERVANTS: &'static str = "従者について";
+  pub fn from_str(title: &str) -> Option<Self> {
+    match title {
+      Self::SUICIDE => Some(Self::ConfessionOfSuicide),
+      Self::LORE_TALKS => Some(Self::UnlockingLoreTalks),
+      Self::SERVANTS => Some(Self::UnlockingServantsComments),
+      _ => None,
+    }
+  }
+  pub fn title(&self) -> &str {
+    match self {
+      Self::ConfessionOfSuicide => Self::SUICIDE,
+      Self::UnlockingLoreTalks => Self::LORE_TALKS,
+      Self::UnlockingServantsComments => Self::SERVANTS,
+    }
+  }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct GlobalVariables {
-  // ゴーストの累計起動回数
+  // ゴーストの累計起動回数
   total_boot_count: Mutex<u64>,
 
   // ゴーストの累計起動時間(秒数)
@@ -88,6 +116,8 @@ pub struct GlobalVariables {
 
   flags: Mutex<EventFlags>,
 
+  pending_event_talk: Mutex<Option<PendingEvent>>,
+
   // 起動ごとにリセットされる変数
   #[serde(skip)]
   pub volatility: VolatilityVariables,
@@ -104,6 +134,7 @@ impl GlobalVariables {
       volatility: VolatilityVariables::default(),
       cumulative_talk_count: Mutex::new(0),
       flags: Mutex::new(EventFlags::default()),
+      pending_event_talk: Mutex::new(None),
     };
 
     // 形態素解析器は時間がかかるので非同期的に初期化
@@ -119,7 +150,7 @@ impl GlobalVariables {
     }
     let now = chrono::Local::now();
     let backup_path = format!("vars_{}.json", now.format("%Y%m%d%H%M%S"));
-    std::fs::copy(VAR_PATH, &backup_path)?;
+    std::fs::copy(VAR_PATH, backup_path)?;
     Ok(())
   }
 
@@ -158,6 +189,9 @@ impl GlobalVariables {
     }
     if !vars.flags().is_empty() {
       self.set_flags(vars.flags());
+    }
+    if vars.pending_event_talk().is_some() {
+      self.set_pending_event_talk(vars.pending_event_talk());
     }
 
     self.delete_undefined_talks();
@@ -200,6 +234,7 @@ impl GlobalVariables {
   generate_getter_setter!(cumulative_talk_count, u64, cloneable);
   generate_getter_setter!(flags, EventFlags, cloneable);
   generate_mut_getter!(flags, EventFlags, non_cloneable);
+  generate_getter_setter!(pending_event_talk, Option<PendingEvent>, cloneable);
 }
 
 pub fn get_global_vars() -> &'static mut GlobalVariables {

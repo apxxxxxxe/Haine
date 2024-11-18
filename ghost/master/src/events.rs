@@ -144,6 +144,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnUserInput" => Some(EventHandler::MayFailure(on_user_input)),
     "OnChangingUserName" => Some(EventHandler::MayFailure(on_changing_user_name)),
     "OnImmersiveDegreeToggled" => Some(EventHandler::AlwaysSuccess(on_immersive_degree_toggled)),
+    "OnStoryEvent" => Some(EventHandler::MayFailure(on_story_event)),
     _ => None,
   }
 }

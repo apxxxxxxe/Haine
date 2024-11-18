@@ -3,69 +3,13 @@ use crate::events::common::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
-use crate::events::TalkType;
 use crate::events::TalkingPlace;
-use crate::events::IMMERSIVE_RATE_MAX;
 use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
 use chrono::Timelike;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
 pub const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
-
-pub fn suicide_coming_out() -> String {
-  let achievements_message = render_achievement_message(TalkType::Past);
-  format!(
-    "\
-    h1111105\\b[{}]……。\\1ハイネ……？\\n\
-    ……いつもの出迎えがないのを不思議に思っていたのだが、\\n\
-    彼女が思索に耽っているときに来てしまったようだ。\\n\
-    ……しばらくそっとしておこう……。\
-    \\0\\c\\b[{}]\\1\\b[-1]\\ch1000000───────────────\\_w[1200]\\c\
-    h1111110…………幽霊にとって、自身の死の記憶はある種のタブー。\\n\
-    誰もが持つがゆえの共通認識。\\n\
-    ……自身の死は恥部であると。\\n\
-    私も、彼らのそれには深く踏み込まない。\\n\
-    けれど、あの子は生者だから。\\n\
-    \\n\
-    いいえ、だからこそ\\n\
-    打ち明けることに意味がある。\
-    \\x\
-    h1000000───────────────\\_w[1200]\\c\
-    h1111105\\b[{}]……h1111101。\\n\
-    \\1ハイネ……？\\n\
-    \\0……{{user_name}}。\\n\
-    少し、話があるの。すぐに済むわ。\\x\
-    h1111106……私の過去について、\\n\
-    今まで話してこなかったわね。\\n\
-    h1111110あなたの過去を根掘り葉掘り聞いているくせに、\\n\
-    私はなにも明かさないのでは不公平だと思ったの。\\n\
-    今更といえば今更なのだけど。\\n\
-    ……だらだらと話しても仕方ないから、一つだけ。\\n\
-    \\x[noclear]\\n\
-    h1111305私はかつて、自殺をしたの。\\n\
-    \\1……。\\n\
-    \\0苦しみを終わらせたかったの。あなたと同じね。\\n\
-    h1111310けれど、運が悪かった。\\n\
-    この場所で自らを殺して、\\n\
-    ここに縛り付けられてしまった。\\n\
-    ずっと待っているというのは、この身の消滅。\\n\
-    h1111305今度こそ終わらせたいのよ。\\n\
-    h1111705\\_w[600]\\1言い終わると、彼女は深く息をついた。\\n\
-    \\0……h1121304どう思おうが、構わないわ。\\n\
-    ただ、私だけ明かさないのは嫌だったの。\\n\
-    \\n\
-    h1121310……h1111204さて、私の話は終わり。\\n\
-    h1111211時間を取らせて悪かったわね。\\n\
-    h1111206すぐにお茶を入れさせるわ。\\n\
-    語らいましょう、いつものように。\
-    \\1\\c{}",
-    TalkingPlace::LivingRoom.balloon_surface(),
-    TalkingPlace::Library.balloon_surface(),
-    TalkingPlace::LivingRoom.balloon_surface(),
-    achievements_message
-  )
-}
 
 pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
@@ -83,21 +27,6 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
       format!("{}(1/{})", FIRST_BOOT_MARKER, FIRST_RANDOMTALKS.len() + 1),
     );
     return Ok(res);
-  }
-
-  // 情報解禁&過去トーク開放
-  if !vars
-    .flags()
-    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Past))
-    && vars.total_boot_count() >= UNLOCK_PAST_BOOT_COUNT
-    && vars.flags().check(&EventFlag::FirstPlaceChange)
-  {
-    vars.volatility.set_immersive_degrees(IMMERSIVE_RATE_MAX);
-    vars.volatility.set_talking_place(TalkingPlace::Library);
-    vars
-      .flags_mut()
-      .done(EventFlag::TalkTypeUnlock(TalkType::Past));
-    return new_response_with_value_with_translate(suicide_coming_out(), TranslateOption::simple_translate());
   }
 
   let talks = all_combo(&vec![
