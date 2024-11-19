@@ -264,16 +264,31 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 
       TalkType::WithYou => vec![
 
+        // - ハイネはユーザの生活をすべて面倒見ることはできない
+        RandomTalkType::Single(RandomTalk {
+            id: "生活の面倒".to_string(),
+            text: "\
+              h1111205あなたの生活のすべてについて、\\n\
+              面倒を見ることはできないわ。\\n\
+              h1111210生者と死者の溝は埋めがたい。\\n\
+              私たちがこうして同じテーブルについているのも、\\n\
+              ひどく不自然で、一時的なこと。\\n\
+              ……h1111304だからこそ面白いのだけれど、ね。\
+              ".to_string(),
+            required_condition: None,
+            callback: None,
+        }),
+
         // - ハイネは人間観察を人一倍好む
         RandomTalkType::Single(RandomTalk {
           id: "人間観察".to_string(),
           text: "\
-            h1111104\\1ハイネはこちらをじっと観察している……\\n\
+            h1111104\\1ハイネはこちらの作業をじっと観察している……\\n\
             \\0……h1111201あら、気に障ったかしら。\\n\
             \\1『何かあった？』\\n\
-            h1111204いえ、ただあなたを見ていただけ。\\n\
-            h1111211気にせず続けてちょうだい。\\n\
-            \\1……落ち着かない……。\
+            h1111204いえ、ただあなたを見ているだけ。\\n\
+            気にせず続けてちょうだい。\\n\
+            h1111211\\1……落ち着かない……。\
             ".to_string(),
           required_condition: None,
           callback: None,
