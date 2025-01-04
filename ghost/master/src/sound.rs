@@ -5,7 +5,7 @@ use std::sync::{Arc, Mutex};
 
 static mut PLAYER: Option<Player> = None;
 
-pub struct Player {
+pub(crate) struct Player {
   // 直接アクセスされることはない
   // ただし、drop時にストリームが閉じられるため、変数として保持しておく必要がある
   stream: OutputStream,
@@ -54,7 +54,7 @@ impl Player {
   }
 }
 
-pub fn force_free_player() {
+pub(crate) fn force_free_player() {
   debug!("free_player");
   let player = get_player();
   if let Some(p) = player {
@@ -71,7 +71,7 @@ pub fn force_free_player() {
   debug!("force_free_player done");
 }
 
-pub fn cooperative_free_player() {
+pub(crate) fn cooperative_free_player() {
   debug!("sleep until end");
   let player = get_player();
   if let Some(p) = player {
@@ -91,7 +91,7 @@ pub fn cooperative_free_player() {
   debug!("cooperative_free_player done");
 }
 
-pub fn get_player() -> Option<&'static mut Player> {
+pub(crate) fn get_player() -> Option<&'static mut Player> {
   if unsafe { PLAYER.is_none() } {
     unsafe {
       PLAYER = Player::new();
@@ -100,7 +100,7 @@ pub fn get_player() -> Option<&'static mut Player> {
   unsafe { PLAYER.as_mut() }
 }
 
-pub fn play_sound(file: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub(crate) fn play_sound(file: &str) -> Result<(), Box<dyn std::error::Error>> {
   let player = if let Some(p) = get_player() {
     p
   } else {

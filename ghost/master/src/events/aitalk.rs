@@ -13,13 +13,13 @@ use crate::events::{
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
-pub const IMMERSIVE_RATE_MAX: u32 = 100;
+pub(crate) const IMMERSIVE_RATE_MAX: u32 = 100;
 // トーク1回あたりに増減する没入度の割合(%)
-pub const IMMERSIVE_RATE: u32 = 5;
+pub(crate) const IMMERSIVE_RATE: u32 = 5;
 
-pub const IMMERSIVE_ICON_COUNT: u32 = 5;
+pub(crate) const IMMERSIVE_ICON_COUNT: u32 = 5;
 
-pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let if_consume_talk_bias = vars.volatility.idle_seconds() < IDLE_THRESHOLD;
   vars
@@ -170,7 +170,7 @@ fn first_random_talk_response(
   Ok(res)
 }
 
-pub fn on_anchor_select_ex(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_anchor_select_ex(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   let id = refs[1];

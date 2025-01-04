@@ -1,4 +1,4 @@
-pub fn anchor_talks(id: &str) -> Option<String> {
+pub(crate) fn anchor_talks(id: &str) -> Option<String> {
   match id {
     "Misemono" => Some(
       "\

@@ -2,7 +2,7 @@ use shiorust::message::{traits::*, Request};
 use std::fmt::Display;
 
 #[derive(Clone, Debug, Default)]
-pub struct Status {
+pub(crate) struct Status {
   pub talking: bool,
   pub choosing: bool,
   pub minimizing: bool,

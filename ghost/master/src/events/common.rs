@@ -12,9 +12,9 @@ use std::collections::HashSet;
 
 use shiorust::message::{parts::HeaderName, parts::*, traits::*, Request, Response};
 
-pub const REMOVE_BALLOON_NUM: &str = "\\0\\![set,balloonnum,,,]";
-pub const RESET_BINDS: &str = "\\![bind,シルエット,,0]\\![bind,ex,,0]";
-pub const STICK_SURFACE: &str = "\
+pub(crate) const REMOVE_BALLOON_NUM: &str = "\\0\\![set,balloonnum,,,]";
+pub(crate) const RESET_BINDS: &str = "\\![bind,シルエット,,0]\\![bind,ex,,0]";
+pub(crate) const STICK_SURFACE: &str = "\
   \\C\
   \\1\
   \\![reset,sticky-window]\
@@ -24,13 +24,13 @@ pub const STICK_SURFACE: &str = "\
   \\0\
   ";
 
-pub fn on_stick_surface(_req: &Request) -> Response {
+pub(crate) fn on_stick_surface(_req: &Request) -> Response {
   // \1のサーフェスを\0に重ねて固定する
   new_response_with_value_with_notranslate(STICK_SURFACE.to_string(), TranslateOption::none())
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TranslateOption {
+pub(crate) enum TranslateOption {
   DoTranslate,
   CompleteShadow,
   CompleteBalloonSurface,
@@ -65,7 +65,7 @@ impl TranslateOption {
   }
 }
 
-pub fn add_error_description(res: &mut Response, error: &str) {
+pub(crate) fn add_error_description(res: &mut Response, error: &str) {
   res
     .headers
     .insert(HeaderName::from("ErrorDescription"), error.to_string());
@@ -74,7 +74,7 @@ pub fn add_error_description(res: &mut Response, error: &str) {
     .insert(HeaderName::from("ErrorLevel"), "error".to_string());
 }
 
-pub fn new_response() -> Response {
+pub(crate) fn new_response() -> Response {
   let mut headers = Headers::new();
   headers.insert(
     HeaderName::Standard(StandardHeaderName::Charset),
@@ -87,13 +87,13 @@ pub fn new_response() -> Response {
   }
 }
 
-pub fn new_response_nocontent() -> Response {
+pub(crate) fn new_response_nocontent() -> Response {
   let mut r = new_response();
   r.status = Status::NoContent;
   r
 }
 
-pub fn new_response_with_value_with_notranslate(
+pub(crate) fn new_response_with_value_with_notranslate(
   value: String,
   option: HashSet<TranslateOption>,
 ) -> Response {
@@ -116,7 +116,7 @@ pub fn new_response_with_value_with_notranslate(
   r
 }
 
-pub fn new_response_with_value_with_translate(
+pub(crate) fn new_response_with_value_with_translate(
   value: String,
   option: HashSet<TranslateOption>,
 ) -> Result<Response, ShioriError> {
@@ -150,7 +150,7 @@ pub fn new_response_with_value_with_translate(
   Ok(r)
 }
 
-pub fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> Option<usize> {
+pub(crate) fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> Option<usize> {
   if values.is_empty() {
     return None;
   }
@@ -164,7 +164,7 @@ pub fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> Option<u
 
 // return all combinations of values
 // e.g. [a, b], [c, d], [e, f] => "ace", "acf", "ade", "adf", "bce", "bcf", "bde", "bdf"
-pub fn all_combo(values: &Vec<Vec<String>>) -> Vec<String> {
+pub(crate) fn all_combo(values: &Vec<Vec<String>>) -> Vec<String> {
   let mut result = Vec::new();
   let mut current = Vec::new();
   all_combo_inner(values, &mut result, &mut current, 0);
@@ -188,7 +188,7 @@ fn all_combo_inner(
   }
 }
 
-pub fn get_references(req: &Request) -> Vec<&str> {
+pub(crate) fn get_references(req: &Request) -> Vec<&str> {
   let mut references: Vec<&str> = Vec::new();
   let mut i = 0;
   while let Some(value) = req
@@ -201,7 +201,7 @@ pub fn get_references(req: &Request) -> Vec<&str> {
   references
 }
 
-pub fn render_shadow(is_complete: bool) -> String {
+pub(crate) fn render_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -200;
   let vars = get_global_vars();
@@ -330,7 +330,7 @@ impl BlinkTransition {
 }
 
 // サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
-pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   let transitions = BlinkTransition::all();
   const DELAY: i32 = 100;
   const CLOSE_EYES_INDEX: i32 = 10;
@@ -409,7 +409,7 @@ pub fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   Ok(res)
 }
 
-pub enum Icon {
+pub(crate) enum Icon {
   Info,
   Cross,
 }
@@ -437,7 +437,7 @@ impl Icon {
   }
 }
 
-pub fn render_achievement_message(talk_type: TalkType) -> String {
+pub(crate) fn render_achievement_message(talk_type: TalkType) -> String {
   format!(
     "\\1\\![quicksection,1]\
     \\f[align,center]\\f[valign,center]\\f[bold,1]\
@@ -447,7 +447,7 @@ pub fn render_achievement_message(talk_type: TalkType) -> String {
   )
 }
 
-pub fn shake_with_notext() -> String {
+pub(crate) fn shake_with_notext() -> String {
   let shakes = [(10, 10), (-14, -14), (4, 4)];
   shakes
     .iter()
@@ -456,7 +456,7 @@ pub fn shake_with_notext() -> String {
     .join("")
 }
 
-pub fn render_immersive_icon() -> String {
+pub(crate) fn render_immersive_icon() -> String {
   let vars = get_global_vars();
   let immersive_degrees = vars.volatility.immersive_degrees();
   let icon_count_float =

@@ -6,7 +6,7 @@ use crate::events::talk::random_talks_analysis;
 use crate::variables::{get_global_vars, EventFlag, GlobalVariables, GHOST_NAME};
 use shiorust::message::{Request, Response};
 
-pub fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   match refs[0] {

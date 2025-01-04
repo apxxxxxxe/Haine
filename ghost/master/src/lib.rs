@@ -28,11 +28,6 @@ extern crate simplelog;
 
 use simplelog::*;
 
-#[derive(Debug)]
-pub enum ResponseError {
-  DecodeFailed,
-}
-
 #[no_mangle]
 pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
   let v = GStr::capture(h, len as usize);

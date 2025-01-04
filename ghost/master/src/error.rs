@@ -2,7 +2,7 @@ use std::error::Error;
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ShioriError {
+pub(crate) enum ShioriError {
   UndefinedVariable,
   ParseIntError,
   SystemTimeError,

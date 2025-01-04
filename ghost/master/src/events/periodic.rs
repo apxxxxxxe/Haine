@@ -9,11 +9,11 @@ use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
-pub const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
-pub const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
-pub const TALK_UNLOCK_COUNT_LORE: u64 = 10;
+pub(crate) const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
+pub(crate) const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
+pub(crate) const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
-pub fn on_notify_user_info(req: &Request) -> Response {
+pub(crate) fn on_notify_user_info(req: &Request) -> Response {
   let vars = get_global_vars();
   let refs = get_references(req);
   let user_name = refs[0].to_string();
@@ -23,12 +23,12 @@ pub fn on_notify_user_info(req: &Request) -> Response {
   new_response_nocontent()
 }
 
-pub fn on_minute_change(_req: &Request) -> Response {
+pub(crate) fn on_minute_change(_req: &Request) -> Response {
   check_story_events();
   new_response_nocontent()
 }
 
-pub fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
 
   // 最小化中かどうかに関わらず実行する処理
@@ -149,7 +149,7 @@ fn tanka(text: &str, author: &str) -> String {
   format!("{}\\n\\f[align,right]({})", text, author)
 }
 
-pub fn on_surface_change(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_surface_change(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let surface = match refs[0].parse::<i32>() {
     Ok(v) => v,
@@ -161,7 +161,7 @@ pub fn on_surface_change(req: &Request) -> Result<Response, ShioriError> {
   Ok(new_response_nocontent())
 }
 
-pub fn check_story_events() {
+pub(crate) fn check_story_events() {
   let vars = get_global_vars();
   if !vars
     .flags()

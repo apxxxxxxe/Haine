@@ -5,7 +5,7 @@ use shiorust::message::{Request, Response};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
-pub enum InputId {
+pub(crate) enum InputId {
   UserName,
 }
 
@@ -26,7 +26,7 @@ impl InputId {
   }
 }
 
-pub fn on_user_input(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_user_input(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let input_id = if let Some(input_id) = InputId::from_str(refs[0]) {
     input_id
@@ -54,7 +54,7 @@ fn input_user_name(text: String) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
-pub fn on_window_state_restore(_req: &Request) -> Response {
+pub(crate) fn on_window_state_restore(_req: &Request) -> Response {
   let vars = get_global_vars();
   // トーク間隔をリセット
   vars

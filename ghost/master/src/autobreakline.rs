@@ -11,7 +11,7 @@ use vibrato::{Dictionary, Tokenizer};
 static SAKURA_SCRIPT_RE: Lazy<Regex> =
   lazy_regex!(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###);
 
-pub static CHANGE_SCOPE_RE: Lazy<FancyRegex> = lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
+pub(crate) static CHANGE_SCOPE_RE: Lazy<FancyRegex> = lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
 
 fn find_change_scope(text: &str) -> Option<String> {
   if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {
@@ -25,7 +25,7 @@ fn find_change_scope(text: &str) -> Option<String> {
   None
 }
 
-pub fn extract_scope(text: &str) -> Option<usize> {
+pub(crate) fn extract_scope(text: &str) -> Option<usize> {
   static RE_NOT_NUMBER: Lazy<Regex> = lazy_regex!(r"[^\d]");
 
   if let Some(scope_tag) = find_change_scope(text) {
@@ -39,13 +39,13 @@ pub fn extract_scope(text: &str) -> Option<usize> {
 }
 
 #[derive(PartialEq, PartialOrd, Eq, Ord, Debug)]
-pub enum Rank {
+pub(crate) enum Rank {
   Break,
   Append,
   Normal,
 }
 
-pub struct Inserter {
+pub(crate) struct Inserter {
   cols_num: f32,
   tokenizer: Arc<Mutex<Option<Tokenizer>>>,
   join_handle: Option<JoinHandle<()>>,

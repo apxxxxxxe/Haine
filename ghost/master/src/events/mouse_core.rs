@@ -23,7 +23,7 @@ const WHEEL_THRESHOLD: i32 = 3;
 const WHEEL_LIFETIME: u128 = 3000;
 
 #[derive(PartialEq, Clone)]
-pub enum Direction {
+pub(crate) enum Direction {
   Up,
   Down,
 }
@@ -37,7 +37,7 @@ impl Direction {
   }
 }
 
-pub fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   let now = SystemTime::now();
@@ -75,12 +75,12 @@ pub fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
   }
 }
 
-pub fn on_mouse_double_click(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_mouse_double_click(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   new_mouse_response(req, format!("{}{}doubleclick", refs[3], refs[4]))
 }
 
-pub fn on_mouse_click_ex(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_mouse_click_ex(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   if refs[5] == "middle" {
     new_mouse_response(req, format!("{}{}middleclick", refs[3], refs[4]))
@@ -89,7 +89,7 @@ pub fn on_mouse_click_ex(req: &Request) -> Result<Response, ShioriError> {
   }
 }
 
-pub fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let refs = get_references(req);
   let status = Status::from_request(req);
