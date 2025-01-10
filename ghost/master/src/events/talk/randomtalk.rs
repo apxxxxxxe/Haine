@@ -1005,9 +1005,9 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalkType::Single(RandomTalk {
           id: "得ることは失うこと".to_string(),
           text: "\
-            h1111110あまねく変化は表裏一体。\\n\
-            h1111106何かを得るとき、選択は慎重にしなければ。\\n\
-            h1111105それは失うものをも左右するのだから。\\n\
+            h1111110ひとつ得るとき、ひとつ失う。\\n\
+            h1111106あなたは今日、なにを失った？\\n\
+            h1111105その喪失は、なにをあなたに齎した？\
             ".to_string(),
           required_condition: None,
           callback: None,
