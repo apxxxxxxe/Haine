@@ -118,9 +118,9 @@ macro_rules! lazy_fancy_regex {
 
 #[allow(clippy::missing_safety_doc)]
 #[no_mangle]
-pub unsafe extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
+pub extern "cdecl" fn request(h: HGLOBAL, len: &mut c_long) -> HGLOBAL {
   // リクエストの取得
-  let v = unsafe { GStr::capture(h, *len as usize) };
+  let v = GStr::capture(h, *len as usize);
 
   let s = if let Ok(s) = v.to_utf8_str() {
     s
@@ -131,7 +131,7 @@ pub unsafe extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
     add_error_description(&mut res, err);
     let bytes = res.to_string().into_bytes();
     let response_gstr = GStr::clone_from_slice_nofree(&bytes);
-    unsafe { *len = response_gstr.len() as c_long };
+    *len = response_gstr.len() as c_long;
     return response_gstr.handle();
   };
 
@@ -144,7 +144,7 @@ pub unsafe extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
     add_error_description(&mut res, err.as_str());
     let bytes = res.to_string().into_bytes();
     let response_gstr = GStr::clone_from_slice_nofree(&bytes);
-    unsafe { *len = response_gstr.len() as c_long };
+    *len = response_gstr.len() as c_long;
     return response_gstr.handle();
   };
 
@@ -161,6 +161,6 @@ pub unsafe extern "cdecl" fn request(h: HGLOBAL, len: *mut c_long) -> HGLOBAL {
 
   let bytes = response.to_string().into_bytes();
   let response_gstr = GStr::clone_from_slice_nofree(&bytes);
-  unsafe { *len = response_gstr.len() as c_long };
+  *len = response_gstr.len() as c_long;
   response_gstr.handle()
 }
