@@ -20,7 +20,7 @@ use strum_macros::EnumIter;
 pub struct Talk {
   pub talk_type: Option<TalkType>,
   pub text: String,
-  pub id: &'static str,
+  pub id: String,
   pub callback: Option<fn()>,
 }
 
@@ -49,7 +49,7 @@ impl Talk {
 impl Talk {
   pub fn new(
     talk_type: Option<TalkType>,
-    id: &'static str,
+    id: String,
     text: String,
     callback: Option<fn()>,
   ) -> Self {
@@ -72,7 +72,7 @@ impl Talk {
 
   pub fn get_unseen_talks(talk_type: TalkType, seen: &HashSet<String>) -> Option<Vec<Talk>> {
     let talks = random_talks(talk_type)?;
-    Some(talks.into_iter().filter(|t| !seen.contains(t.id)).collect())
+    Some(talks.into_iter().filter(|t| !seen.contains(&t.id)).collect())
   }
 }
 

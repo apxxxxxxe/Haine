@@ -13,8 +13,9 @@ use crate::events::{
 use crate::variables::{get_global_vars, EventFlag, IDLE_THRESHOLD};
 use shiorust::message::{parts::*, traits::*, Request, Response};
 
-// トーク1回あたりに上昇する没入度の割合(%)
 pub const IMMERSIVE_RATE_MAX: u32 = 100;
+// トーク1回あたりに増減する没入度の割合(%)
+pub const IMMERSIVE_RATE: u32 = 5;
 
 pub const IMMERSIVE_ICON_COUNT: u32 = 5;
 
@@ -107,6 +108,22 @@ pub fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     }
   };
 
+  // 没入度を増減
+  // トークのたび燭台への干渉を修復する方へ没入度が増減する
+  if vars.volatility.talking_place() == TalkingPlace::LivingRoom {
+    vars.volatility.set_immersive_degrees(
+      vars
+        .volatility
+        .immersive_degrees()
+        .saturating_sub(IMMERSIVE_RATE),
+    );
+  } else {
+    let new_rate = vars.volatility.immersive_degrees() + IMMERSIVE_RATE;
+    vars
+      .volatility
+      .set_immersive_degrees(new_rate.min(IMMERSIVE_RATE_MAX));
+  }
+
   new_response_with_value_with_translate(
     format!(
       "\\0{}\\![set,balloonnum,{}]{}",
@@ -182,12 +199,13 @@ mod test {
   use super::*;
   use crate::events::on_boot;
   use crate::events::on_close;
+  use crate::events::on_minute_change;
   use crate::events::on_mouse_double_click;
-  use crate::events::talk::randomtalk::{
-    random_talks, TALK_ID_LORE_INTRO, TALK_ID_SERVANT_INTRO, TALK_UNLOCK_COUNT_LORE,
-    TALK_UNLOCK_COUNT_SERVANT,
-  };
+  use crate::events::on_story_event;
+  use crate::events::TALK_UNLOCK_COUNT_LORE;
+  use crate::events::TALK_UNLOCK_COUNT_SERVANT;
   use crate::events::UNLOCK_PAST_BOOT_COUNT;
+  use crate::variables::PendingEvent;
   use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::Request;
 
@@ -260,7 +278,7 @@ mod test {
 
     // 初回没入度マックス時の場所変更
     assert!(!vars.flags().check(&EventFlag::FirstPlaceChange));
-    for _i in 0..IMMERSIVE_ICON_COUNT  {
+    for _i in 0..IMMERSIVE_ICON_COUNT {
       on_mouse_double_click(&on_mouse_double_click_req)?;
     }
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
@@ -284,12 +302,12 @@ mod test {
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_SERVANT {
       on_ai_talk(&on_second_change_req)?;
     }
-    let r = random_talks(TalkType::SelfIntroduce).ok_or(Box::new(ShioriError::TalkNotFound))?;
-    let unlock_talk_servant = r.iter().find(|t| t.id == TALK_ID_SERVANT_INTRO);
-    if unlock_talk_servant.is_none() {
-      return Err("Failed to find unlock talk for servant".into());
-    }
-    unlock_talk_servant.unwrap().consume();
+    on_minute_change(&on_second_change_req);
+    let story_event = vars
+      .pending_event_talk()
+      .ok_or("Failed to get story event")?;
+    assert_eq!(story_event, PendingEvent::UnlockingServantsComments);
+    on_story_event(&make_story_event_request(story_event))?;
     assert!(vars
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)));
@@ -298,12 +316,12 @@ mod test {
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_LORE {
       on_ai_talk(&on_second_change_req)?;
     }
-    let r = random_talks(TalkType::SelfIntroduce).ok_or(Box::new(ShioriError::TalkNotFound))?;
-    let unlock_talk_lore = r.iter().find(|t| t.id == TALK_ID_LORE_INTRO);
-    if unlock_talk_lore.is_none() {
-      return Err("Failed to find unlock talk for lore".into());
-    }
-    unlock_talk_lore.unwrap().consume();
+    on_minute_change(&on_second_change_req);
+    let story_event = vars
+      .pending_event_talk()
+      .ok_or("Failed to get story event")?;
+    assert_eq!(story_event, PendingEvent::UnlockingLoreTalks);
+    on_story_event(&make_story_event_request(story_event))?;
     assert!(vars
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
@@ -324,11 +342,13 @@ mod test {
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Past)));
     assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
-    assert!(vars.total_boot_count() < UNLOCK_PAST_BOOT_COUNT - 1);
-    while vars.total_boot_count() < UNLOCK_PAST_BOOT_COUNT - 1 {
+    while vars.total_boot_count() < UNLOCK_PAST_BOOT_COUNT {
       on_boot(&on_second_change_req)?;
     }
-    let res = on_boot(&on_second_change_req)?;
+    let story_event = vars
+      .pending_event_talk()
+      .ok_or("Failed to get story event")?;
+    let res = on_story_event(&make_story_event_request(story_event))?;
     let value = res.headers.get("Value").ok_or("Failed to get value")?;
     assert!(value.contains(PAST_TALK_UNLOCK_TALK_PART)); // 過去トーク開放トークの内容が含まれていることの確認
     assert!(vars
@@ -338,5 +358,16 @@ mod test {
     assert_eq!(vars.volatility.immersive_degrees(), IMMERSIVE_RATE_MAX);
 
     Ok(())
+  }
+
+  fn make_story_event_request(event: PendingEvent) -> Request {
+    let mut headers = Headers::new();
+    headers.insert("ID", "OnStoryEvent".to_string());
+    headers.insert("Reference0", event.title().to_string());
+    Request {
+      method: Method::GET,
+      version: Version::V20,
+      headers,
+    }
   }
 }

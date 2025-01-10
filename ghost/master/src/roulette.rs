@@ -151,7 +151,7 @@ mod test {
 
     let talks: Vec<Talk> = ["a", "b", "c", "d", "e", "f", "g", "h"]
       .iter()
-      .map(|s| Talk::new(None, s, s.to_string(), None))
+      .map(|s| Talk::new(None, s.to_string(), s.to_string(), None))
       .collect();
 
     let mut indexes: Vec<usize> = vec![];
