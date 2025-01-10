@@ -1,15 +1,15 @@
-pub mod aitalk;
+pub(crate) mod aitalk;
 mod bootend;
-pub mod common;
+pub(crate) mod common;
 mod input;
 mod key;
 mod menu;
 mod mouse;
-pub mod mouse_core;
+pub(crate) mod mouse_core;
 mod periodic;
-pub mod talk;
+pub(crate) mod talk;
 mod tooltip;
-pub mod translate;
+pub(crate) mod translate;
 mod webclap;
 
 use crate::error::ShioriError;
@@ -30,7 +30,7 @@ use crate::variables::get_global_vars;
 use shiorust::message::{parts::*, traits::*, Request, Response};
 use std::fs;
 
-pub fn handle_request(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn handle_request(req: &Request) -> Result<Response, ShioriError> {
   match req.method {
     Method::GET => (),
     Method::NOTIFY => (),
@@ -99,7 +99,7 @@ fn uniqueid(req: &Request) -> Result<Response, ShioriError> {
   Ok(new_response_nocontent())
 }
 
-pub enum EventHandler {
+pub(crate) enum EventHandler {
   AlwaysSuccess(fn(&Request) -> Response),
   MayFailure(fn(&Request) -> Result<Response, ShioriError>),
 }

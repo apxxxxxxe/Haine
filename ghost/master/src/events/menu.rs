@@ -12,7 +12,7 @@ use crate::variables::PendingEvent;
 use crate::variables::{get_global_vars, EventFlag};
 use shiorust::message::{Request, Response};
 
-pub fn on_menu_exec(_req: &Request) -> Response {
+pub(crate) fn on_menu_exec(_req: &Request) -> Response {
   let current_talk_interval = get_global_vars().random_talk_interval().unwrap_or(180);
   let mut selections = Vec::new();
 
@@ -208,7 +208,7 @@ fn show_bar_with_simple_label(max: u32, current: u32, label: &str) -> String {
   )
 }
 
-pub fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let v = check_error!(refs[0].parse::<u64>(), ShioriError::ParseIntError);
   get_global_vars().set_random_talk_interval(Some(v));
@@ -301,7 +301,7 @@ impl Question {
   }
 }
 
-pub fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
   let mut questions = [
     Question::FEELING_OF_DEATH,
     Question::FATIGUE_OF_LIFE,
@@ -322,7 +322,7 @@ pub fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
 
-pub fn on_talk_answer(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_talk_answer(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let q = Question(check_error!(
     refs[0].parse::<u32>(),
@@ -331,7 +331,7 @@ pub fn on_talk_answer(req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(q.talk(), TranslateOption::with_shadow_completion())
 }
 
-pub fn on_check_talk_collection(_req: &Request) -> Response {
+pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
   let mut lines = Vec::new();
   let mut sum = 0;
   let mut all_sum = 0;
@@ -384,7 +384,7 @@ pub fn on_check_talk_collection(_req: &Request) -> Response {
   )
 }
 
-pub fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let user_name = if let Some(user_name) = vars.user_name() {
     user_name
@@ -402,7 +402,7 @@ pub fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {
   )
 }
 
-pub fn on_immersive_degree_toggled(req: &Request) -> Response {
+pub(crate) fn on_immersive_degree_toggled(req: &Request) -> Response {
   let vars = get_global_vars();
   vars
     .volatility
@@ -410,7 +410,7 @@ pub fn on_immersive_degree_toggled(req: &Request) -> Response {
   on_menu_exec(req)
 }
 
-pub fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let vars = get_global_vars();
   let s = if let Some(hoge) = PendingEvent::from_str(refs[0]) {

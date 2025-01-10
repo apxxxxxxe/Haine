@@ -10,7 +10,7 @@ use chrono::Timelike;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
-pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   vars.set_total_boot_count(vars.total_boot_count() + 1);
 
@@ -61,7 +61,7 @@ pub fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(v, TranslateOption::simple_translate())
 }
 
-pub fn on_close(_req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let mut parts = vec![vec![RESET_BINDS.to_string()]];
   let is_immersing = vars.volatility.talking_place() == TalkingPlace::Library;
@@ -107,7 +107,7 @@ pub fn on_close(_req: &Request) -> Result<Response, ShioriError> {
 }
 
 // FIXME: 実装予定
-pub fn on_vanish_selected(_req: &Request) -> Response {
+pub(crate) fn on_vanish_selected(_req: &Request) -> Response {
   new_response_nocontent()
 }
 

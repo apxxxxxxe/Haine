@@ -19,7 +19,7 @@ use shiorust::message::{Parser, Request, Response};
 const SOUND_LIGHT_CANDLE: &str = "マッチで火をつける.mp3";
 const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
 
-pub enum BodyPart {
+pub(crate) enum BodyPart {
   Head,
   Face,
   Mouth,
@@ -69,7 +69,7 @@ macro_rules! get_touch_info {
   };
 }
 
-pub fn new_mouse_response(req: &Request, info: String) -> Result<Response, ShioriError> {
+pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response, ShioriError> {
   let vars = get_global_vars();
   let last_touch_info = vars.volatility.last_touch_info();
   let status = Status::from_request(req);
@@ -166,7 +166,7 @@ fn is_first_sexial_allowed(vars: &mut GlobalVariables) -> bool {
     && vars.flags().check(&EventFlag::FirstClose)
 }
 
-pub fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriError> {
+pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriError> {
   let touch_count = get_touch_info!(info.as_str()).count()?;
 
   // 通常の触り反応候補
@@ -444,7 +444,7 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
   None
 }
 
-pub fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (Vec<String>, bool) {
+pub(crate) fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (Vec<String>, bool) {
   let dialog_lengthes = phased_talk_list
     .iter()
     .map(|x| x.len() as u32)

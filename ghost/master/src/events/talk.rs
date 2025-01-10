@@ -1,6 +1,6 @@
-pub mod anchor;
-pub mod first_boot;
-pub mod randomtalk;
+pub(crate) mod anchor;
+pub(crate) mod first_boot;
+pub(crate) mod randomtalk;
 
 use crate::check_error;
 use crate::error::ShioriError;
@@ -17,7 +17,7 @@ use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
 #[derive(Clone)]
-pub struct Talk {
+pub(crate) struct Talk {
   pub talk_type: Option<TalkType>,
   pub text: String,
   pub id: String,
@@ -77,7 +77,7 @@ impl Talk {
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
-pub enum TalkType {
+pub(crate) enum TalkType {
   SelfIntroduce,
   WithYou,
   Servant,
@@ -111,7 +111,7 @@ impl TalkType {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub enum TalkingPlace {
+pub(crate) enum TalkingPlace {
   LivingRoom,
   Library,
 }
@@ -142,7 +142,7 @@ impl TalkingPlace {
   }
 }
 
-pub fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let talk_type_num = check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError);
   let talk_type = TalkType::from_u32(talk_type_num).unwrap();
@@ -163,7 +163,7 @@ pub fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriError> {
   )
 }
 
-pub fn register_talk_collection(talk: &Talk) -> Result<(), ShioriError> {
+pub(crate) fn register_talk_collection(talk: &Talk) -> Result<(), ShioriError> {
   let mut talk_collection = get_global_vars().talk_collection_mut();
   match talk_collection.get_mut(&(talk.talk_type.ok_or(ShioriError::FieldAccessError)?)) {
     Some(t) => {
@@ -182,7 +182,7 @@ pub fn register_talk_collection(talk: &Talk) -> Result<(), ShioriError> {
   Ok(())
 }
 
-pub fn random_talks_analysis() -> String {
+pub(crate) fn random_talks_analysis() -> String {
   let mut s = String::new();
   let mut sum = 0;
   for talk_type in TalkType::all() {

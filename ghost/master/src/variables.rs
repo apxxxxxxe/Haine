@@ -13,7 +13,7 @@ use std::error::Error;
 use std::sync::Mutex;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
-pub const GHOST_NAME: &str = "Crave The Grave";
+pub(crate) const GHOST_NAME: &str = "Crave The Grave";
 const VAR_PATH: &str = "vars.json";
 static mut GLOBALVARS: Option<GlobalVariables> = None;
 
@@ -69,7 +69,7 @@ macro_rules! generate_mut_getter {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
-pub enum PendingEvent {
+pub(crate) enum PendingEvent {
   ConfessionOfSuicide,
   UnlockingLoreTalks,
   UnlockingServantsComments,
@@ -103,7 +103,7 @@ impl PendingEvent {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct GlobalVariables {
+pub(crate) struct GlobalVariables {
   // ゴーストの累計起動回数
   total_boot_count: Mutex<u64>,
 
@@ -243,7 +243,7 @@ impl GlobalVariables {
   generate_getter_setter!(pending_event_talk, Option<PendingEvent>, cloneable);
 }
 
-pub fn get_global_vars() -> &'static mut GlobalVariables {
+pub(crate) fn get_global_vars() -> &'static mut GlobalVariables {
   unsafe {
     if GLOBALVARS.is_none() {
       GLOBALVARS = Some(GlobalVariables::new());
@@ -253,7 +253,7 @@ pub fn get_global_vars() -> &'static mut GlobalVariables {
 }
 
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
-pub enum EventFlag {
+pub(crate) enum EventFlag {
   FirstBoot,
   FirstRandomTalkDone(u32),
   FirstPlaceChange,
@@ -265,7 +265,7 @@ pub enum EventFlag {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
-pub struct EventFlags {
+pub(crate) struct EventFlags {
   flags: HashSet<EventFlag>,
 }
 
@@ -288,10 +288,10 @@ impl EventFlags {
   }
 }
 
-pub const TRANSPARENT_SURFACE: i32 = 1000000;
+pub(crate) const TRANSPARENT_SURFACE: i32 = 1000000;
 
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
-pub struct VolatilityVariables {
+pub(crate) struct VolatilityVariables {
   pub debug_mode: Mutex<bool>,
 
   // ログファイルのフルパス
@@ -410,10 +410,10 @@ impl Default for VolatilityVariables {
   }
 }
 
-pub const IDLE_THRESHOLD: i32 = 60 * 5;
+pub(crate) const IDLE_THRESHOLD: i32 = 60 * 5;
 
 #[derive(Clone)]
-pub struct TouchInfo {
+pub(crate) struct TouchInfo {
   count: u32,
   pub last_unixtime: SystemTime,
 }

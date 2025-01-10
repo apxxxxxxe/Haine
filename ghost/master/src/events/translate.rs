@@ -11,7 +11,7 @@ use shiorust::message::{Request, Response};
 use std::thread;
 use std::time::Duration;
 
-pub fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
   while !get_global_vars().volatility.inserter_mut().is_ready() {
     thread::sleep(Duration::from_millis(100));
   }
@@ -22,7 +22,7 @@ pub fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(m.0, m.1)
 }
 
-pub fn on_translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
+pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   if text.is_empty() {
     return Ok(text);
   }
@@ -181,7 +181,7 @@ fn translate_whole(text: String) -> Result<String, ShioriError> {
 }
 
 #[derive(Debug, Clone)]
-pub struct Dialog {
+pub(crate) struct Dialog {
   text: String,
   pub scope: usize,
 }
@@ -339,7 +339,7 @@ fn replace_with_check(
 }
 
 // 1文字ずつ\\_qで囲めば口パクしなくなる
-pub fn replace_dialog_for_nomouthmove(text: String) -> Result<String, ShioriError> {
+pub(crate) fn replace_dialog_for_nomouthmove(text: String) -> Result<String, ShioriError> {
   let text = translate(text, true)?;
   let split_parts: Vec<&str> = RE_TEXT_ONLY.split(&text).collect();
   let mut matches: Vec<String> = Vec::new();

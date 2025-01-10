@@ -1,9 +1,9 @@
 use crate::events::IMMERSIVE_ICON_COUNT;
 use once_cell::sync::Lazy;
 
-pub const FIRST_BOOT_MARKER: &str = "邂逅";
+pub(crate) const FIRST_BOOT_MARKER: &str = "邂逅";
 
-pub static FIRST_BOOT_TALK: Lazy<String> = Lazy::new(|| {
+pub(crate) static FIRST_BOOT_TALK: Lazy<String> = Lazy::new(|| {
   format!("\\t\\*\
     h1000000\\1\\b[10]────今夜、私は死にに行く。\
     \\x\
@@ -281,7 +281,7 @@ pub static FIRST_BOOT_TALK: Lazy<String> = Lazy::new(|| {
     (0..IMMERSIVE_ICON_COUNT).map(|i| format!("\\![bind,icon,没入度{},1]", i+1)).collect::<Vec<String>>().join(""),)
 });
 
-pub static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
+pub(crate) static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
   vec!["\
       h1111206いま、別の者にお茶の準備をさせているわ。\\n\
       \\n\
@@ -368,7 +368,7 @@ pub static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
 
 // 話し相手を失いたくない
 // 本音ではハイネはユーザを帰したくない
-pub static FIRST_CLOSE_TALK: &str = "\
+pub(crate) static FIRST_CLOSE_TALK: &str = "\
     h1111201あら、今日はやめるの？h1111204そう。\\n\
     \\n\
     ……ねえ、{user_name}。\\n\

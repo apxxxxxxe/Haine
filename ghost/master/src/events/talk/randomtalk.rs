@@ -9,7 +9,7 @@ use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
 // 僕/主様: 30代のおとなしい男
 // わたし/主さま: 20代の活発な女
 // ぼく/ご主人さま: 10代の男の子
-pub const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 18] = [
+pub(crate) const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 18] = [
   "霧が濃い。",
   "彼女の声は低いがよく通る。",
   "彼女の赤い瞳の奥の思考は伺い知れない。",
@@ -31,7 +31,7 @@ pub const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 18] = [
 ];
 
 // 上の空のハイネに対するユーザの行動を一人称視点で
-pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
+pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
   "目の前で手を振っても、彼女には見えていないようだ。",
   "常軌を逸した集中力だ。……幽霊だからというより、彼女の才能だろう。",
   "これが彼女の言っていた思索だとしても、真似できる気はしない。",
@@ -39,7 +39,7 @@ pub const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
   "無駄かもしれないが、呼び掛け続ける。",
 ];
 
-pub const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
+pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
   "ハイネの口からは不明瞭な呟きが漏れている。",
   "おとなしく待つだけでは、彼女は我に返らないだろう。",
   "",
@@ -48,7 +48,7 @@ pub const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
   "",
 ];
 
-pub fn talk_with_punchline(text: String, funny_punchline: String) -> String {
+pub(crate) fn talk_with_punchline(text: String, funny_punchline: String) -> String {
   text + "\\n" + &funny_punchline
 }
 
@@ -92,7 +92,7 @@ struct RandomTalk {
   callback: Option<fn()>,
 }
 
-pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
+pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   let strings: Vec<RandomTalkType> = match talk_type {
       TalkType::SelfIntroduce => vec![
 
@@ -1034,7 +1034,7 @@ pub fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   Some(talks)
 }
 
-pub fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
+pub(crate) fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
   let vars = get_global_vars();
   let mut parts: Vec<Vec<String>> = vec![vec![format!(
     "\\0\\b[{}]h1113705……。\\1ハイネ……？\\0\\n…………。\\1\\n反応が鈍い……。\\n思考に没頭してる……？\\0\\b[{}]",
@@ -1080,7 +1080,7 @@ pub fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
   Ok(all_combo(&parts))
 }
 
-pub fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
+pub(crate) fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
   let mut parts: Vec<Vec<String>> = vec![];
   parts.push(vec![format!(
     "\\0\\b[{}]h1111705……。\\n\
