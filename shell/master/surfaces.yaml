@@ -395,6 +395,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,201,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
+            animation500603.interval,runonce
+            animation500603.pattern0,overlay,251,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -403,6 +407,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,202,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
+            animation500603.interval,runonce
+            animation500603.pattern0,overlay,251,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -411,6 +419,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,203,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
+            animation500603.interval,runonce
+            animation500603.pattern0,overlay,251,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -419,6 +431,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,204,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
+            animation500603.interval,runonce
+            animation500603.pattern0,overlay,252,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,4,0,0
@@ -427,6 +443,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,205,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
+            animation500603.interval,runonce
+            animation500603.pattern0,overlay,252,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,4,0,0
@@ -435,6 +455,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,206,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
+            animation500603.interval,runonce
+            animation500603.pattern0,overlay,252,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,4,0,0
@@ -483,6 +507,8 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,208,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -491,6 +517,8 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,210,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -499,6 +527,8 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,211,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -507,6 +537,8 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,212,0,0,0
+            animation500602.interval,runonce
+            animation500602.pattern0,overlay,250,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
