@@ -397,8 +397,10 @@ characters:
             animation500300.pattern0,overlay,201,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
-            animation500603.interval,runonce
-            animation500603.pattern0,overlay,251,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,251,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,258,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -409,8 +411,10 @@ characters:
             animation500300.pattern0,overlay,202,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
-            animation500603.interval,runonce
-            animation500603.pattern0,overlay,251,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,251,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,258,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -421,8 +425,10 @@ characters:
             animation500300.pattern0,overlay,203,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
-            animation500603.interval,runonce
-            animation500603.pattern0,overlay,251,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,251,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,258,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -433,8 +439,10 @@ characters:
             animation500300.pattern0,overlay,204,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
-            animation500603.interval,runonce
-            animation500603.pattern0,overlay,252,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,252,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,259,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,4,0,0
@@ -445,8 +453,10 @@ characters:
             animation500300.pattern0,overlay,205,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
-            animation500603.interval,runonce
-            animation500603.pattern0,overlay,252,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,252,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,259,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,4,0,0
@@ -457,8 +467,10 @@ characters:
             animation500300.pattern0,overlay,206,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
-            animation500603.interval,runonce
-            animation500603.pattern0,overlay,252,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,252,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,259,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,4,0,0
@@ -467,6 +479,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,213,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,255,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,259,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -475,6 +491,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,214,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,255,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,259,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -483,6 +503,10 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,215,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,255,0,0,0
+            animation500203.interval,runonce
+            animation500203.pattern0,overlay,259,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -491,6 +515,8 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,209,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,256,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -499,6 +525,8 @@ characters:
           text: |
             animation500300.interval,runonce
             animation500300.pattern0,overlay,207,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,257,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,3,0,0
@@ -509,6 +537,8 @@ characters:
             animation500300.pattern0,overlay,208,0,0,0
             animation500602.interval,runonce
             animation500602.pattern0,overlay,250,0,0,0
+            animation500604.interval,runonce
+            animation500604.pattern0,overlay,251,0,0,0
 
             animation800004.interval,bind
             animation800004.pattern0,overlayfast,5,0,0
@@ -680,8 +710,8 @@ characters:
       animation506304.pattern0,overlay,1804,0,0,0
       animation506305.interval,bind
       animation506305.pattern0,overlay,1805,0,0,0
-      animation506306.interval,bind
-      animation506306.pattern0,overlay,1806,0,0,0
+      animation506326.interval,bind
+      animation506326.pattern0,overlay,1806,0,0,0
       animation506307.interval,bind
       animation506307.pattern0,overlay,1807,0,0,0
       animation506308.interval,bind
@@ -696,6 +726,8 @@ characters:
       animation506314.pattern0,overlay,1814,0,0,0
       animation506316.interval,bind
       animation506316.pattern0,overlay,1817,0,0,0
+      animation506317.interval,bind
+      animation506317.pattern0,overlay,1819,0,0,0
       animation506298.interval,bind
       animation506298.pattern0,overlay,1815,0,0,0
 
@@ -711,6 +743,9 @@ characters:
       animation504417.pattern0,overlay,1900,0,0,0
       animation504418.interval,bind
       animation504418.pattern0,overlay,1901,0,0,0
+
+      animation507419.interval,bind
+      animation507419.pattern0,overlay,1902,0,0,0
 
       //手back4000
 
@@ -741,6 +776,10 @@ characters:
       animation506510.pattern0,overlay,1711,0,0,0
       animation506511.interval,bind
       animation506511.pattern0,overlay,1712,0,0,0
+      animation506512.interval,bind
+      animation506512.pattern0,overlay,1713,0,0,0
+      animation506513.interval,bind
+      animation506513.pattern0,overlay,1714,0,0,0
 
       //袖 507000
 

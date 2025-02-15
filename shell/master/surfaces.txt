@@ -394,8 +394,10 @@ surface1111101,1111201,1111301,1111501,1111601,1111701,1111901,1112101,1112201,1
   animation500300.pattern0,overlay,201,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
-  animation500603.interval,runonce
-  animation500603.pattern0,overlay,251,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,251,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,258,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,5,0,0
@@ -408,8 +410,10 @@ surface1111102,1111202,1111302,1111502,1111602,1111702,1111902,1112102,1112202,1
   animation500300.pattern0,overlay,202,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
-  animation500603.interval,runonce
-  animation500603.pattern0,overlay,251,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,251,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,258,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,5,0,0
@@ -422,8 +426,10 @@ surface1111103,1111203,1111303,1111503,1111603,1111703,1111903,1112103,1112203,1
   animation500300.pattern0,overlay,203,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
-  animation500603.interval,runonce
-  animation500603.pattern0,overlay,251,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,251,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,258,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,5,0,0
@@ -436,8 +442,10 @@ surface1111104,1111204,1111304,1111504,1111604,1111704,1111904,1112104,1112204,1
   animation500300.pattern0,overlay,204,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
-  animation500603.interval,runonce
-  animation500603.pattern0,overlay,252,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,252,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,259,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,4,0,0
@@ -450,8 +458,10 @@ surface1111105,1111205,1111305,1111505,1111605,1111705,1111905,1112105,1112205,1
   animation500300.pattern0,overlay,205,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
-  animation500603.interval,runonce
-  animation500603.pattern0,overlay,252,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,252,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,259,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,4,0,0
@@ -464,8 +474,10 @@ surface1111106,1111206,1111306,1111506,1111606,1111706,1111906,1112106,1112206,1
   animation500300.pattern0,overlay,206,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
-  animation500603.interval,runonce
-  animation500603.pattern0,overlay,252,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,252,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,259,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,4,0,0
@@ -476,6 +488,10 @@ surface1111107,1111207,1111307,1111507,1111607,1111707,1111907,1112107,1112207,1
   // こっち半半目
   animation500300.interval,runonce
   animation500300.pattern0,overlay,213,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,255,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,259,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,3,0,0
@@ -486,6 +502,10 @@ surface1111108,1111208,1111308,1111508,1111608,1111708,1111908,1112108,1112208,1
   // 上の空半半目
   animation500300.interval,runonce
   animation500300.pattern0,overlay,214,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,255,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,259,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,3,0,0
@@ -496,6 +516,10 @@ surface1111109,1111209,1111309,1111509,1111609,1111709,1111909,1112109,1112209,1
   // あっち半半目
   animation500300.interval,runonce
   animation500300.pattern0,overlay,215,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,255,0,0,0
+  animation500203.interval,runonce
+  animation500203.pattern0,overlay,259,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,3,0,0
@@ -506,6 +530,8 @@ surface1111110,1111210,1111310,1111510,1111610,1111710,1111910,1112110,1112210,1
   // 閉じ目
   animation500300.interval,runonce
   animation500300.pattern0,overlay,209,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,256,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,3,0,0
@@ -516,6 +542,8 @@ surface1111111,1111211,1111311,1111511,1111611,1111711,1111911,1112111,1112211,1
   // にこ目
   animation500300.interval,runonce
   animation500300.pattern0,overlay,207,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,257,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,3,0,0
@@ -528,6 +556,8 @@ surface1111112,1111212,1111312,1111512,1111612,1111712,1111912,1112112,1112212,1
   animation500300.pattern0,overlay,208,0,0,0
   animation500602.interval,runonce
   animation500602.pattern0,overlay,250,0,0,0
+  animation500604.interval,runonce
+  animation500604.pattern0,overlay,251,0,0,0
   
   animation800004.interval,bind
   animation800004.pattern0,overlayfast,5,0,0
@@ -707,8 +737,8 @@ surface.append1111101-2544915
   animation506304.pattern0,overlay,1804,0,0,0
   animation506305.interval,bind
   animation506305.pattern0,overlay,1805,0,0,0
-  animation506306.interval,bind
-  animation506306.pattern0,overlay,1806,0,0,0
+  animation506326.interval,bind
+  animation506326.pattern0,overlay,1806,0,0,0
   animation506307.interval,bind
   animation506307.pattern0,overlay,1807,0,0,0
   animation506308.interval,bind
@@ -723,6 +753,8 @@ surface.append1111101-2544915
   animation506314.pattern0,overlay,1814,0,0,0
   animation506316.interval,bind
   animation506316.pattern0,overlay,1817,0,0,0
+  animation506317.interval,bind
+  animation506317.pattern0,overlay,1819,0,0,0
   animation506298.interval,bind
   animation506298.pattern0,overlay,1815,0,0,0
   
@@ -738,6 +770,9 @@ surface.append1111101-2544915
   animation504417.pattern0,overlay,1900,0,0,0
   animation504418.interval,bind
   animation504418.pattern0,overlay,1901,0,0,0
+  
+  animation507419.interval,bind
+  animation507419.pattern0,overlay,1902,0,0,0
   
   //手back4000
   
@@ -768,6 +803,10 @@ surface.append1111101-2544915
   animation506510.pattern0,overlay,1711,0,0,0
   animation506511.interval,bind
   animation506511.pattern0,overlay,1712,0,0,0
+  animation506512.interval,bind
+  animation506512.pattern0,overlay,1713,0,0,0
+  animation506513.interval,bind
+  animation506513.pattern0,overlay,1714,0,0,0
   
   //袖 507000
   
