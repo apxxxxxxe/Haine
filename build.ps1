@@ -84,24 +84,24 @@ $surface_number_original = 10000000
 $collision_images = @()
 $collision_image = "$prefix\immersion_candle_collision.png"
 $collision_images += $collision_image
-magick convert -resize ${size}x${size} "$prefix\immersion_candle_base.png" "$prefix\surface$surface_number_original.png"
-magick convert -fill "rgb(0,255,0)" -colorize 100 "$prefix\surface$surface_number_original.png" $collision_image
+magick convert -strip -resize ${size}x${size} "$prefix\immersion_candle_base.png" "$prefix\surface$surface_number_original.png"
+magick convert -strip -fill "rgb(0,255,0)" -colorize 100 "$prefix\surface$surface_number_original.png" $collision_image
 for ($i = 1; $i -le 5; $i++) {
   for ($j = 1; $j -le 2; $j++) {
     $surface_number = $surface_number_original + $i + 10 * ($j - 1)
-    magick convert -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_${j}.png" "$prefix\surface$surface_number.png"
+    magick convert -strip -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_${j}.png" "$prefix\surface$surface_number.png"
   }
 }
 
 # 消えるろうそく画像をリサイズしてサーフェス画像としてリネーム
 for ($i = 1; $i -le 5; $i++) {
   $surface_number = $surface_number_original + $i + 100
-  magick convert -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_0.png" "$prefix\surface$surface_number.png"
+  magick convert -strip -resize ${size}x${size} "$prefix\immersion_candle_fire_${i}_0.png" "$prefix\surface$surface_number.png"
 }
 
 # $collision_imagesを重ねて出力
 $collision_image_name = "$prefix\immersion_candle_master_collision.png"
-magick convert $collision_images -composite $collision_image_name
+magick convert -strip $collision_images -composite $collision_image_name
 Remove-Item $collision_images
 
 Send-SSTP "\1\_qビルド完了\![reload,ghost]\e" $uniqueid
