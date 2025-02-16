@@ -16,6 +16,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: tag name
+      if: github.event_name == 'workflow_run'
+      run: echo "TAG_NAME=開発版-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+    - name: tag push
+      if: github.event_name == 'workflow_run'
+      run: |
+        git pull
+        git tag "${{ env.TAG_NAME }}"
+        git push --tags
+
     - name: Zip output
       run: |
         zip -r ${{ env.NAR_NAME }}.nar * -x .git/\* -x .github/\* -x .git* -x ${{ env.NAR_NAME }}.nar -x Cargo\* -x src/\* -x ipadic\*/ -x md5buildignore.txt -x build\*
@@ -29,16 +40,6 @@ jobs:
       with:
         files: |
           ${{ env.NAR_NAME }}.nar
-
-    - name: construct now datetime
-      if: github.event_name == 'workflow_run'
-      run: echo "TAG_NAME=開発版-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
-
-    - name: tag push
-      if: github.event_name == 'workflow_run'
-      run: |
-        git tag "${{ env.TAG_NAME }}"
-        git push --tags
 
     - name: Upload Release Asset(pre-release per push)
       uses: softprops/action-gh-release@v2
