@@ -29,7 +29,7 @@ jobs:
 
     - name: Zip output
       run: |
-        zip -r ${{ env.NAR_NAME }}.nar * -x .git/\* -x .github/\* -x .git* -x ${{ env.NAR_NAME }}.nar -x Cargo\* -x src/\* -x ipadic\*/ -x md5buildignore.txt -x build\*
+        zip -r ${{ env.NAR_NAME }}.nar * -x .git/\* -x .github/\* -x .git* -x ${{ env.NAR_NAME }}.nar -x ghost/master/rustfmt.toml -x ghost/master/.cargo\* -x ghost/master/Cargo\* -x ghost/master/src/\* -x ghost/master/ipadic\*/ -x md5buildignore.txt -x build\*
 
     - name: Check event name
       run: echo "event name is ${{ github.event_name }}"
