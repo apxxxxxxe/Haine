@@ -4,6 +4,7 @@
 .gitmessage
 .gitmodules
 .gitattributes
+.githooks/
 readme.md
 ReadMe.md
 README.md

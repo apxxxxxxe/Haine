@@ -9,3 +9,9 @@
 ## 伺かゴースト「Crave The Grave」
 
 ![screenshot](https://github.com/apxxxxxxe/Haine/raw/image/haine.png)
+
+### 開発者向け
+
+#### git hooks の設定
+ローカル開発時には以下のコマンドで git hooks を設定してください
+`git config --local core.hooksPath .githooks`

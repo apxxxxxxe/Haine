@@ -1,0 +1,47 @@
+#!/bin/bash
+
+range=$(git rev-parse --abbrev-ref HEAD)@{upstream}..HEAD
+
+# $1: リモート名、$2: リモートブランチ名
+remote="$1"
+remote_ref="$2"
+
+# 差分がない場合はスキップ（git rev-listで確認）
+if [ -z "$(git rev-list "$range")" ]; then
+  echo "追加のコミットはありません。バリデーションをスキップします。"
+  exit 0
+fi
+
+# md5buildignore.txtからパターンを読み込み、無視リストを作成
+ignore_patterns=()
+while IFS= read -r pattern; do
+    # 空行や#で始まる行は無視
+    echo "$pattern" | grep -E '^\s*$' > /dev/null && continue
+    ignore_patterns+=("$pattern")
+done < md5buildignore.txt
+
+wildcard_patterns=()
+for pattern in "${ignore_patterns[@]}"; do
+    # パターンをシェルのワイルドカードに変換
+    # 例えば、*.log -> *.log
+    #          /dir/ -> ^dir/*     # /はgit rootを表す
+    #          **/temp/* -> temp/* # **は任意のディレクトリを表す
+    wildcard_patterns+=("$(echo "$pattern" | sed -e 's#^/#^#' -e 's#/\*$#/*#' -e 's#^\*\*/#*/#')")
+done
+
+grep_patterns=$(IFS=\|; echo "${wildcard_patterns[*]}")
+
+# マッチするファイルがあるかどうかを確認
+if ! git diff --name-only "$range" | grep -v -E "$grep_patterns" > /dev/null; then
+    echo "プッシュ対象のファイルが含まれていません。バリデーションをスキップし、プッシュを続行します。"
+    exit 0
+fi
+
+# Cargo.tomlのversion変更確認
+if ! git diff "$range" -- Cargo.toml | grep '^\+version = "' > /dev/null; then
+  echo "Cargo.tomlのバージョンが更新されていません。プッシュを中止します。"
+  exit 1
+fi
+
+echo "Cargo.tomlのバージョン更新を確認しました。プッシュを続行します。"
+exit 0
