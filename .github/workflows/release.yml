@@ -23,6 +23,8 @@ jobs:
     - name: tag push
       if: github.event_name == 'workflow_run'
       run: |
+        git tag | grep 開発版 \
+        | xargs -I{} sh -c "git tag -d {}; git push --delete origin tag {}"
         git pull
         git tag "${{ env.TAG_NAME }}"
         git push --tags
