@@ -1,0 +1,48 @@
+name: release-with-tag
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_call:
+
+env:
+  NAR_NAME: Haine
+
+jobs:
+  release-with-tag:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Zip output
+      run: |
+        zip -r ${{ env.NAR_NAME }}.nar * -x .git/\* -x .github/\* -x .git* -x ${{ env.NAR_NAME }}.nar -x Cargo\* -x src/\* -x ipadic\*/ -x md5buildignore.txt -x build\*
+
+    - name: Check event name
+      run: echo "event name is ${{ github.event_name }}"
+
+    - name: Upload Release Asset(with tag)
+      uses: softprops/action-gh-release@v2
+      if: github.event_name == 'push'
+      with:
+        files: |
+          ${{ env.NAR_NAME }}.nar
+
+    - name: construct now datetime
+      if: github.event_name == 'workflow_run'
+      run: echo "開発版-RELEASE_NAME=$(date +'%Y%m%d%H%M%S') >> $GITHUB_ENV"
+
+    - name: Upload Release Asset(pre-release per push)
+      uses: softprops/action-gh-release@v2
+      if: github.event_name == 'workflow_run'
+      with:
+        name: ${{ env.RELEASE_NAME }}
+        body: |
+          **注意**
+          このリリースは開発版です。  
+          現時点での設定や機能は今後変更・削除される可能性があります。
+        files: |
+          ${{ env.NAR_NAME }}.nar
+        prerelease: true

@@ -38,7 +38,7 @@ if ! git diff --name-only "$range" | grep -v -E "$grep_patterns" > /dev/null; th
 fi
 
 # Cargo.tomlのversion変更確認
-if ! git diff "$range" -- Cargo.toml | grep '^\+version = "' > /dev/null; then
+if ! git diff "$range" -- ghost/master/Cargo.toml | grep '^\+version = "' > /dev/null; then
   echo "Cargo.tomlのバージョンが更新されていません。プッシュを中止します。"
   exit 1
 fi
