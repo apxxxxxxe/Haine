@@ -32,13 +32,19 @@ jobs:
 
     - name: construct now datetime
       if: github.event_name == 'workflow_run'
-      run: echo "開発版-RELEASE_NAME=$(date +'%Y%m%d%H%M%S') >> $GITHUB_ENV"
+      run: echo "TAG_NAME=開発版-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+    - name: tag push
+      if: github.event_name == 'workflow_run'
+      run: |
+        git tag "${{ env.TAG_NAME }}"
+        git push --tags
 
     - name: Upload Release Asset(pre-release per push)
       uses: softprops/action-gh-release@v2
       if: github.event_name == 'workflow_run'
       with:
-        name: ${{ env.RELEASE_NAME }}
+        tag_name: ${{ env.TAG_NAME }}
         body: |
           **注意**
           このリリースは開発版です。  
