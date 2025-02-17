@@ -18,13 +18,42 @@ jobs:
 
     - name: tag name
       if: github.event_name == 'workflow_run'
-      run: echo "TAG_NAME=開発版-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+      run: |
+        # 現在の日付を取得
+        CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y-%m-%d")
+
+        # その日付に該当するタグを取得
+        TAG_PREFIX="開発版-${CURRENT_DATE}-"
+        EXISTING_TAGS=$(git tag | grep "^${TAG_PREFIX}" || true)
+
+        if [ -z "$EXISTING_TAGS" ]; then
+          # その日の日付で該当タグがない場合、part1を作成
+          NEW_TAG="${TAG_PREFIX}1"
+        else
+          # すでにタグがある場合、最大のpartXを探してインクリメント
+          MAX_PART=0
+          for TAG in $EXISTING_TAGS; do
+            PART_NUM=$(echo "$TAG" | sed -E "s/^${TAG_PREFIX}([0-9]+)$/\1/")
+            if [ "$PART_NUM" -gt "$MAX_PART" ]; then
+              MAX_PART=$PART_NUM
+            fi
+          done
+
+          # インクリメント
+          NEXT_PART=$((MAX_PART + 1))
+          NEW_TAG="${TAG_PREFIX}${NEXT_PART}"
+        fi
+
+        echo "新しいタグを作成: $NEW_TAG"
+        echo "TAG_NAME=$NEW_TAG" >> $GITHUB_ENV
 
     - name: tag push
       if: github.event_name == 'workflow_run'
       run: |
-        git tag | grep 開発版 \
-        | xargs -I{} sh -c "git tag -d {}; git push --delete origin tag {}"
+        while read tag; do
+          git tag -d $tag
+          git push --delete origin tag $tag
+        done < <(git tag | grep 開発版)
         git pull
         git tag "${{ env.TAG_NAME }}"
         git push --tags
