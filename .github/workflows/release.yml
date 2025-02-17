@@ -18,7 +18,7 @@ jobs:
 
     - name: tag name
       if: github.event_name == 'workflow_run'
-      run: echo "TAG_NAME=開発版-$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
+      run: echo "TAG_NAME=開発版-$(date +'%Y/%m/%d-%H%M')" >> $GITHUB_ENV
 
     - name: tag push
       if: github.event_name == 'workflow_run'
