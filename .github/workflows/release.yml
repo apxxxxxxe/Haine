@@ -9,6 +9,7 @@ on:
 
 env:
   NAR_NAME: Haine
+  FETCH_DEPTH: 10
 
 jobs:
   release-with-tag:
@@ -16,6 +17,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: ${{ env.FETCH_DEPTH }}
 
     - name: tag name
       if: github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch'
@@ -30,17 +33,12 @@ jobs:
           # 既にタグが存在する場合はリリースを作成しないようにする
           echo "TAG_NAME=none" >> $GITHUB_ENV
         else
-          NEW_TAG="開発版-v$version"
-          echo "TAG_NAME=$NEW_TAG" >> $GITHUB_ENV
-          echo "新しいタグを作成: $NEW_TAG"
-
           # 最新タグからHEADまでのコミットメッセージを取得してenv.BODYに格納
           # もし最新タグが存在しない場合は、最初のコミットからHEADまでのコミットメッセージを取得
-          LATEST_TAG=$(git describe --tags --abbrev=0 || echo "")
-          {
-            echo "BODY<<EOF"
+          LATEST_TAG=$(git tag --sort=-creatordate | head -n1 || echo "")
+          echo "LATEST_TAG: $LATEST_TAG"
             if [ -n "$LATEST_TAG" ]; then
-              git log ${LATEST_TAG}..HEAD --pretty=format:"%s" \
+              git log "${LATEST_TAG}..HEAD" --pretty=format:"%s" \
                 | grep -v "update md5" \
                 | grep -v "Merge pull request" \
                 | grep -v "Merge branch" \
@@ -53,10 +51,35 @@ jobs:
                 | grep -v "Merge pull request" \
                 | grep -v "Merge branch" \
                 | grep -v "Merge remote-tracking" \
+                | sed -e 's/^/- /' \
+                | head -n ${{ env.FETCH_DEPTH }}
+              echo "EOF"
+            fi
+          {
+            echo "BODY<<EOF"
+            if [ -n "$LATEST_TAG" ]; then
+              git log "${LATEST_TAG}..HEAD" --pretty=format:"%s" \
+                | grep -v "update md5" \
+                | grep -v "Merge pull request" \
+                | grep -v "Merge branch" \
+                | grep -v "Merge remote-tracking" \
                 | sed -e 's/^/- /'
+              echo "EOF"
+            else
+              git log --pretty=format:"%s" \
+                | grep -v "update md5" \
+                | grep -v "Merge pull request" \
+                | grep -v "Merge branch" \
+                | grep -v "Merge remote-tracking" \
+                | sed -e 's/^/- /' \
+                | head -n 5
               echo "EOF"
             fi
           } >> $GITHUB_ENV
+
+          NEW_TAG="開発版-v$version"
+          echo "TAG_NAME=$NEW_TAG" >> $GITHUB_ENV
+          echo "新しいタグを作成: $NEW_TAG"
         fi
 
     - name: tag push
