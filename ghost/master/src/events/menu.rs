@@ -226,6 +226,7 @@ impl Question {
   const HOW_MUCH_IS_YOUR_BWH: Self = Self(3);
   const FEELING_OF_DEATH: Self = Self(5);
   const FATIGUE_OF_LIFE: Self = Self(6);
+  const HOW_TO_GET_TEALEAVES: Self = Self(7);
 
   fn theme(&self) -> String {
     match *self {
@@ -235,6 +236,7 @@ impl Question {
       Question::HOW_MUCH_IS_YOUR_BWH => "スリーサイズを教えて".to_string(),
       Question::FEELING_OF_DEATH => "死んだ感想は？".to_string(),
       Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
+      Question::HOW_TO_GET_TEALEAVES => "お茶はどこから手に入れているの？".to_string(),
       _ => unreachable!(),
     }
   }
@@ -295,6 +297,18 @@ impl Question {
       死んでからは……h1111511教えてあげない。\\n\
       "
       .to_string(),
+      Question::HOW_TO_GET_TEALEAVES => "\
+      \\1『お茶はどこから手に入れているの？』\\n\
+      h1111206行商人がいるのよ。私と同じ、実態を持つ霊。\\n\
+      h1111210それでいて場所に囚われない、稀有な存在よ。\\n\
+      それに定期的なお使いを頼んでいるの。\\n\
+      良い茶葉を扱う店に、買い物を。\\n\
+      \\n\
+      h1111205勿論、対価も払わなければならない。\\n\
+      それは自由に動ける代わりに、長い休眠を必要とするの。\\n\
+      h1111210取引をする者たちはあれが無防備な間、身の安全を保障する契約なのよ。\
+      "
+      .to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
@@ -309,6 +323,7 @@ pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
     Question::HOW_WEIGHT_ARE_YOU,
     Question::HOW_MUCH_IS_YOUR_BWH,
     Question::HOW_OLD_ARE_YOU,
+    Question::HOW_TO_GET_TEALEAVES,
   ];
   questions.sort_by(|a, b| a.0.cmp(&b.0));
 
