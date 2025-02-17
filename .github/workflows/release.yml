@@ -19,33 +19,19 @@ jobs:
     - name: tag name
       if: github.event_name == 'workflow_run'
       run: |
-        # 現在の日付を取得
-        CURRENT_DATE=$(TZ="Asia/Tokyo" date +"%Y-%m-%d")
+        # ghost/master/Cargo.toml からバージョンを取得
+        version=$(grep -E '^version = "[0-9]+\.[0-9]+\.[0-9]+"' ghost/master/Cargo.toml | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
 
-        # その日付に該当するタグを取得
-        TAG_PREFIX="開発版-${CURRENT_DATE}-"
-        EXISTING_TAGS=$(git tag | grep "^${TAG_PREFIX}" || true)
-
-        if [ -z "$EXISTING_TAGS" ]; then
-          # その日の日付で該当タグがない場合、part1を作成
-          NEW_TAG="${TAG_PREFIX}1"
+        # タグが存在するか確認
+        tag_prefix="開発版-v"
+        if git tag | grep -q "$tag_prefix$version"; then
+          # 既にタグが存在する場合はリリースを作成しないようにする
+          echo "TAG_NAME=none" >> $GITHUB_ENV
         else
-          # すでにタグがある場合、最大のpartXを探してインクリメント
-          MAX_PART=0
-          for TAG in $EXISTING_TAGS; do
-            PART_NUM=$(echo "$TAG" | sed -E "s/^${TAG_PREFIX}([0-9]+)$/\1/")
-            if [ "$PART_NUM" -gt "$MAX_PART" ]; then
-              MAX_PART=$PART_NUM
-            fi
-          done
-
-          # インクリメント
-          NEXT_PART=$((MAX_PART + 1))
-          NEW_TAG="${TAG_PREFIX}${NEXT_PART}"
+          NEW_TAG="開発版-v$version"
+          echo "TAG_NAME=$NEW_TAG" >> $GITHUB_ENV
+          echo "新しいタグを作成: $NEW_TAG"
         fi
-
-        echo "新しいタグを作成: $NEW_TAG"
-        echo "TAG_NAME=$NEW_TAG" >> $GITHUB_ENV
 
     - name: tag push
       if: github.event_name == 'workflow_run'
@@ -74,7 +60,7 @@ jobs:
 
     - name: Upload Release Asset(pre-release per push)
       uses: softprops/action-gh-release@v2
-      if: github.event_name == 'workflow_run'
+      if: github.event_name == 'workflow_run' && env.TAG_NAME != 'none'
       with:
         tag_name: ${{ env.TAG_NAME }}
         body: |
