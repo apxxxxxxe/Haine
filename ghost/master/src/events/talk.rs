@@ -72,7 +72,12 @@ impl Talk {
 
   pub fn get_unseen_talks(talk_type: TalkType, seen: &HashSet<String>) -> Option<Vec<Talk>> {
     let talks = random_talks(talk_type)?;
-    Some(talks.into_iter().filter(|t| !seen.contains(&t.id)).collect())
+    Some(
+      talks
+        .into_iter()
+        .filter(|t| !seen.contains(&t.id))
+        .collect(),
+    )
   }
 }
 

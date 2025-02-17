@@ -317,8 +317,7 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
       "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
       "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
       "h1111205気安いのね。あまり好きではないわ。".to_string(),
-      "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。"
-        .to_string(),
+      "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。".to_string(),
     ]);
   } else if count < zero_bust_touch_threshold / 3 * 2 {
     zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
@@ -326,13 +325,13 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
     zero_bust_touch.extend(DIALOG_SEXIAL_AKIRE.clone());
   } else if count == zero_bust_touch_threshold {
     zero_bust_touch.push(
-    "\
+      "\
     h1111205\\1触れようとした手先が、霧に溶けた。\\n\
     慌てて引っ込めると、手は元通りになった。\
     h1111201許されていると思ったの？\\n\
     h1111304残念だけど、それほど気は長くないの。\\n\
     h1111310わきまえなさい。"
-    .to_string(),
+        .to_string(),
     );
   } else {
     zero_bust_touch.push("h1111204\\1自重しよう……。".to_string());

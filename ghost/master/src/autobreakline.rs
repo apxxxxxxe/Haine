@@ -11,7 +11,8 @@ use vibrato::{Dictionary, Tokenizer};
 static SAKURA_SCRIPT_RE: Lazy<Regex> =
   lazy_regex!(r###"\\_{0,2}[a-zA-Z0-9*!&](\d|\[("([^"]|\\")+?"|([^\]]|\\\])+?)+?\])?"###);
 
-pub(crate) static CHANGE_SCOPE_RE: Lazy<FancyRegex> = lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
+pub(crate) static CHANGE_SCOPE_RE: Lazy<FancyRegex> =
+  lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
 
 fn find_change_scope(text: &str) -> Option<String> {
   if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {

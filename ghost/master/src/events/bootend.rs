@@ -1,5 +1,5 @@
-use crate::events::check_story_events;
 use crate::error::ShioriError;
+use crate::events::check_story_events;
 use crate::events::common::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
