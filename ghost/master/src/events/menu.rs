@@ -227,6 +227,7 @@ impl Question {
   const FEELING_OF_DEATH: Self = Self(5);
   const FATIGUE_OF_LIFE: Self = Self(6);
   const HOW_TO_GET_TEALEAVES: Self = Self(7);
+  const DO_SERVENTS_HAVE_NAMES: Self = Self(8);
 
   fn theme(&self) -> String {
     match *self {
@@ -237,6 +238,7 @@ impl Question {
       Question::FEELING_OF_DEATH => "死んだ感想は？".to_string(),
       Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
       Question::HOW_TO_GET_TEALEAVES => "お茶はどこから手に入れているの？".to_string(),
+      Question::DO_SERVENTS_HAVE_NAMES => "従者たちに名前はあるの？".to_string(),
       _ => unreachable!(),
     }
   }
@@ -309,6 +311,22 @@ impl Question {
       h1111210取引をする者たちはあれが無防備な間、身の安全を保障する契約なのよ。\
       "
       .to_string(),
+      Question::DO_SERVENTS_HAVE_NAMES => "\
+      \\1『従者たちに名前はあるの？』\\n\
+      h1111210ええ、もちろん。\\n\
+      でも、教えることはできないわ。\\n\
+      \\n\
+      h1111206霊にとって、自分が何者であるかは文字通り死活問題なの。\\n\
+      肉の器がない分、簡単に存在が揺らいでしまうから。\\n\
+      h1111210必要なときは偽名や通り名を名乗り、\\n\
+      真の名前は基本的には契約する相手にしか明かさないのよ。\\n\
+      \\n\
+      ……h1111204「寂しい」って思った？……h1111211ふふ。\\n\
+      h1111204あなたに教えた私の名前は偽名ではないわ。\\n\
+      私は低級霊ではないから、多少は構わないの。\\n\
+      h1111210生者の時間を奪うことへの、せめてもの礼儀よ。\
+      "
+      .to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
@@ -324,6 +342,7 @@ pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
     Question::HOW_MUCH_IS_YOUR_BWH,
     Question::HOW_OLD_ARE_YOU,
     Question::HOW_TO_GET_TEALEAVES,
+    Question::DO_SERVENTS_HAVE_NAMES,
   ];
   questions.sort_by(|a, b| a.0.cmp(&b.0));
 
@@ -332,7 +351,7 @@ pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
     m.push_str(&q.to_script());
     m.push_str("\\n");
   }
-  m.push_str("\\q[戻る,OnMenuExec]");
+  m.push_str("\\n\\q[戻る,OnMenuExec]");
 
   new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
