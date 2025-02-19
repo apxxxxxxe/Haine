@@ -20,7 +20,7 @@ raw: |
   {
     version,1
     animation-sort,descend
-    collision-sort,descend // 効いてなさそう
+    collision-sort,descend
   }
 
   surface1000000 {
@@ -172,6 +172,7 @@ characters:
 
             animation505000.interval,runonce
             animation505000.pattern0,overlay,503,0,0,0
+            animation505000.collisionex14,hand,polygon,247,508,250,540,277,538,285,529,295,508,283,501,271,513,259,504
 
             animation505310.interval,bind
             animation505310.pattern0,overlay,1400,0,0,0
@@ -194,8 +195,6 @@ characters:
             animation505319.interval,bind
             animation505319.pattern0,overlay,1439,0,0,0
 
-            collisionex14,hand,polygon,247,508,250,540,277,538,285,529,295,508,283,501,271,513,259,504
-
         - name: 胸に手
           text: |
             animation500201.interval,runonce
@@ -203,6 +202,7 @@ characters:
 
             animation504000.interval,runonce
             animation504000.pattern0,overlay,501,0,0,0
+            animation504000.collisionex14,hand,polygon,252,355,239,351,236,325,246,306,262,302,280,303,298,313,304,336,304,349,283,360,273,342,261,358
 
             animation580000.interval,runonce
             animation580000.pattern0,overlay,601,0,0,0
@@ -234,7 +234,6 @@ characters:
             animation585319.interval,bind
             animation585319.pattern0,overlay,2509,0,0,0
 
-            collisionex14,hand,polygon,252,355,239,351,236,325,246,306,262,302,280,303,298,313,304,336,304,349,283,360,273,342,261,358
 
         - name: 考える手
           text: |
@@ -243,6 +242,8 @@ characters:
 
             animation504000.interval,runonce
             animation504000.pattern0,overlay,502,0,0,0
+            animation504000.collisionex14,hand,polygon,256,331,252,324,253,303,258,288,270,284,285,313,274,319,265,334
+            animation504000.collisionex15,hand,polygon,243,432,225,432,216,424,212,412,224,400,237,400,243,410,244,425
 
             animation580000.interval,runonce
             animation580000.pattern0,overlay,602,0,0,0
@@ -273,9 +274,6 @@ characters:
             animation505319.pattern0,overlay,3409,0,0,0
             animation585319.interval,bind
             animation585319.pattern0,overlay,3509,0,0,0
-
-            collisionex14,hand,polygon,256,331,252,324,253,303,258,288,270,284,285,313,274,319,265,334
-            collisionex15,hand,polygon,243,432,225,432,216,424,212,412,224,400,237,400,243,410,244,425
 
         - name: 後ろ手
           text: |
