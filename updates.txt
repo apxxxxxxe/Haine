@@ -1,6 +1,6 @@
 charset,UTF-8
 file,ghost/master/descript.txt21d97cf2b5d2b327ec8d9fcea3023cfesize=492date=2012-12-21T00:00:00
-file,ghost/master/haine.dll4cc36a5246ca0c3b25c4207f6c29a0d6size=11505664date=2012-12-21T00:00:00
+file,ghost/master/haine.dllb66f473e9139cc26702743c526b7968fsize=11505664date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttfc01dd07dfe6d9335c66e9105cb6a2b53size=1420date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
