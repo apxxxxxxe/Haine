@@ -228,6 +228,13 @@ impl Question {
   const FATIGUE_OF_LIFE: Self = Self(6);
   const HOW_TO_GET_TEALEAVES: Self = Self(7);
   const DO_SERVENTS_HAVE_NAMES: Self = Self(8);
+  const CALL_YOU_MASTER: Self = Self(9);
+  const WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE: Self = Self(10); // ひとりのときは何をして過ごしてる？
+  // 今日泊まってもいい？
+  // このあたりに観光できる場所はある？
+  // かわいい
+  // 美人
+  // 似顔絵を描く
 
   fn theme(&self) -> String {
     match *self {
@@ -239,6 +246,8 @@ impl Question {
       Question::FATIGUE_OF_LIFE => "生きるのって苦しいね".to_string(),
       Question::HOW_TO_GET_TEALEAVES => "お茶はどこから手に入れているの？".to_string(),
       Question::DO_SERVENTS_HAVE_NAMES => "従者たちに名前はあるの？".to_string(),
+      Question::CALL_YOU_MASTER => "ご主人様".to_string(),
+      Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE => "ひとりのときは何をして過ごしてる？".to_string(),
       _ => unreachable!(),
     }
   }
@@ -327,6 +336,29 @@ impl Question {
       h1111210生者の時間を奪うことへの、せめてもの礼儀よ。\
       "
       .to_string(),
+      Question::CALL_YOU_MASTER => "\
+      \\1『ご主人様』\\n\
+      h1111101……h1111210ふふ、従者の仲間入りがしたいの？\\n\
+      \\n\
+      h1111304いいえ、あなたは客人よ。\\n\
+      あなたにとって私は、ただのハイネ。\\n\
+      \\n\
+      h1111205なにかに身を委ねるのは簡単だけれどね。\\n\
+      自分の手綱は自分で握るものよ。\\n\
+      h1111210自分の意志でここにいる。\\n\
+      そんなあなただから、こうして一緒にいるのよ。\
+      "
+      .to_string(),
+      Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE => "\
+      \\1『ひとりのときは何をして過ごしてる？』\\n\
+      h1111105……ひとりのときというと、仕事がないときね。\\n\
+      h1111204大抵は書斎で本を読むか、私室でお茶を飲んで休むか、\\n\
+      h1111206ああ、ここで従者たちの相手をすることもあるわね。\\n\
+      彼らも仕事の息抜きを欲しているから、定期的にね。\\n\
+      ……h1111105これはひとりのときではないか。\\n\
+      h1111204まあ、好きなように過ごしているわ。\
+      "
+      .to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
@@ -343,6 +375,8 @@ pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
     Question::HOW_OLD_ARE_YOU,
     Question::HOW_TO_GET_TEALEAVES,
     Question::DO_SERVENTS_HAVE_NAMES,
+    Question::CALL_YOU_MASTER,
+    Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE,
   ];
   questions.sort_by(|a, b| a.0.cmp(&b.0));
 
