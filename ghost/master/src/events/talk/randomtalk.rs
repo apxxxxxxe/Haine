@@ -263,6 +263,21 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       ],
 
       TalkType::WithYou => vec![
+        // - ハイネはインターネットにあえて触れていない
+        RandomTalkType::Single(RandomTalk {
+          id: "スマホとインターネット".to_string(),
+          text: "\
+            h1111205最近の携帯電話というのは随分便利なのね。\\n\
+            写真はもはや当然で、インターネットすら常に使えるなんて。\\n\
+            \\n\
+            h1111101私？h1111206私は……あえて手を出さずにいるわ。\\n\
+            聞く限りでは、手に入る情報があまりにも膨大で、急速で、無秩序なようだから。\\n\
+            誰でも情報が発信できる環境は、意図が絡みすぎていて流れが読めないの。\\n\
+            h1111210急流に飛び込む快感よりも、瀞(とろ)にたゆたう心地よさを求めたいのよ。\\n\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
 
         // - ハイネはユーザの生活をすべて面倒見ることはできない
         RandomTalkType::Single(RandomTalk {
