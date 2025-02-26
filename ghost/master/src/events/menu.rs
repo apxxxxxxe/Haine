@@ -230,11 +230,12 @@ impl Question {
   const DO_SERVENTS_HAVE_NAMES: Self = Self(8);
   const CALL_YOU_MASTER: Self = Self(9);
   const WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE: Self = Self(10); // ひとりのときは何をして過ごしてる？
-  // 今日泊まってもいい？
-  // このあたりに観光できる場所はある？
-  // かわいい
-  // 美人
-  // 似顔絵を描く
+                                                            // 今日泊まってもいい？
+  const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
+                                                    // かわいい
+                                                    // 美人
+                                                    // 似顔絵を描く
+                                                    // お腹が空いた
 
   fn theme(&self) -> String {
     match *self {
@@ -247,7 +248,10 @@ impl Question {
       Question::HOW_TO_GET_TEALEAVES => "お茶はどこから手に入れているの？".to_string(),
       Question::DO_SERVENTS_HAVE_NAMES => "従者たちに名前はあるの？".to_string(),
       Question::CALL_YOU_MASTER => "ご主人様".to_string(),
-      Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE => "ひとりのときは何をして過ごしてる？".to_string(),
+      Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE => {
+        "ひとりのときは何をして過ごしてる？".to_string()
+      }
+      Question::IS_THERE_A_PLACE_TO_VISIT => "このあたりに観光できる場所はある？".to_string(),
       _ => unreachable!(),
     }
   }
@@ -263,7 +267,8 @@ impl Question {
       どんな感じだった？何か思うことはある？』\
       h1111204いいえ、何も。\\n\
       h1111205私の求める変化はそこには無いし、何より私はまだ死ねていない。\\n\
-      自我を手放してこその死でしょう？h1111210だから、これからよ。\\n\
+      自我を手放してこその死でしょう？\\n\
+      h1111210だから、これからよ。\\n\
       "
       .to_string(),
       Question::FATIGUE_OF_LIFE => "\
@@ -359,6 +364,26 @@ impl Question {
       h1111204まあ、好きなように過ごしているわ。\
       "
       .to_string(),
+      Question::IS_THERE_A_PLACE_TO_VISIT => "\
+      \\1『このあたりに観光できる場所はある？』\\n\
+      h1113205そうね……h1113304あなた、史跡は好き？\\n\
+      h1113206今でこそ寂れた田舎町だけれど、\\n\
+      その昔、ここは学問の中心地だったのよ。\\n\
+      ここから東に行ったところに修道院跡があるわ。\\n\
+      h1113210大半は焼失してしまったけれど、\\n\
+      名物だった鐘楼はかろうじて原型を残しているの。\\n\
+      h1111205あとは……北に小さな劇場もあるわね。\\n\
+      あれもかつては貴族の社交場だったのだけれど、\\n\
+      今はもう、地元の劇団が使う程度ね。\\n\
+      ……h1111210まあ、\\n\
+      退屈しのぎには良いんじゃないかしら。\\n\
+      \\n\
+      ……そんなことを聞くなんて、\\n\
+      h1111204私との語らいには飽きてしまったのかしら？\\n\
+      ……h1111310冗談よ。\\n\
+      h1111304あなたの目はそう言っていないものね。\
+      "
+      .to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
@@ -377,10 +402,11 @@ pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
     Question::DO_SERVENTS_HAVE_NAMES,
     Question::CALL_YOU_MASTER,
     Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE,
+    Question::IS_THERE_A_PLACE_TO_VISIT,
   ];
   questions.sort_by(|a, b| a.0.cmp(&b.0));
 
-  let mut m = "\\_q".to_string();
+  let mut m = "\\_q\\b[2]".to_string();
   for q in questions.iter_mut() {
     m.push_str(&q.to_script());
     m.push_str("\\n");
