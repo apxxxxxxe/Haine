@@ -10,6 +10,7 @@ mod periodic;
 pub(crate) mod talk;
 mod tooltip;
 pub(crate) mod translate;
+mod update;
 mod webclap;
 
 use crate::error::ShioriError;
@@ -25,6 +26,7 @@ use crate::events::periodic::*;
 use crate::events::talk::*;
 use crate::events::tooltip::*;
 use crate::events::translate::*;
+use crate::events::update::*;
 use crate::events::webclap::*;
 use crate::variables::get_global_vars;
 use shiorust::message::{parts::*, traits::*, Request, Response};
@@ -146,6 +148,8 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnChangingUserName" => Some(EventHandler::MayFailure(on_changing_user_name)),
     "OnImmersiveDegreeToggled" => Some(EventHandler::AlwaysSuccess(on_immersive_degree_toggled)),
     "OnStoryEvent" => Some(EventHandler::MayFailure(on_story_event)),
+    "OnUpdateBegin" => Some(EventHandler::AlwaysSuccess(on_update_begin)),
+    "OnUpdateComplete" => Some(EventHandler::AlwaysSuccess(on_update_complete)),
     _ => None,
   }
 }
