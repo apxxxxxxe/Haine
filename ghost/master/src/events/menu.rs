@@ -406,6 +406,10 @@ pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let vars = get_global_vars();
   let s = if let Some(hoge) = PendingEvent::from_str(refs[0]) {
+    let callback = || {
+      let vars = get_global_vars();
+      vars.set_pending_event_talk(None);
+    };
     match hoge {
       PendingEvent::ConfessionOfSuicide => {
         vars
@@ -417,12 +421,14 @@ pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
         get_global_vars()
           .flags_mut()
           .done(EventFlag::TalkTypeUnlock(TalkType::Lore));
+        callback();
         unlock_lore_talks()
       }
       PendingEvent::UnlockingServantsComments => {
         get_global_vars()
           .flags_mut()
           .done(EventFlag::TalkTypeUnlock(TalkType::Servant));
+        callback();
         unlock_servents_comments()
       }
     }
