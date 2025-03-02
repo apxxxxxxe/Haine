@@ -190,13 +190,16 @@ fn all_combo_inner(
 
 pub(crate) fn get_references(req: &Request) -> Vec<&str> {
   let mut references: Vec<&str> = Vec::new();
-  let mut i = 0;
-  while let Some(value) = req
-    .headers
-    .get(&HeaderName::from(&format!("Reference{}", i)))
-  {
-    references.push(value);
-    i += 1;
+  const MAX_REF: usize = 10; // とりあえず10個まで取得
+  for i in 0..MAX_REF {
+    if let Some(value) = req
+      .headers
+      .get(&HeaderName::from(&format!("Reference{}", i)))
+    {
+      references.push(value);
+    } else {
+      references.push("");
+    }
   }
   references
 }
