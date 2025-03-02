@@ -204,7 +204,6 @@ mod test {
   use crate::events::on_story_event;
   use crate::events::TALK_UNLOCK_COUNT_LORE;
   use crate::events::TALK_UNLOCK_COUNT_SERVANT;
-  use crate::events::UNLOCK_PAST_BOOT_COUNT;
   use crate::variables::PendingEvent;
   use crate::variables::{get_global_vars, GlobalVariables};
   use shiorust::message::Request;
@@ -214,7 +213,6 @@ mod test {
     const FIRST_CLOSE_TALK_PART: &str = "生きたあなたと話していたい";
     const SECOND_CLOSE_TALK_PART: &str = "がありますように";
     const CLOSE_TALK_IN_LIBRARY_PART: &str = "戻ってきたようだ。";
-    const PAST_TALK_UNLOCK_TALK_PART: &str = "あの子は生者だから";
 
     let vars = get_global_vars();
     *vars = GlobalVariables::new();
@@ -311,6 +309,8 @@ mod test {
     assert!(vars
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)));
+    let story_event = vars.pending_event_talk();
+    assert!(story_event.is_none());
 
     // ロア関連トークの開放確認
     while vars.cumulative_talk_count() < TALK_UNLOCK_COUNT_LORE {
@@ -325,6 +325,8 @@ mod test {
     assert!(vars
       .flags()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
+    let story_event = vars.pending_event_talk();
+    assert!(story_event.is_none());
 
     // 初回終了時に通常モードだったときのトークが再生されるかのテスト
     vars.flags_mut().delete(EventFlag::FirstClose);
@@ -337,25 +339,6 @@ mod test {
     let res = on_close(&on_second_change_req)?;
     let value = res.headers.get("Value").ok_or("Failed to get value")?;
     assert!(value.contains(SECOND_CLOSE_TALK_PART)); // 2回目以降の終了トークが含まれていることの確認
-
-    assert!(!vars
-      .flags()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Past)));
-    assert!(vars.flags().check(&EventFlag::FirstPlaceChange));
-    while vars.total_boot_count() < UNLOCK_PAST_BOOT_COUNT {
-      on_boot(&on_second_change_req)?;
-    }
-    let story_event = vars
-      .pending_event_talk()
-      .ok_or("Failed to get story event")?;
-    let res = on_story_event(&make_story_event_request(story_event))?;
-    let value = res.headers.get("Value").ok_or("Failed to get value")?;
-    assert!(value.contains(PAST_TALK_UNLOCK_TALK_PART)); // 過去トーク開放トークの内容が含まれていることの確認
-    assert!(vars
-      .flags()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Past)));
-    assert_eq!(vars.volatility.talking_place(), TalkingPlace::Library);
-    assert_eq!(vars.volatility.immersive_degrees(), IMMERSIVE_RATE_MAX);
 
     Ok(())
   }

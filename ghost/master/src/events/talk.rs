@@ -142,7 +142,7 @@ impl TalkingPlace {
   pub fn talk_types(&self) -> Vec<TalkType> {
     match self {
       Self::LivingRoom => vec![TalkType::SelfIntroduce, TalkType::Lore, TalkType::WithYou],
-      Self::Library => vec![TalkType::Abstract, TalkType::Past],
+      Self::Library => vec![TalkType::Abstract],
     }
   }
 }

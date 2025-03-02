@@ -282,7 +282,6 @@ impl EventFlags {
     self.flags.contains(flag)
   }
 
-  #[allow(dead_code)]
   pub fn delete(&mut self, flag: EventFlag) {
     self.flags.remove(&flag);
   }

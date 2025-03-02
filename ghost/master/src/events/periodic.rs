@@ -9,7 +9,6 @@ use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
-pub(crate) const UNLOCK_PAST_BOOT_COUNT: u64 = 3;
 pub(crate) const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
 pub(crate) const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
@@ -177,13 +176,28 @@ pub(crate) fn check_story_events() {
   {
     // ロアトーク開放
     vars.set_pending_event_talk(Some(PendingEvent::UnlockingLoreTalks));
-  } else if !vars
+  } else if vars.pending_event_talk() == Some(PendingEvent::ConfessionOfSuicide) {
+    // 仕様変更のため解禁されないように
+    // すでにPendingEventにConfessionOfSuicideがセットされている場合は消す
+    vars.set_pending_event_talk(None);
+  }
+
+  // 過去トークの解禁がされている場合、再び閉じる
+  if vars
     .flags()
     .check(&EventFlag::TalkTypeUnlock(super::TalkType::Past))
-    && vars.total_boot_count() >= UNLOCK_PAST_BOOT_COUNT
-    && vars.flags().check(&EventFlag::FirstPlaceChange)
   {
-    // 情報解禁&過去トーク開放
-    vars.set_pending_event_talk(Some(PendingEvent::ConfessionOfSuicide));
+    vars
+      .flags_mut()
+      .delete(EventFlag::TalkTypeUnlock(super::TalkType::Past));
+  }
+
+  // 変数に過去トークの情報が入っている場合消去する
+  if vars
+    .talk_collection_mut()
+    .remove(&super::TalkType::Past)
+    .is_some()
+  {
+    debug!("過去トークの情報を消去しました");
   }
 }
