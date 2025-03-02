@@ -4,7 +4,6 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::random_talks;
-use crate::events::tooltip::show_tooltip;
 use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_RATE_MAX;
@@ -67,7 +66,6 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\![*]\\q[{},OnAiTalk]\\n\
         {}\
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
-        \\![*]{}\
         \\_l[0,@1.75em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
         \\_l[0,@1.75em]\
@@ -75,7 +73,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         {}\
         {}\
         \\1{}\
-        \\0\\_l[0,0]{}\
+        \\0\\_l[0,0]\
         ",
         if vars.volatility.talking_place() == TalkingPlace::Library {
           "耳を澄ます"
@@ -87,38 +85,12 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         } else {
           "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
         },
-        if vars.flags().check(&EventFlag::FirstLibraryEnd) {
-          format!(
-            "\\q[没入度{},OnImmersiveDegreeToggled]",
-            if vars.volatility.is_immersive_degrees_fixed() {
-              "の固定を解除する"
-            } else {
-              "を固定する"
-            }
-          )
-        } else {
-          "？？？".to_string()
-        },
         talk_interval_selector,
         close_button,
         if let Some(event) = vars.pending_event_talk() {
           format!("\\![*]\\q[{},OnStoryEvent,{}]", event, event)
         } else {
           "".to_string()
-        },
-        if vars.volatility.talking_place() == TalkingPlace::Library {
-          show_bar_with_simple_label(
-            100,
-            vars.volatility.immersive_degrees(),
-            "ハイネは応えない。",
-          )
-        } else {
-          show_bar_with_caption(
-            100,
-            vars.volatility.immersive_degrees(),
-            "没入度",
-            "WhatIsImersiveDegree",
-          )
         },
       )
     },
@@ -132,80 +104,6 @@ fn show_minute(m: &u64) -> String {
     0 => "黙る".to_string(),
     _ => format!("{}分", m),
   }
-}
-
-fn make_bar_chips(length: u32) -> Vec<String> {
-  let mut v = Vec::new();
-  if length == 0 {
-    return v;
-  }
-  v.push("●".to_string());
-  for _i in 1..length - 1 {
-    v.push("■".to_string());
-  }
-  v.push("●".to_string());
-  v
-}
-
-fn show_bar_with_caption(max: u32, current: u32, label: &str, tooltip_id: &str) -> String {
-  const SPEED: u32 = 10; // 何文字分の表示時間でバーを描画するか
-  const BAR_WIDTH: u32 = 16; // バーの長さを何文字分で描画するか
-  const BAR_HEIGHT: u32 = 10;
-  let rate = ((current * 100) as f32 / max as f32) as u32;
-  let bar_width = BAR_WIDTH * 2; // 重ねながら描画するので2倍
-  let bar_chip_wait = (50.0 * ((SPEED as f32) / (BAR_WIDTH as f32))) as u32; // 1文字分の表示時間
-
-  let vars = get_global_vars();
-  format!(
-    "\
-    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\![quicksection,true]{}: {}\\_l[@5,]{}\
-    \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
-    \\f[height,{}]\\_l[0,]\\f[color,{}]{}\
-    \\![quicksection,false]\\f[color,default]\\f[height,default]\
-    ",
-    BAR_HEIGHT,
-    BAR_WIDTH + 1,
-    label,
-    if vars.volatility.is_immersive_degrees_fixed() {
-      "固定中".to_string()
-    } else {
-      format!("{}%", rate)
-    },
-    show_tooltip(tooltip_id),
-    BAR_HEIGHT,
-    make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
-    BAR_HEIGHT,
-    if vars.volatility.is_immersive_degrees_fixed() {
-      "50,50,50"
-    } else {
-      "120,0,0"
-    },
-    make_bar_chips(bar_width * rate / 100).join(&format!("\\_w[{}]\\_l[@-0.5em,]", bar_chip_wait)),
-  )
-}
-
-fn show_bar_with_simple_label(max: u32, current: u32, label: &str) -> String {
-  const SPEED: u32 = 10; // 何文字分の表示時間でバーを描画するか
-  const BAR_WIDTH: u32 = 16; // バーの長さを何文字分で描画するか
-  const BAR_HEIGHT: u32 = 10;
-  let rate = ((current * 100) as f32 / max as f32) as u32;
-  let bar_width = BAR_WIDTH * 2; // 重ねながら描画するので2倍
-  let bar_chip_wait = (50.0 * ((SPEED as f32) / (BAR_WIDTH as f32))) as u32; // 1文字分の表示時間
-
-  format!(
-    "\
-    \\f[height,{}]\\_l[{}em,]\\f[height,default]\\f[height,-1]\\![quicksection,true]{}\
-    \\f[height,{}]\\_l[0,@3]\\f[color,80,80,80]{}\
-    \\f[height,{}]\\_l[0,]\\f[color,120,0,0]{}\
-    ",
-    BAR_HEIGHT,
-    BAR_WIDTH + 1,
-    label,
-    BAR_HEIGHT,
-    make_bar_chips(bar_width).join("\\_l[@-0.5em,]"),
-    BAR_HEIGHT,
-    make_bar_chips(bar_width * rate / 100).join(&format!("\\_w[{}]\\_l[@-0.5em,]", bar_chip_wait)),
-  )
 }
 
 pub(crate) fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
