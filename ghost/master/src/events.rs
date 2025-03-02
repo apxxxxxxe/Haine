@@ -150,6 +150,8 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnStoryEvent" => Some(EventHandler::MayFailure(on_story_event)),
     "OnUpdateBegin" => Some(EventHandler::AlwaysSuccess(on_update_begin)),
     "OnUpdateComplete" => Some(EventHandler::AlwaysSuccess(on_update_complete)),
+    "OnUpdateOtherBegin" => Some(EventHandler::AlwaysSuccess(on_update_other_begin)),
+    "OnUpdateOtherComplete" => Some(EventHandler::AlwaysSuccess(on_update_other_complete)),
     _ => None,
   }
 }
