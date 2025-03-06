@@ -127,7 +127,7 @@ impl Question {
   const DO_SERVENTS_HAVE_NAMES: Self = Self(8);
   const CALL_YOU_MASTER: Self = Self(9);
   const WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE: Self = Self(10); // ひとりのときは何をして過ごしてる？
-                                                            // 今日泊まってもいい？
+  const CAN_I_STAY_TONIGHT: Self = Self(11); // 今日泊まってもいい？
   const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
                                                     // かわいい
                                                     // 美人
@@ -148,6 +148,7 @@ impl Question {
       Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE => {
         "ひとりのときは何をして過ごしてる？".to_string()
       }
+      Question::CAN_I_STAY_TONIGHT => "今日泊まってもいい？".to_string(),
       Question::IS_THERE_A_PLACE_TO_VISIT => "このあたりに観光できる場所はある？".to_string(),
       _ => unreachable!(),
     }
@@ -261,6 +262,22 @@ impl Question {
       h1111204まあ、好きなように過ごしているわ。\
       "
       .to_string(),
+      Question::CAN_I_STAY_TONIGHT => "\
+      \\1『今日泊まってもいい？』\\n\\n\
+      h1111201あら、泊まりたいの？h1111204ええ、構わないわよ。\\n\
+      h1111206客室は常に手入れされているし、\\n\
+      寝心地も保証するわ。\\n\
+      \\n\
+      ……h1111204いっそ、ここへ住んでもいいのよ？\\n\
+      あなたの食事は用意できないけれど、\\n\
+      それ以外で不自由はさせないわ。\\n\\n\
+      h1111104\\1『そうしたいのは山々だけど、\\n\
+      生活があるから…』\\n\
+      \\0…………h1111205ええ、そうよね。\\n\
+      \\n\
+      h1111204部屋にはあとで案内させるわ。\\n\
+      h1111210くつろいでちょうだい。\
+      ".to_string(),
       Question::IS_THERE_A_PLACE_TO_VISIT => "\
       \\1『このあたりに観光できる場所はある？』\\n\
       h1113205そうね……h1113304あなた、史跡は好き？\\n\
@@ -269,9 +286,10 @@ impl Question {
       ここから東に行ったところに修道院跡があるわ。\\n\
       h1113210大半は焼失してしまったけれど、\\n\
       名物だった鐘楼はかろうじて原型を残しているの。\\n\
-      h1111205あとは……北に小さな劇場もあるわね。\\n\
+      h1111205娯楽でいえば、北側に小さな劇場もあるわね。\\n\
       あれもかつては貴族の社交場だったのだけれど、\\n\
       今はもう、地元の劇団が使う程度ね。\\n\
+      それでも細々と公演を続けているわ。\\n\
       ……h1111210まあ、\\n\
       退屈しのぎには良いんじゃないかしら。\\n\
       \\n\
@@ -299,6 +317,7 @@ pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
     Question::DO_SERVENTS_HAVE_NAMES,
     Question::CALL_YOU_MASTER,
     Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE,
+    Question::CAN_I_STAY_TONIGHT,
     Question::IS_THERE_A_PLACE_TO_VISIT,
   ];
   questions.sort_by(|a, b| a.0.cmp(&b.0));
@@ -437,11 +456,11 @@ fn unlock_lore_talks() -> String {
   format!(
     "\
     h1111201死について。深く考えることはある？\\n\
-    h1111206……あなたには聞くまでもないようね。\\n\
-    h1111205私もそう。\\n\
+    h1111206……あなたには聞くまでもないわよね。\\n\
+    h1111205私もそうなの。\\n\
     生きていたころから、なぜ生きるのか、死ぬとはどういうことかをずっと考えていたわ。\\n\
     いくつか不思議な話を知っているの。\\n\
-    話の種に、いくつか語ってみましょうか。{}\
+    話の種に、語ってみましょうか。{}\
     ",
     if !get_global_vars()
       .flags()
