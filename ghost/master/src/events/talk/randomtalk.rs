@@ -263,6 +263,38 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       ],
 
       TalkType::WithYou => vec![
+        RandomTalkType::Single(RandomTalk{
+          id: "".to_string(),
+          text: "\
+              \\1（カチ、コチ、カチ、コチ……）\\n\
+              振り子時計の音、そして私の息遣いだけが聞こえる。\\n\
+              h1111206……静かね。\\n\
+              h1111210けれど、静寂を恐れたり気まずく思う必要はないわ。\\n\
+              私たちの心が、この瞬間しか見つけられないものを探しているの。\\n\
+              h1111204あなたの中の静寂は、\\n\
+              いま、どんな言葉を秘めているのかしら？\
+              ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
+
+        RandomTalkType::Single(RandomTalk{
+          id: "霊と時間".to_string(),
+          text: "\
+            h1111204たとえばあなたが目を閉じて、\\n\
+            次に開いたときに1年が経っていたら。\\n\
+            それは1年？それとも一瞬？\\n\
+            h1111205私の感覚は、ちょうどそれに似ているの。\\n\
+            h1111210時間は進んでいるけれど、\\n\
+            h1111205私にとっては何も意味をなさない。\\n\
+            \\n\
+            h1111101……いえ、今は違うわね。\\n\
+            h1111304あなたがここにいるのだから。\
+            ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
+
         // - ハイネはインターネットにあえて触れていない
         RandomTalkType::Single(RandomTalk {
           id: "スマホとインターネット".to_string(),
