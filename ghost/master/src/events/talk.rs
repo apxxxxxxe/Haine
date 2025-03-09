@@ -207,3 +207,37 @@ pub(crate) fn random_talks_analysis() -> String {
     s, sum
   )
 }
+
+#[cfg(test)]
+mod tests {
+  use crate::events::menu::QUESTIONS;
+  use crate::events::talk::first_boot::{FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS};
+  use crate::events::talk::{random_talks, TalkType};
+  use std::fs::File;
+  use std::io::Write;
+
+  pub fn write_all_talks() {
+    let mut all_talks_file = File::create("all_talks.txt").unwrap();
+    let mut write = |f: &mut File, text: String| {
+      writeln!(f, "{}", text).unwrap();
+      writeln!(all_talks_file, "{}", text).unwrap();
+    };
+    let mut file = File::create("first_boot.txt").unwrap();
+    write(&mut file, FIRST_BOOT_TALK.to_string());
+    for t in FIRST_RANDOMTALKS.iter() {
+      write(&mut file, t.to_string());
+    }
+    write(&mut file, FIRST_CLOSE_TALK.to_string());
+    let mut file = File::create("questions.txt").unwrap();
+    for q in QUESTIONS.iter() {
+      write(&mut file, q.talk());
+    }
+    let mut file = File::create("random_talks.txt").unwrap();
+    for talk_type in TalkType::all() {
+      let talks = random_talks(talk_type).unwrap();
+      for t in talks {
+        write(&mut file, t.text);
+      }
+    }
+  }
+}
