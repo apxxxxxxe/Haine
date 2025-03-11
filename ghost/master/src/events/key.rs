@@ -3,15 +3,15 @@ use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::talk::random_talks_analysis;
-use crate::variables::{get_global_vars, EventFlag, GlobalVariables, GHOST_NAME};
+use crate::variables::*;
 use shiorust::message::{Request, Response};
+use std::collections::HashMap;
 
 pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
   let refs = get_references(req);
   match refs[0] {
     "t" => {
-      if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
+      if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
         FIRST_RANDOMTALKS.len() as u32 - 1,
       )) {
         Ok(new_response_nocontent())
@@ -20,7 +20,7 @@ pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
       }
     }
     "c" => {
-      if vars.volatility.debug_mode() {
+      if *DEBUG_MODE.read().unwrap() {
         Ok(new_response_with_value_with_notranslate(
           random_talks_analysis(),
           TranslateOption::balloon_surface_only(),
@@ -29,10 +29,17 @@ pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
         Ok(new_response_nocontent())
       }
     }
-
     "d" => {
-      if vars.volatility.debug_mode() {
-        *vars = GlobalVariables::new();
+      if *DEBUG_MODE.read().unwrap() {
+        // 全変数をリセット
+        *TOTAL_BOOT_COUNT.write().unwrap() = 0;
+        *TOTAL_TIME.write().unwrap() = 0;
+        *RANDOM_TALK_INTERVAL.write().unwrap() = 0;
+        *USER_NAME.write().unwrap() = "".to_string();
+        *TALK_COLLECTION.write().unwrap() = HashMap::new();
+        *CUMULATIVE_TALK_COUNT.write().unwrap() = 0;
+        *FLAGS.write().unwrap() = EventFlags::default();
+        *PENDING_EVENT_TALK.write().unwrap() = None;
         Ok(new_response_with_value_with_notranslate(
           format!("\\![change,ghost,{}]", GHOST_NAME),
           TranslateOption::none(),

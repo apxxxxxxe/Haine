@@ -61,7 +61,7 @@ impl Inserter {
     }
   }
 
-  pub fn is_ready(&mut self) -> bool {
+  pub fn is_ready(&self) -> bool {
     let tokenizer_clone = self.tokenizer.clone();
     let tokenizer = if let Ok(v) = tokenizer_clone.lock() {
       v

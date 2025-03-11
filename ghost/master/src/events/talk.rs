@@ -6,8 +6,8 @@ use crate::check_error;
 use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::talk::randomtalk::random_talks;
-use crate::get_global_vars;
 use crate::roulette::RouletteCell;
+use crate::variables::TALK_COLLECTION;
 use core::fmt::{Display, Formatter};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -151,15 +151,17 @@ pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriErr
   let refs = get_references(req);
   let talk_type_num = check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError);
   let talk_type = TalkType::from_u32(talk_type_num).unwrap();
-  let talk_collection = get_global_vars().talk_collection();
-  let empty_hashset = HashSet::new();
-  let seen_talks = talk_collection.get(&talk_type).unwrap_or(&empty_hashset);
-  let talks = Talk::get_unseen_talks(talk_type, seen_talks).ok_or(ShioriError::TalkNotFound)?;
-  let choosed_talk = talks
-    .choose(&mut rand::thread_rng())
-    .ok_or(ShioriError::TalkNotFound)?
-    .to_owned();
-
+  let choosed_talk;
+  {
+    let talk_collection = TALK_COLLECTION.read().unwrap();
+    let empty_hashset = HashSet::new();
+    let seen_talks = talk_collection.get(&talk_type).unwrap_or(&empty_hashset);
+    let talks = Talk::get_unseen_talks(talk_type, seen_talks).ok_or(ShioriError::TalkNotFound)?;
+    choosed_talk = talks
+      .choose(&mut rand::thread_rng())
+      .ok_or(ShioriError::TalkNotFound)?
+      .clone();
+  }
   register_talk_collection(&choosed_talk)?;
 
   new_response_with_value_with_translate(
@@ -169,7 +171,7 @@ pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriErr
 }
 
 pub(crate) fn register_talk_collection(talk: &Talk) -> Result<(), ShioriError> {
-  let mut talk_collection = get_global_vars().talk_collection_mut();
+  let mut talk_collection = TALK_COLLECTION.write().unwrap();
   match talk_collection.get_mut(&(talk.talk_type.ok_or(ShioriError::FieldAccessError)?)) {
     Some(t) => {
       let key = talk.id.to_string();

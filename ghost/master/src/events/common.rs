@@ -6,7 +6,7 @@ use crate::events::translate::on_translate;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::roulette::RouletteCell;
-use crate::variables::get_global_vars;
+use crate::variables::*;
 use core::fmt::{Display, Formatter};
 use std::collections::HashSet;
 
@@ -97,10 +97,8 @@ pub(crate) fn new_response_with_value_with_notranslate(
   value: String,
   option: HashSet<TranslateOption>,
 ) -> Response {
-  let vars = get_global_vars();
-
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", vars.volatility.talking_place().balloon_surface(),)
+    format!("\\b[{}]", TALKING_PLACE.read().unwrap().balloon_surface())
   } else {
     String::new()
   };
@@ -120,19 +118,17 @@ pub(crate) fn new_response_with_value_with_translate(
   value: String,
   option: HashSet<TranslateOption>,
 ) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", vars.volatility.talking_place().balloon_surface(),)
+    format!("\\b[{}]", TALKING_PLACE.read().unwrap().balloon_surface())
   } else {
     String::new()
   };
 
   let v = if option.contains(&TranslateOption::DoTranslate) {
-    if vars.volatility.inserter_mut().is_ready() {
+    if INSERTER.read().unwrap().is_ready() {
       on_translate(value, option.contains(&TranslateOption::CompleteShadow))?
     } else {
-      vars.volatility.set_waiting_talk(Some((value, option)));
+      *WAITING_TALK.write().unwrap() = Some((value, option));
       "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
     }
   } else {
@@ -154,11 +150,7 @@ pub(crate) fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> O
   if values.is_empty() {
     return None;
   }
-  let vars = get_global_vars();
-  let u = vars
-    .volatility
-    .talk_bias_mut()
-    .roulette(values, update_weight);
+  let u = TALK_BIAS.write().unwrap().roulette(values, update_weight);
   u
 }
 
@@ -207,9 +199,8 @@ pub(crate) fn get_references(req: &Request) -> Vec<&str> {
 pub(crate) fn render_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -200;
-  let vars = get_global_vars();
   if is_complete {
-    let degree = vars.volatility.immersive_degrees();
+    let degree = *IMMERSIVE_DEGREES.read().unwrap();
     format!(
       "\\0\\![bind,ex,没入度用,1]\\![anim,offset,800100,0,{}]",
       ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32
@@ -348,7 +339,7 @@ pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
     check_error!(refs[2].parse::<i32>(), ShioriError::ParseIntError) == 1;
   let dest_eyes = dest_surface % eye_index_digit_pow;
   let dest_remain = dest_surface - dest_eyes;
-  let from_surface = get_global_vars().volatility.current_surface();
+  let from_surface = *CURRENT_SURFACE.read().unwrap();
   let from_eyes = from_surface % eye_index_digit_pow;
   let direct_res = new_response_with_value_with_notranslate(
     format!(
@@ -460,18 +451,17 @@ pub(crate) fn shake_with_notext() -> String {
 }
 
 pub(crate) fn render_immersive_icon() -> String {
-  let vars = get_global_vars();
-  let immersive_degrees = vars.volatility.immersive_degrees();
+  let immersive_degrees = *IMMERSIVE_DEGREES.read().unwrap();
   let icon_count_float =
     immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
-  let icon_count = if vars.volatility.talking_place() == TalkingPlace::Library {
+  let icon_count = if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     // 繰り上げ
     icon_count_float.ceil() as u32
   } else {
     // 切り捨て
     icon_count_float.floor() as u32
   };
-  let mut candles = vars.volatility.candles_mut();
+  let mut candles = *CANDLES.write().unwrap();
   let mut v = String::new();
   for i in 1..=IMMERSIVE_ICON_COUNT {
     let enabled = i <= icon_count;

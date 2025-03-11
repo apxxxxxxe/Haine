@@ -7,11 +7,14 @@ use crate::events::talk::randomtalk::random_talks;
 use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::variables::PendingEvent;
-use crate::variables::{get_global_vars, EventFlag};
+use crate::variables::{
+  EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
+  TALKING_PLACE, TALK_COLLECTION, USER_NAME,
+};
 use shiorust::message::{Request, Response};
 
 pub(crate) fn on_menu_exec(_req: &Request) -> Response {
-  let current_talk_interval = get_global_vars().random_talk_interval().unwrap_or(180);
+  let current_talk_interval = *RANDOM_TALK_INTERVAL.read().unwrap();
   let mut selections = Vec::new();
 
   for i in [1, 3, 5, 7, 10, 0].iter() {
@@ -42,16 +45,12 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
     "\\_l[0,0]\\f[align,right]\\__q[script:\\e]{}\\__q",
     Icon::Cross
   );
-  let vars = get_global_vars();
   let m = format!(
     "\\_q{}{}",
     REMOVE_BALLOON_NUM,
-    if !get_global_vars()
-      .flags()
-      .check(&EventFlag::FirstRandomTalkDone(
-        (FIRST_RANDOMTALKS.len() - 1) as u32,
-      ))
-    {
+    if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+      (FIRST_RANDOMTALKS.len() - 1) as u32,
+    )) {
       "\
       \\_l[0,3em]\\![*]\\q[話の続き,OnAiTalk]\\n[150]\
       \\![*]\\q[その名前で呼ばれたくない,OnChangingUserName]\\n\
@@ -74,23 +73,30 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\1{}\
         \\0\\_l[0,0]\
         ",
-        if vars.volatility.talking_place() == TalkingPlace::Library {
+        if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
           "耳を澄ます"
         } else {
           "なにか話して"
         },
-        if vars.volatility.talking_place() == TalkingPlace::Library {
+        if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
           "".to_string()
         } else {
           "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
         },
         talk_interval_selector,
         close_button,
-        if let Some(event) = vars.pending_event_talk() {
-          format!("\\![*]\\q[{},OnStoryEvent,{}]", event, event)
-        } else {
-          "".to_string()
-        },
+        {
+          let hoge = PENDING_EVENT_TALK.read().unwrap();
+          if hoge.is_some() {
+            format!(
+              "\\![*]\\q[{},OnStoryEvent,{}]",
+              hoge.as_ref().unwrap(),
+              hoge.as_ref().unwrap()
+            )
+          } else {
+            "".to_string()
+          }
+        }
       )
     },
   );
@@ -108,7 +114,7 @@ fn show_minute(m: &u64) -> String {
 pub(crate) fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let v = check_error!(refs[0].parse::<u64>(), ShioriError::ParseIntError);
-  get_global_vars().set_random_talk_interval(Some(v));
+  *RANDOM_TALK_INTERVAL.write().unwrap() = v;
 
   Ok(on_menu_exec(req))
 }
@@ -382,14 +388,13 @@ pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
   let mut sum = 0;
   let mut all_sum = 0;
   const DIMMED_COLOR: &str = "\\f[color,150,150,130]";
-  let talk_collection = get_global_vars().talk_collection_mut();
-  let vars = get_global_vars();
-  let talking_place = vars.volatility.talking_place();
+  let talk_collection = TALK_COLLECTION.read().unwrap();
+  let talking_place = TALKING_PLACE.read().unwrap();
   lines.push(format!("[トーク統計: {}]\\n", talking_place));
   let talk_types = talking_place.talk_types();
   let is_unlocked_checks = talk_types
     .iter()
-    .map(|t| vars.flags().check(&EventFlag::TalkTypeUnlock(*t)))
+    .map(|t| FLAGS.read().unwrap().check(&EventFlag::TalkTypeUnlock(*t)))
     .collect::<Vec<_>>();
   for i in 0..talk_types.len() {
     let talk_type = talk_types[i];
@@ -431,28 +436,23 @@ pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
 }
 
 pub(crate) fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-  let user_name = if let Some(user_name) = vars.user_name() {
-    user_name
-  } else {
-    error!("User name is not set.");
-    return Ok(new_response_nocontent());
-  };
   new_response_with_value_with_translate(
     format!(
       "\\_q\\![open,inputbox,{},0]新しい呼び名を入力してください。\\n現在:{}",
       InputId::UserName,
-      user_name,
+      *USER_NAME.read().unwrap()
     ),
     TranslateOption::with_shadow_completion(),
   )
 }
 
 pub(crate) fn on_immersive_degree_toggled(req: &Request) -> Response {
-  let vars = get_global_vars();
-  vars
-    .volatility
-    .set_is_immersive_degrees_fixed(!vars.volatility.is_immersive_degrees_fixed());
+  let i;
+  {
+    i = *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap();
+  }
+  *IS_IMMERSIVE_DEGREES_FIXED.write().unwrap() = !i;
+
   on_menu_exec(req)
 }
 
@@ -460,23 +460,24 @@ pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let s = if let Some(hoge) = PendingEvent::from_str(refs[0]) {
     let callback = || {
-      let vars = get_global_vars();
-      vars.set_pending_event_talk(None);
+      *PENDING_EVENT_TALK.write().unwrap() = None;
     };
     match hoge {
       PendingEvent::ConfessionOfSuicide => {
         unreachable!();
       }
       PendingEvent::UnlockingLoreTalks => {
-        get_global_vars()
-          .flags_mut()
+        FLAGS
+          .write()
+          .unwrap()
           .done(EventFlag::TalkTypeUnlock(TalkType::Lore));
         callback();
         unlock_lore_talks()
       }
       PendingEvent::UnlockingServantsComments => {
-        get_global_vars()
-          .flags_mut()
+        FLAGS
+          .write()
+          .unwrap()
           .done(EventFlag::TalkTypeUnlock(TalkType::Servant));
         callback();
         unlock_servents_comments()
@@ -498,8 +499,9 @@ fn unlock_lore_talks() -> String {
     いくつか不思議な話を知っているの。\\n\
     話の種に、語ってみましょうか。{}\
     ",
-    if !get_global_vars()
-      .flags()
+    if !FLAGS
+      .read()
+      .unwrap()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Lore))
     {
       render_achievement_message(TalkType::Lore)
@@ -522,24 +524,21 @@ fn unlock_servents_comments() -> String {
     h1111209耳を澄ませていれば、彼らの声が聞こえることもあるんじゃない？\\n\
     私を通して彼らとも縁ができているはずだから。{}{}\
     ",
-    if !get_global_vars()
-      .flags()
+    if !FLAGS
+      .read()
+      .unwrap()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
     {
-      let user_name = if let Some(name) = get_global_vars().user_name() {
-        name.to_string()
-      } else {
-        "お客".to_string()
-      };
       format!(
         "\\![set,balloonnum,おや、本当だ。よろしくね、{}さん。]",
-        user_name
+        *USER_NAME.read().unwrap()
       )
     } else {
       "".to_string()
     },
-    if !get_global_vars()
-      .flags()
+    if !FLAGS
+      .read()
+      .unwrap()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
     {
       render_achievement_message(TalkType::Servant)
