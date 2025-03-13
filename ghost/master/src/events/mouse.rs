@@ -10,7 +10,6 @@ use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE_MAX;
-use crate::sound::play_sound;
 use crate::status::Status;
 use crate::variables::{
   EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES,
@@ -344,9 +343,6 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if *IMMERSIVE_DEGREES.read().unwrap() < threshold {
       *IMMERSIVE_DEGREES.write().unwrap() = threshold;
-      if play_sound(SOUND_BLOW_CANDLE).is_err() {
-        return Some(Err(ShioriError::PlaySoundError));
-      }
       // 没入度最大なら書斎へ移動
       let m = if threshold == IMMERSIVE_RATE_MAX {
         *TALKING_PLACE.write().unwrap() = TalkingPlace::Library;
@@ -371,8 +367,9 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
       };
       return Some(new_response_with_value_with_translate(
         format!(
-          "\\0{}{}\\p[2]{}{}",
-          render_shadow(true),
+          "\\_v[{}]\\0{}{}\\p[2]{}{}",
+          SOUND_BLOW_CANDLE,
+		  render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m
@@ -392,9 +389,6 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
   for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if *IMMERSIVE_DEGREES.read().unwrap() > threshold {
-      if play_sound(SOUND_LIGHT_CANDLE).is_err() {
-        return Some(Err(ShioriError::PlaySoundError));
-      }
       // 没入度0なら居間へ移動
       let m = if threshold == 0 && *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
         *TALKING_PLACE.write().unwrap() = TalkingPlace::LivingRoom;
@@ -413,8 +407,9 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
       *IMMERSIVE_DEGREES.write().unwrap() = threshold;
       return Some(new_response_with_value_with_translate(
         format!(
-          "\\0{}{}\\p[2]{}{}",
-          render_shadow(true),
+          "\\_v[{}]\\0{}{}\\p[2]{}{}",
+          SOUND_LIGHT_CANDLE,
+		  render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m
