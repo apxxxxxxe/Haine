@@ -63,8 +63,8 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\_l[0,1.5em]\
         \\![*]\\q[{},OnAiTalk]\\n\
         {}\
-        \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
-        \\_l[0,@1.75em]\
+        \\![*]\\q[トーク統計,OnCheckTalkCollection]\
+        \\_l[0,@2.5em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
         \\_l[0,@1.75em]\
         \\![*]\\q[呼び名を変える,OnChangingUserName]\\n\
