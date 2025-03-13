@@ -28,7 +28,7 @@ use crate::events::tooltip::*;
 use crate::events::translate::*;
 use crate::events::update::*;
 use crate::events::webclap::*;
-use crate::variables::get_global_vars;
+use crate::variables::*;
 use shiorust::message::{parts::*, traits::*, Request, Response};
 use std::fs;
 
@@ -85,7 +85,7 @@ fn name(_req: &Request) -> Response {
 }
 
 fn log_path(_req: &Request) -> Response {
-  let log_path = get_global_vars().volatility.log_path();
+  let log_path = LOG_PATH.read().unwrap().clone();
   new_response_with_value_with_notranslate(log_path, TranslateOption::none())
 }
 

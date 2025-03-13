@@ -4,13 +4,11 @@ mod events;
 mod autobreakline;
 mod error;
 mod roulette;
-mod sound;
 mod status;
 mod variables;
 
 use crate::events::common::{add_error_description, new_response_nocontent};
-use crate::sound::cooperative_free_player;
-use crate::variables::get_global_vars;
+use crate::variables::*;
 
 use std::fs::{metadata, File};
 use std::panic;
@@ -38,22 +36,18 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
     return FALSE; // SSPの仕様上意味なし
   };
 
-  let vars = get_global_vars();
-
-  if let Err(e) = vars.load() {
+  if let Err(e) = load_global_variables() {
     error!("{}", e);
   }
 
   // ./debugが存在するならデバッグモード
   if metadata("./debug").is_ok() {
-    vars.volatility.set_debug_mode(true);
+    *DEBUG_MODE.write().unwrap() = true;
   }
 
   // ログの設定
   let log_path = Path::new(&s.to_string()).join("haine.log");
-  vars
-    .volatility
-    .set_log_path(log_path.to_str().unwrap().to_string());
+  *LOG_PATH.write().unwrap() = log_path.to_str().unwrap().to_string();
   let fp = if let Ok(fp) = File::create(log_path) {
     fp
   } else {
@@ -72,6 +66,9 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
     debug!("{}", panic_info);
   }));
 
+  // Inserterの初期化を別スレッドで開始
+  INSERTER.write().unwrap().start_init();
+
   debug!("load");
 
   TRUE
@@ -81,9 +78,7 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
 pub extern "cdecl" fn unload() -> BOOL {
   debug!("unload");
 
-  cooperative_free_player();
-
-  if let Err(e) = get_global_vars().save() {
+  if let Err(e) = save_global_variables() {
     error!("{}", e);
   }
 

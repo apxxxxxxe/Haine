@@ -5,18 +5,17 @@ use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
 use crate::events::TalkingPlace;
-use crate::variables::{get_global_vars, EventFlag, TRANSPARENT_SURFACE};
+use crate::variables::*;
 use chrono::Timelike;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
 pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-  vars.set_total_boot_count(vars.total_boot_count() + 1);
+  *TOTAL_BOOT_COUNT.write().unwrap() += 1;
 
   // 初回起動
-  if !vars.flags().check(&EventFlag::FirstBoot) {
-    vars.flags_mut().done(EventFlag::FirstBoot);
+  if !FLAGS.read().unwrap().check(&EventFlag::FirstBoot) {
+    FLAGS.write().unwrap().done(EventFlag::FirstBoot);
     let mut res = new_response_with_value_with_translate(
       FIRST_BOOT_TALK.to_string(),
       TranslateOption::simple_translate(),
@@ -62,11 +61,9 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
 }
 
 pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
   let mut parts = vec![vec![RESET_BINDS.to_string()]];
-  let is_immersing = vars.volatility.talking_place() == TalkingPlace::Library;
 
-  if is_immersing {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     parts.push(vec![format!(
       "\\0\\b[{}]h1111705……。\
       \\1ネ……\\n\
@@ -81,8 +78,8 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
       TalkingPlace::LivingRoom.balloon_surface(),
     )]);
   }
-  if !vars.flags().check(&EventFlag::FirstClose) {
-    vars.flags_mut().done(EventFlag::FirstClose);
+  if !FLAGS.read().unwrap().check(&EventFlag::FirstClose) {
+    FLAGS.write().unwrap().done(EventFlag::FirstClose);
     parts.push(vec![FIRST_CLOSE_TALK.to_string()]);
   } else {
     parts.extend(vec![

@@ -3,8 +3,11 @@ use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::status::Status;
-use crate::variables::PendingEvent;
-use crate::variables::{get_global_vars, EventFlag};
+use crate::variables::{
+  EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME, IDLE_SECONDS,
+  LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
+};
+use crate::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
 use chrono::Timelike;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
@@ -13,12 +16,8 @@ pub(crate) const TALK_UNLOCK_COUNT_SERVANT: u64 = 5;
 pub(crate) const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
 pub(crate) fn on_notify_user_info(req: &Request) -> Response {
-  let vars = get_global_vars();
   let refs = get_references(req);
-  let user_name = refs[0].to_string();
-  if vars.user_name().is_none() {
-    vars.set_user_name(Some(user_name));
-  }
+  *USER_NAME.write().unwrap() = refs[0].to_string();
   new_response_nocontent()
 }
 
@@ -28,21 +27,12 @@ pub(crate) fn on_minute_change(_req: &Request) -> Response {
 }
 
 pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-
   // 最小化中かどうかに関わらず実行する処理
-  let total_time = if let Some(v) = vars.total_time() {
-    v
-  } else {
-    return Err(ShioriError::UndefinedVariable);
-  };
-  vars.set_total_time(Some(total_time + 1));
-  vars
-    .volatility
-    .set_ghost_up_time(vars.volatility.ghost_up_time() + 1);
+  *TOTAL_TIME.write().unwrap() += 1;
+  *GHOST_UP_TIME.write().unwrap() += 1;
 
   // 初回起動イベントが終わるまではランダムトークなし
-  if !vars.flags().check(&EventFlag::FirstRandomTalkDone(
+  if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
     FIRST_RANDOMTALKS.len() as u32 - 1,
   )) {
     return Ok(new_response_nocontent());
@@ -53,26 +43,28 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
     Ok(v) => v,
     Err(_) => return Err(ShioriError::ParseIntError),
   };
-  vars.volatility.set_idle_seconds(idle_secs);
+  *IDLE_SECONDS.write().unwrap() = idle_secs;
 
   let status = Status::from_request(req);
 
   debug!("status: {}", status);
-  if let Some(v) = vars.random_talk_interval() {
-    if v > 0
-      && (vars.volatility.ghost_up_time() - vars.volatility.last_random_talk_time()) >= v
+  {
+    let random_talk_interval = *RANDOM_TALK_INTERVAL.read().unwrap();
+    if random_talk_interval > 0
+      && (*GHOST_UP_TIME.read().unwrap() - *LAST_RANDOM_TALK_TIME.read().unwrap())
+        >= random_talk_interval
       && !status.minimizing
     {
       return on_ai_talk(req);
     }
-  } else {
-    return Err(ShioriError::UndefinedVariable);
-  };
+  }
 
   let mut text = String::new();
-  if vars.volatility.ghost_up_time() % 60 == 0 && !status.talking {
-    // 1分ごとにサーフェスを重ね直す
-    text += STICK_SURFACE;
+  {
+    if *GHOST_UP_TIME.read().unwrap() % 60 == 0 && !status.talking {
+      // 1分ごとにサーフェスを重ね直す
+      text += STICK_SURFACE;
+    }
   }
 
   let now = chrono::Local::now();
@@ -155,46 +147,46 @@ pub(crate) fn on_surface_change(req: &Request) -> Result<Response, ShioriError> 
     Err(_) => return Err(ShioriError::ParseIntError),
   };
 
-  get_global_vars().volatility.set_current_surface(surface);
+  *CURRENT_SURFACE.write().unwrap() = surface;
 
   Ok(new_response_nocontent())
 }
 
 pub(crate) fn check_story_events() {
-  let vars = get_global_vars();
-  if !vars
-    .flags()
+  if !FLAGS
+    .read()
+    .unwrap()
     .check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
-    && vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_SERVANT
+    && *CUMULATIVE_TALK_COUNT.read().unwrap() >= TALK_UNLOCK_COUNT_SERVANT
   {
     // 従者コメント開放
-    vars.set_pending_event_talk(Some(PendingEvent::UnlockingServantsComments));
-  } else if !vars
-    .flags()
+    *PENDING_EVENT_TALK.write().unwrap() = Some(PendingEvent::UnlockingServantsComments);
+  } else if !FLAGS
+    .read()
+    .unwrap()
     .check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
-    && vars.cumulative_talk_count() >= TALK_UNLOCK_COUNT_LORE
+    && *CUMULATIVE_TALK_COUNT.read().unwrap() >= TALK_UNLOCK_COUNT_LORE
   {
     // ロアトーク開放
-    vars.set_pending_event_talk(Some(PendingEvent::UnlockingLoreTalks));
-  } else if vars.pending_event_talk() == Some(PendingEvent::ConfessionOfSuicide) {
+    *PENDING_EVENT_TALK.write().unwrap() = Some(PendingEvent::UnlockingLoreTalks);
+  } else if *PENDING_EVENT_TALK.read().unwrap() == Some(PendingEvent::ConfessionOfSuicide) {
     // 仕様変更のため解禁されないように
     // すでにPendingEventにConfessionOfSuicideがセットされている場合は消す
-    vars.set_pending_event_talk(None);
+    *PENDING_EVENT_TALK.write().unwrap() = None;
   }
 
   // 過去トークの解禁がされている場合、再び閉じる
-  if vars
-    .flags()
-    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Past))
   {
-    vars
-      .flags_mut()
-      .delete(EventFlag::TalkTypeUnlock(super::TalkType::Past));
+    let mut flags = FLAGS.write().unwrap();
+    if flags.check(&EventFlag::TalkTypeUnlock(super::TalkType::Past)) {
+      flags.delete(EventFlag::TalkTypeUnlock(super::TalkType::Past));
+    }
   }
 
   // 変数に過去トークの情報が入っている場合消去する
-  if vars
-    .talk_collection_mut()
+  if TALK_COLLECTION
+    .write()
+    .unwrap()
     .remove(&super::TalkType::Past)
     .is_some()
   {

@@ -3,7 +3,7 @@ use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::mouse::*;
 use crate::status::Status;
-use crate::variables::get_global_vars;
+use crate::variables::*;
 use shiorust::message::{Request, Response};
 use std::time::SystemTime;
 
@@ -38,11 +38,10 @@ impl Direction {
 }
 
 pub(crate) fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
   let refs = get_references(req);
   let now = SystemTime::now();
   let dur = check_error!(
-    now.duration_since(vars.volatility.last_wheel_count_unixtime()),
+    now.duration_since(*LAST_WHEEL_COUNT_UNIXTIME.read().unwrap()),
     ShioriError::SystemTimeError
   )
   .as_millis();
@@ -53,24 +52,19 @@ pub(crate) fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
     Direction::Down
   };
 
-  if vars.volatility.last_wheel_part() != refs[4]
-    || vars.volatility.wheel_direction() != d
-    || dur > WHEEL_LIFETIME
-  {
-    vars.volatility.set_wheel_counter(1);
+  if *LAST_WHEEL_PART.read().unwrap() != refs[4] || dur > WHEEL_LIFETIME {
+    *WHEEL_COUNTER.write().unwrap() = 1;
   } else {
-    vars
-      .volatility
-      .set_wheel_counter(vars.volatility.wheel_counter() + 1);
+    *WHEEL_COUNTER.write().unwrap() += 1;
   }
 
-  if vars.volatility.wheel_counter() >= WHEEL_THRESHOLD {
-    vars.volatility.set_wheel_counter(0);
+  if *WHEEL_COUNTER.read().unwrap() >= WHEEL_THRESHOLD {
+    *WHEEL_COUNTER.write().unwrap() = 0;
     new_mouse_response(req, format!("{}{}{}", refs[3], refs[4], d.to_str()))
   } else {
-    vars.volatility.set_last_wheel_count_unixtime(now);
-    vars.volatility.set_last_wheel_part(refs[4].to_string());
-    vars.volatility.set_wheel_direction(d);
+    *LAST_WHEEL_COUNT_UNIXTIME.write().unwrap() = now;
+    *LAST_WHEEL_PART.write().unwrap() = refs[4].to_string();
+    *WHEEL_DIRECTION.write().unwrap() = d;
     Ok(new_response_nocontent())
   }
 }
@@ -90,35 +84,32 @@ pub(crate) fn on_mouse_click_ex(req: &Request) -> Result<Response, ShioriError> 
 }
 
 pub(crate) fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
   let refs = get_references(req);
   let status = Status::from_request(req);
   if refs[4].is_empty() || status.talking {
     Ok(new_response_nocontent())
   } else {
     let now = SystemTime::now();
-    if vars.volatility.last_nade_part() == refs[4] {
+    if *LAST_NADE_PART.read().unwrap() == refs[4] {
       let dur = check_error!(
-        now.duration_since(vars.volatility.last_nade_count_unixtime()),
+        now.duration_since(*LAST_NADE_COUNT_UNIXTIME.read().unwrap()),
         ShioriError::SystemTimeError
       )
       .as_millis();
       if dur > NADE_LIFETIME {
-        vars.volatility.set_nade_counter(1);
-        vars.volatility.set_last_nade_count_unixtime(now);
+        *NADE_COUNTER.write().unwrap() = 1;
+        *LAST_NADE_COUNT_UNIXTIME.write().unwrap() = now;
       } else if dur >= NADE_DURATION {
-        vars
-          .volatility
-          .set_nade_counter(vars.volatility.nade_counter() + 1);
-        vars.volatility.set_last_nade_count_unixtime(now);
+        *NADE_COUNTER.write().unwrap() += 1;
+        *LAST_NADE_COUNT_UNIXTIME.write().unwrap() = now;
       }
-      debug!("{} {} {}", refs[4], dur, vars.volatility.nade_counter());
+      debug!("{} {} {}", refs[4], dur, *NADE_COUNTER.read().unwrap());
     } else {
-      vars.volatility.set_nade_counter(1);
+      *NADE_COUNTER.write().unwrap() = 1;
     }
-    vars.volatility.set_last_nade_part(refs[4].to_string());
-    if vars.volatility.nade_counter() > NADE_THRESHOLD {
-      vars.volatility.set_nade_counter(0);
+    *LAST_NADE_PART.write().unwrap() = refs[4].to_string();
+    if *NADE_COUNTER.read().unwrap() > NADE_THRESHOLD {
+      *NADE_COUNTER.write().unwrap() = 0;
       new_mouse_response(req, format!("{}{}nade", refs[3], refs[4]))
     } else {
       Ok(new_response_nocontent())

@@ -10,9 +10,11 @@ use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE_MAX;
-use crate::sound::play_sound;
 use crate::status::Status;
-use crate::variables::{get_global_vars, EventFlag, GlobalVariables, TouchInfo};
+use crate::variables::{
+  EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES,
+  IS_IMMERSIVE_DEGREES_FIXED, LAST_TOUCH_INFO, TALKING_PLACE, TOUCH_INFO,
+};
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
 
@@ -61,17 +63,15 @@ impl std::fmt::Display for BodyPart {
 #[macro_export]
 macro_rules! get_touch_info {
   ($info:expr) => {
-    get_global_vars()
-      .volatility
-      .touch_info_mut()
+    TOUCH_INFO
+      .write()
+      .unwrap()
       .entry($info.to_string())
       .or_insert($crate::variables::TouchInfo::new())
   };
 }
 
 pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-  let last_touch_info = vars.volatility.last_touch_info();
   let status = Status::from_request(req);
 
   // 同一に扱う
@@ -83,23 +83,20 @@ pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response
     info.clone()
   };
 
-  if i != last_touch_info.as_str() {
-    if let Some(touch_info) = vars
-      .volatility
-      .touch_info_mut()
-      .get_mut(last_touch_info.as_str())
+  if i != LAST_TOUCH_INFO.read().unwrap().as_str() {
+    if let Some(touch_info) = TOUCH_INFO
+      .write()
+      .unwrap()
+      .get_mut(LAST_TOUCH_INFO.read().unwrap().as_str())
     {
       touch_info.reset_if_timeover()?;
     }
-    vars.volatility.set_last_touch_info(i.clone());
+    *LAST_TOUCH_INFO.write().unwrap() = i.clone();
   }
 
-  if !get_global_vars()
-    .flags()
-    .check(&EventFlag::FirstRandomTalkDone(
-      FIRST_RANDOMTALKS.len() as u32 - 1,
-    ))
-  {
+  if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+    FIRST_RANDOMTALKS.len() as u32 - 1,
+  )) {
     if info.as_str().contains("doubleclick") && !status.talking {
       let dummy_req = check_error!(
         Request::parse(DUMMY_REQUEST),
@@ -114,9 +111,9 @@ pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response
   let response = mouse_dialogs(req, i.clone())?;
 
   // 一括で回数を増やす
-  vars
-    .volatility
-    .touch_info_mut()
+  TOUCH_INFO
+    .write()
+    .unwrap()
     .entry(i)
     .or_insert(TouchInfo::new())
     .add();
@@ -160,10 +157,10 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
   ]
 });
 
-fn is_first_sexial_allowed(vars: &mut GlobalVariables) -> bool {
-  !vars.volatility.first_sexial_touch()
-    && vars.volatility.ghost_up_time() < 30
-    && vars.flags().check(&EventFlag::FirstClose)
+fn is_first_sexial_allowed() -> bool {
+  !*FIRST_SEXIAL_TOUCH.read().unwrap()
+    && *GHOST_UP_TIME.read().unwrap() < 30
+    && FLAGS.read().unwrap().check(&EventFlag::FirstClose)
 }
 
 pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriError> {
@@ -195,9 +192,7 @@ pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, Shi
 }
 
 fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-
-  if vars.volatility.talking_place() == TalkingPlace::Library {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
@@ -210,9 +205,7 @@ fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-
-  if vars.volatility.talking_place() == TalkingPlace::Library {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
@@ -226,9 +219,7 @@ fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-
-  if vars.volatility.talking_place() == TalkingPlace::Library {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
@@ -253,15 +244,13 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-
-  if vars.volatility.talking_place() == TalkingPlace::Library {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     return None;
   }
 
   let mut conbo_parts: Vec<Vec<String>> = vec![vec!["hr2144402……！h1141102\\n".to_string()]];
-  if is_first_sexial_allowed(vars) {
-    vars.volatility.set_first_sexial_touch(true);
+  if is_first_sexial_allowed() {
+    *FIRST_SEXIAL_TOUCH.write().unwrap() = true;
     conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
   } else {
     conbo_parts.push(vec![
@@ -300,16 +289,14 @@ fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, Shi
 }
 
 fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-
-  if vars.volatility.talking_place() == TalkingPlace::Library {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
   let zero_bust_touch_threshold = 12;
   let mut zero_bust_touch = Vec::new();
-  if is_first_sexial_allowed(vars) {
-    vars.volatility.set_first_sexial_touch(true);
+  if is_first_sexial_allowed() {
+    *FIRST_SEXIAL_TOUCH.write().unwrap() = true;
     zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
   } else if count < zero_bust_touch_threshold / 3 {
     zero_bust_touch.extend(vec![
@@ -340,12 +327,11 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
 }
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
   // 没入度固定時は何もしない
-  if vars.volatility.is_immersive_degrees_fixed() {
+  if *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap() {
     return None;
   }
-  if vars.volatility.talking_place() == TalkingPlace::Library {
+  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     light_candle_fire()
   } else {
     blow_candle_fire()
@@ -353,18 +339,13 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
 }
 
 fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-  let immersive_degrees = vars.volatility.immersive_degrees();
   for i in 0..=IMMERSIVE_ICON_COUNT {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
-    if immersive_degrees < threshold {
-      vars.volatility.set_immersive_degrees(threshold);
-      if play_sound(SOUND_BLOW_CANDLE).is_err() {
-        return Some(Err(ShioriError::PlaySoundError));
-      }
+    if *IMMERSIVE_DEGREES.read().unwrap() < threshold {
+      *IMMERSIVE_DEGREES.write().unwrap() = threshold;
       // 没入度最大なら書斎へ移動
       let m = if threshold == IMMERSIVE_RATE_MAX {
-        vars.volatility.set_talking_place(TalkingPlace::Library);
+        *TALKING_PLACE.write().unwrap() = TalkingPlace::Library;
         let messages = match moving_to_library_talk() {
           Ok(v) => v,
           Err(e) => return Some(Err(e)),
@@ -374,7 +355,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
           Err(e) => return Some(Err(e)),
         };
         messages[index].to_owned()
-      } else if !vars.flags().check(&EventFlag::FirstPlaceChange) {
+      } else if !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
         match i {
           1 => "\\1火を消した。\\nなんだか胸騒ぎがする。".to_string(),
           2 => "h1111105\\1ハイネの目線が虚ろになってきている気がする。".to_string(),
@@ -386,8 +367,9 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
       };
       return Some(new_response_with_value_with_translate(
         format!(
-          "\\0{}{}\\p[2]{}{}",
-          render_shadow(true),
+          "\\_v[{}]\\0{}{}\\p[2]{}{}",
+          SOUND_BLOW_CANDLE,
+		  render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m
@@ -401,20 +383,15 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
 
 // 没入度を下げ、ろうそくを点ける
 fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
-  let vars = get_global_vars();
-  let immersive_degrees = vars.volatility.immersive_degrees();
-  if immersive_degrees == 0 || vars.volatility.is_immersive_degrees_fixed() {
+  if *IMMERSIVE_DEGREES.read().unwrap() == 0 || *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap() {
     return None;
   }
   for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
-    if immersive_degrees > threshold {
-      if play_sound(SOUND_LIGHT_CANDLE).is_err() {
-        return Some(Err(ShioriError::PlaySoundError));
-      }
+    if *IMMERSIVE_DEGREES.read().unwrap() > threshold {
       // 没入度0なら居間へ移動
-      let m = if threshold == 0 && vars.volatility.talking_place() == TalkingPlace::Library {
-        vars.volatility.set_talking_place(TalkingPlace::LivingRoom);
+      let m = if threshold == 0 && *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+        *TALKING_PLACE.write().unwrap() = TalkingPlace::LivingRoom;
         let messages = match moving_to_living_room_talk() {
           Ok(v) => v,
           Err(e) => return Some(Err(e)),
@@ -427,11 +404,12 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
       } else {
         "".to_string()
       };
-      vars.volatility.set_immersive_degrees(threshold);
+      *IMMERSIVE_DEGREES.write().unwrap() = threshold;
       return Some(new_response_with_value_with_translate(
         format!(
-          "\\0{}{}\\p[2]{}{}",
-          render_shadow(true),
+          "\\_v[{}]\\0{}{}\\p[2]{}{}",
+          SOUND_LIGHT_CANDLE,
+		  render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m

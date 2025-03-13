@@ -3,7 +3,7 @@ use crate::events::common::*;
 use crate::events::replace_dialog_for_nomouthmove;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
-use crate::variables::{get_global_vars, EventFlag, GlobalVariables};
+use crate::variables::*;
 
 // 私/主: 50代の身綺麗な男
 // 僕/主様: 30代のおとなしい男
@@ -60,7 +60,7 @@ enum RandomTalkType {
 fn new_randomtalks(
   id: String,
   texts: Vec<String>,
-  required_condition: Option<fn(&mut GlobalVariables) -> bool>,
+  required_condition: Option<fn() -> bool>,
   callback: Option<fn()>,
 ) -> Vec<RandomTalk> {
   texts
@@ -88,7 +88,7 @@ fn flattern_randomtalk_types(talks: Vec<RandomTalkType>) -> Vec<RandomTalk> {
 struct RandomTalk {
   id: String,
   text: String,
-  required_condition: Option<fn(&mut GlobalVariables) -> bool>,
+  required_condition: Option<fn() -> bool>,
   callback: Option<fn()>,
 }
 
@@ -1063,11 +1063,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       ],
     };
 
-  let vars = get_global_vars();
   let mut talks = Vec::new();
   for st in flattern_randomtalk_types(strings) {
     if let Some(expr) = st.required_condition {
-      if !expr(vars) {
+      if !expr() {
         continue;
       }
     }
@@ -1082,13 +1081,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 }
 
 pub(crate) fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
-  let vars = get_global_vars();
   let mut parts: Vec<Vec<String>> = vec![vec![format!(
     "\\0\\b[{}]h1113705……。\\1ハイネ……？\\0\\n…………。\\1\\n反応が鈍い……。\\n思考に没頭してる……？\\0\\b[{}]",
     TalkingPlace::LivingRoom.balloon_surface(),
     TalkingPlace::Library.balloon_surface(),
   )]];
-  if !vars.flags().check(&EventFlag::FirstPlaceChange) {
+  if !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
     // 初回
     parts.push(vec![replace_dialog_for_nomouthmove(
       "\
@@ -1109,11 +1107,11 @@ pub(crate) fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
   parts.push(vec!["\\1\\c(没入モードに入りました)".to_string()]);
 
   // 初回は抽象・過去トークの開放を通知
-  if !vars.flags().check(&EventFlag::FirstPlaceChange) {
-    vars.flags_mut().done(EventFlag::FirstPlaceChange);
+  if !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
+    FLAGS.write().unwrap().done(EventFlag::FirstPlaceChange);
     let achieved_talk_types = [TalkType::Abstract];
     achieved_talk_types.iter().for_each(|t| {
-      vars.flags_mut().done(EventFlag::TalkTypeUnlock(*t));
+      FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
     });
     let achievements_messages = achieved_talk_types
       .iter()

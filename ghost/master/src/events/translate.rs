@@ -1,7 +1,7 @@
 use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::variables::get_global_vars;
+use crate::variables::*;
 use crate::{lazy_fancy_regex, lazy_regex};
 use core::fmt::{Display, Formatter};
 use fancy_regex::Regex as FancyRegex;
@@ -12,13 +12,15 @@ use std::thread;
 use std::time::Duration;
 
 pub(crate) fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
-  while !get_global_vars().volatility.inserter_mut().is_ready() {
+  while !INSERTER.read().unwrap().is_ready() {
     thread::sleep(Duration::from_millis(100));
   }
-  let m = get_global_vars()
-    .volatility
-    .waiting_talk()
-    .ok_or(ShioriError::ArrayAccessError)?;
+  let has_waiting_talk = WAITING_TALK.read().unwrap().is_some();
+  let m = if has_waiting_talk {
+    WAITING_TALK.read().unwrap().clone().unwrap()
+  } else {
+    return Err(ShioriError::ArrayAccessError);
+  };
   new_response_with_value_with_translate(m.0, m.1)
 }
 
@@ -31,11 +33,10 @@ pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String
 
   let balloonnum_reset = format!("{}{}", REMOVE_BALLOON_NUM, translated);
 
-  let vars = get_global_vars();
-  if !vars.volatility.inserter_mut().is_ready() {
+  if !INSERTER.read().unwrap().is_ready() {
     return Err(ShioriError::TranslaterNotReadyError);
   }
-  vars.volatility.inserter_mut().run(balloonnum_reset)
+  INSERTER.write().unwrap().run(balloonnum_reset)
 }
 
 fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
@@ -170,11 +171,7 @@ fn translate_whole(text: String) -> Result<String, ShioriError> {
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
-  let vars = get_global_vars();
-  let user_name = vars
-    .user_name()
-    .clone()
-    .ok_or(ShioriError::ArrayAccessError)?;
+  let user_name = USER_NAME.read().unwrap().clone();
   translated = translated.replace("{user_name}", &user_name);
 
   Ok(translated)

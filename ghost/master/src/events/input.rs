@@ -1,6 +1,6 @@
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::variables::get_global_vars;
+use crate::variables::*;
 use shiorust::message::{Request, Response};
 use std::fmt;
 use std::fmt::{Display, Formatter};
@@ -42,8 +42,7 @@ pub(crate) fn on_user_input(req: &Request) -> Result<Response, ShioriError> {
 }
 
 fn input_user_name(text: String) -> Result<Response, ShioriError> {
-  let vars = get_global_vars();
-  vars.set_user_name(Some(text.clone()));
+  *USER_NAME.write().unwrap() = text.clone();
   let m = format!(
     "\
     h1111204そう、h1111210ならばそう呼ぶことにしましょう。\
@@ -55,10 +54,7 @@ fn input_user_name(text: String) -> Result<Response, ShioriError> {
 }
 
 pub(crate) fn on_window_state_restore(_req: &Request) -> Response {
-  let vars = get_global_vars();
   // トーク間隔をリセット
-  vars
-    .volatility
-    .set_last_random_talk_time(vars.volatility.ghost_up_time());
+  *LAST_RANDOM_TALK_TIME.write().unwrap() = *GHOST_UP_TIME.read().unwrap();
   new_response_nocontent()
 }
