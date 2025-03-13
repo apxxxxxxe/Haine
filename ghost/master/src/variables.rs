@@ -109,10 +109,6 @@ pub(crate) struct EventFlags {
 }
 
 impl EventFlags {
-  pub fn is_empty(&self) -> bool {
-    self.flags.is_empty()
-  }
-
   pub fn done(&mut self, flag: EventFlag) {
     self.flags.insert(flag);
   }

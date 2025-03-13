@@ -3,7 +3,6 @@ use std::fmt;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum ShioriError {
-  UndefinedVariable,
   ParseIntError,
   SystemTimeError,
   FieldAccessError,
@@ -20,9 +19,6 @@ pub(crate) enum ShioriError {
 impl fmt::Display for ShioriError {
   fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
     match self {
-      ShioriError::UndefinedVariable => {
-        write!(f, "[UndefinedVariable]未定義の変数にアクセスしました")
-      }
       ShioriError::ParseIntError => write!(f, "[ParseIntError]文字列のパースに失敗しました"),
       ShioriError::SystemTimeError => {
         write!(f, "[SystemTimeError]システム時刻の取得に失敗しました")
