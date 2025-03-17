@@ -218,9 +218,8 @@ mod tests {
   use std::fs::File;
   use std::io::Write;
 
-  #[allow(dead_code)]
-  // #[test]
-  pub fn write_all_talks() {
+  #[test]
+  fn write_all_talks() {
     let mut all_talks_file = File::create("all_talks.txt").unwrap();
     let mut write = |f: &mut File, text: String| {
       writeln!(f, "{}", text).unwrap();
