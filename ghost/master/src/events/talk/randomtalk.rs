@@ -264,7 +264,18 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 
       TalkType::WithYou => vec![
         RandomTalkType::Single(RandomTalk{
-          id: "".to_string(),
+          id: "知って、祓う".to_string(),
+          text: "\
+              h1111205無知にこそ不安の種は宿るもの。\\n\
+              h1111210訊いて、調べて、学びなさい。\\n\
+              h1111204知ることで、自分を守るのよ。\
+              ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
+
+        RandomTalkType::Single(RandomTalk{
+          id: "静寂が秘める言葉".to_string(),
           text: "\
               \\1（カチ、コチ、カチ、コチ……）\\n\
               振り子時計の音、そして私の息遣いだけが聞こえる。\\n\
