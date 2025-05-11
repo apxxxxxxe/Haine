@@ -137,8 +137,16 @@ impl Question {
   const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
   const YOU_ARE_CUTE: Self = Self(13); // 『かわいい』
   const YOU_ARE_BEAUTIFUL: Self = Self(14); // 『美人』
-                                            // 『似顔絵を描く』
+                                            // const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
   const I_AM_HUNGRY: Self = Self(16); // 『お腹が空いた』
+                                      // const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
+                                      // const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
+  const CALL_YOU_HAINE_1: Self = Self(19); // 「ハイネ」
+  const CALL_YOU_HAINE_2: Self = Self(20); // 「ハイネさん」
+  const CALL_YOU_HAINE_3: Self = Self(21); // 「ハイネちゃん」
+  const WHEN_DO_YOU_WAKE_UP: Self = Self(22); // ふだん何時に寝起きしてる？
+                                              // const WHY_IS_YOUR_BODY_COLD: Self = Self(23); // どうして体温が低い？
+  const AM_I_BOTHERING_YOU: Self = Self(24); // 迷惑じゃない？
 
   fn theme(&self) -> String {
     match *self {
@@ -159,6 +167,11 @@ impl Question {
       Question::YOU_ARE_CUTE => "かわいい".to_string(),
       Question::YOU_ARE_BEAUTIFUL => "美人".to_string(),
       Question::I_AM_HUNGRY => "お腹が空いた".to_string(),
+      Question::WHEN_DO_YOU_WAKE_UP => "ふだん何時に寝起きしてる？".to_string(),
+      Question::CALL_YOU_HAINE_1 => "ハイネ".to_string(),
+      Question::CALL_YOU_HAINE_2 => "ハイネさん".to_string(),
+      Question::CALL_YOU_HAINE_3 => "ハイネちゃん".to_string(),
+      Question::AM_I_BOTHERING_YOU => "迷惑じゃない？".to_string(),
       _ => unreachable!(),
     }
   }
@@ -336,13 +349,46 @@ impl Question {
 	  h1111205…………その、できればここで食べて見せてほしいわ。\\n\
 	  h1111210……娯楽だけでない、生きる糧としての食事を眺めていたいの。\
 	  ".to_string(),
+    Question::CALL_YOU_HAINE_1 => "\
+    \\1『ハイネ』\\n\
+    h1111201ええ、何？\
+    ".to_string(),
+    Question::CALL_YOU_HAINE_2 => "\
+    \\1『ハイネさん』\\n\
+    h1111204……どうしたの、かしこまって。\\n\
+    ".to_string(),
+    Question::CALL_YOU_HAINE_3 => "\
+    \\1『ハイネちゃん』\\n\
+    h1111210うん……h1111201うん？\
+    ".to_string(),
+    Question::WHEN_DO_YOU_WAKE_UP => "\
+    \\1『ふだん何時に寝起きしてる？』\\n\
+    h1111204……質問に答えるなら、数日起きて、数日寝ているわ。\\n\
+    h1111206私も彼らも、必要ならば何日でも活動し続ける。\\n\
+    h1111210霊は基本的に眠りを必要としないから、\\n\
+    起きていようと思えばいくらでも起きていられるのよ。\\n\
+    \\n\
+    h1121211とはいえ、それでは倦んでしまうから。\\n\
+    h1111210必要に応じて…というか、起きている必要のないときは眠るの。\\n\
+    \\n\
+    h1111204……最近は、ある人間のおかげで退屈しなくて済んでいるけれど、ね。\\n\
+    ".to_string(),
+    Question::AM_I_BOTHERING_YOU => "\
+    \\1『迷惑じゃない？』\\n\
+    h1111204……今更よ、そんなこと。\\n\
+    h1111210この場所は私のもの。h1111204ここにいるのは、私が必要とするものだけよ。\\n\
+    h1111204あなたが必要だから、あなたはここにいるの。\\n\
+    \\n\
+    \\_w[1200]h1111210さあ、くだらないことを考えるのはおしまい。\\n\
+    h1111204いつものように、あなたの話を聞かせてちょうだい。\
+    ".to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
   }
 }
 
-pub(crate) const QUESTIONS: [Question; 15] = [
+pub(crate) const QUESTIONS: [Question; 20] = [
   Question::FEELING_OF_DEATH,
   Question::FATIGUE_OF_LIFE,
   Question::HOW_TALL_ARE_YOU,
@@ -358,6 +404,11 @@ pub(crate) const QUESTIONS: [Question; 15] = [
   Question::YOU_ARE_CUTE,
   Question::YOU_ARE_BEAUTIFUL,
   Question::I_AM_HUNGRY,
+  Question::CALL_YOU_HAINE_1,
+  Question::CALL_YOU_HAINE_2,
+  Question::CALL_YOU_HAINE_3,
+  Question::WHEN_DO_YOU_WAKE_UP,
+  Question::AM_I_BOTHERING_YOU,
 ];
 
 pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
