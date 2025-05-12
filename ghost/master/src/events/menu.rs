@@ -137,15 +137,15 @@ impl Question {
   const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
   const YOU_ARE_CUTE: Self = Self(13); // 『かわいい』
   const YOU_ARE_BEAUTIFUL: Self = Self(14); // 『美人』
-                                            // const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
+  const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
   const I_AM_HUNGRY: Self = Self(16); // 『お腹が空いた』
-                                      // const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
-                                      // const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
+  const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
+  const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
   const CALL_YOU_HAINE_1: Self = Self(19); // 「ハイネ」
   const CALL_YOU_HAINE_2: Self = Self(20); // 「ハイネさん」
   const CALL_YOU_HAINE_3: Self = Self(21); // 「ハイネちゃん」
   const WHEN_DO_YOU_WAKE_UP: Self = Self(22); // ふだん何時に寝起きしてる？
-                                              // const WHY_IS_YOUR_BODY_COLD: Self = Self(23); // どうして体温が低い？
+  const WHY_IS_YOUR_BODY_COLD: Self = Self(23); // どうして体温が低い？
   const AM_I_BOTHERING_YOU: Self = Self(24); // 迷惑じゃない？
 
   fn theme(&self) -> String {
@@ -171,6 +171,7 @@ impl Question {
       Question::CALL_YOU_HAINE_1 => "ハイネ".to_string(),
       Question::CALL_YOU_HAINE_2 => "ハイネさん".to_string(),
       Question::CALL_YOU_HAINE_3 => "ハイネちゃん".to_string(),
+      Question::WHY_IS_YOUR_BODY_COLD => "どうして体温が低い？".to_string(),
       Question::AM_I_BOTHERING_YOU => "迷惑じゃない？".to_string(),
       _ => unreachable!(),
     }
@@ -373,6 +374,16 @@ impl Question {
     \\n\
     h1111204……最近は、ある人間のおかげで退屈しなくて済んでいるけれど、ね。\\n\
     ".to_string(),
+    Question::WHY_IS_YOUR_BODY_COLD => "\
+    \\1『どうして体温が低い？』\\n\
+    h1113205さあ、なぜかしらね。\\n\
+    h1113210真面目に考えるなら、そのほうが効率がいいから、とか。\\n\
+    生物に体温があるのは、代謝……生存のための化学反応に温度が必要だから。\\n\
+    h1113206私達がどのような原理で存在しているのかは未解明だけれど、きっと存在に温度を必要としないのでしょう。\\n\
+    h1113204まあ、そのせいであなたには冷たい思いをさせてしまうけれど。\\n\
+    h1113205……私の手をろうそくで炙れば、少しは暖かくなるかしら？\\n\
+    ……h1121210当然、冗談よ。そんな顔しないで。\
+    ".to_string(),
     Question::AM_I_BOTHERING_YOU => "\
     \\1『迷惑じゃない？』\\n\
     h1111204……今更よ、そんなこと。\\n\
@@ -388,7 +399,7 @@ impl Question {
   }
 }
 
-pub(crate) const QUESTIONS: [Question; 20] = [
+pub(crate) const QUESTIONS: [Question; 21] = [
   Question::FEELING_OF_DEATH,
   Question::FATIGUE_OF_LIFE,
   Question::HOW_TALL_ARE_YOU,
@@ -408,6 +419,7 @@ pub(crate) const QUESTIONS: [Question; 20] = [
   Question::CALL_YOU_HAINE_2,
   Question::CALL_YOU_HAINE_3,
   Question::WHEN_DO_YOU_WAKE_UP,
+  Question::WHY_IS_YOUR_BODY_COLD,
   Question::AM_I_BOTHERING_YOU,
 ];
 

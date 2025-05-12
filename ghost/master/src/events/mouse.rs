@@ -369,7 +369,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
         format!(
           "\\_v[{}]\\0{}{}\\p[2]{}{}",
           SOUND_BLOW_CANDLE,
-		  render_shadow(true),
+          render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m
@@ -409,7 +409,7 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
         format!(
           "\\_v[{}]\\0{}{}\\p[2]{}{}",
           SOUND_LIGHT_CANDLE,
-		  render_shadow(true),
+          render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
           m
