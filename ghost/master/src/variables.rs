@@ -4,6 +4,7 @@ use crate::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
+use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{TalkType, TalkingPlace};
 use crate::roulette::TalkBias;
 use serde::{Deserialize, Serialize};
@@ -18,7 +19,8 @@ const VAR_PATH: &str = "vars.json";
 pub(crate) static TOTAL_BOOT_COUNT: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static TOTAL_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static RANDOM_TALK_INTERVAL: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(180));
-pub(crate) static USER_NAME: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static USER_NAME: LazyLock<RwLock<String>> =
+  LazyLock::new(|| RwLock::new("".to_string()));
 pub(crate) static TALK_COLLECTION: LazyLock<RwLock<HashMap<TalkType, HashSet<String>>>> =
   LazyLock::new(|| RwLock::new(HashMap::new()));
 pub(crate) static CUMULATIVE_TALK_COUNT: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
@@ -137,22 +139,39 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
   if let Some(name) = raw_vars.user_name {
     *USER_NAME.write().unwrap() = name;
   }
-  *TALK_COLLECTION.write().unwrap() = raw_vars.talk_collection;
   *CUMULATIVE_TALK_COUNT.write().unwrap() = raw_vars.cumulative_talk_count;
   *FLAGS.write().unwrap() = raw_vars.flags;
   *PENDING_EVENT_TALK.write().unwrap() = raw_vars.pending_event_talk;
+  let mut raw_talk_collection: HashMap<TalkType, HashSet<String>> = HashMap::new();
+  for (talk_type, ids) in raw_vars.talk_collection {
+    // トークidがtalksに含まれている場合のみ追加
+    // 更新で削除されたトークなどを除外するため
+    let talks = match random_talks(talk_type) {
+      Some(t) => t,
+      None => {
+        continue;
+      }
+    };
+    let talk_ids = talks.into_iter().map(|t| t.id).collect::<Vec<String>>();
+    let existing_and_seen_talk_ids: HashSet<String> = ids
+      .into_iter()
+      .filter(|id| talk_ids.contains(id))
+      .collect::<HashSet<String>>();
+    raw_talk_collection.insert(talk_type, existing_and_seen_talk_ids);
+  }
+  *TALK_COLLECTION.write().unwrap() = raw_talk_collection;
 
   Ok(())
 }
 
 pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
   let raw_vars = RawVariables {
-    total_boot_count: TOTAL_BOOT_COUNT.read().unwrap().clone(),
-    total_time: Some(TOTAL_TIME.read().unwrap().clone()),
-    random_talk_interval: Some(RANDOM_TALK_INTERVAL.read().unwrap().clone()),
+    total_boot_count: *TOTAL_BOOT_COUNT.read().unwrap(),
+    total_time: Some(*TOTAL_TIME.read().unwrap()),
+    random_talk_interval: Some(*RANDOM_TALK_INTERVAL.read().unwrap()),
     user_name: Some(USER_NAME.read().unwrap().clone()),
     talk_collection: TALK_COLLECTION.read().unwrap().clone(),
-    cumulative_talk_count: CUMULATIVE_TALK_COUNT.read().unwrap().clone(),
+    cumulative_talk_count: *CUMULATIVE_TALK_COUNT.read().unwrap(),
     flags: FLAGS.read().unwrap().clone(),
     pending_event_talk: PENDING_EVENT_TALK.read().unwrap().clone(),
   };
@@ -164,7 +183,8 @@ pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
 
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
 pub(crate) static DEBUG_MODE: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
-pub(crate) static LOG_PATH: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static LOG_PATH: LazyLock<RwLock<String>> =
+  LazyLock::new(|| RwLock::new("".to_string()));
 pub(crate) static GHOST_UP_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static LAST_RANDOM_TALK_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static NADE_COUNTER: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
