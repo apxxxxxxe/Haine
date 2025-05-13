@@ -12,7 +12,7 @@ use crate::variables::*;
 
 use std::fs::{metadata, File};
 use std::panic;
-use std::path::Path;
+use std::path::PathBuf;
 
 use shiori_hglobal::*;
 use shiorust::message::*;
@@ -29,11 +29,25 @@ use simplelog::*;
 #[no_mangle]
 pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
   let v = GStr::capture(h, len as usize);
-  let s = if let Ok(s) = v.to_utf8_str() {
-    s
-  } else {
-    error!("error while decoding path");
-    return FALSE; // SSPの仕様上意味なし
+  let s: String;
+  match v.to_utf8_str() {
+    Ok(st) => {
+      // UTF-8に変換
+      s = st.to_string();
+    }
+    Err(e) => {
+      eprintln!("Failed to convert HGLOBAL to UTF-8: {:?}", e);
+      match v.to_ansi_str() {
+        Ok(st) => {
+          // ANSIに変換
+          s = st.to_string_lossy().to_string();
+        }
+        Err(e) => {
+          eprintln!("Failed to convert HGLOBAL to ANSI: {:?}", e);
+          return FALSE;
+        }
+      }
+    }
   };
 
   if let Err(e) = load_global_variables() {
@@ -46,7 +60,8 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
   }
 
   // ログの設定
-  let log_path = Path::new(&s.to_string()).join("haine.log");
+  // Windows(UTF-16)を想定しPathBufでパスを作成
+  let log_path = PathBuf::from(&s).join("haine.log");
   *LOG_PATH.write().unwrap() = log_path.to_str().unwrap().to_string();
   let fp = if let Ok(fp) = File::create(log_path) {
     fp
