@@ -34,6 +34,10 @@ pub(crate) enum PendingEvent {
   ConfessionOfSuicide,
   UnlockingLoreTalks,
   UnlockingServantsComments,
+  FirstBoot,
+  FirstRandomTalk(u32),
+  FirstClose,
+  FirstPlaceChange,
 }
 
 impl std::fmt::Display for PendingEvent {
@@ -46,19 +50,38 @@ impl PendingEvent {
   const SUICIDE: &'static str = "ハイネの様子を観察する";
   const LORE_TALKS: &'static str = "新しい話";
   const SERVANTS: &'static str = "従者について";
+  const FIRST_BOOT: &'static str = "初回起動";
+  const FIRST_RANDOMTALK: &'static str = "初回ランダムトーク";
+  const FIRST_PLACE_CHANGE: &'static str = "初回独白モード開始";
+  const FIRST_CLOSE: &'static str = "初回終了";
   pub fn from_str(title: &str) -> Option<Self> {
     match title {
       Self::SUICIDE => Some(Self::ConfessionOfSuicide),
       Self::LORE_TALKS => Some(Self::UnlockingLoreTalks),
       Self::SERVANTS => Some(Self::UnlockingServantsComments),
-      _ => None,
+      Self::FIRST_BOOT => Some(Self::FirstBoot),
+      Self::FIRST_CLOSE => Some(Self::FirstClose),
+      Self::FIRST_PLACE_CHANGE => Some(Self::FirstPlaceChange),
+      _ => {
+        if !title.starts_with(Self::FIRST_RANDOMTALK) {
+          None
+        } else if let Ok(a) = title.replace(Self::FIRST_RANDOMTALK, "").parse::<u32>() {
+          Some(Self::FirstRandomTalk(a))
+        } else {
+          None
+        }
+      }
     }
   }
-  pub fn title(&self) -> &str {
+  pub fn title(&self) -> String {
     match self {
-      Self::ConfessionOfSuicide => Self::SUICIDE,
-      Self::UnlockingLoreTalks => Self::LORE_TALKS,
-      Self::UnlockingServantsComments => Self::SERVANTS,
+      Self::ConfessionOfSuicide => Self::SUICIDE.to_string(),
+      Self::UnlockingLoreTalks => Self::LORE_TALKS.to_string(),
+      Self::UnlockingServantsComments => Self::SERVANTS.to_string(),
+      Self::FirstBoot => Self::FIRST_BOOT.to_string(),
+      Self::FirstRandomTalk(i) => format!("{}{}", Self::FIRST_RANDOMTALK, i),
+      Self::FirstClose => Self::FIRST_CLOSE.to_string(),
+      Self::FirstPlaceChange => Self::FIRST_PLACE_CHANGE.to_string(),
     }
   }
 }

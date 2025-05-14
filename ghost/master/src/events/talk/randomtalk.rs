@@ -3,7 +3,6 @@ use crate::events::common::*;
 use crate::events::replace_dialog_for_nomouthmove;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
-use crate::variables::*;
 
 // 私/主: 50代の身綺麗な男
 // 僕/主様: 30代のおとなしい男
@@ -1091,13 +1090,15 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   Some(talks)
 }
 
-pub(crate) fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
+pub(crate) fn moving_to_library_talk_parts(
+  is_first_change: bool,
+) -> Result<Vec<Vec<String>>, ShioriError> {
   let mut parts: Vec<Vec<String>> = vec![vec![format!(
     "\\0\\b[{}]h1113705……。\\1ハイネ……？\\0\\n…………。\\1\\n反応が鈍い……。\\n思考に没頭してる……？\\0\\b[{}]",
     TalkingPlace::LivingRoom.balloon_surface(),
     TalkingPlace::Library.balloon_surface(),
   )]];
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
+  if is_first_change {
     // 初回
     parts.push(vec![replace_dialog_for_nomouthmove(
       "\
@@ -1117,28 +1118,11 @@ pub(crate) fn moving_to_library_talk() -> Result<Vec<String>, ShioriError> {
   }
   parts.push(vec!["\\1\\c(没入モードに入りました)".to_string()]);
 
-  // 初回は抽象・過去トークの開放を通知
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
-    FLAGS.write().unwrap().done(EventFlag::FirstPlaceChange);
-    let achieved_talk_types = [TalkType::Abstract];
-    achieved_talk_types.iter().for_each(|t| {
-      FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
-    });
-    let achievements_messages = achieved_talk_types
-      .iter()
-      .map(|t| render_achievement_message(*t))
-      .collect::<Vec<_>>();
-    parts.push(vec![format!(
-      "\\1\\n\\n{}",
-      achievements_messages.join("\\n")
-    )]);
-  }
-  Ok(all_combo(&parts))
+  Ok(parts)
 }
 
 pub(crate) fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
-  let mut parts: Vec<Vec<String>> = vec![];
-  parts.push(vec![format!(
+  Ok(vec![format!(
     "\\0\\b[{}]h1111705……。\\n\
     \\1ネ……\\n\
     イネ……。\
@@ -1146,15 +1130,11 @@ pub(crate) fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
     \\1\\nハイネ！\
     \\0…………\\n\\n\
     h1111101……h1111204あら、{{user_name}}。\\n\
-    \\1\\n\\n……戻ってきたようだ。\\n",
+    \\1\\n\\n……戻ってきたようだ。\\n\
+    \\0\\n……h1111210いつものことよ。そんなに心配しないで。\
+    \\1\\n……『心配しないのは無理だと思う……』\
+    \\1\\n\\n(没入モードが解除されました)",
     TalkingPlace::Library.balloon_surface(),
     TalkingPlace::LivingRoom.balloon_surface(),
-  )]);
-  parts.push(vec![
-    "\\0\\n……h1111210いつものことよ。そんなに心配しないで。\
-    \\1\\n……『心配しないのは無理だと思う……』"
-      .to_string(),
-  ]);
-  parts.push(vec!["\\1\\n\\n(没入モードが解除されました)".to_string()]);
-  Ok(all_combo(&parts))
+  )])
 }

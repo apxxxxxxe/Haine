@@ -1,7 +1,6 @@
-use crate::check_error;
 use crate::error::ShioriError;
 use crate::events::common::*;
-use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::first_boot::{FIRST_BOOT_TALK, FIRST_RANDOMTALKS};
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::TalkType;
@@ -11,7 +10,12 @@ use crate::variables::{
   EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
   TALKING_PLACE, TALK_COLLECTION, USER_NAME,
 };
+use crate::{check_error, IMMERSIVE_DEGREES};
 use shiorust::message::{Request, Response};
+
+use super::aitalk::IMMERSIVE_RATE_MAX;
+use super::talk::first_boot::FIRST_CLOSE_TALK;
+use super::talk::randomtalk::moving_to_library_talk_parts;
 
 pub(crate) fn on_menu_exec(_req: &Request) -> Response {
   let current_talk_interval = *RANDOM_TALK_INTERVAL.read().unwrap();
@@ -63,10 +67,10 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\_l[0,1.5em]\
         \\![*]\\q[{},OnAiTalk]\\n\
         {}\
-        \\![*]\\q[トーク統計,OnCheckTalkCollection]\
+        \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
+        \\![*]\\q[回想,OnStoryHistoryMenu]\
         \\_l[0,@2.5em]\
-        \\![*]\\q[手紙を書く,OnWebClapOpen]\
-        \\_l[0,@1.75em]\
+        \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\
         \\![*]\\q[呼び名を変える,OnChangingUserName]\\n\
         {}\
         {}\
@@ -137,10 +141,10 @@ impl Question {
   const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
   const YOU_ARE_CUTE: Self = Self(13); // 『かわいい』
   const YOU_ARE_BEAUTIFUL: Self = Self(14); // 『美人』
-  const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
+                                            // const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
   const I_AM_HUNGRY: Self = Self(16); // 『お腹が空いた』
-  const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
-  const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
+                                      // const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
+                                      // const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
   const CALL_YOU_HAINE_1: Self = Self(19); // 「ハイネ」
   const CALL_YOU_HAINE_2: Self = Self(20); // 「ハイネさん」
   const CALL_YOU_HAINE_3: Self = Self(21); // 「ハイネちゃん」
@@ -545,11 +549,120 @@ pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
         callback();
         unlock_servents_comments()
       }
+      _ => {
+        unreachable!();
+      }
     }
   } else {
     return Err(ShioriError::InvalidEvent);
   };
   new_response_with_value_with_translate(s, TranslateOption::with_shadow_completion())
+}
+
+pub fn on_story_history_menu(_req: &Request) -> Response {
+  let mut events = vec![("初回起動".to_string(), PendingEvent::FirstBoot, true)];
+  for (i, _event) in FIRST_RANDOMTALKS.iter().enumerate() {
+    events.push((
+      format!("初回ランダムトーク{}/{}", i + 1, FIRST_RANDOMTALKS.len()),
+      PendingEvent::FirstRandomTalk(i as u32),
+      true,
+    ));
+  }
+  events.push((
+    "初回終了".to_string(),
+    PendingEvent::FirstClose,
+    FLAGS.read().unwrap().check(&EventFlag::FirstClose),
+  ));
+  events.push((
+    "ロアトーク開放".to_string(),
+    PendingEvent::UnlockingLoreTalks,
+    FLAGS
+      .read()
+      .unwrap()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)),
+  ));
+  events.push((
+    "従者コメント開放".to_string(),
+    PendingEvent::UnlockingServantsComments,
+    FLAGS
+      .read()
+      .unwrap()
+      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)),
+  ));
+  events.push((
+    "初回独白モード移行".to_string(),
+    PendingEvent::FirstPlaceChange,
+    FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange),
+  ));
+
+  let mut m = "\\_q\\b[2]イベント回想\\n\\n".to_string();
+  for event in events {
+    if event.2 {
+      m.push_str(&format!(
+        "\\![*]\\q[{},OnStoryHistoryExec,{}]\\n",
+        event.0, event.1
+      ));
+    } else {
+      m.push_str("\\![*]？？？\\n");
+    }
+  }
+  m.push_str("\\n\\q[戻る,OnMenuExec]");
+  new_response_with_value_with_notranslate(m, TranslateOption::none())
+}
+
+pub fn on_story_history_exec(req: &Request) -> Result<Response, ShioriError> {
+  let refs = get_references(req);
+  let s = if let Some(hoge) = PendingEvent::from_str(refs[0]) {
+    match hoge {
+      PendingEvent::FirstBoot => (FIRST_BOOT_TALK.clone(), TranslateOption::simple_translate()),
+      PendingEvent::FirstRandomTalk(n) => (
+        FIRST_RANDOMTALKS[n as usize].clone(),
+        TranslateOption::simple_translate(),
+      ),
+      PendingEvent::FirstClose => (
+        FIRST_CLOSE_TALK.to_string(),
+        TranslateOption::simple_translate(),
+      ),
+      PendingEvent::UnlockingLoreTalks => (
+        unlock_lore_talks(),
+        TranslateOption::with_shadow_completion(),
+      ),
+      PendingEvent::UnlockingServantsComments => (
+        unlock_servents_comments(),
+        TranslateOption::with_shadow_completion(),
+      ),
+      PendingEvent::FirstPlaceChange => {
+        // 没入度を実際に変更しないと影の描写が再現されない
+        // トーク再生中にembedでsmooth_blinkが入りそのタイミングでも没入度が参照されるため、
+        // この時点で戻すわけにもいかない
+        // この回想を見ると独白モードへ移行するという仕様にする
+        *IMMERSIVE_DEGREES.write().unwrap() = IMMERSIVE_RATE_MAX;
+        *TALKING_PLACE.write().unwrap() = TalkingPlace::Library;
+
+        let parts = moving_to_library_talk_parts(true)?;
+        match all_combo(&parts).first() {
+          Some(v) => (
+            format!(
+              "\\p[2]{}\\0{}{}",
+              render_immersive_icon(),
+              IMMERSIVE_DEGREES.read().unwrap(),
+              v
+            ),
+            TranslateOption::with_shadow_completion(),
+          ),
+          None => {
+            return Err(ShioriError::InvalidEvent);
+          }
+        }
+      }
+      _ => {
+        return Err(ShioriError::InvalidEvent);
+      }
+    }
+  } else {
+    return Err(ShioriError::InvalidEvent);
+  };
+  new_response_with_value_with_translate(s.0, s.1)
 }
 
 fn unlock_lore_talks() -> String {

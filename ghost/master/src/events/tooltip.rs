@@ -10,7 +10,5 @@ pub(crate) fn balloon_tooltip(req: &Request) -> Response {
   if refs[1] != "OnBalloonTooltip" {
     return new_response_nocontent();
   }
-  match refs[2] {
-    _ => new_response_nocontent(),
-  }
+  new_response_nocontent()
 }

@@ -152,6 +152,8 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnUpdateComplete" => Some(EventHandler::AlwaysSuccess(on_update_complete)),
     "OnUpdateOtherBegin" => Some(EventHandler::AlwaysSuccess(on_update_other_begin)),
     "OnUpdateOtherComplete" => Some(EventHandler::AlwaysSuccess(on_update_other_complete)),
+    "OnStoryHistoryMenu" => Some(EventHandler::AlwaysSuccess(on_story_history_menu)),
+    "OnStoryHistoryExec" => Some(EventHandler::MayFailure(on_story_history_exec)),
     _ => None,
   }
 }

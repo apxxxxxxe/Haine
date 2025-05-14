@@ -35,7 +35,7 @@ pub(crate) fn on_update_other_begin(req: &Request) -> Response {
 }
 
 fn render_refs(refs: &Vec<&str>) -> String {
-  return refs.iter().map(|x| format!("{}, ", x)).collect::<String>();
+  refs.iter().map(|x| format!("{}, ", x)).collect::<String>()
 }
 
 pub(crate) fn on_update_other_complete(req: &Request) -> Response {

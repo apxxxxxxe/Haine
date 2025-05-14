@@ -4,7 +4,7 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
-use crate::events::randomtalk::moving_to_library_talk;
+use crate::events::randomtalk::moving_to_library_talk_parts;
 use crate::events::randomtalk::moving_to_living_room_talk;
 use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
@@ -17,6 +17,8 @@ use crate::variables::{
 };
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
+
+use super::talk::TalkType;
 
 const SOUND_LIGHT_CANDLE: &str = "マッチで火をつける.mp3";
 const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
@@ -346,9 +348,31 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
       // 没入度最大なら書斎へ移動
       let m = if threshold == IMMERSIVE_RATE_MAX {
         *TALKING_PLACE.write().unwrap() = TalkingPlace::Library;
-        let messages = match moving_to_library_talk() {
+        let mut parts = match moving_to_library_talk_parts(
+          !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange),
+        ) {
           Ok(v) => v,
           Err(e) => return Some(Err(e)),
+        };
+        let messages = if FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
+          // すでに開放済みならそのまま
+          all_combo(&parts)
+        } else {
+          // 初回は抽象・過去トークの開放を通知
+          FLAGS.write().unwrap().done(EventFlag::FirstPlaceChange);
+          let achieved_talk_types = [TalkType::Abstract];
+          achieved_talk_types.iter().for_each(|t| {
+            FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
+          });
+          let achievements_messages = achieved_talk_types
+            .iter()
+            .map(|t| render_achievement_message(*t))
+            .collect::<Vec<_>>();
+          parts.push(vec![format!(
+            "\\1\\n\\n{}",
+            achievements_messages.join("\\n")
+          )]);
+          all_combo(&parts)
         };
         let index = match choose_one(&messages, true).ok_or(ShioriError::TalkNotFound) {
           Ok(v) => v,
