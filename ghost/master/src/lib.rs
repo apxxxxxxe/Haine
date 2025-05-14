@@ -27,6 +27,31 @@ extern crate simplelog;
 use simplelog::*;
 
 #[no_mangle]
+pub extern "cdecl" fn loadu(h: HGLOBAL, len: c_long) -> BOOL {
+  let v = GStr::capture(h, len as usize);
+  let s = match v.to_utf8_str() {
+    Ok(st) => {
+      // UTF-8に変換
+      st.to_string()
+    }
+    Err(e) => {
+      eprintln!("Failed to convert HGLOBAL to UTF-8: {:?}", e);
+      return FALSE;
+    }
+  };
+  match common_load_procedure(&s) {
+    Ok(_) => {
+      debug!("loadu");
+      TRUE
+    }
+    Err(_) => {
+      error!("error while loading");
+      FALSE
+    }
+  }
+}
+
+#[no_mangle]
 pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
   let v = GStr::capture(h, len as usize);
   let s: String;
@@ -50,6 +75,41 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
     }
   };
 
+  match common_load_procedure(&s) {
+    Ok(_) => {
+      debug!("load");
+      TRUE
+    }
+    Err(_) => {
+      error!("error while loading");
+      FALSE
+    }
+  }
+}
+
+fn common_load_procedure(path: &str) -> Result<(), ()> {
+  // ログの設定
+  // Windows(UTF-16)を想定しPathBufでパスを作成
+  let log_path = PathBuf::from(path).join("haine.log");
+  *LOG_PATH.write().unwrap() = log_path.to_str().unwrap().to_string();
+  let fp = if let Ok(fp) = File::create(log_path) {
+    fp
+  } else {
+    error!("error while creating log file");
+    return Err(());
+  };
+  match WriteLogger::init(LevelFilter::Debug, Config::default(), fp) {
+    Ok(_) => {}
+    Err(e) => {
+      error!("{}", e);
+      return Err(());
+    }
+  }
+
+  panic::set_hook(Box::new(|panic_info| {
+    debug!("{}", panic_info);
+  }));
+
   if let Err(e) = load_global_variables() {
     error!("{}", e);
   }
@@ -59,34 +119,10 @@ pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
     *DEBUG_MODE.write().unwrap() = true;
   }
 
-  // ログの設定
-  // Windows(UTF-16)を想定しPathBufでパスを作成
-  let log_path = PathBuf::from(&s).join("haine.log");
-  *LOG_PATH.write().unwrap() = log_path.to_str().unwrap().to_string();
-  let fp = if let Ok(fp) = File::create(log_path) {
-    fp
-  } else {
-    error!("error while creating log file");
-    return FALSE; // SSPの仕様上意味なし
-  };
-  match WriteLogger::init(LevelFilter::Debug, Config::default(), fp) {
-    Ok(_) => {}
-    Err(e) => {
-      error!("{}", e);
-      return FALSE; // SSPの仕様上意味なし
-    }
-  }
-
-  panic::set_hook(Box::new(|panic_info| {
-    debug!("{}", panic_info);
-  }));
-
   // Inserterの初期化を別スレッドで開始
   INSERTER.write().unwrap().start_init();
 
-  debug!("load");
-
-  TRUE
+  Ok(())
 }
 
 #[no_mangle]
