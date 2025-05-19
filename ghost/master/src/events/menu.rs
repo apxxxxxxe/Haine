@@ -144,7 +144,7 @@ impl Question {
                                             // const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
   const I_AM_HUNGRY: Self = Self(16); // 『お腹が空いた』
                                       // const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
-                                      // const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
+  const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
   const CALL_YOU_HAINE_1: Self = Self(19); // 「ハイネ」
   const CALL_YOU_HAINE_2: Self = Self(20); // 「ハイネさん」
   const CALL_YOU_HAINE_3: Self = Self(21); // 「ハイネちゃん」
@@ -172,6 +172,7 @@ impl Question {
       Question::YOU_ARE_BEAUTIFUL => "美人".to_string(),
       Question::I_AM_HUNGRY => "お腹が空いた".to_string(),
       Question::WHEN_DO_YOU_WAKE_UP => "ふだん何時に寝起きしてる？".to_string(),
+      Question::CAN_I_TALK_TO_YOUR_SERVANTS => "従者たちと話してもいい？".to_string(),
       Question::CALL_YOU_HAINE_1 => "ハイネ".to_string(),
       Question::CALL_YOU_HAINE_2 => "ハイネさん".to_string(),
       Question::CALL_YOU_HAINE_3 => "ハイネちゃん".to_string(),
@@ -354,6 +355,17 @@ impl Question {
 	  h1111205…………その、できればここで食べて見せてほしいわ。\\n\
 	  h1111210……娯楽だけでない、生きる糧としての食事を眺めていたいの。\
 	  ".to_string(),
+    Question::CAN_I_TALK_TO_YOUR_SERVANTS => "\
+    \\1『従者たちと話してもいい？』\\n\
+    h1111101それは……h1111104許容しかねるわ。\\n\
+    h1111110彼らは外部からの影響に弱いの。\\n\
+    h1113206挨拶程度なら構わないけれど、それ以上…ただの雑談だとしても、\\n\
+    あなたから漏れる悪意なき偏見が、彼らの存在を不可逆に再定義してしまうかもしれない。\\n\
+    h1113210生者から死者へ言葉を送るという行為がもつ意味は、\\n\
+    あなたが想像するより遥かに重いの。\\n\
+    この、互いの声が漏れ聞こえている状況が限界点。\\n\
+    h1111204分かってちょうだいね。\
+    ".to_string(),
     Question::CALL_YOU_HAINE_1 => "\
     \\1『ハイネ』\\n\
     h1111201ええ、何？\
@@ -380,13 +392,13 @@ impl Question {
     ".to_string(),
     Question::WHY_IS_YOUR_BODY_COLD => "\
     \\1『どうして体温が低い？』\\n\
-    h1113205さあ、なぜかしらね。\\n\
-    h1113210真面目に考えるなら、そのほうが効率がいいから、とか。\\n\
+    h1113205一言で言えば、血が通っていないからでしょうね。\\n\
     生物に体温があるのは、代謝……生存のための化学反応に温度が必要だから。\\n\
-    h1113206私達がどのような原理で存在しているのかは未解明だけれど、きっと存在に温度を必要としないのでしょう。\\n\
+    h1113204血液を回し、酸素を通わせ、栄養をエネルギーに、そして熱に変える。\\n\
+    h1113206一方で……私達がどのような原理で存在しているのかは未解明だけれど、温度を必要としない在り方なのでしょう。\\n\
     h1113204まあ、そのせいであなたには冷たい思いをさせてしまうけれど。\\n\
-    h1113205……私の手をろうそくで炙れば、少しは暖かくなるかしら？\\n\
-    ……h1121210当然、冗談よ。そんな顔しないで。\
+    h1113205……私の手をろうそくで炙れば、少しは温かくなるかしら？\\n\
+    痛覚もさほどh1113101……h1121210冗談よ。そんな顔しないで。\
     ".to_string(),
     Question::AM_I_BOTHERING_YOU => "\
     \\1『迷惑じゃない？』\\n\
@@ -403,7 +415,7 @@ impl Question {
   }
 }
 
-pub(crate) const QUESTIONS: [Question; 21] = [
+pub(crate) const QUESTIONS: [Question; 22] = [
   Question::FEELING_OF_DEATH,
   Question::FATIGUE_OF_LIFE,
   Question::HOW_TALL_ARE_YOU,
@@ -419,6 +431,7 @@ pub(crate) const QUESTIONS: [Question; 21] = [
   Question::YOU_ARE_CUTE,
   Question::YOU_ARE_BEAUTIFUL,
   Question::I_AM_HUNGRY,
+  Question::CAN_I_TALK_TO_YOUR_SERVANTS,
   Question::CALL_YOU_HAINE_1,
   Question::CALL_YOU_HAINE_2,
   Question::CALL_YOU_HAINE_3,
