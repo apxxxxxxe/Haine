@@ -218,29 +218,30 @@ mod tests {
   use std::fs::File;
   use std::io::Write;
 
+  use super::randomtalk::RANDOMTALK_COMMENTS_LIVING_ROOM;
+
   #[test]
   fn write_all_talks() {
     let mut all_talks_file = File::create("all_talks.txt").unwrap();
-    let mut write = |f: &mut File, text: String| {
-      writeln!(f, "{}", text).unwrap();
+    let mut write = |text: String| {
       writeln!(all_talks_file, "{}", text).unwrap();
     };
-    let mut file = File::create("first_boot.txt").unwrap();
-    write(&mut file, FIRST_BOOT_TALK.to_string());
+    write(FIRST_BOOT_TALK.to_string());
     for t in FIRST_RANDOMTALKS.iter() {
-      write(&mut file, t.to_string());
+      write(t.to_string());
     }
-    write(&mut file, FIRST_CLOSE_TALK.to_string());
-    let mut file = File::create("questions.txt").unwrap();
+    write(FIRST_CLOSE_TALK.to_string());
     for q in QUESTIONS.iter() {
-      write(&mut file, q.talk());
+      write(q.talk());
     }
-    let mut file = File::create("random_talks.txt").unwrap();
     for talk_type in TalkType::all() {
       let talks = random_talks(talk_type).unwrap();
       for t in talks {
-        write(&mut file, t.text);
+        write(t.text);
       }
+    }
+    for t in RANDOMTALK_COMMENTS_LIVING_ROOM.iter() {
+      write(t.to_string());
     }
   }
 }
