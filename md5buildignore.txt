@@ -37,4 +37,5 @@ src/
 Cargo.*
 .cargo/
 rustfmt.toml
+clippy.toml
 build.*
