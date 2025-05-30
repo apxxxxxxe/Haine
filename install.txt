@@ -3,5 +3,3 @@ type,ghost
 name,Crave The Grave
 directory,Haine
 balloon.directory,kirinokougai
-
-robots,noindex

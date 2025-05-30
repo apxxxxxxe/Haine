@@ -1,6 +1,6 @@
 #!/bin/bash
 
-manual_exclude_patterns="haine.dll"
+manual_exclude_patterns=("haine.dll", "install.txt")
 
 range=$(git rev-parse --abbrev-ref HEAD)@{upstream}..HEAD
 
@@ -32,9 +32,10 @@ for pattern in "${ignore_patterns[@]}"; do
 done
 
 grep_patterns=$(IFS=\|; echo "${wildcard_patterns[*]}")
+manual_grep_patterns=$(IFS=\|; echo "${manual_exclude_patterns[*]}")
 
 # マッチするファイルがあるかどうかを確認
-if ! git diff --name-only "$range" | grep -v -E "$grep_patterns" | grep -v -E "$manual_exclude_patterns" > /dev/null; then
+if ! git diff --name-only "$range" | grep -v -E "$grep_patterns" | grep -v -E "$manual_grep_patterns" > /dev/null; then
     echo "プッシュ対象のファイルが含まれていません。バリデーションをスキップし、プッシュを続行します。"
     exit 0
 fi
