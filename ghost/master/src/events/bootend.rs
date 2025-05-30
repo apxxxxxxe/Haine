@@ -103,9 +103,9 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   )
 }
 
-// FIXME: 実装予定
-pub(crate) fn on_vanish_selected(_req: &Request) -> Response {
-  new_response_nocontent()
+pub(crate) fn on_vanish_selecting(_req: &Request) -> Response {
+  let m = "\\1※Vanishイベントは未実装です。".to_string();
+  new_response_with_value_with_notranslate(m, TranslateOption::none())
 }
 
 fn randomize_underwear() -> String {

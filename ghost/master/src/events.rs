@@ -116,7 +116,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "uniqueid" => Some(EventHandler::MayFailure(uniqueid)),
     "OnBoot" => Some(EventHandler::MayFailure(on_boot)),
     "OnClose" => Some(EventHandler::MayFailure(on_close)),
-    "OnVanishSelected" => Some(EventHandler::AlwaysSuccess(on_vanish_selected)),
+    "OnVanishSelecting" => Some(EventHandler::AlwaysSuccess(on_vanish_selecting)),
     "OnAiTalk" => Some(EventHandler::MayFailure(on_ai_talk)),
     "OnAnchorSelectEx" => Some(EventHandler::MayFailure(on_anchor_select_ex)),
     "OnNotifyUserInfo" => Some(EventHandler::AlwaysSuccess(on_notify_user_info)),
