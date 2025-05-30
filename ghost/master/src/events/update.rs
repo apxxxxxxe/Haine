@@ -41,9 +41,7 @@ pub(crate) fn on_update_result_ex(req: &Request) -> Response {
       "ghost" => "ゴースト",
       "shell" => "シェル",
       "balloon" => "バルーン",
-      "plugin" => "プラグイン",
-      "headline" => "ヘッドライン",
-      _ => &format!("不明なアイテム({})", render_refs(&refs)),
+      _ => continue, // ハイネに関係ないアイテムは無視
     };
     let status = match results[2] {
       "OK" => match results[3] {
