@@ -35,7 +35,7 @@ pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
   "常軌を逸した集中力だ。……幽霊だからというより、彼女の才能だろう。",
   "これが彼女の言っていた思索だとしても、真似できる気はしない。",
   "放置するとこうなってしまうらしい。……次はもっと話しかけようか。",
-  "無駄かもしれないが、呼び掛け続ける。",
+  "無駄かもしれないが、肩を揺さぶる。",
 ];
 
 pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
@@ -1127,7 +1127,7 @@ pub(crate) fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
     \\1ネ……\\n\
     イネ……。\
     \\0\\b[{}]hr1141112φ！\
-    \\1\\nハイネ！\
+    \\1\\n（ハイネ！）\
     \\0…………\\n\\n\
     h1111101……h1111204あら、{{user_name}}。\\n\
     \\1\\n\\n……戻ってきたようだ。\\n\
