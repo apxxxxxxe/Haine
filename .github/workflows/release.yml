@@ -4,8 +4,6 @@ on:
   push:
     tags:
       - 'v*'
-  workflow_call:
-  workflow_dispatch:
 
 env:
   NAR_NAME: Haine
@@ -20,99 +18,14 @@ jobs:
       with:
         fetch-depth: ${{ env.FETCH_DEPTH }}
 
-    - name: tag name
-      if: github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch'
-      run: |
-        # ghost/master/Cargo.toml からバージョンを取得
-        version=$(grep -E '^version = "[0-9]+\.[0-9]+\.[0-9]+"' ghost/master/Cargo.toml | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-
-        # タグが存在するか確認
-        tag_prefix="開発版-v"
-        git pull --tags
-        if git tag | grep -q "$tag_prefix$version"; then
-          # 既にタグが存在する場合はリリースを作成しないようにする
-          echo "TAG_NAME=none" >> $GITHUB_ENV
-        else
-          # 最新タグからHEADまでのコミットメッセージを取得してenv.BODYに格納
-          # もし最新タグが存在しない場合は、最初のコミットからHEADまでのコミットメッセージを取得
-          LATEST_TAG=$(git tag --sort=-creatordate | head -n1 || echo "")
-          echo "LATEST_TAG: $LATEST_TAG"
-            if [ -n "$LATEST_TAG" ]; then
-              git log "${LATEST_TAG}..HEAD" --pretty=format:"%s" \
-                | grep -v "update md5" \
-                | grep -v "Merge pull request" \
-                | grep -v "Merge branch" \
-                | grep -v "Merge remote-tracking" \
-                | sed -e 's/^/- /'
-              echo "EOF"
-            else
-              git log --pretty=format:"%s" \
-                | grep -v "update md5" \
-                | grep -v "Merge pull request" \
-                | grep -v "Merge branch" \
-                | grep -v "Merge remote-tracking" \
-                | sed -e 's/^/- /' \
-                | head -n ${{ env.FETCH_DEPTH }}
-              echo "EOF"
-            fi
-          {
-            echo "BODY<<EOF"
-            if [ -n "$LATEST_TAG" ]; then
-              git log "${LATEST_TAG}..HEAD" --pretty=format:"%s" \
-                | grep -v "update md5" \
-                | grep -v "Merge pull request" \
-                | grep -v "Merge branch" \
-                | grep -v "Merge remote-tracking" \
-                | sed -e 's/^/- /'
-              echo "EOF"
-            else
-              git log --pretty=format:"%s" \
-                | grep -v "update md5" \
-                | grep -v "Merge pull request" \
-                | grep -v "Merge branch" \
-                | grep -v "Merge remote-tracking" \
-                | sed -e 's/^/- /' \
-                | head -n 5
-              echo "EOF"
-            fi
-          } >> $GITHUB_ENV
-
-          NEW_TAG="開発版-v$version"
-          echo "TAG_NAME=$NEW_TAG" >> $GITHUB_ENV
-          echo "新しいタグを作成: $NEW_TAG"
-        fi
-
-    - name: tag push
-      if: (github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch') && env.TAG_NAME != 'none'
-      run: |
-        git pull
-        git tag "${{ env.TAG_NAME }}"
-        git push --tags
-
     - name: Zip output
       run: |
         zip -r ${{ env.NAR_NAME }}.nar * -x readme.md -x .git/\* -x .github/\* -x .git* -x ${{ env.NAR_NAME }}.nar -x ghost/master/rustfmt.toml -x ghost/master/.cargo\* -x ghost/master/Cargo\* -x ghost/master/src/\* -x ghost/master/ipadic\* -x md5buildignore.txt -x build\*
 
-    - name: Check event name
-      run: echo "event name is ${{ github.event_name }}"
-
     - name: Upload Release Asset(with tag)
       uses: softprops/action-gh-release@v2
-      if: github.event_name == 'push'
       with:
         files: |
           ${{ env.NAR_NAME }}.nar
-
-    - name: Upload Release Asset(pre-release per push)
-      uses: softprops/action-gh-release@v2
-      if: (github.event_name == 'workflow_run' || github.event_name == 'workflow_dispatch') && env.TAG_NAME != 'none'
-      with:
-        tag_name: ${{ env.TAG_NAME }}
         body: |
-          **注意**
-          このリリースは開発版です。  
-          現時点での設定や機能は今後変更・削除される可能性があります。
           ${{ env.BODY }}
-        files: |
-          ${{ env.NAR_NAME }}.nar
-        prerelease: true

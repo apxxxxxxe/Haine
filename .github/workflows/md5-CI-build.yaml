@@ -76,6 +76,3 @@ jobs:
           git commit -m "update md5, dll and surfaces.txt" -a
           git pull
           git push
-  pre-release:
-    needs: [build]
-    uses: ./.github/workflows/release.yml
