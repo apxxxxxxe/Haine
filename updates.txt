@@ -1,7 +1,6 @@
 charset,UTF-8
-file,ghost/master/clippy.tomlaa0b10b40157641aa9ebd8cef382637asize=34date=2012-12-21T00:00:00
 file,ghost/master/descript.txt21d97cf2b5d2b327ec8d9fcea3023cfesize=492date=2012-12-21T00:00:00
-file,ghost/master/haine.dll2f1bbf31fed76e13f90a1ed275a56a0dsize=10685440date=2012-12-21T00:00:00
+file,ghost/master/haine.dll44975d2d38e1d05c92b2cd6bb1ac4ca9size=10684928date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttfc01dd07dfe6d9335c66e9105cb6a2b53size=1420date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
