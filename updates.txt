@@ -1,12 +1,12 @@
 charset,UTF-8
 file,ghost/master/descript.txt21d97cf2b5d2b327ec8d9fcea3023cfesize=492date=2012-12-21T00:00:00
-file,ghost/master/haine.dll44975d2d38e1d05c92b2cd6bb1ac4ca9size=10684928date=2012-12-21T00:00:00
+file,ghost/master/haine.dll3bd548372e3824dff9620cf82a0c7bcbsize=10684928date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttfc01dd07dfe6d9335c66e9105cb6a2b53size=1420date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
 file,ghost/master/マッチで火をつける.mp3060949cf33bc6d965dc90b95fdfc2748size=18410date=2012-12-21T00:00:00
 file,ghost/master/マッチの火を吹き消す.mp38dd251d04e84e128abd8b88ff332a64esize=8355date=2012-12-21T00:00:00
-file,install.txtba33b9e676f12c2bab95d0f3bc65d740size=116date=2012-12-21T00:00:00
+file,install.txt89cd7457389a7b9d4aa7f3728fd6f741size=98date=2012-12-21T00:00:00
 file,readme.txtb6880caa1364b2b1b283a1c38ed27b1dsize=275date=2012-12-21T00:00:00
 file,shell/master/descript.txt6da777c864753ced79598b8cad8b781fsize=11648date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_base.png3796b27994b42a1a038fa3127a7a87ffsize=191821date=2012-12-21T00:00:00
