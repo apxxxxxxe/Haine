@@ -11,9 +11,3 @@
 
 ## ダウンロード
 [![Haine.nar](https://img.shields.io/github/v/release/apxxxxxxe/Haine?color=%23ab1609&label=Haine.nar&logo=github)](https://github.com/apxxxxxxe/Haine/releases/latest/download/Haine.nar)
-
-### 開発者向け
-
-#### git hooks の設定
-ローカル開発時には以下のコマンドで git hooks を設定してください
-`git config --local core.hooksPath .githooks`
