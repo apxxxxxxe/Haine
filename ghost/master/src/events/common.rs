@@ -193,6 +193,9 @@ pub(crate) fn get_references(req: &Request) -> Vec<&str> {
       references.push("");
     }
   }
+  // 最後の空でない参照のインデックスを取得し、それ以降の要素を削除
+  let last_valid_index = references.iter().rposition(|&s| !s.is_empty()).unwrap_or(0);
+  references.truncate(last_valid_index + 1);
   references
 }
 

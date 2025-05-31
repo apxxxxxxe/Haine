@@ -149,7 +149,6 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnImmersiveDegreeToggled" => Some(EventHandler::AlwaysSuccess(on_immersive_degree_toggled)),
     "OnStoryEvent" => Some(EventHandler::MayFailure(on_story_event)),
     "OnUpdateBegin" => Some(EventHandler::AlwaysSuccess(on_update_begin)),
-    "OnUpdateOtherBegin" => Some(EventHandler::AlwaysSuccess(on_update_other_begin)),
     "OnUpdateResultEx" => Some(EventHandler::AlwaysSuccess(on_update_result_ex)),
     "OnStoryHistoryMenu" => Some(EventHandler::AlwaysSuccess(on_story_history_menu)),
     "OnStoryHistoryExec" => Some(EventHandler::MayFailure(on_story_history_exec)),
