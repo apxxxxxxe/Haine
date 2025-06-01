@@ -68,7 +68,12 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   }
 
   let now = chrono::Local::now();
-  if now.minute() == 0 && now.second() == 0 {
+  if now.minute() == 0
+    && now.second() == 0
+    && FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+      FIRST_RANDOMTALKS.len() as u32 - 1,
+    ))
+  {
     let tanka_list = [
       tanka(
         "もう二度と死ななくてよい安らぎに\\n見つめてゐたり祖母の寝顔を",
