@@ -7,7 +7,8 @@ on:
 
 env:
   NAR_NAME: Haine
-  FETCH_DEPTH: 10
+  FETCH_DEPTH: 30
+  MAIN_BRANCH: main
 
 jobs:
   release-with-tag:
@@ -16,7 +17,54 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
+        ref: ${{ env.MAIN_BRANCH }}
         fetch-depth: ${{ env.FETCH_DEPTH }}
+
+    - name: tag name
+      run: |
+        git pull --tags
+        # から最新タグまでのコミットメッセージを取得してenv.BODYに格納
+        LATEST_TAG=$(git tag --sort=-creatordate | head -n1 || echo "")
+        SEMI_LATEST_TAG=$(git tag --sort=-creatordate | head -n2 | tail -n1 || echo "")
+        echo "LATEST_TAG: $LATEST_TAG"
+        echo "SEMI_LATEST_TAG: $SEMI_LATEST_TAG"
+        if [ -n "$LATEST_TAG" ]; then
+          git log "${SEMI_LATEST_TAG}..${LATEST_TAG}" --pretty=format:"%s" \
+            | grep -v "update md5" \
+            | grep -v "Merge pull request" \
+            | grep -v "Merge branch" \
+            | grep -v "Merge remote-tracking" \
+            | sed -e 's/^/- /'
+        else
+          git log --pretty=format:"%s" \
+            | grep -v "update md5" \
+            | grep -v "Merge pull request" \
+            | grep -v "Merge branch" \
+            | grep -v "Merge remote-tracking" \
+            | sed -e 's/^/- /' \
+            | head -n ${{ env.FETCH_DEPTH }}
+        fi
+        {
+          echo "BODY<<EOF"
+          if [ -n "$LATEST_TAG" ]; then
+            git log "${SEMI_LATEST_TAG}..${LATEST_TAG}" --pretty=format:"%s" \
+              | grep -v "update md5" \
+              | grep -v "Merge pull request" \
+              | grep -v "Merge branch" \
+              | grep -v "Merge remote-tracking" \
+              | sed -e 's/^/- /'
+            echo "EOF"
+          else
+            git log --pretty=format:"%s" \
+              | grep -v "update md5" \
+              | grep -v "Merge pull request" \
+              | grep -v "Merge branch" \
+              | grep -v "Merge remote-tracking" \
+              | sed -e 's/^/- /' \
+              | head -n 5
+            echo "EOF"
+          fi
+        } >> $GITHUB_ENV
 
     - name: Zip output
       run: |
