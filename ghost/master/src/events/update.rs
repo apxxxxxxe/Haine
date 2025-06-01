@@ -22,6 +22,7 @@ pub(crate) fn on_update_result_ex(req: &Request) -> Response {
   if refs.is_empty() {
     return new_response_nocontent();
   }
+  let mut no_update = true;
   for r in refs.iter() {
     let results = r.split(1 as char).collect::<Vec<&str>>();
     if results.len() < 4 {
@@ -55,6 +56,10 @@ pub(crate) fn on_update_result_ex(req: &Request) -> Response {
       _ => &format!("不明なステータス({})", refs[0]),
     };
     m.push_str(&format!("{}({}): {}\\n", item_name, item_type, status));
+    no_update = false;
+  }
+  if no_update {
+    return new_response_nocontent();
   }
   new_response_with_value_with_notranslate(
     format!(
