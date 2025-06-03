@@ -141,9 +141,9 @@ impl Question {
   const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
   const YOU_ARE_CUTE: Self = Self(13); // 『かわいい』
   const YOU_ARE_BEAUTIFUL: Self = Self(14); // 『美人』
-                                            // const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』
+  const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』 描いた似顔絵を見せる
   const I_AM_HUNGRY: Self = Self(16); // 『お腹が空いた』
-                                      // const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
+  const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
   const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
   const CALL_YOU_HAINE_1: Self = Self(19); // 「ハイネ」
   const CALL_YOU_HAINE_2: Self = Self(20); // 「ハイネさん」
@@ -151,6 +151,10 @@ impl Question {
   const WHEN_DO_YOU_WAKE_UP: Self = Self(22); // ふだん何時に寝起きしてる？
   const WHY_IS_YOUR_BODY_COLD: Self = Self(23); // どうして体温が低い？
   const AM_I_BOTHERING_YOU: Self = Self(24); // 迷惑じゃない？
+  const CALL_YOU_MOTHER: Self = Self(25); // 「お母さん」
+  const CALL_YOU_SISTER: Self = Self(26); // 「お姉ちゃん」
+  const LET_ME_PLAY: Self = Self(27); // 「遊びに行こう」
+  const CAN_I_PET_YOU: Self = Self(28); // 「なでていい？」
 
   fn theme(&self) -> String {
     match *self {
@@ -178,6 +182,8 @@ impl Question {
       Question::CALL_YOU_HAINE_3 => "ハイネちゃん".to_string(),
       Question::WHY_IS_YOUR_BODY_COLD => "どうして体温が低い？".to_string(),
       Question::AM_I_BOTHERING_YOU => "迷惑じゃない？".to_string(),
+      Question::CALL_YOU_MOTHER => "お母さん".to_string(),
+      Question::CALL_YOU_SISTER => "お姉ちゃん".to_string(),
       _ => unreachable!(),
     }
   }
@@ -409,13 +415,25 @@ impl Question {
     \\_w[1200]h1111210さあ、くだらないことを考えるのはおしまい。\\n\
     h1111204いつものように、あなたの話を聞かせてちょうだい。\
     ".to_string(),
+    Question::CALL_YOU_MOTHER => "\
+    \\1『お母さん』\\n\
+    h1111101……h1111304聞き間違いかしら？\\n\
+    h1111210先生のことを間違えてそう呼んでしまうという笑い話はよく聞くけれど。\\n\
+    h1111204まさか、私を母親と間違えたわけではないでしょう？\\n\
+    h1111210私に母親の素質なんてないものね。\\n\
+    ".to_string(),
+    Question::CALL_YOU_SISTER => "\
+    \\1『お姉ちゃん』\\n\
+    h1111204……h1111210きょうだいにしては、歳が離れているわね。\\n\
+    そういう戯れの気分なのかしら？h1111204{user_name}ちゃん。\
+    ".to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
   }
 }
 
-pub(crate) const QUESTIONS: [Question; 22] = [
+pub(crate) const QUESTIONS: [Question; 24] = [
   Question::FEELING_OF_DEATH,
   Question::FATIGUE_OF_LIFE,
   Question::HOW_TALL_ARE_YOU,
@@ -438,6 +456,8 @@ pub(crate) const QUESTIONS: [Question; 22] = [
   Question::WHEN_DO_YOU_WAKE_UP,
   Question::WHY_IS_YOUR_BODY_COLD,
   Question::AM_I_BOTHERING_YOU,
+  Question::CALL_YOU_MOTHER,
+  Question::CALL_YOU_SISTER,
 ];
 
 pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
