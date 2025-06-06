@@ -2,6 +2,10 @@ name: cargo-test
 
 on:
   push:
+    tags-ignore:
+      - '**' # Ignore all tags
+    branches:
+      - '*' # タグpushを除くすべてのブランチで実行
   workflow_dispatch:
 
 concurrency:
