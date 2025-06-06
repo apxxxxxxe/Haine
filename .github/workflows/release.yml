@@ -19,6 +19,7 @@ jobs:
       with:
         ref: ${{ env.MAIN_BRANCH }}
         fetch-depth: ${{ env.FETCH_DEPTH }}
+        submodules: 'recursive'
 
     - name: tag name
       run: |
