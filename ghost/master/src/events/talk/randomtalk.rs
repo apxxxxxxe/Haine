@@ -94,6 +94,17 @@ struct RandomTalk {
 pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   let strings: Vec<RandomTalkType> = match talk_type {
       TalkType::SelfIntroduce => vec![
+        RandomTalkType::Single(RandomTalk {
+          id: "別れの悲しみ".to_string(),
+          text: "\
+          h1111110「別れがこんなに悲しいなら、最初から出会わなければよかった」\\n\
+          h1111205……使い古された句だけど、私も、その時が来たらきっとそう感じると思う。\\n\
+          過程がどうであれ、別れてしまえば残った傷は他の思い出を変質させてしまう。\\n\
+          元通りの幸せな感情は決して戻らない。h1111210そう思うの。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
 
         // - 霊は姿を変えることはできない
         // - ハイネは人目を気にして外出を避けている
@@ -262,6 +273,28 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       ],
 
       TalkType::WithYou => vec![
+        RandomTalkType::Single(RandomTalk {
+          id: "".to_string(),
+          text: "\
+            h1111206盲目的にすべてを行うことも、全く行わないことも正解ではない。\\n\
+            いつだって答えは中庸。\\n\
+            悩ましくて、煮えきらなくて……\\n\
+            h1111210考えるって、だからこんなにも楽しいのでしょう。\\n\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
+
+        RandomTalkType::Single(RandomTalk {
+          id: "訪問の意図".to_string(),
+          text: "\
+            h1111210想うという意味では、嫌悪も愛慕も変わらないと思うの。\\n\
+            h1111204あなたの気持ちがどうであれ、h1111211あなたがここに来てくれることは私にとって喜ばしいことだわ。\\n\
+            h1111204……意地悪だったかしら？h1111210わかっているわよ、あなたが好んでここに来ているって。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        }),
         RandomTalkType::Single(RandomTalk{
           id: "知って、祓う".to_string(),
           text: "\
