@@ -1,6 +1,6 @@
 charset,UTF-8
 file,ghost/master/descript.txt21d97cf2b5d2b327ec8d9fcea3023cfesize=492date=2012-12-21T00:00:00
-file,ghost/master/haine.dll12b60d689b03f100767f977753f2f53bsize=10684928date=2012-12-21T00:00:00
+file,ghost/master/haine.dll53ead8e28f3a0ab08104d20d522909e5size=10686976date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttfc01dd07dfe6d9335c66e9105cb6a2b53size=1420date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
@@ -31,6 +31,7 @@ file,shell/master/menu_background.pngc41543a1c48e90d317a73ad509c0011dsize=1109
 file,shell/master/menu_foreground.pnge57c08f18a349362e1ed3904e5d374desize=89date=2012-12-21T00:00:00
 file,shell/master/menu_sidebar.pnga2883faa2f45c823f9c352f97c1ef261size=85date=2012-12-21T00:00:00
 file,shell/master/readme.txt7802faebd6fc938760b7647428ea8199size=172date=2012-12-21T00:00:00
+file,shell/master/surface0.apngc50f6598e86bd823b3a7d7d4ba0c9b82size=165886date=2012-12-21T00:00:00
 file,shell/master/surface00000.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
 file,shell/master/surface00001.png88c55016e702208b7525412f9d0a1f3asize=4135date=2012-12-21T00:00:00
 file,shell/master/surface00002.pngac6405984e8def7c577925c032d7391asize=9447date=2012-12-21T00:00:00
@@ -204,6 +205,7 @@ file,shell/master/surface03408.pnge88abc0b190afdd8f8a8d792dc0efb77size=12743d
 file,shell/master/surface03409.png70dd746c6ba258443f56c60b11790503size=11256date=2012-12-21T00:00:00
 file,shell/master/surface03508.png75ebef129fe0a1aa1b03d15ab075843dsize=14765date=2012-12-21T00:00:00
 file,shell/master/surface03509.pnge98e6d86baf7c30b391a6b522fe2ec48size=12833date=2012-12-21T00:00:00
+file,shell/master/surface10.apng057fd2b886d313dde80f37ce7f3bfdbasize=91941date=2012-12-21T00:00:00
 file,shell/master/surface1000000.png67c1fc4981d880e366040f4d7e1bbe69size=4135date=2012-12-21T00:00:00
 file,shell/master/surface10000000.png2720b8e5e1343ee6a417a37eb3ed0991size=78518date=2012-12-21T00:00:00
 file,shell/master/surface10000001.pngaa9c53253cdffeba2f6d287f5382f4f8size=1791date=2012-12-21T00:00:00
