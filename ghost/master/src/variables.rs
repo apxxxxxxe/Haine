@@ -28,6 +28,8 @@ pub(crate) static FLAGS: LazyLock<RwLock<EventFlags>> =
   LazyLock::new(|| RwLock::new(EventFlags::default()));
 pub(crate) static PENDING_EVENT_TALK: LazyLock<RwLock<Option<PendingEvent>>> =
   LazyLock::new(|| RwLock::new(None));
+pub(crate) static DERIVATIVE_TALK_REQUESTABLE: LazyLock<RwLock<bool>> =
+  LazyLock::new(|| RwLock::new(false));
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub(crate) enum PendingEvent {
@@ -96,6 +98,7 @@ pub(crate) struct RawVariables {
   cumulative_talk_count: u64,
   flags: EventFlags,
   pending_event_talk: Option<PendingEvent>,
+  derivative_talk_requestable: Option<bool>,
 }
 
 impl RawVariables {
@@ -183,6 +186,11 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
     raw_talk_collection.insert(talk_type, existing_and_seen_talk_ids);
   }
   *TALK_COLLECTION.write().unwrap() = raw_talk_collection;
+  if let Some(derivative_talk_requestable) = raw_vars.derivative_talk_requestable {
+    *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = derivative_talk_requestable;
+  } else {
+    *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = false;
+  }
 
   Ok(())
 }
@@ -197,6 +205,7 @@ pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
     cumulative_talk_count: *CUMULATIVE_TALK_COUNT.read().unwrap(),
     flags: FLAGS.read().unwrap().clone(),
     pending_event_talk: PENDING_EVENT_TALK.read().unwrap().clone(),
+    derivative_talk_requestable: Some(*DERIVATIVE_TALK_REQUESTABLE.read().unwrap()),
   };
 
   raw_vars.save()?;

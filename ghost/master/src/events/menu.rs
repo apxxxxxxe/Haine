@@ -10,7 +10,7 @@ use crate::variables::{
   EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
   TALKING_PLACE, TALK_COLLECTION, USER_NAME,
 };
-use crate::{check_error, IMMERSIVE_DEGREES};
+use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE, IMMERSIVE_DEGREES};
 use shiorust::message::{Request, Response};
 
 use super::aitalk::IMMERSIVE_RATE_MAX;
@@ -45,8 +45,15 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
     selections.join("  ")
   );
 
-  let close_button = format!(
-    "\\_l[0,0]\\f[align,right]\\__q[script:\\e]{}\\__q",
+  let buttons = format!(
+    "\\_l[0,0]\\f[align,right]{}\\__q[script:\\e]{}\\__q",
+    if FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+      (FIRST_RANDOMTALKS.len() - 1) as u32,
+    )) {
+      format!("\\__q[OnConfigMenuExec]{}\\__q ", Icon::Cog)
+    } else {
+      "".to_string()
+    },
     Icon::Cross
   );
   let m = format!(
@@ -60,7 +67,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
       \\![*]\\q[その名前で呼ばれたくない,OnChangingUserName]\\n\
       "
       .to_string()
-        + &close_button
+        + &buttons
     } else {
       format!(
         "\
@@ -70,8 +77,8 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
         \\![*]\\q[回想,OnStoryHistoryMenu]\
         \\_l[0,@2.5em]\
-        \\![*]\\q[手紙を書く,OnWebClapOpen]\\n\
-        \\![*]\\q[呼び名を変える,OnChangingUserName]\\n\
+        \\![*]\\q[手紙を書く,OnWebClapOpen]\
+        \\_l[0,@2.5em]\
         {}\
         {}\
         \\1{}\
@@ -88,7 +95,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
           "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
         },
         talk_interval_selector,
-        close_button,
+        buttons,
         {
           let hoge = PENDING_EVENT_TALK.read().unwrap();
           if hoge.is_some() {
@@ -102,6 +109,26 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
           }
         }
       )
+    },
+  );
+
+  new_response_with_value_with_notranslate(m, TranslateOption::balloon_surface_only())
+}
+
+pub(crate) fn on_config_menu_exec(_req: &Request) -> Response {
+  let m = format!(
+    "\
+    \\_q\\_l[0,0]\\f[align,right]\\__q[OnMenuExec]{}\\__q \\__q[script:\\e]{}\\__q\
+    \\_l[0,1.5em]\
+    \\![*]\\q[呼び名を変える,OnChangingUserName]\\n\
+    \\![*]\\q[リクエストボタンの表示,OnDerivativeTalkRequestButtonToggled]【現在 {}】\\n\
+    ",
+    Icon::ArrowLeft,
+    Icon::Cross,
+    if *DERIVATIVE_TALK_REQUESTABLE.read().unwrap() {
+      "表示"
+    } else {
+      "非表示"
     },
   );
 
@@ -546,6 +573,16 @@ pub(crate) fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriEr
   )
 }
 
+pub(crate) fn on_derivative_talk_request_button_toggled(req: &Request) -> Response {
+  let is_derivative_talks_enabled;
+  {
+    is_derivative_talks_enabled = *DERIVATIVE_TALK_REQUESTABLE.read().unwrap();
+  }
+  *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = !is_derivative_talks_enabled;
+
+  on_config_menu_exec(req)
+}
+
 pub(crate) fn on_immersive_degree_toggled(req: &Request) -> Response {
   let i;
   {
@@ -731,20 +768,8 @@ fn unlock_servents_comments() -> String {
     契約関係としては対等なのだけれど、彼ら自身がそう呼ぶのを好むのよ。\\n\
     \\n\
     h1111209耳を澄ませていれば、彼らの声が聞こえることもあるんじゃない？\\n\
-    私を通して彼らとも縁ができているはずだから。{}{}\
+    私を通して彼らとも縁ができているはずだから。{}\
     ",
-    if !FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
-    {
-      format!(
-        "\\![set,balloonnum,おや、本当だ。よろしくね、{}さん。]",
-        *USER_NAME.read().unwrap()
-      )
-    } else {
-      "".to_string()
-    },
     if !FLAGS
       .read()
       .unwrap()

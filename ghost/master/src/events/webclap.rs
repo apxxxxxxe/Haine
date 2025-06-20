@@ -2,6 +2,36 @@ use crate::error::ShioriError;
 use crate::events::common::*;
 use shiorust::message::{Request, Response};
 
+use super::talk::Talk;
+
+pub(crate) fn on_derivative_talk_request_open(req: &Request) -> Result<Response, ShioriError> {
+  let refs = get_references(req);
+  let event_id = refs[0];
+  if event_id.is_empty() {
+    return Err(ShioriError::BadRequestError);
+  }
+  let last_talk = match Talk::all_talks().unwrap().iter().find(|t| t.id == event_id) {
+    Some(t) => t.text.clone(),
+    None => "".to_string(),
+  };
+  new_response_with_value_with_translate(
+    format!("\\1\\![open,inputbox,OnDerivativeTalkRequestInput,0,このトークに対するリアクションの要望を送信できます。,--reference={}]{}", event_id,
+    last_talk),
+    TranslateOption::simple_translate(),
+  )
+}
+
+pub(crate) fn on_derivative_talk_request_input(req: &Request) -> Result<Response, ShioriError> {
+  let refs = get_references(req);
+  let text = refs[0];
+  let event_id = refs[2];
+  let m = format!(
+    "\\1\\![execute,http-post,https://webclap.apxxxxxxe.dev/clap,--param=Haine:{}:{},--async=webclap]",
+    event_id, text
+  );
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
+}
+
 pub(crate) fn on_web_clap_open(_req: &Request) -> Result<Response, ShioriError> {
   let m = "\
              \\1\\![open,inputbox,OnWebClapInput,0]Web拍手を送ります。\\n\

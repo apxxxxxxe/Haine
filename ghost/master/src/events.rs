@@ -125,6 +125,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnSurfaceChange" => Some(EventHandler::MayFailure(on_surface_change)),
     "OnSmoothBlink" => Some(EventHandler::MayFailure(on_smooth_blink)),
     "OnMenuExec" => Some(EventHandler::AlwaysSuccess(on_menu_exec)),
+    "OnConfigMenuExec" => Some(EventHandler::AlwaysSuccess(on_config_menu_exec)),
     "OnTalkIntervalChanged" => Some(EventHandler::MayFailure(on_talk_interval_changed)),
     "OnMouseClickEx" => Some(EventHandler::MayFailure(on_mouse_click_ex)),
     "OnMouseDoubleClick" => Some(EventHandler::MayFailure(on_mouse_double_click)),
@@ -152,6 +153,15 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnUpdateResultEx" => Some(EventHandler::AlwaysSuccess(on_update_result_ex)),
     "OnStoryHistoryMenu" => Some(EventHandler::AlwaysSuccess(on_story_history_menu)),
     "OnStoryHistoryExec" => Some(EventHandler::MayFailure(on_story_history_exec)),
+    "OnDerivativeTalkRequestButtonToggled" => Some(EventHandler::AlwaysSuccess(
+      on_derivative_talk_request_button_toggled,
+    )),
+    "OnDerivativeTalkRequestOpen" => {
+      Some(EventHandler::MayFailure(on_derivative_talk_request_open))
+    }
+    "OnDerivativeTalkRequestInput" => {
+      Some(EventHandler::MayFailure(on_derivative_talk_request_input))
+    }
     _ => None,
   }
 }

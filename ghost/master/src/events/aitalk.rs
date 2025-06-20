@@ -107,6 +107,18 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     }
   };
 
+  let derivative_talk_request_button = if *DERIVATIVE_TALK_REQUESTABLE.read().unwrap()
+    && *TALKING_PLACE.read().unwrap() == TalkingPlace::LivingRoom
+  {
+    format!(
+      "\\0\\__q[OnDerivativeTalkRequestOpen,{}]{}\\__q\\_l[0,@1.5em]",
+      choosed_talk.id,
+      Icon::Bubble,
+    )
+  } else {
+    String::new()
+  };
+
   // 没入度を増減
   // トークのたび燭台への干渉を修復する方へ没入度が増減する
   if *TALKING_PLACE.read().unwrap() == TalkingPlace::LivingRoom {
@@ -128,9 +140,10 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 
   new_response_with_value_with_translate(
     format!(
-      "\\0{}\\![set,balloonnum,{}]{}",
+      "\\0{}\\![set,balloonnum,{}]{}{}",
       render_immersive_icon(),
       comment,
+      derivative_talk_request_button,
       choosed_talk.consume()
     ),
     TranslateOption::with_shadow_completion(),

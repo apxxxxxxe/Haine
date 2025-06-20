@@ -407,7 +407,12 @@ pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
 }
 
 pub(crate) enum Icon {
+  Cog,
   Cross,
+  ArrowRight,
+  ArrowLeft,
+  Bubble,
+  Info,
 }
 
 impl Display for Icon {
@@ -427,7 +432,12 @@ impl Display for Icon {
 impl Icon {
   fn to_code(&self) -> u32 {
     match self {
-      Icon::Cross => 901,
+      Icon::Cog => 902,
+      Icon::Cross => 903,
+      Icon::ArrowRight => 904,
+      Icon::ArrowLeft => 905,
+      Icon::Bubble => 906,
+      Icon::Info => 907,
     }
   }
 }

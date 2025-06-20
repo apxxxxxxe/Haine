@@ -14,6 +14,7 @@ pub(crate) enum ShioriError {
   BadRequest,
   FileWriteError,
   InvalidEvent,
+  BadRequestError,
 }
 
 impl fmt::Display for ShioriError {
@@ -47,6 +48,7 @@ impl fmt::Display for ShioriError {
       ShioriError::BadRequest => write!(f, "[BadRequest]リクエストが不正です"),
       ShioriError::FileWriteError => write!(f, "[FileWriteError]ファイルの書き込みに失敗しました"),
       ShioriError::InvalidEvent => write!(f, "[InvalidEvent]無効なイベントが指定されました"),
+      ShioriError::BadRequestError => write!(f, "[BadRequestError]不正なリクエストが発生しました"),
     }
   }
 }
