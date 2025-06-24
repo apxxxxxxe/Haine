@@ -4,7 +4,7 @@ use crate::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
 use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
-use crate::events::talk::randomtalk::random_talks;
+use crate::events::talk::randomtalk::{derivative_talks, random_talks};
 use crate::events::talk::{TalkType, TalkingPlace};
 use crate::roulette::TalkBias;
 use serde::{Deserialize, Serialize};
@@ -169,19 +169,23 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
   *FLAGS.write().unwrap() = raw_vars.flags;
   *PENDING_EVENT_TALK.write().unwrap() = raw_vars.pending_event_talk;
   let mut raw_talk_collection: HashMap<TalkType, HashSet<String>> = HashMap::new();
+  let mut all_talk_ids = TalkType::all()
+    .into_iter()
+    .filter_map(random_talks)
+    .flatten()
+    .map(|t| t.id)
+    .collect::<Vec<_>>();
+  let derivalive_talk_ids = derivative_talks()
+    .into_iter()
+    .map(|t| t.id)
+    .collect::<Vec<_>>();
+  all_talk_ids.extend(derivalive_talk_ids);
   for (talk_type, ids) in raw_vars.talk_collection {
     // トークidがtalksに含まれている場合のみ追加
     // 更新で削除されたトークなどを除外するため
-    let talks = match random_talks(talk_type) {
-      Some(t) => t,
-      None => {
-        continue;
-      }
-    };
-    let talk_ids = talks.into_iter().map(|t| t.id).collect::<Vec<String>>();
     let existing_and_seen_talk_ids: HashSet<String> = ids
       .into_iter()
-      .filter(|id| talk_ids.contains(id))
+      .filter(|id| all_talk_ids.contains(id))
       .collect::<HashSet<String>>();
     raw_talk_collection.insert(talk_type, existing_and_seen_talk_ids);
   }

@@ -4,12 +4,7 @@ use shiorust::message::{Request, Response};
 
 use super::talk::Talk;
 
-pub(crate) fn on_derivative_talk_request_open(req: &Request) -> Result<Response, ShioriError> {
-  let refs = get_references(req);
-  let event_id = refs[0];
-  if event_id.is_empty() {
-    return Err(ShioriError::BadRequestError);
-  }
+pub(crate) fn derivative_talk_request_open(event_id: &str) -> Result<Response, ShioriError> {
   let last_talk = match Talk::all_talks().unwrap().iter().find(|t| t.id == event_id) {
     Some(t) => t.text.clone(),
     None => "".to_string(),

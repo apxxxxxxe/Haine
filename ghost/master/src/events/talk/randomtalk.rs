@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use crate::error::ShioriError;
-use crate::events::common::*;
 use crate::events::replace_dialog_for_nomouthmove;
 use crate::events::talk::{Talk, TalkType};
 use crate::events::TalkingPlace;
+
+use super::DerivaliveTalk;
 
 // 私/主: 50代の身綺麗な男
 // 僕/主様: 30代のおとなしい男
@@ -51,39 +54,6 @@ pub(crate) fn talk_with_punchline(text: String, funny_punchline: String) -> Stri
   text + "\\n" + &funny_punchline
 }
 
-enum RandomTalkType {
-  Single(RandomTalk),
-  Multi(Vec<RandomTalk>),
-}
-
-fn new_randomtalks(
-  id: String,
-  texts: Vec<String>,
-  required_condition: Option<fn() -> bool>,
-  callback: Option<fn()>,
-) -> Vec<RandomTalk> {
-  texts
-    .into_iter()
-    .enumerate()
-    .map(|(idx, text)| RandomTalk {
-      id: format!("{}-{}", id, idx),
-      text,
-      required_condition,
-      callback,
-    })
-    .collect()
-}
-
-fn flattern_randomtalk_types(talks: Vec<RandomTalkType>) -> Vec<RandomTalk> {
-  talks
-    .into_iter()
-    .flat_map(|talk| match talk {
-      RandomTalkType::Single(t) => vec![t],
-      RandomTalkType::Multi(t) => t,
-    })
-    .collect()
-}
-
 struct RandomTalk {
   id: String,
   text: String,
@@ -92,9 +62,9 @@ struct RandomTalk {
 }
 
 pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
-  let strings: Vec<RandomTalkType> = match talk_type {
+  let strings: Vec<RandomTalk> = match talk_type {
       TalkType::SelfIntroduce => vec![
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "別れの悲しみ".to_string(),
           text: "\
           h1111110「別れがこんなに悲しいなら、最初から出会わなければよかった」\\n\
@@ -104,11 +74,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - 霊は姿を変えることはできない
         // - ハイネは人目を気にして外出を避けている
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "姿は変えられない".to_string(),
           text: "\
           h1111306霊は不定形だけれど、自由に形を変えられるわけではないわ。\\n\
@@ -120,10 +90,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは科学に興味がある
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "科学への興味".to_string(),
           text: "\
           h1111210生きていた頃、科学に興味を持っていたわ。\\n\
@@ -137,35 +107,24 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは服装には無頓着
-        RandomTalkType::Multi(new_randomtalks(
-            "服装へのこだわり".to_string(),
-            all_combo(&vec![
-              vec![
+        RandomTalk {
+            id: "服装へのこだわり".to_string(),
+              text:
                 "h1111203服装にはどちらかというと無頓着なの。\\n\
                 h1112305一度決めた「いつもの」を守り続けるだけ。\\n\
                 h1112304そうすれば、余計なことを考えなくて良くなるわ。\\n\
-                \\n".to_string()
-              ],
-              vec![
-                "h1111210私のような霊に特有の悩みよ。\\n\
+                h1111210私のような霊に特有の悩みよ。\\n\
                 h1111204低級霊はそもそも実体を持たないから、ね。\
                 ".to_string(),
-                "\\1『つまり、その服装は昔から？』\
-                h1111205ええ、そうよ。\
-                h1111211けれど、あなたのファッションを見る限りでは\\n\
-                それほど浮世離れしているわけではなさそうね。\
-                ".to_string(),
-              ],
-            ]),
-            None,
-            None,
-        )),
+            required_condition: None,
+            callback: None,
+        },
 
         // - ハイネは1世紀以上前に死んだ
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生前の記録".to_string(),
           text: "\
           h1111206生前のこと、記録に残しているの。\\n\
@@ -175,10 +134,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは恋愛とは無縁の人生だった
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "恋愛観".to_string(),
           text: talk_with_punchline("\
             h1111205幽霊は生前の想い……好みや恨みに執着するの。\\n\
@@ -191,28 +150,28 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string()),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは強い霊
         // - ハイネは霊たちに慕われている
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
             id: "霊力の多寡".to_string(),
             text: "\
             h1111204霊力の多寡は年月や才能、特別な契約の有無などで変わるけれど、\\n\
             最も大きな要因は環境──つまり、その地との関わりの深さによるの。\\n\
             h1111310私のように生家に根付いた霊は言わずもがな。\\n\
             h1111205……まあ、強いからといって良いことばかりでもないわ。\\n\
-            h1111203霊にも社会がある。h1111205\\_a[NoblesseOblige,義務ってどんなこと？]上位者の義務\\_aというものも。\\n\
+            h1111203霊にも社会がある。h1111205\\_a[AnchorTalk,NoblesseOblige,義務ってどんなこと？]上位者の義務\\_aというものも。\\n\
             \\n\
             h1111210……はじめは億劫だと思っていたのだけどね。\\n\
             h1111206悪くないものよ。感謝され、慕われるというのは。\
             ".to_string(),
             required_condition: None,
             callback: None,
-        }),
+        },
 
         // - この街には霊が集まりやすい
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "カンテルベリオという土壌".to_string(),
           text: "\
             h1111203カンテルベリオには、霊……正確には、\\n\
@@ -225,23 +184,23 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ここはハイネの生家
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生家の広さ".to_string(),
           text: "\
             h1111210ここは私の生家なの。実際は別荘なのだけど。\\n\
             h1111206知っての通り、従者がいなければ掃除が行き届かないほど広いの。\\n\
-            h1111205……まあ、\\_a[LiveHome,別荘だけど長く住んでいたの？]勝手知ったる場所\\_aなのは不幸中の幸い、といえなくもないかしらね。\\n\
+            h1111205……まあ、\\_a[AnchorTalk,LiveHome,別荘だけど長く住んでいたの？]勝手知ったる場所\\_aなのは不幸中の幸い、といえなくもないかしらね。\\n\
             h1111210くつろいで暮らすのにこれ以上の場所はないわ。\
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは生家からあまり離れられない
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "フィクションの価値".to_string(),
           text: "\
           h1111210良質なフィクションは現実を忘れさせてくれる。\\n\
@@ -254,27 +213,27 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - 家はいとこの子孫が管理している
         // - いとこは帰っていない
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生活と人間との折り合い".to_string(),
           text: "\
             h1111206この家は、今は私の家の子孫が管理しているの。\\n\
             厳密には、いとこの子孫がね。\\n\
             h1111210ずいぶん帰っていないし、管理もおざなりよ。\\n\
-            h1111204……まあ、\\_a[Poltergeist,物の配置が変わってたりしたら怪しまれない？]好き勝手にできる\\_aのは楽でいいわね。\
+            h1111204……まあ、\\_a[AnchorTalk,Poltergeist,物の配置が変わってたりしたら怪しまれない？]好き勝手にできる\\_aのは楽でいいわね。\
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
       ],
 
       TalkType::WithYou => vec![
-        RandomTalkType::Single(RandomTalk {
-          id: "".to_string(),
+        RandomTalk {
+          id: "中庸".to_string(),
           text: "\
             h1111206盲目的にすべてを行うことも、全く行わないことも正解ではない。\\n\
             いつだって答えは中庸。\\n\
@@ -283,9 +242,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "訪問の意図".to_string(),
           text: "\
             h1111210想うという意味では、嫌悪も愛慕も変わらないと思うの。\\n\
@@ -294,8 +253,8 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ".to_string(),
           required_condition: None,
           callback: None,
-        }),
-        RandomTalkType::Single(RandomTalk{
+        },
+        RandomTalk{
           id: "知って、祓う".to_string(),
           text: "\
               h1111205無知にこそ不安の種は宿るもの。\\n\
@@ -304,9 +263,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
               ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk{
+        RandomTalk{
           id: "静寂が秘める言葉".to_string(),
           text: "\
               \\1（カチ、コチ、カチ、コチ……）\\n\
@@ -319,9 +278,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
               ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk{
+        RandomTalk{
           id: "霊と時間".to_string(),
           text: "\
             h1111204たとえばあなたが目を閉じて、\\n\
@@ -336,10 +295,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネはインターネットにあえて触れていない
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "スマホとインターネット".to_string(),
           text: "\
             h1111205最近の携帯電話というのは随分便利なのね。\\n\
@@ -352,10 +311,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネはユーザの生活をすべて面倒見ることはできない
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
             id: "生活の面倒".to_string(),
             text: "\
               h1111205あなたの生活のすべてについて、\\n\
@@ -367,10 +326,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
               ".to_string(),
             required_condition: None,
             callback: None,
-        }),
+        },
 
         // - ハイネは人間観察を人一倍好む
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "人間観察".to_string(),
           text: "\
             h1111104\\1ハイネはこちらの作業をじっと観察している……\\n\
@@ -382,11 +341,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - 幽霊は写真に写らない
         // - ハイネは現代の知識を持っている
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "写真には写らない".to_string(),
           text: "\
             h1111210今は手軽に写真が撮れていいわね。\\n\
@@ -398,11 +357,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - この街の霧は霊的なもの
         // - この街では霊が活発になる
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "霧の力".to_string(),
           text: "\
             h1111206霧が、濃いでしょう。\\n\
@@ -417,11 +376,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは身体が弱かった
         // - ハイネは霊になっても身体が弱い
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "身体が弱い".to_string(),
           text: "\
             h1111210外を出歩くのはとても疲れるの。\\n\
@@ -434,11 +393,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ユーザはゴスファッションをしている
         // - ハイネは個性的なファッションを重んじる
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "あなたのゴスファッション".to_string(),
           text: "\
             h1111201あなたのその趣味……\\n\
@@ -455,14 +414,14 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ハイネは生前食が細かった(作業に没頭していると食事を忘れる)
         // - ハイネは生前家政婦を雇っていた
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生前の食事事情".to_string(),
           text: "\
-            h1111204あなたは\\_a[LikeTheGranma,なんだかおばあちゃんみたい]ちゃんと食べているかしら？\\_a\\n\
+            h1111204あなたは\\_a[AnchorTalk,LikeTheGranma,なんだかおばあちゃんみたい]ちゃんと食べているかしら？\\_a\\n\
             h1111210そう。いいことね。\\n\
             h1111104私？……h1111205生前は食が細かったわ。\\n\
             h1111210……身体が弱い上に、食そのものにあまり関心がなくてね。\\n\
@@ -471,11 +430,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
         // - ユーザは絵が得意
         // - ハイネの生きていた時代には肖像画は珍しかった
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "スケッチ".to_string(),
           text: "\
             h1111205……h1111201あら、絵を描いているの？見せて。\\n\
@@ -489,12 +448,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
       ],
       TalkType::Lore => vec![
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "冥界の渡し賃".to_string(),
           text: "\
             h1111206古代ギリシャでは死者に銅貨を持たせて葬っていたの。\\n\
@@ -506,9 +465,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死体のうめき声".to_string(),
           text: "\
             h1111205死体は、うめき声を上げることがあるのよ。\\n\
@@ -521,9 +480,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "屍蝋".to_string(),
           text: "\
             h1111205屍蝋、って聞いたことあるかしら？\\n\
@@ -539,9 +498,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死後の温かさ".to_string(),
           text: "\
             h1111205死後数日経ったはずの身体が、まだ温かい。\\n\
@@ -554,9 +513,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生長する死体".to_string(),
           text: "\
             h1111205掘り起こした死体の髪や爪が伸びていた！\\n\
@@ -566,9 +525,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "土葬の空洞".to_string(),
           text: "\
             h1111206土葬の場合、地中の遺体が朽ちるとそこに空洞ができるわ。\\n\
@@ -579,9 +538,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "永遠の夢".to_string(),
           text: "\
             h1113105恒久の平和、不死の身体、永劫の繁栄……。\\n\
@@ -591,21 +550,21 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生体電気".to_string(),
           text: "\
             h1111206カエルの足に電流を流す実験。\\n\
             生体電気の発見に繋がったといわれる\\n\
-            あの現象は、\\_a[Misemono,どんな見世物だったの？]死者の蘇りを謳う見世物\\_aに\\n\
+            あの現象は、\\_a[AnchorTalk,Misemono,どんな見世物だったの？]死者の蘇りを謳う見世物\\_aに\\n\
             利用されたことがあったの。\
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死者の埋葬".to_string(),
           text: "\
             h1111206古代ギリシャでは、刑死の際は毒薬に阿片を混ぜたものを飲ませていたの。\\n\
@@ -615,9 +574,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "黒死病".to_string(),
           text: "\
             h1111210黒死病が蔓延していたとき、問題になっていたのがいわゆる「早すぎた埋葬」。\\n\
@@ -629,11 +588,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
       ],
       TalkType::Servant => vec![
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "霊力と可視性".to_string(),
           text: talk_with_punchline("\
             h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
@@ -646,9 +605,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string()),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "低級霊との契約".to_string(),
           text: talk_with_punchline("\
             h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
@@ -661,9 +620,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string()),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "幽霊たちの役割".to_string(),
           text: "\
             h1111203従者……と、私が呼ぶ幽霊たち。\\n\
@@ -677,9 +636,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "幽霊たちの自由".to_string(),
           text: talk_with_punchline("\
             h1111206彼らと直接話すことはできないの。\\n\
@@ -693,9 +652,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string()),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "あなたの価値".to_string(),
           text: "\
             h1111101何をすればいいかって？\\n\
@@ -707,12 +666,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
       ],
       TalkType::Past => vec![
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "人ひとり".to_string(),
           text: "\
             h1111110人ひとり、殺せるとしたら誰にする？という他愛ない問い。\\n\
@@ -720,9 +679,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死体損壊".to_string(),
           text: "\
             h1111110「死体の損壊は死者への冒涜だ」\\n\
@@ -733,18 +692,18 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "惨めな人生".to_string(),
           text: "\
             h1111105みじめな人生の上に正気でいるには、\\n日々は長すぎたの。\
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "行き場のない苦しみ".to_string(),
           text: "\
             h1112102誰が悪い？いいえ、誰も悪くない。\\n\
@@ -754,9 +713,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死の瞬間".to_string(),
           text: "\
             h1111105死ぬ瞬間、後悔はなかった。\\n\\n\
@@ -765,9 +724,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "助けは遂げられず".to_string(),
           text: "\
             h1111105助けようとしてくれた人は沢山いたけれど、\\n\
@@ -775,9 +734,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死なない理由".to_string(),
           text: "\
             h1111110生きていて良かったと思えることは数えきれないほどあったわ。\\n\
@@ -785,9 +744,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "ふつうになりたかった".to_string(),
           text: "\
             h1112110ふつうになりたかった。\\n\
@@ -799,9 +758,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "人と本".to_string(),
           text: "\
             h1111105昔から、人と本の違いがわからなかったの。\\n\
@@ -810,9 +769,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "今度こそ無へ".to_string(),
           text: "\
             h1111105死にぞこなったものだから、\\n\
@@ -821,9 +780,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "魂は消える".to_string(),
           text: "\
             h1111110未練もなく、しかし現世に留まっている魂。\\n\
@@ -833,9 +792,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "人生の無意味".to_string(),
           text: "\
             h1111210人生に意味などあってはならない。\\n\
@@ -844,12 +803,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
       ],
       TalkType::Abstract => vec![
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "今ここに立っていること".to_string(),
           text: "\
             h1111310過去は記憶の中にしかない。\\n\
@@ -861,9 +820,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "感動と倦み".to_string(),
           text: "\
             h1111105ある本を最初に読んだときの感動と、何度も読み返して全て見知ったゆえの倦み。\\n\
@@ -875,9 +834,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "納得のための因果".to_string(),
           text: "\
             h1111110因果が巡ってきた。\\n\
@@ -887,9 +846,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "怖いものを見るということ".to_string(),
           text: "\
             h1111102怖いものだからこそ、見つめなければ戦えない。\\n\
@@ -897,9 +856,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "停滞を終わらせるために".to_string(),
           text: "\
             h1111105危険と隣り合わせだからこそ、世界は美しいの。\\n\
@@ -910,9 +869,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "停滞の破壊".to_string(),
           text: "\
             h1111105人生に変化は付きもの\\n\
@@ -924,9 +883,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "極限の変化としての死".to_string(),
           text: "\
             h1111105死の瞬間の、極限に振れた変化。\\n\
@@ -935,18 +894,18 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "死の向こう側".to_string(),
           text: "\
             h1112110どうか、死の向こう側がありませんように。\
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "沈んでいく".to_string(),
           text: "\
             h1111105沈んでいく。\\n\
@@ -958,9 +917,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "人を解体したい".to_string(),
           text: "\
             h1111110人を解体したいと、思うことがあるの。\\n\
@@ -970,9 +929,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "わがままな祈り".to_string(),
           text: "\
             h1111110がんばっているってこと、\\n\
@@ -981,9 +940,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "生者にとっての慰め".to_string(),
           text: "\
             h1111110枯れ木に水をあげましょう。\\n\
@@ -995,9 +954,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "不可逆な崩壊".to_string(),
           text: "\
             h1111110燃え殻がひとりでに崩れるように、心が静かに割れて戻らなくなった。\\n\
@@ -1005,9 +964,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "中途半端な助け".to_string(),
           text: "\
             h1111110中途半端な助けは何もしないより残酷だわ。\\n\
@@ -1015,9 +974,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "レンズの歪み".to_string(),
           text: "\
             h1111105観察と模倣を続ければ、完全に近づけると思っていた。\\n\
@@ -1027,9 +986,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "先の見えない苦しみ".to_string(),
           text: "\
             h1111105一寸先は暗く、扉は閉ざされている。\\n\
@@ -1039,9 +998,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "唯一の視点".to_string(),
           text: "\
             h1111106私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
@@ -1051,9 +1010,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "一つの個としての限界".to_string(),
           text: "\
             h1111103世界が複雑で曖昧すぎるから、\\n\
@@ -1064,9 +1023,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "自己同一性の仮定".to_string(),
           text: "\
             h1111105環境と経験の総体こそが、\\n\
@@ -1079,9 +1038,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "自分の理解者は自分だけ".to_string(),
           text: "\
             h1111110「なぜみんな私をわかってくれないの？」と誰もが思う。\\n\
@@ -1090,9 +1049,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
-        RandomTalkType::Single(RandomTalk {
+        RandomTalk {
           id: "得ることは失うこと".to_string(),
           text: "\
             h1111110ひとつ得るとき、ひとつ失う。\\n\
@@ -1101,13 +1060,13 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             ".to_string(),
           required_condition: None,
           callback: None,
-        }),
+        },
 
       ],
     };
 
   let mut talks = Vec::new();
-  for st in flattern_randomtalk_types(strings) {
+  for st in strings {
     if let Some(expr) = st.required_condition {
       if !expr() {
         continue;
@@ -1121,6 +1080,120 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
     ));
   }
   Some(talks)
+}
+
+pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
+  vec![DerivaliveTalk {
+    parent_id: "生前の記録".to_string(),
+    id: "生前の記録・過去".to_string(),
+    summary: "『読んでみたい』".to_string(),
+    text: "\
+          \\0h1111204……それは、できない相談ね。\\n\
+          h1111210他人に見せるために書いたものではないもの。\\n\
+          h1112205私の記憶は、私だけのもの。\\n\
+          h1112204従者にも、あなたにも、見せるつもりはないわ。\\n\
+          h1111310……それに、興味本位で読むには長すぎるの。\\n\
+          忘れないうちにと書き始めたけれど、\\n\
+          気づけば三百を超えてしまって。\\n\
+          h1111206冊数がね。置き場所にも困っているわ。\
+          "
+    .to_string(),
+    required_condition: None,
+    callback: None,
+  },
+    DerivaliveTalk {
+        parent_id: "服装へのこだわり".to_string(),
+        id: "服装へのこだわり・昔から".to_string(),
+        summary: "『つまり、その服装は昔から？』".to_string(),
+        text: "\
+            h1111205ええ、そうよ。\
+            h1111211けれど、あなたのファッションを見る限りでは\\n\
+            それほど浮世離れしているわけではなさそうね。\
+            ".to_string(),
+        required_condition: None,
+        callback: None,
+    },
+    DerivaliveTalk {
+        parent_id: "服装へのこだわり".to_string(),
+        id: "服装へのこだわり・違う服".to_string(),
+        summary: "『たまには違う服も着てみない？』".to_string(),
+        text: "\
+            h1113205……そうね、たまにはいいかもしれないわ。\\n\
+            h1111204あなた、選んでくれる？\\n\
+            h1111210…だって、自分では良し悪しも好き嫌いもわからないもの。\\n\
+            h1111206従者にクローゼットの中身を\\n\
+            持って来させましょう。\\n\
+            h1111204あなたのセンスをh1111211信じているわ。\
+            ".to_string(),
+        required_condition: None,
+        callback: None,
+    },
+    DerivaliveTalk {
+        parent_id: "生家の広さ".to_string(),
+        id: "生家の広さ・思い出".to_string(),
+        summary: "『思い出の品や場所はある？』".to_string(),
+        text: "\
+            h1111206ここへ来るまでの階段の下に、スペースがあったでしょう。\\n\
+            h1111210あそこに隠れるのが好きでね。\\n\
+            お気に入りの本やランプ、自作の地図に方位磁石なんかを持ち込んで、秘密基地を作っていたのよ。\\n\
+            h1111205大きくなるにつれて縁遠くなったけれど、\\n\
+            h1111210今でもあのわくわくする気持ちは思い出せるの。\
+            ".to_string(),
+        required_condition: None,
+        callback: None,
+    }
+  ]
+}
+
+pub(crate) fn derivative_talks_per_talk_type() -> HashMap<TalkType, Vec<DerivaliveTalk>> {
+  let all_talks = TalkType::all()
+    .iter()
+    .map(|t| random_talks(*t))
+    .flat_map(|t| t.unwrap_or_default())
+    .collect::<Vec<_>>();
+  let mut talks: HashMap<TalkType, Vec<DerivaliveTalk>> = HashMap::new();
+  for talk in derivative_talks() {
+    let parent_talk = all_talks
+      .iter()
+      .find(|t| t.id == talk.parent_id)
+      .unwrap_or_else(|| panic!("Parent talk with id {} not found", talk.parent_id));
+    talks
+      .entry(parent_talk.talk_type.unwrap())
+      .or_default()
+      .push(talk);
+  }
+  talks
+}
+
+pub(crate) fn derivative_talk_by_id(parent_id: &str) -> Option<Vec<DerivaliveTalk>> {
+  derivative_talks()
+    .into_iter()
+    .filter(|t| {
+      let condition_ok = match &t.required_condition {
+        Some(condition) => condition(),
+        None => true,
+      };
+      t.parent_id == parent_id && condition_ok
+    })
+    .collect::<Vec<_>>()
+    .into()
+}
+
+pub(crate) fn get_parent_talk(derivative_talk: &DerivaliveTalk) -> Talk {
+  let all_talks = TalkType::all()
+    .iter()
+    .map(|t| random_talks(*t))
+    .flat_map(|t| t.unwrap_or_default())
+    .collect::<Vec<_>>();
+  all_talks
+    .into_iter()
+    .find(|t| t.id == derivative_talk.parent_id)
+    .unwrap_or_else(|| {
+      panic!(
+        "Parent talk with id {} not found",
+        derivative_talk.parent_id
+      )
+    })
 }
 
 pub(crate) fn moving_to_library_talk_parts(

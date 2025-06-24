@@ -16,6 +16,10 @@ use std::collections::HashSet;
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
+use self::randomtalk::{derivative_talks_per_talk_type, get_parent_talk};
+
+use super::aitalk::render_talk;
+
 #[derive(Clone)]
 pub(crate) struct Talk {
   pub talk_type: Option<TalkType>,
@@ -157,33 +161,39 @@ pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriErr
     let empty_hashset = HashSet::new();
     let seen_talks = talk_collection.get(&talk_type).unwrap_or(&empty_hashset);
     let talks = Talk::get_unseen_talks(talk_type, seen_talks).ok_or(ShioriError::TalkNotFound)?;
-    choosed_talk = talks
+    let derivative_talks = DerivaliveTalk::get_unseen_talks(talk_type, seen_talks)
+      .unwrap_or_default()
+      .iter()
+      .map(get_parent_talk)
+      .collect::<Vec<Talk>>();
+    let combined_talks = talks
+      .into_iter()
+      .chain(derivative_talks)
+      .collect::<Vec<Talk>>();
+    choosed_talk = combined_talks
       .choose(&mut rand::thread_rng())
       .ok_or(ShioriError::TalkNotFound)?
       .clone();
   }
-  register_talk_collection(&choosed_talk)?;
+  register_talk_collection(&choosed_talk.id, talk_type)?;
 
   new_response_with_value_with_translate(
-    choosed_talk.consume(),
+    render_talk(&choosed_talk),
     TranslateOption::with_shadow_completion(),
   )
 }
 
-pub(crate) fn register_talk_collection(talk: &Talk) -> Result<(), ShioriError> {
+pub(crate) fn register_talk_collection(id: &str, talk_type: TalkType) -> Result<(), ShioriError> {
   let mut talk_collection = TALK_COLLECTION.write().unwrap();
-  match talk_collection.get_mut(&(talk.talk_type.ok_or(ShioriError::FieldAccessError)?)) {
+  match talk_collection.get_mut(&talk_type) {
     Some(t) => {
-      let key = talk.id.to_string();
+      let key = id.to_string();
       if !t.contains(&key) {
         t.insert(key);
       }
     }
     None => {
-      talk_collection.insert(
-        talk.talk_type.unwrap(),
-        HashSet::from_iter(vec![talk.id.to_string()]),
-      );
+      talk_collection.insert(talk_type, HashSet::from_iter(vec![id.to_string()]));
     }
   }
   Ok(())
@@ -208,6 +218,52 @@ pub(crate) fn random_talks_analysis() -> String {
     TOTAL: {}",
     s, sum
   )
+}
+
+#[derive(Clone)]
+pub(crate) struct DerivaliveTalk {
+  pub(crate) parent_id: String,
+  pub(crate) id: String,
+  pub(crate) summary: String,
+  pub(crate) text: String,
+  pub(crate) required_condition: Option<fn() -> bool>,
+  pub(crate) callback: Option<fn()>,
+}
+
+impl DerivaliveTalk {
+  pub fn consume(&self) -> String {
+    if let Some(callback) = self.callback {
+      callback();
+    }
+    self.text.clone()
+  }
+
+  pub fn get_unseen_talks(
+    talk_type: TalkType,
+    seen: &HashSet<String>,
+  ) -> Option<Vec<DerivaliveTalk>> {
+    let talks = derivative_talks_per_talk_type()
+      .get(&talk_type)
+      .cloned()
+      .unwrap_or_default();
+    let mut result = Vec::new();
+    for talk in talks {
+      if !seen.contains(&talk.id) {
+        if let Some(condition) = talk.required_condition {
+          if condition() {
+            result.push(talk);
+          }
+        } else {
+          result.push(talk);
+        }
+      }
+    }
+    if result.is_empty() {
+      None
+    } else {
+      Some(result)
+    }
+  }
 }
 
 #[cfg(test)]

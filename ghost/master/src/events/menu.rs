@@ -2,7 +2,7 @@ use crate::error::ShioriError;
 use crate::events::common::*;
 use crate::events::first_boot::{FIRST_BOOT_TALK, FIRST_RANDOMTALKS};
 use crate::events::input::InputId;
-use crate::events::talk::randomtalk::random_talks;
+use crate::events::talk::randomtalk::{derivative_talks_per_talk_type, random_talks};
 use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::variables::PendingEvent;
@@ -528,12 +528,19 @@ pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
     if !is_unlocked_checks[i] {
       lines.push(format!("{}{}: 未解放\\f[default]", DIMMED_COLOR, talk_type));
     } else {
+      // 派生トーク込みの閲覧済みトーク数
       let len = talk_collection.get(&talk_type).map_or(0, |v| v.len());
-      let all_len = if let Some(v) = random_talks(talk_type) {
+      // 派生トークを除いた全トーク数
+      let mut all_len = if let Some(v) = random_talks(talk_type) {
         v.len()
       } else {
         0
       };
+      // 派生トークのトーク数を全トーク数に加える
+      let derivative_talk_len = derivative_talks_per_talk_type()
+        .get(&talk_type)
+        .map_or(0, |v| v.len());
+      all_len += derivative_talk_len;
       let anal = if len < all_len {
         format!(
           "\\n  \\f[height,13]\\q[未読トーク再生,OnCheckUnseenTalks,{}]\\f[default]",

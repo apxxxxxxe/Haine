@@ -12,6 +12,11 @@ use crate::events::{
 };
 use crate::variables::*;
 use shiorust::message::{parts::*, traits::*, Request, Response};
+use vibrato::errors::Result;
+
+use super::talk::randomtalk::{derivative_talk_by_id, derivative_talks};
+use super::talk::Talk;
+use super::webclap::derivative_talk_request_open;
 
 pub(crate) const IMMERSIVE_RATE_MAX: u32 = 100;
 // トーク1回あたりに増減する没入度の割合(%)
@@ -59,7 +64,9 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   let choosed_talk = talks[index].clone();
   if if_consume_talk_bias {
     // ユーザが見ているときのみトークを消費&トークカウントを加算
-    register_talk_collection(&choosed_talk)?;
+    if let Some(talk_type) = choosed_talk.talk_type {
+      register_talk_collection(&choosed_talk.id, talk_type)?;
+    }
     *CUMULATIVE_TALK_COUNT.write().unwrap() += 1;
   }
 
@@ -111,7 +118,7 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     && *TALKING_PLACE.read().unwrap() == TalkingPlace::LivingRoom
   {
     format!(
-      "\\0\\__q[OnDerivativeTalkRequestOpen,{}]{}\\__q\\_l[0,@1.5em]",
+      "\\0\\f[anchornotselectfontcolor,default.plain]\\_a[DerivativeTalkRequest,{}]{}\\_a\\_l[0,@1.5em]\\f[anchornotselectfontcolor,default]",
       choosed_talk.id,
       Icon::Bubble,
     )
@@ -144,10 +151,30 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
       render_immersive_icon(),
       comment,
       derivative_talk_request_button,
-      choosed_talk.consume()
+      render_talk(&choosed_talk),
     ),
     TranslateOption::with_shadow_completion(),
   )
+}
+
+pub fn render_talk(talk: &Talk) -> String {
+  let derivative_talk_anchors = if let Some(dtalks) = derivative_talk_by_id(&talk.id) {
+    let mut anchors = "\\1\\_q".to_string();
+    for (i, dtalk) in dtalks.iter().enumerate() {
+      if i > 0 {
+        anchors += "\\_w[1em]";
+      }
+      anchors += &format!(
+        "\\![*]\\_a[DerivativeTalk,{}]{}\\_a\\n",
+        dtalk.id, dtalk.summary,
+      );
+    }
+    anchors
+  } else {
+    String::new()
+  };
+
+  format!("{}{}", talk.consume(), derivative_talk_anchors,)
 }
 
 fn first_random_talk_response(
@@ -187,13 +214,51 @@ fn first_random_talk_response(
 
 pub(crate) fn on_anchor_select_ex(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let id = refs[1];
-  let user_dialog = refs.get(2).unwrap_or(&"").to_string();
+  let anchor_type = refs[1]; // AnchorTalk || DerivativeTalk // DerivativeTalkRequest
+  let id = refs[2];
+  let user_dialog = refs.get(3).unwrap_or(&"").to_string();
 
   if *LAST_ANCHOR_ID.read().unwrap() == Some(id.to_string()) {
     return Ok(new_response_nocontent());
   }
 
+  match anchor_type {
+    "AnchorTalk" => anchor_talk_dialog(id, &user_dialog),
+    "DerivativeTalk" => derivative_talk_dialog(id),
+    "DerivativeTalkRequest" => derivative_talk_request_open(id),
+    _ => Err(ShioriError::BadRequest),
+  }
+}
+
+fn derivative_talk_dialog(id: &str) -> Result<Response, ShioriError> {
+  match derivative_talks().iter().find(|t| t.id == id) {
+    Some(talk) => {
+      let mut m = String::from("\\C");
+      m += &format!("\\1\\c\\_q{}\\_q", talk.summary);
+      m += "\\0\\n\\f[align,center]\\_q─\\w1──\\w1───\\w1─────\\w1────\\w1──\\w1──\\w1─\\w1─\\n";
+      m += "\\_w[750]\\_q\\_l[@0,]";
+      m += &talk.consume();
+      let parent_talk = TalkType::all()
+        .iter()
+        .map(|t| {
+          if let Some(talks) = random_talks(*t) {
+            talks.iter().find(|t| t.id == talk.parent_id).cloned()
+          } else {
+            None
+          }
+        })
+        .find(|t| t.is_some())
+        .and_then(|t| t);
+      if let Some(parent) = parent_talk {
+        register_talk_collection(id, parent.talk_type.unwrap())?;
+      }
+      new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
+    }
+    None => Ok(new_response_nocontent()),
+  }
+}
+
+fn anchor_talk_dialog(id: &str, user_dialog: &str) -> Result<Response, ShioriError> {
   let mut m = String::from("\\C");
   m += "\\0\\n\\f[align,center]\\_q─\\w1──\\w1───\\w1─────\\w1────\\w1──\\w1──\\w1─\\w1─\\n\\_w[750]\\_q\\_l[@0,]";
   if !user_dialog.is_empty() {
