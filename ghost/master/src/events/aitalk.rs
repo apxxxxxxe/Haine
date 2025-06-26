@@ -234,7 +234,7 @@ fn derivative_talk_dialog(id: &str) -> Result<Response, ShioriError> {
   match derivative_talks().iter().find(|t| t.id == id) {
     Some(talk) => {
       let mut m = String::from("\\C");
-      m += &format!("\\1\\c\\_q{}\\_q", talk.summary);
+      m += &format!("\\1\\c\\_q{}\\n\\_q", talk.summary);
       m += "\\0\\n\\f[align,center]\\_q─\\w1──\\w1───\\w1─────\\w1────\\w1──\\w1──\\w1─\\w1─\\n";
       m += "\\_w[750]\\_q\\_l[@0,]";
       m += &talk.consume();

@@ -1141,6 +1141,44 @@ pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
             ".to_string(),
         required_condition: None,
         callback: None,
+    },
+    DerivaliveTalk {
+        parent_id: "生前の食事事情".to_string(),
+        id: "生前の食事事情・好きな食べ物".to_string(),
+        summary: "『何か好きな食べ物はなかった？』".to_string(),
+        text: "\
+            h1111205……そうね、硬い焼き菓子が好きよ。\\n\
+            甘さが控えめのものが、特に。\\n\
+            長持ちするし、口の中に味が残りにくいから読書の邪魔にならないの。\\n\
+            ……従者からは不評だけれど。ポロポロこぼして回るから掃除が大変だ、ってね。\\n\
+            \\1『こぼして回る……？』\\n\
+            h1221210……ええ、そう。\\n\
+            考え事をするとき、歩き回る癖があって……\\n\
+            h1221206進んで汚したいわけではないのだけど、どうしてもやめられなくて。\
+            ".to_string(),
+        required_condition: None,
+        callback: None,
+    },
+    DerivaliveTalk {
+        parent_id: "身体が弱い".to_string(),
+        id: "身体が弱い・お使い".to_string(),
+        summary: "『かわりにお使いをしようか？』".to_string(),
+        text: "\
+            h1111101……h1111210やさしいのね。\\n\
+            h1111210ありがたいけれど、結構よ。\\n\
+            h1111206定期的な買い出しは既にしているし、\\n\
+            h1111210私達が必要とするものはとても少ないの。\\n\
+            h1111204あなたは客人で、従者ではないから。\\n\
+            h1111210あなた自身のことだけを考えていてほしいの。\\n\
+            \\1『私はあなたの役に立ちたいと思ってる』\\n\
+            h1111101…………h1111204そう、わかったわ。\\n\
+            ならば、そうね、\\n\
+            h1111210次からはあなたにお茶菓子を用意してもらいましょう。\\n\
+            h1111204私の好みはわかっているでしょう？\\n\
+            h1111211お願いね、{user_name}。\
+            ".to_string(),
+        required_condition: None,
+        callback: None,
     }
   ]
 }
