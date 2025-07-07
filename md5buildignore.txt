@@ -39,3 +39,6 @@ Cargo.*
 rustfmt.toml
 clippy.toml
 build.*
+
+CLAUDE.md
+.claude/
