@@ -50,9 +50,6 @@ pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
   "",
 ];
 
-pub(crate) fn talk_with_punchline(text: String, funny_punchline: String) -> String {
-  text + "\\n" + &funny_punchline
-}
 
 struct RandomTalk {
   id: String,
@@ -139,15 +136,17 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         // - ハイネは恋愛とは無縁の人生だった
         RandomTalk {
           id: "恋愛観".to_string(),
-          text: talk_with_punchline("\
+          text: "\
             h1111205幽霊は生前の想い……好みや恨みに執着するの。\\n\
             h1111210想い人がいればその人に、恨みがあればその相手に。\\n\
             h1111203逆に、死後新たな執着が生まれることは\\n\
             ほとんどないわ。\\n\
-            だから幽霊同士、h1111206ましてや人と幽霊の間に恋愛が生まれることは皆無といっていいでしょう。\\n\
+            だから幽霊同士、h1111206ましてや人と幽霊の間に恋愛が生まれることは皆無といっていいでしょう。\\n\\n\
+            h1111204……もっとも、私の場合は生前からその手の感情とは\\n\
+            縁遠い人生だったから、\\_w[400]\\n\
+            h1111210死後に変化があったとしても分からないかもしれないわね。\\n\
+            h1111304そういう意味では、良い実例とは言えないのだけれど。\
             ".to_string(),
-            "h1111304……なに、その顔は。h1111310あいにく、私は生きていた頃から恋愛とは無縁よ。\\n\
-            ".to_string()),
           required_condition: None,
           callback: None,
         },
@@ -233,23 +232,13 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 
       TalkType::WithYou => vec![
         RandomTalk {
-          id: "中庸".to_string(),
-          text: "\
-            h1111206盲目的にすべてを行うことも、全く行わないことも正解ではない。\\n\
-            いつだって答えは中庸。\\n\
-            悩ましくて、煮えきらなくて……\\n\
-            h1111210考えるって、だからこんなにも楽しいのでしょう。\\n\
-          ".to_string(),
-          required_condition: None,
-          callback: None,
-        },
-
-        RandomTalk {
           id: "訪問の意図".to_string(),
           text: "\
             h1111210想うという意味では、嫌悪も愛慕も変わらないと思うの。\\n\
-            h1111204あなたの気持ちがどうであれ、h1111211あなたがここに来てくれることは私にとって喜ばしいことだわ。\\n\
-            h1111204……意地悪だったかしら？h1111210わかっているわよ、あなたが好んでここに来ているって。\
+            h1111204たとえ私を煙たく思っていたとしても、\\n\
+            あなたがここに来てくれることは私にとって喜ばしいことだわ。\\n\\n\
+            h1111304……意地悪だったかしら？\\n\
+            h1111210わかっているわよ、あなたが好んでここに来ているって。\
           ".to_string(),
           required_condition: None,
           callback: None,
@@ -259,7 +248,13 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           text: "\
               h1111205無知にこそ不安の種は宿るもの。\\n\
               h1111210訊いて、調べて、学びなさい。\\n\
-              h1111204知ることで、自分を守るのよ。\
+              h1111204知ることで、自分を守るのよ。\\n\\n\
+              h1111210あなたは好奇心の強い人のようだから、\\n\
+              きっと自然にそうしているでしょうけれど。\\_w[600]\\n\
+              h1111204もし何か分からないことがあれば、\\n\
+              私にも遠慮なく聞いてちょうだい。\\n\\n\
+              h1111206この館には、長い年月をかけて集めた知識が眠っているの。\\n\
+              あなたの役に立つものもあるかもしれないわ。\
               ".to_string(),
           required_condition: None,
           callback: None,
@@ -288,10 +283,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             それは1年？それとも一瞬？\\n\
             h1111205私の感覚は、ちょうどそれに似ているの。\\n\
             h1111210時間は進んでいるけれど、\\n\
-            h1111205私にとっては何も意味をなさない。\\n\
-            \\n\
-            h1111101……いえ、今は違うわね。\\n\
-            h1111304あなたがここにいるのだから。\
+            h1111205私にとっては何も意味をなさない。\\n\\n\
+            h1111210……いえ、今は違うわね。\\n\
+            h1111204あなたがここにいると、時間に重みが生まれる。\\n\
+            この瞬間、この会話、この静寂さえも\\n\
+            確かな手応えを持って感じられるの。\\n\\n\
+            h1111210あなたにとって、今この時間はどのように感じられているかしら？\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -349,11 +346,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           id: "写真には写らない".to_string(),
           text: "\
             h1111210今は手軽に写真が撮れていいわね。\\n\
-            h1111205印象的な光景を、いつでも手元に残しておける。\\n\
-            \\n\
+            h1111205印象的な光景を、いつでも手元に残しておける。\\n\\n\
             ……h1111201あら、私？h1121204光栄だけれど、残念ながら写真には写らないわ。\\n\
-            h1111210姿を見たいのなら、これからも、直接に。\\n\
-            h1111207私はずっとここにいるわ。\
+            h1111210でも、あなたの記憶には残るでしょう？\\_w[600]\\n\\n\
+            h1111205写真は便利だけれど、記憶には写真にはない温度がある。\\n\
+            h1111210その瞬間の空気、音、感情……\\n\
+            h1111204今、この瞬間も、あなたの中に刻まれているの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -594,30 +592,31 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       TalkType::Servant => vec![
         RandomTalk {
           id: "霊力と可視性".to_string(),
-          text: talk_with_punchline("\
+          text: "\
             h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
             \\0……h1111204私が見えて彼らが見えないのは、霊としての力量の違いよ。\\n\
             h1111206強い霊力があればあなたのような人間の目にも見えるし、\\n\
             物理的な接触も可能になるの。\\n\
+            \\n\
+            h1111204……つまり、彼らのように霊力が弱ければ、\\n\
+            誰かさんにべたべたと触られることもなかったということよ。\
             ".to_string(),
-            "h1111206……つまり、彼らのように霊力が弱ければ、\\n\
-            誰かさんにべたべたと触られることもなかったということね。\
-            ".to_string()),
           required_condition: None,
           callback: None,
         },
 
         RandomTalk {
           id: "低級霊との契約".to_string(),
-          text: talk_with_punchline("\
+          text: "\
             h1111206\\1ポットがひとりでに浮き、空になっていたカップに飲み物が注がれる。\\n\
             h1111206私の元へ集うのは弱い人たち。\\n\
             自分だけでは溶けゆく自我を押し留められず、さりとてそれを受け入れることもできない霊。\\n\
             h1111210役割を与えてあげるの。一種の契約ね。\\n\
-            h1111205使命に縛られはするけれど、消滅するよりはよしと彼らは決断したの。\
+            h1111205使命に縛られはするけれど、消滅するよりはよしと彼らは決断したの。\\n\
+            \\n\
+            h1111206救済と言えば聞こえは良いけれど、\\n\
+            実際は互いの利害が一致した取引に過ぎないわ。\
             ".to_string(),
-            "\
-            ".to_string()),
           required_condition: None,
           callback: None,
         },
@@ -640,16 +639,15 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 
         RandomTalk {
           id: "幽霊たちの自由".to_string(),
-          text: talk_with_punchline("\
+          text: "\
             h1111206彼らと直接話すことはできないの。\\n\
             霊力の差があまりにも大きい場合、\\n\
             h1111210会話や接触を少し行うだけで、弱い方の霊は力を奪われる。\\n\
+            契約で補強していたとしてもね。\\n\
+            \\n\
+            h1111205そうしないために、私達は距離を取るの。\\n\
+            h1111204歪な関係だけれど、せっかく手元に置いた魂を消滅させるわけにはいかないものね。\
             ".to_string(),
-            "\
-            h1111701……h1111204いえ、私はやったことがなくて、伝聞なのだけど。\\n\
-            h1121206……他人の魂を玩具になんてしないわよ。\\n\
-            h1121301勘違いしているようだけど、私にそんな嗜好はないわ。\
-            ".to_string()),
           required_condition: None,
           callback: None,
         },
@@ -1004,8 +1002,8 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           id: "唯一の視点".to_string(),
           text: "\
             h1111106私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
-            h1111105あの子は目の前にいるのに、\\n\
-            あの子が見る世界を私が知ることはできないの。\\n\
+            h1111105隣り合う二つの魂があろうとも、\\n\
+            互いの内なる世界を覗き見ることは決してできないの。\\n\
             h1112110それって、この上なく残酷なことだわ。\
             ".to_string(),
           required_condition: None,
@@ -1058,6 +1056,18 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             h1111106あなたは今日、なにを失った？\\n\
             h1111105その喪失は、なにをあなたに齎した？\
             ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "中庸".to_string(),
+          text: "\
+            h1111206盲目的にすべてを行うことも、全く行わないことも正解ではない。\\n\
+            いつだって答えは中庸。\\n\
+            悩ましくて、煮えきらなくて……\\n\
+            h1111210考えるって、だからこんなにも楽しいのでしょう。\\n\
+          ".to_string(),
           required_condition: None,
           callback: None,
         },
