@@ -274,7 +274,7 @@ mod tests {
   use std::fs::File;
   use std::io::Write;
 
-  use super::randomtalk::RANDOMTALK_COMMENTS_LIVING_ROOM;
+  use super::randomtalk::{derivative_talks, get_parent_talk, RANDOMTALK_COMMENTS_LIVING_ROOM};
 
   #[test]
   fn write_all_talks() {
@@ -295,6 +295,13 @@ mod tests {
       for t in talks {
         write(t.text);
       }
+    }
+    for derivative_talk in derivative_talks().iter() {
+      let parent_talk = get_parent_talk(derivative_talk);
+      write(format!(
+        "{}\\1{}{}",
+        parent_talk.text, derivative_talk.summary, derivative_talk.text
+      ));
     }
     for t in RANDOMTALK_COMMENTS_LIVING_ROOM.iter() {
       write(t.to_string());
