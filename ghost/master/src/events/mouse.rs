@@ -199,9 +199,9 @@ fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
   }
 
   let dialogs = vec![vec![
-    "h1111205何のつもり？".to_string(),
-    "h1111304それ、あまり好きではないわ。".to_string(),
-    "h1111207軽んじられている気がするわ。".to_string(),
+    "h1111210\\1触れた瞬間、冷たい感触が指先に伝わった。\\nh1111204髪も肌も、生きている人間のようには温かくないのよ。\\n……h1111207構わない？h1111310そう、物好きね。".to_string(),
+    "h1111204\\1さらさらだ……。\\nh1111205昔、家政婦がよく私の髪を褒めてくれたわ。\\nh1111210「お嬢様の髪は絹のようで」って。\\n今でも覚えているの。\\n……h1111205懐かしいものね。".to_string(),
+    "h1111204\\1恐る恐る髪に触れる。\\nh1111205そんなに遠慮しなくてもいいのに。\\nh1111210中途半端にされる方が\\nくすぐったいのよ。\\nもう少し、しっかりと。".to_string(),
   ]];
   Some(common_choice_process(phased_talks(count, dialogs).0))
 }
@@ -212,10 +212,9 @@ fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
   }
 
   let dialogs = vec![vec![
-    "h1111204……気安いのね。".to_string(),
-    "h1111201\\1……冷たい。h1111304触れられるだけよ。\\n人間のような触れあいを求められても困るわ。"
-      .to_string(),
     "h1111104\\1すべすべだ。h1111204……もういいかしら。".to_string(),
+    "h1111204\\1柔らかいが、どこか頼りない感触だ。\\nh1111204あなたには奇妙な感触なのでしょうね。\\nh1111210霊体の肌よ。見た目ほど確かではないの。".to_string(),
+    "h1111201\\1触れられながら、彼女はじっと見つめ返している。\\nh1111204興味深い表情だわ。\\n親愛に、安心。h1111310ずいぶん幸せそうね。".to_string(),
   ]];
   Some(common_choice_process(phased_talks(count, dialogs).0))
 }
@@ -237,10 +236,12 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
     "
     .to_string(),
     "\
-    h1111205\\1彼女の指は長い。
-    h1111210……うん。\\n\
+    h1111205\\1彼女の指は長い。\\n\
+    h1111210……うん。
     "
     .to_string(),
+    "h1111204\\1冷たい手だ。\\nh1111205あなたの手、いつもこんなに温かいの？\\nh1111210私と対照的で、不思議な感覚だわ。".to_string(),
+    "h1111205\\1そっと手を握る。\\nh1111204優しい握り方ね。h1111210こわれものを扱うみたいに。\\n……h1111205そんなに繊細じゃないわよ。".to_string(),
   ]];
   Some(common_choice_process(phased_talks(count, dialogs).0))
 }
@@ -307,6 +308,7 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
       "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
       "h1111205気安いのね。あまり好きではないわ。".to_string(),
       "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。".to_string(),
+      "h1111205\\1触れた瞬間、彼女は微かに身を引いた。\\nh1111204よくもまあ、躊躇いもなく……。\\nh1111310私が生きていた頃とは、随分と常識も変わったものね。".to_string(),
     ]);
   } else if count < zero_bust_touch_threshold / 3 * 2 {
     zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
