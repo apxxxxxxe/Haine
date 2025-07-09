@@ -114,18 +114,6 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
     }
   };
 
-  let derivative_talk_request_button = if *DERIVATIVE_TALK_REQUESTABLE.read().unwrap()
-    && *TALKING_PLACE.read().unwrap() == TalkingPlace::LivingRoom
-  {
-    format!(
-      "\\0\\f[anchornotselectfontcolor,default.plain]\\_a[DerivativeTalkRequest,{}]{}\\_a\\_l[0,@1.5em]\\f[anchornotselectfontcolor,default]",
-      choosed_talk.id,
-      Icon::Bubble,
-    )
-  } else {
-    String::new()
-  };
-
   // 没入度を増減
   // トークのたび燭台への干渉を修復する方へ没入度が増減する
   if *TALKING_PLACE.read().unwrap() == TalkingPlace::LivingRoom {
@@ -147,10 +135,9 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 
   new_response_with_value_with_translate(
     format!(
-      "\\0{}\\![set,balloonnum,{}]{}{}",
+      "\\0{}\\![set,balloonnum,{}]{}",
       render_immersive_icon(),
       comment,
-      derivative_talk_request_button,
       render_talk(&choosed_talk),
     ),
     TranslateOption::with_shadow_completion(),
@@ -158,6 +145,18 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
 }
 
 pub fn render_talk(talk: &Talk) -> String {
+  let derivative_talk_request_button = if *DERIVATIVE_TALK_REQUESTABLE.read().unwrap()
+    && *TALKING_PLACE.read().unwrap() == TalkingPlace::LivingRoom
+  {
+    format!(
+      "\\0\\f[default]\\f[anchornotselectfontcolor,default.plain]\\_a[DerivativeTalkRequest,{}]{}\\_a\\f[anchornotselectfontcolor,default]\\_l[0,@1.5em]",
+      talk.id,
+      Icon::Bubble,
+    )
+  } else {
+    String::new()
+  };
+
   let derivative_talk_anchors = if let Some(dtalks) = derivative_talk_by_id(&talk.id) {
     let mut anchors = "\\1\\_q".to_string();
     for (i, dtalk) in dtalks.iter().enumerate() {
@@ -174,7 +173,12 @@ pub fn render_talk(talk: &Talk) -> String {
     String::new()
   };
 
-  format!("{}{}", talk.consume(), derivative_talk_anchors,)
+  format!(
+    "{}{}{}",
+    derivative_talk_request_button,
+    talk.consume(),
+    derivative_talk_anchors,
+  )
 }
 
 fn first_random_talk_response(
