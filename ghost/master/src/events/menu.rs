@@ -168,7 +168,7 @@ impl Question {
   const IS_THERE_A_PLACE_TO_VISIT: Self = Self(12); // このあたりに観光できる場所はある？
   const YOU_ARE_CUTE: Self = Self(13); // 『かわいい』
   const YOU_ARE_BEAUTIFUL: Self = Self(14); // 『美人』
-  const I_WANT_TO_DRAW_A_PORTRAIT: Self = Self(15); // 『似顔絵を描く』 描いた似顔絵を見せる
+  const I_DREW_YOUR_PORTRAIT: Self = Self(15); // 『似顔絵を描いた』 ：描いた似顔絵を見せる
   const I_AM_HUNGRY: Self = Self(16); // 『お腹が空いた』
   const WHAT_IS_YOUR_FAVORITE_SNACK: Self = Self(17); // 好きなお茶菓子は何？
   const CAN_I_TALK_TO_YOUR_SERVANTS: Self = Self(18); // 従者たちと話してもいい？
@@ -211,6 +211,10 @@ impl Question {
       Question::AM_I_BOTHERING_YOU => "迷惑じゃない？".to_string(),
       Question::CALL_YOU_MOTHER => "お母さん".to_string(),
       Question::CALL_YOU_SISTER => "お姉ちゃん".to_string(),
+      Question::WHAT_IS_YOUR_FAVORITE_SNACK => "好きなお茶菓子は何？".to_string(),
+      Question::I_DREW_YOUR_PORTRAIT => "似顔絵を描いた".to_string(),
+      Question::LET_ME_PLAY => "遊びに行こう".to_string(),
+      Question::CAN_I_PET_YOU => "なでていい？".to_string(),
       _ => unreachable!(),
     }
   }
@@ -454,13 +458,81 @@ impl Question {
     h1111204……h1111210きょうだいにしては、歳が離れているわね。\\n\
     そういう戯れの気分なのかしら？h1111204{user_name}ちゃん。\
     ".to_string(),
+    Question::WHAT_IS_YOUR_FAVORITE_SNACK => "\
+    \\1『好きなお茶菓子は何？』\\n\
+    h1111205そうね……硬く焼き締めた菓子が好きなの。\\n\
+    h1111206ビスケットやラスクのような、\\n\
+    日持ちがして、片手でつまめるもの。\\n\
+    \\n\
+    h1111204生前の私は寝食を忘れて本を読むことが多くてね。\\n\
+    h1111210食事の時間になっても席を立たず、\\n\
+    家政婦を困らせていたのよ。\\n\
+    \\n\
+    h1111206見かねた彼女が、作業をしながらでも食べられるように\\n\
+    硬く焼いた菓子を用意してくれたの。\\n\
+    h1111210それが思いのほか美味しくて、\\n\
+    読書の合間につまむのが習慣になったわ。\\n\
+    \\n\
+    h1111205……あれは私の体調を案じてくれた\\n\
+    優しい工夫だったのでしょう。\\n\
+    h1111206だからこそ、今でもあの味を懐かしく思うのよ。\
+    ".to_string(),
+    Question::I_DREW_YOUR_PORTRAIT => "\
+    \\1『似顔絵を描いた』\\n\
+    h1111101あら、私を？\\n\
+    h1111204……見せてもらえるかしら？\\n\
+    \\n\
+    h1111210\\1手に持っていたスケッチブックを見せると、\\n\
+    ハイネがゆっくりと手を伸ばしてページをめくった。\\n\
+    \\0h1111205……h1111206なるほど。\\n\
+    あなたの目には、私はこんな風に映っているのね。\\n\
+    \\n\
+    h1111210絵の技術もなかなかのものだけど、\\n\
+    h1111204それよりも、あなたが私を見つめていた時間を思うと……\\n\
+    h1111205少し照れくさいわね。h1111210ありがとう。\\n\
+    \\n\
+    h1111204大切にしてちょうだい。\\n\
+    私にとっても、あなたにとっても、\\n\
+    この瞬間の証になるものだから。\
+    ".to_string(),
+    Question::LET_ME_PLAY => "\
+    \\1『遊びに行こう』\\n\
+    h1111210……遊び。\\n\
+    h1111204その「遊び」とは、どのようなものかしら。\\n\
+    h1111206私にとっての娯楽といえば、読書や音楽鑑賞程度だけれど、\\n\
+    h1111205生きている人間の「遊び」は、もっと動的なものでしょう？\\n\
+    \\n\
+    h1111210……でも、面白そうね。\\n\
+    h1111204あなたがどのような遊びを望むのか、\\n\
+    聞かせてちょうだい。\\n\
+    h1111204この館の中でできることなら、私も一緒に楽しませてもらうわ。\\n\
+    h1111206……もしくは、見学させてもらうかしら。\\n\
+    h1111210霊体では制約も多いものだから。\
+    ".to_string(),
+    Question::CAN_I_PET_YOU => "\
+    \\1『なでていい？』\\n\
+    h1111101……h1111201なでる？\\n\
+    h1111204ああ、頭のことね。\\n\
+    h1111205構わないわ。\\n\
+    \\n\
+    h1111210\\1そっと手を伸ばすと、\\n\
+    ハイネの髪は思ったより柔らかく、\\n\
+    冷たい感触が指先に伝わってくる。\\n\
+    h1111105……h1111210久しぶりね、人の手の温もりを感じるのは。\\n\
+    h1111206生前、最後に誰かに触れられたのは……\\n\
+    h1111210……もう覚えていないわ。\\n\
+    \\n\
+    h1111205あなたの手は温かいのね。\\n\
+    私が冷たいからそう感じるのかもしれないけれど、\\n\
+    h1111210それでも、温かい。\
+    ".to_string(),
       _ => unreachable!(),
     };
     m + "\\x\\![raise,OnTalk]"
   }
 }
 
-pub(crate) const QUESTIONS: [Question; 24] = [
+pub(crate) const QUESTIONS: [Question; 28] = [
   Question::FEELING_OF_DEATH,
   Question::FATIGUE_OF_LIFE,
   Question::HOW_TALL_ARE_YOU,
@@ -475,7 +547,9 @@ pub(crate) const QUESTIONS: [Question; 24] = [
   Question::IS_THERE_A_PLACE_TO_VISIT,
   Question::YOU_ARE_CUTE,
   Question::YOU_ARE_BEAUTIFUL,
+  Question::I_DREW_YOUR_PORTRAIT,
   Question::I_AM_HUNGRY,
+  Question::WHAT_IS_YOUR_FAVORITE_SNACK,
   Question::CAN_I_TALK_TO_YOUR_SERVANTS,
   Question::CALL_YOU_HAINE_1,
   Question::CALL_YOU_HAINE_2,
@@ -485,6 +559,8 @@ pub(crate) const QUESTIONS: [Question; 24] = [
   Question::AM_I_BOTHERING_YOU,
   Question::CALL_YOU_MOTHER,
   Question::CALL_YOU_SISTER,
+  Question::LET_ME_PLAY,
+  Question::CAN_I_PET_YOU,
 ];
 
 pub(crate) fn on_talk(_req: &Request) -> Result<Response, ShioriError> {
