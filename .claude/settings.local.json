@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(shuf:*)"
+      "Bash(shuf:*)",
+      "Bash(python:*)"
     ],
     "deny": []
   }

@@ -180,12 +180,44 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
     .map(|t| t.id)
     .collect::<Vec<_>>();
   all_talk_ids.extend(derivalive_talk_ids);
+
+  // 各TalkTypeごとに有効なトークIDのマップを作成
+  let mut valid_talk_ids_per_type: HashMap<TalkType, HashSet<String>> = HashMap::new();
+  for talk_type in TalkType::all() {
+    let mut valid_ids = HashSet::new();
+
+    // 通常トークのIDを追加
+    if let Some(talks) = random_talks(talk_type) {
+      for talk in talks {
+        valid_ids.insert(talk.id);
+      }
+    }
+
+    // 派生トークのIDを追加
+    for derivative_talk in derivative_talks() {
+      // 派生トークの親トークがこのTalkTypeに属するかチェック
+      if let Some(parent_talks) = random_talks(talk_type) {
+        if parent_talks
+          .iter()
+          .any(|t| t.id == derivative_talk.parent_id)
+        {
+          valid_ids.insert(derivative_talk.id);
+        }
+      }
+    }
+
+    valid_talk_ids_per_type.insert(talk_type, valid_ids);
+  }
+
   for (talk_type, ids) in raw_vars.talk_collection {
-    // トークidがtalksに含まれている場合のみ追加
-    // 更新で削除されたトークなどを除外するため
+    // そのTalkTypeに属するトークIDのみを残す
+    let valid_ids = valid_talk_ids_per_type
+      .get(&talk_type)
+      .cloned()
+      .unwrap_or_default();
     let existing_and_seen_talk_ids: HashSet<String> = ids
       .into_iter()
-      .filter(|id| all_talk_ids.contains(id))
+      .filter(|id| valid_ids.contains(id))
       .collect::<HashSet<String>>();
     raw_talk_collection.insert(talk_type, existing_and_seen_talk_ids);
   }

@@ -50,7 +50,6 @@ pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
   "",
 ];
 
-
 struct RandomTalk {
   id: String,
   text: String,
