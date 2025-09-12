@@ -7,6 +7,8 @@ use crate::variables::*;
 use shiorust::message::{Request, Response};
 use std::collections::HashMap;
 
+use super::bootend::halloween_boot;
+
 pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   match refs[0] {
@@ -25,6 +27,13 @@ pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
           random_talks_analysis(),
           TranslateOption::balloon_surface_only(),
         ))
+      } else {
+        Ok(new_response_nocontent())
+      }
+    }
+    "h" => {
+      if *DEBUG_MODE.read().unwrap() {
+        halloween_boot(req)
       } else {
         Ok(new_response_nocontent())
       }
