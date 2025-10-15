@@ -88,6 +88,16 @@ pub(crate) fn anchor_talks(id: &str) -> Option<String> {
         "
       .to_string(),
     ),
+    "Menohikari" => Some(
+      "\
+        h1111204ええ。\\n\
+        あなた、自分で気づいていないのね。\\n\
+        h1111210私を見るあなたの瞳は、\\n\
+        いつだって満面の喜色をたたえているの。\\n\
+        h1111204その有り様はひどく歪んでいる。\\n\
+        h1111211とても好ましいわ。"
+        .to_string(),
+    ),
     _ => None,
   }
 }
