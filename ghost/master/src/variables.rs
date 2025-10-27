@@ -129,6 +129,8 @@ pub(crate) enum EventFlag {
   FirstHitTalkDone,
   TalkTypeUnlock(TalkType),
   FirstLibraryEnd,
+  /// 季節イベント: (年, 月, 日)
+  SeasonEvent(u32, u32, u32),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
@@ -147,6 +149,29 @@ impl EventFlags {
 
   pub fn delete(&mut self, flag: EventFlag) {
     self.flags.remove(&flag);
+  }
+
+  /// 指定した年月日の季節イベントが既に閲覧済みかチェック
+  pub fn check_season_event(&self, year: u32, month: u32, day: u32) -> bool {
+    self.flags.contains(&EventFlag::SeasonEvent(year, month, day))
+  }
+
+  /// 季節イベントを閲覧済みとしてマーク
+  pub fn mark_season_event(&mut self, year: u32, month: u32, day: u32) {
+    self.flags.insert(EventFlag::SeasonEvent(year, month, day));
+  }
+
+  /// 指定した月日の季節イベントを過去に何回見たか取得
+  pub fn count_season_event(&self, month: u32, day: u32) -> usize {
+    self.flags.iter()
+      .filter(|f| {
+        if let EventFlag::SeasonEvent(_, m, d) = f {
+          *m == month && *d == day
+        } else {
+          false
+        }
+      })
+      .count()
   }
 }
 
