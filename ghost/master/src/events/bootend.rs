@@ -6,7 +6,7 @@ use crate::events::first_boot::{
 };
 use crate::events::TalkingPlace;
 use crate::variables::*;
-use chrono::{Datelike, Timelike};
+use crate::windows::get_local_time;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
@@ -42,7 +42,8 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
         h1111204{}、{{user_name}}。\
         ",
         {
-          let hour = chrono::Local::now().hour();
+          let st = get_local_time();
+          let hour = st.wHour;
           if hour <= 3 || hour >= 19 {
             "こんばんは"
           } else if hour < 11 {
@@ -125,10 +126,10 @@ fn randomize_underwear() -> String {
 }
 
 fn check_date_event_talk() -> Option<String> {
-  let now = chrono::Local::now();
-  let year = now.year() as u32;
-  let month = now.month();
-  let day = now.day();
+  let st = get_local_time();
+  let year = st.wYear as u32;
+  let month = st.wMonth as u32;
+  let day = st.wDay as u32;
 
   // 既に今年のイベントを閲覧済みならスキップ
   if FLAGS.read().unwrap().check_season_event(year, month, day) {
