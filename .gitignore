@@ -27,3 +27,4 @@ vars.json
 ghost/master/debug
 
 .mise.toml
+.claude/

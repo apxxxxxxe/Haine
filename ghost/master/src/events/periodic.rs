@@ -8,7 +8,7 @@ use crate::variables::{
   LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
 };
 use crate::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
-use chrono::Timelike;
+use crate::windows::get_local_time;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
@@ -67,9 +67,9 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
     }
   }
 
-  let now = chrono::Local::now();
-  if now.minute() == 0
-    && now.second() == 0
+  let now = get_local_time();
+  if now.wMinute == 0
+    && now.wSecond == 0
     && FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
       FIRST_RANDOMTALKS.len() as u32 - 1,
     ))
@@ -131,7 +131,7 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
       return Err(ShioriError::ArrayAccessError);
     };
 
-    text += &format!("\\1\\_q{}時\\n{}", now.hour(), tanka);
+    text += &format!("\\1\\_q{}時\\n{}", now.wHour, tanka);
   }
 
   if text.is_empty() {

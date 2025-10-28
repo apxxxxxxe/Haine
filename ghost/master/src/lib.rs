@@ -7,6 +7,9 @@ mod roulette;
 mod status;
 mod variables;
 
+#[cfg(windows)]
+mod windows;
+
 use crate::events::common::{add_error_description, new_response_nocontent};
 use crate::variables::*;
 
