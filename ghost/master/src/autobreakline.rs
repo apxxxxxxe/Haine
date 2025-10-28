@@ -75,9 +75,9 @@ impl Inserter {
     self.tokenizer = Arc::new(Mutex::new(None));
     let tokenizer_clone = self.tokenizer.clone();
     self.join_handle = Some(std::thread::spawn(move || {
-      let bytes = include_bytes!("../ipadic-mecab-2_7_0/system.dic.zst").to_vec();
-      let reader = zstd::Decoder::with_buffer(&bytes[..]).unwrap();
-      let dict = Dictionary::read(reader).unwrap();
+      // Use pre-compiled bincode dictionary for faster initialization
+      let bytes = include_bytes!("../ipadic-mecab-2_7_0/system.dic.bincode");
+      let dict = Dictionary::read(&bytes[..]).unwrap();
       *tokenizer_clone.lock().unwrap() = Some(Tokenizer::new(dict));
     }));
   }

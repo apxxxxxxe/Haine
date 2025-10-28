@@ -1,6 +1,6 @@
 [package]
 name = "haine"
-version = "1.1.1"
+version = "1.1.2"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -26,6 +26,10 @@ strum = "0.26.2"
 strum_macros = "0.26.2"
 rodio = "0.19.0"
 
+[build-dependencies]
+vibrato = "0.5.1"
+zstd = "0.12.4"
+
 [target.'cfg(windows)'.dependencies]
 winapi = {version = "0.3.9", features = ["winbase", "libloaderapi", "stringapiset", "sysinfoapi", "minwinbase"]}
 
@@ -33,6 +37,10 @@ winapi = {version = "0.3.9", features = ["winbase", "libloaderapi", "stringapise
 name = "haine"
 path = "src/lib.rs"
 crate-type = ["rlib", "cdylib"]
+
+[[bin]]
+name = "precompile_dict"
+path = "bin/precompile_dict.rs"
 
 [profile.dev]
 opt-level = 1

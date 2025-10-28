@@ -31,13 +31,18 @@ This is a "Ghost" for the Ukagaka/伺か desktop mascot system written in Rust. 
 Events are organized into specialized modules:
 - `events/aitalk.rs`: AI talk functionality
 - `events/bootend.rs`: Boot/shutdown events
+- `events/common.rs`: Common utilities (response generation, blink animation, icons)
 - `events/input.rs`: Input handling
+- `events/key.rs`: Keyboard input events
 - `events/mouse.rs`: Mouse interaction
+- `events/mouse_core.rs`: Core mouse event processing (wheel, double-click, move)
+- `events/talk.rs`: Talk system main module (Talk, TalkType, TalkingPlace)
 - `events/talk/`: Talk-related events (first boot, random talk, anchors)
 - `events/periodic.rs`: Periodic/timer events
 - `events/menu.rs`: Menu system
 - `events/tooltip.rs`: Tooltip display
 - `events/translate.rs`: Translation features
+- `events/update.rs`: Update events
 - `events/webclap.rs`: Web clap functionality
 
 ### Build Process
@@ -110,7 +115,7 @@ No specific test commands found in the codebase. The project appears to rely on 
 - **間**: `\\_w[数字]`で発言の間を作る（重要な発言前によく使用）
 - **アンカー**: `\\_a[AnchorTalk,ID,ユーザーの反応]\\_a`で派生話題への導線
   - IDは`ghost/master/src/events/talk/anchor.rs`のmatch文で定義済みのもの
-  - 既存ID: "Misemono"（復活の奇術）、"Poltergeist"（幽霊の存在）、"LikeTheGranma"（年寄り扱い）、"LiveHome"（家督問題）、"NoblesseOblige"（霊体の義務）、"ManorKnowledge"（館の知識）
+  - 既存ID: "Misemono"（復活の奇術）、"Poltergeist"（幽霊の存在）、"LikeTheGranma"（年寄り扱い）、"LiveHome"（家督問題）、"NoblesseOblige"（霊体の義務）、"Menohikari"（目の光）
   - **重要**: ランダムトークとアンカートークは基本的に1対1の関係であり、既存のアンカーIDを流用しない
   - 新しいアンカーが必要な場合は、新しいIDと対応するアンカートークの実装が必要
   - **アンカー作成の要件**:
@@ -127,6 +132,12 @@ No specific test commands found in the codebase. The project appears to rely on 
 - 生前の体験、死後の状況、能力について客観視点で語る
 - 「〜だったわ」「〜なのよ」で過去の体験を振り返る
 - 自己批判的な視点も含みつつ、事実を淡々と述べる
+
+#### Servant（従者について）
+- 見えない従者たちとの関係性や霊体社会のシステムを説明
+- 霊力の強弱と可視性の関係、契約の仕組みを語る
+- 「救済と言えば聞こえは良いけれど」等、露悪的表現と善意の併存
+- 従者の記憶の記録化など、彼らの自我と存在確認の様子を描写
 
 #### WithYou（ユーザーについて）
 - **多様な導入パターン**: 
@@ -319,12 +330,16 @@ No specific test commands found in the codebase. The project appears to rely on 
 `ghost/master/src/events/mouse.rs`で定義されるマウス操作への反応は、ハイネの性格と関係性を表現する重要な要素。
 
 #### 身体部位別の反応パターン
+実装されている部位：
 - **頭（head）**: 威厳を保った拒否反応「何のつもり？」「軽んじられている気がする」、霊体の物理的特性を説明する受容的反応「冷たい感触」「物好きね」
 - **顔（face）**: 冷静な受容と客観的指摘「気安いのね」「冷たい。触れられるだけよ」
 - **手（hand）**: 詩的表現と温度感覚「ゼリーを掴むような頼りなさ」「手が冷える」
 - **胸（bust）**: 段階的な感情変化（困惑→叱責→呆れ→制裁）
 - **スカート（skirt）**: 屈辱感と威厳「屈辱だわ」「相応の代償を払う用意」
 - **肩（shoulder）**: 物理的制約の表現「腕は彼女をすり抜けた」
+
+定義されているが未実装の部位：
+- **口（mouth）**: BodyPart Enumに定義されているが、マウスイベント処理は未実装
 
 **注意**: これらの反応パターンは現状の実装であり、ハイネの性格（知的で威厳があるが根底に優しさを持つ）や世界観（霊体の特性、館の主人としての立場）に照らして柔軟に拡張・修正可能である。
 方向性としては、威厳を保ちつつもポジティブな感情表現を増やし、ユーザーとの関係性を深めることが目標。
@@ -418,13 +433,15 @@ h1111204\\1[触感の客観描写]\\nh1111205[簡潔な疑問・感想]\\n\\nh11
 - **相手の心理推察**: 行動の背景にある感情への言及
 
 ##### トーク数のバランス調整
-現在の各部位のトーク数（2024年実績）：
-- **head**: 6個（拡張完了）
-- **face**: 6個（拡張完了）
-- **hand**: 5個（拡張完了）
+現在の各部位のトーク数（2025年実績）：
+- **head**: 3個
+- **face**: 3個
+- **hand**: 5個
 - **bust**: 約11個（段階制、充実済み）
-- **shoulder**: 3個（要拡張）
+- **shoulder**: 3個
 - **skirt**: 5個（中程度）
+
+**注**: BodyPart Enumには`Mouth`も定義されているが、現時点では実装されていない。
 
 ### 技術的注意事項
 - **サーフェス番号は正常**: `h1113xxx`等の7桁コードは各桁が身体パーツに対応する正常な仕様
@@ -434,15 +451,13 @@ h1111204\\1[触感の客観描写]\\nh1111205[簡潔な疑問・感想]\\n\\nh11
 
 ## アンカートーク作成の実績・知見
 
-### 2024年追加: "ManorKnowledge"（館の知識について）
-- **派生元**: 「知って、祓う」（WithYouカテゴリ）
-- **アンカーリンク**: 「この館には、長い年月をかけて集めた知識が眠っているの」
-- **ユーザー反応**: 「どんな本があるの？」
-- **成功要素**:
-  - 館の蔵書の説得力ある説明（カンテルベリオに霊が集まる設定の活用）
-  - 知識への情熱と整理不足という人間味のバランス
-  - 抽象的説明から具体的提案への自然な流れ
-  - 最後の軽い自虐で親しみやすさを演出
+### 現在実装されているアンカートーク
+- **"Misemono"**（復活の奇術）: 死刑囚の遺体を使った奇術興行の歴史
+- **"Poltergeist"**（幽霊の存在）: カンテルベリオでの超自然現象の公然の秘密
+- **"LikeTheGranma"**（年寄り扱い）: 年寄り呼ばわりへの反応と忠告
+- **"LiveHome"**（家督問題）: 嫁入りを渋り追いやられた過去
+- **"NoblesseOblige"**（霊体の義務）: 弱い霊の保護と治安維持の責務
+- **"Menohikari"**（目の光）: ユーザーの瞳に映る喜色への言及
 
 ### アンカートーク作成の要点
 1. **文脈の連続性**: アンカーリンクの文字列から自然に続く内容であること

@@ -113,6 +113,8 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
     debug!("{}", panic_info);
   }));
 
+  INSERTER.write().unwrap().start_init();
+
   if let Err(e) = load_global_variables() {
     error!("{}", e);
   }
@@ -121,9 +123,6 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
   if metadata("./debug").is_ok() {
     *DEBUG_MODE.write().unwrap() = true;
   }
-
-  // Inserterの初期化を別スレッドで開始
-  INSERTER.write().unwrap().start_init();
 
   Ok(())
 }

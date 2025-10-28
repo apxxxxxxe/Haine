@@ -129,7 +129,7 @@ pub(crate) fn new_response_with_value_with_translate(
       on_translate(value, option.contains(&TranslateOption::CompleteShadow))?
     } else {
       *WAITING_TALK.write().unwrap() = Some((value, option));
-      "\\1Loading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
+      "\\1\\_qLoading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
     }
   } else {
     value
