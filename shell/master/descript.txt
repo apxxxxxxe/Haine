@@ -86,7 +86,7 @@ sakura.bindgroup506304.name,トップス+,リボン黒
 sakura.bindgroup506316.name,トップス+,リボン白
 sakura.bindgroup506305.name,トップス+,リボン赤
 sakura.bindgroup506306.name,トップス+,ブローチ
-sakura.bindgroup506307.name,トップス+,スカーフ
+sakura.bindgroup506307.name,トップス+,フリルタイ
 sakura.bindgroup506308.name,トップス+,チョーカー
 sakura.bindgroup506309.name,トップス+,ネクタイ
 sakura.bindgroup504510.name,トップス+,コルセットA
