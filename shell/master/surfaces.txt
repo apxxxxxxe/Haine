@@ -690,6 +690,10 @@ surface.append1111101-2544915
   animation506316.pattern0,overlay,1817,0,0,0
   animation506298.interval,bind
   animation506298.pattern0,overlay,1815,0,0,0
+  animation506317.interval,bind
+  animation506317.pattern0,overlay,1819,0,0,0
+  animation500052.interval,bind
+  animation500052.pattern0,overlay,1850,0,0,0
   
   //コルセットのみ腕より下に
   animation504510.interval,bind
@@ -709,7 +713,7 @@ surface.append1111101-2544915
   //帽子
   animation507000.interval,bind
   animation507000.pattern0,overlay,1700,0,0,0
-  animation500050.interval,bind
+  animation500050.interval,bind // 背面に回す
   animation500050.pattern0,overlay,1707,0,0,0
   animation507001.interval,bind
   animation507001.pattern0,overlay,1701,0,0,0
@@ -733,6 +737,12 @@ surface.append1111101-2544915
   animation506510.pattern0,overlay,1711,0,0,0
   animation506511.interval,bind
   animation506511.pattern0,overlay,1712,0,0,0
+  animation506512.interval,bind
+  animation506512.pattern0,overlay,1713,0,0,0
+  animation507008.interval,bind
+  animation507008.pattern0,overlay,1714,0,0,0
+  animation500051.interval,bind
+  animation500051.pattern0,overlay,1750,0,0,0
   
   //袖 507000
   

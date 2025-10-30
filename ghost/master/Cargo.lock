@@ -464,6 +464,8 @@ dependencies = [
  "fancy-regex",
  "log",
  "md5",
+ "num-derive",
+ "num-traits",
  "once_cell",
  "paste",
  "rand",

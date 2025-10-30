@@ -58,8 +58,16 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     talks[index].clone()
   };
 
+  let local_time = crate::windows::get_local_time();
+  let unset_halloween = if local_time.wMonth != 10 || local_time.wDay != 31 {
+    "\\![bind,頭,ヤギ角,0]\\![bind,頭,魔女帽,0]\\![bind,トップス+,黒赤マント,0]"
+  } else {
+    ""
+  };
+
   let v = format!(
-    "\\0\\s[{}]{}\\![embed,OnStickSurface]{}{}",
+    "\\0{}\\s[{}]{}\\![embed,OnStickSurface]{}{}",
+    unset_halloween,
     TRANSPARENT_SURFACE,
     RESET_BINDS,
     randomize_underwear(),

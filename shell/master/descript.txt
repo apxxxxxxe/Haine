@@ -29,6 +29,9 @@ sakura.bindgroup506508.name,頭,メガネ黒
 sakura.bindgroup506509.name,頭,メガネ赤
 sakura.bindgroup506510.name,頭,モノクル左
 sakura.bindgroup506511.name,頭,モノクル右
+sakura.bindgroup506512.name,頭,ヤギ角
+sakura.bindgroup507008.name,頭,魔女帽
+sakura.bindgroup507008.addid,500051
 
 sakura.bindoption.group,後髪,mustselect
 sakura.bindgroup500100.name,後髪,デフォルト
@@ -96,6 +99,8 @@ sakura.bindgroup506312.name,トップス+,リボン大黒
 sakura.bindgroup506313.name,トップス+,リボン大白
 sakura.bindgroup504417.name,トップス+,スカート装飾黒
 sakura.bindgroup504418.name,トップス+,スカート装飾白
+sakura.bindgroup506317.name,トップス+,黒赤マント
+sakura.bindgroup506317.addid,500052
 sakura.bindgroup506304.default,1
 sakura.bindgroup504510.default,1
 

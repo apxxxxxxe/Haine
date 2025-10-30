@@ -126,6 +126,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnSmoothBlink" => Some(EventHandler::MayFailure(on_smooth_blink)),
     "OnMenuExec" => Some(EventHandler::AlwaysSuccess(on_menu_exec)),
     "OnConfigMenuExec" => Some(EventHandler::AlwaysSuccess(on_config_menu_exec)),
+    "OnCostumeMenuExec" => Some(EventHandler::MayFailure(on_costume_menu_exec)),
     "OnTalkIntervalChanged" => Some(EventHandler::MayFailure(on_talk_interval_changed)),
     "OnMouseClickEx" => Some(EventHandler::MayFailure(on_mouse_click_ex)),
     "OnMouseDoubleClick" => Some(EventHandler::MayFailure(on_mouse_double_click)),

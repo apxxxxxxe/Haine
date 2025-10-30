@@ -11,11 +11,21 @@ use crate::variables::{
   TALKING_PLACE, TALK_COLLECTION, USER_NAME,
 };
 use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE, IMMERSIVE_DEGREES};
+use num_derive::{FromPrimitive, ToPrimitive};
 use shiorust::message::{Request, Response};
 
 use super::aitalk::IMMERSIVE_RATE_MAX;
 use super::talk::first_boot::FIRST_CLOSE_TALK;
 use super::talk::randomtalk::moving_to_library_talk_parts;
+
+#[derive(Debug, Clone, Copy, FromPrimitive, ToPrimitive)]
+#[repr(u32)]
+enum HalloweenCostumeTrigger {
+  AskToWear = 0,
+  GoatHorn = 1,
+  WitchHat = 2,
+  BlackRedCape = 3,
+}
 
 pub(crate) fn on_menu_exec(_req: &Request) -> Response {
   let current_talk_interval = *RANDOM_TALK_INTERVAL.read().unwrap();
@@ -56,6 +66,18 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
     },
     Icon::Cross
   );
+
+  // ハロウィン専用メニュー項目
+  let local_time = crate::windows::get_local_time();
+  let halloween_menu = if local_time.wMonth == 10 && local_time.wDay == 31 {
+    format!(
+      "\\_l[0,@1.5em]\\![*]\\q[仮装してもらう,OnCostumeMenuExec,{}]\\n",
+      HalloweenCostumeTrigger::AskToWear as u32
+    )
+  } else {
+    "".to_string()
+  };
+
   let m = format!(
     "\\_q{}{}",
     REMOVE_BALLOON_NUM,
@@ -78,6 +100,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\![*]\\q[回想,OnStoryHistoryMenu]\
         \\_l[0,@2.5em]\
         \\![*]\\q[手紙を書く,OnWebClapOpen]\
+        {}\
         \\_l[0,@2.5em]\
         {}\
         {}\
@@ -94,6 +117,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         } else {
           "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
         },
+        halloween_menu,
         talk_interval_selector,
         buttons,
         {
@@ -133,6 +157,38 @@ pub(crate) fn on_config_menu_exec(_req: &Request) -> Response {
   );
 
   new_response_with_value_with_notranslate(m, TranslateOption::balloon_surface_only())
+}
+
+pub(crate) fn on_costume_menu_exec(req: &Request) -> Result<Response, ShioriError> {
+  let refs = get_references(req);
+  let dialog = match refs[0].parse::<u32>().unwrap() {
+    x if x == HalloweenCostumeTrigger::AskToWear as u32 => {
+      "h1113101着てほしいもの？h1113204また面白いことを考えるのね。".to_string()
+    }
+    x if x == HalloweenCostumeTrigger::GoatHorn as u32 => {
+      "h1111210悪魔の象徴。h1111204拐かしてあげましょうか？".to_string()
+    }
+    x if x == HalloweenCostumeTrigger::WitchHat as u32 => "h1111210魔法、ではないけれど、近いことはできるわね。\\n\\n".to_string(),
+    x if x == HalloweenCostumeTrigger::BlackRedCape as u32 => {
+      "h1111205吸血鬼かしら。\\nh1111206血は別に好みではないのだけど。\\n\\n".to_string()
+    }
+    _ => "".to_string(),
+  };
+  let m = format!("\
+    \\_l[0,3em]\\_q\
+    \\![*]\\q[ヤギ角,\"script:\\![bind,頭,ヤギ角,1]\\![raise,OnCostumeMenuExec,{}]\"]\\_l[8em,@0]\\![*]\\q[外す,\"script:\\![bind,頭,ヤギ角,0]\\![raise,OnCostumeMenuExec,99]\"]\\n\
+    \\![*]\\q[魔女帽,\"script:\\![bind,頭,魔女帽,1]\\![raise,OnCostumeMenuExec,{}]\"]\\_l[8em,@0]\\![*]\\q[外す,\"script:\\![bind,頭,魔女帽,0]\\![raise,OnCostumeMenuExec,99]\"]\\n\
+    \\![*]\\q[黒赤マント,\"script:\\![bind,トップス+,黒赤マント,1]\\![raise,OnCostumeMenuExec,{}]\"]\\_l[8em,@0]\\![*]\\q[外す,\"script:\\![bind,トップス+,黒赤マント,0]\\![raise,OnCostumeMenuExec,99]\"]\\n\
+    \\n\
+    \\q[戻る,OnMenuExec]\\_q\\_l[0,0]{}\
+    ",
+    HalloweenCostumeTrigger::GoatHorn as u32,
+    HalloweenCostumeTrigger::WitchHat as u32,
+    HalloweenCostumeTrigger::BlackRedCape as u32,
+    dialog,
+    );
+
+  new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
 }
 
 fn show_minute(m: &u64) -> String {
