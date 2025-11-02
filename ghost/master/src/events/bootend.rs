@@ -81,15 +81,9 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
 
   if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     parts.push(vec![format!(
-      "\\0\\b[{}]h1111705……。\
-      \\1ネ……\\n\
-      イネ……。\
-      \\0\\b[{}]hr1141112φ！\
-      \\1\\nハイネ！\
-      \\0…………\\n\\n\
-      h1111101……h1111204あら、{{user_name}}。\\n\
-      \\1\\n\\n……戻ってきたようだ。\\n\
-      \\0h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
+      "\\0\\b[{}]h1111705……。h1111101\\n\
+      ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
+      h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
       TalkingPlace::Library.balloon_surface(),
       TalkingPlace::LivingRoom.balloon_surface(),
     )]);

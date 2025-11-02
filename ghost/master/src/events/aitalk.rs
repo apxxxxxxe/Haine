@@ -4,14 +4,12 @@ use crate::events::randomtalk::RANDOMTALK_COMMENTS_LIVING_ROOM;
 use crate::events::talk::anchor::anchor_talks;
 use crate::events::talk::randomtalk::random_talks;
 use crate::events::talk::{register_talk_collection, TalkType, TalkingPlace};
-use crate::events::BodyPart;
 use crate::events::{
   first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS},
-  randomtalk::RANDOMTALK_COMMENTS_LIBRARY_ACTIVE,
   randomtalk::RANDOMTALK_COMMENTS_LIBRARY_INACTIVE,
 };
 use crate::variables::*;
-use shiorust::message::{parts::*, traits::*, Request, Response};
+use shiorust::message::{parts::*, Request, Response};
 use vibrato::errors::Result;
 
 use super::talk::randomtalk::{derivative_talk_by_id, derivative_talks};
@@ -24,7 +22,7 @@ pub(crate) const IMMERSIVE_RATE: u32 = 5;
 
 pub(crate) const IMMERSIVE_ICON_COUNT: u32 = 5;
 
-pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
+pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   let if_consume_talk_bias = *IDLE_SECONDS.read().unwrap() < IDLE_THRESHOLD;
   *LAST_RANDOM_TALK_TIME.write().unwrap() = *GHOST_UP_TIME.read().unwrap();
 
@@ -73,32 +71,9 @@ pub(crate) fn on_ai_talk(req: &Request) -> Result<Response, ShioriError> {
   // バルーン右下に表示するコメントを取得
   let comment = if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     // 書斎では能動的に話しかけたかどうかで異なるコメントを表示
-    if let Some(id) = req.headers.get("ID") {
-      match id.as_str() {
-        "OnSecondChange" => {
-          let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false)
-            .ok_or(ShioriError::TalkNotFound)?;
-          RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index].to_string()
-        }
-        "OnMouseDoubleClick" | "OnMouseMove" | "OnMouseWheel" | "OnMouseClickEx" => {
-          let refs = get_references(req);
-          if let Some(r) = refs.get(4) {
-            let part = BodyPart::from_str(r).ok_or(ShioriError::TalkNotFound)?;
-            format!("{}に触れても、反応はない。", part)
-          } else {
-            "".to_string()
-          }
-        }
-        "OnKeyPress" => {
-          let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_ACTIVE, false)
-            .ok_or(ShioriError::TalkNotFound)?;
-          RANDOMTALK_COMMENTS_LIBRARY_ACTIVE[index].to_string()
-        }
-        _ => "".to_string(),
-      }
-    } else {
-      "".to_string()
-    }
+    let index =
+      choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
+    RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index].to_string()
   } else {
     // 居間では従者トーク解禁済みの場合コメントを表示
     if FLAGS
@@ -296,12 +271,12 @@ mod test {
   fn test_firstboot_flags() -> Result<(), Box<dyn std::error::Error>> {
     const FIRST_CLOSE_TALK_PART: &str = "生きたあなたと話していたい";
     const SECOND_CLOSE_TALK_PART: &str = "がありますように";
-    const CLOSE_TALK_IN_LIBRARY_PART: &str = "戻ってきたようだ。";
+    const CLOSE_TALK_IN_LIBRARY_PART: &str = "ハイネはお茶を一口飲んだ";
 
     *USER_NAME.write().unwrap() = "test".to_string(); // 実際はOnNotifyUserInfoで設定される
 
     let mut headers = Headers::new();
-    headers.insert("ID", "OnSecondChange".to_string());
+    headers.insert_by_header_name(HeaderName::from("ID"), "OnSecondChange".to_string());
 
     let on_second_change_req = Request {
       method: Method::GET,
@@ -310,12 +285,12 @@ mod test {
     };
 
     let mut headers = Headers::new();
-    headers.insert("ID", "OnMouseDoubleClick".to_string());
-    headers.insert("Reference0", "0".to_string());
-    headers.insert("Reference1", "0".to_string());
-    headers.insert("Reference2", "0".to_string());
-    headers.insert("Reference3", "2".to_string());
-    headers.insert("Reference4", "candle".to_string());
+    headers.insert_by_header_name(HeaderName::from("ID"), "OnMouseDoubleClick".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference0"), "0".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference1"), "0".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference2"), "0".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference3"), "2".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference4"), "candle".to_string());
 
     let on_mouse_double_click_req = Request {
       method: Method::GET,
@@ -373,7 +348,7 @@ mod test {
     // 初回終了時に独白モードだったときトークが特別なものになるかのテスト
     assert!(!FLAGS.read().unwrap().check(&EventFlag::FirstClose));
     let res = on_close(&on_second_change_req)?;
-    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    let value = res.headers.get_by_header_name(&HeaderName::from("Value")).ok_or("Failed to get value")?;
     assert!(value.contains(CLOSE_TALK_IN_LIBRARY_PART)); // 独白モード終了トークが含まれていることの確認
     assert!(value.contains(FIRST_CLOSE_TALK_PART)); // 初回終了トークが含まれていることの確認
     assert!(FLAGS.read().unwrap().check(&EventFlag::FirstClose));
@@ -425,12 +400,12 @@ mod test {
     FLAGS.write().unwrap().delete(EventFlag::FirstClose);
     assert!(!FLAGS.read().unwrap().check(&EventFlag::FirstClose));
     let res = on_close(&on_second_change_req)?;
-    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    let value = res.headers.get_by_header_name(&HeaderName::from("Value")).ok_or("Failed to get value")?;
     assert!(value.contains(FIRST_CLOSE_TALK_PART)); // 初回終了トークが含まれていることの確認
 
     // 2回目以降の終了時トークが再生されることの確認
     let res = on_close(&on_second_change_req)?;
-    let value = res.headers.get("Value").ok_or("Failed to get value")?;
+    let value = res.headers.get_by_header_name(&HeaderName::from("Value")).ok_or("Failed to get value")?;
     assert!(value.contains(SECOND_CLOSE_TALK_PART)); // 2回目以降の終了トークが含まれていることの確認
 
     Ok(())
@@ -438,8 +413,8 @@ mod test {
 
   fn make_story_event_request(event: PendingEvent) -> Request {
     let mut headers = Headers::new();
-    headers.insert("ID", "OnStoryEvent".to_string());
-    headers.insert("Reference0", event.title().to_string());
+    headers.insert_by_header_name(HeaderName::from("ID"), "OnStoryEvent".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference0"), event.title().to_string());
     Request {
       method: Method::GET,
       version: Version::V20,

@@ -20,7 +20,6 @@ use crate::events::common::*;
 use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
-use crate::events::mouse::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::talk::*;
