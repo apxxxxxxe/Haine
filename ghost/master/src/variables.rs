@@ -30,6 +30,8 @@ pub(crate) static PENDING_EVENT_TALK: LazyLock<RwLock<Option<PendingEvent>>> =
   LazyLock::new(|| RwLock::new(None));
 pub(crate) static DERIVATIVE_TALK_REQUESTABLE: LazyLock<RwLock<bool>> =
   LazyLock::new(|| RwLock::new(false));
+pub(crate) static LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX: LazyLock<RwLock<u32>> =
+  LazyLock::new(|| RwLock::new(1000));
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub(crate) enum PendingEvent {
@@ -99,6 +101,7 @@ pub(crate) struct RawVariables {
   flags: EventFlags,
   pending_event_talk: Option<PendingEvent>,
   derivative_talk_requestable: Option<bool>,
+  library_transition_sequense_dialog_index: Option<u32>,
 }
 
 impl RawVariables {
@@ -153,7 +156,9 @@ impl EventFlags {
 
   /// 指定した年月日の季節イベントが既に閲覧済みかチェック
   pub fn check_season_event(&self, year: u32, month: u32, day: u32) -> bool {
-    self.flags.contains(&EventFlag::SeasonEvent(year, month, day))
+    self
+      .flags
+      .contains(&EventFlag::SeasonEvent(year, month, day))
   }
 
   /// 季節イベントを閲覧済みとしてマーク
@@ -163,7 +168,9 @@ impl EventFlags {
 
   /// 指定した月日の季節イベントを過去に何回見たか取得
   pub fn count_season_event(&self, month: u32, day: u32) -> usize {
-    self.flags.iter()
+    self
+      .flags
+      .iter()
       .filter(|f| {
         if let EventFlag::SeasonEvent(_, m, d) = f {
           *m == month && *d == day
@@ -267,6 +274,7 @@ pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
     flags: FLAGS.read().unwrap().clone(),
     pending_event_talk: PENDING_EVENT_TALK.read().unwrap().clone(),
     derivative_talk_requestable: Some(*DERIVATIVE_TALK_REQUESTABLE.read().unwrap()),
+    library_transition_sequense_dialog_index: Some(*LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap())
   };
 
   raw_vars.save()?;

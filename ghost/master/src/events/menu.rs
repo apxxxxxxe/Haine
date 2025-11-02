@@ -10,13 +10,11 @@ use crate::variables::{
   EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
   TALKING_PLACE, TALK_COLLECTION, USER_NAME,
 };
-use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE, IMMERSIVE_DEGREES};
+use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE};
 use num_derive::{FromPrimitive, ToPrimitive};
 use shiorust::message::{Request, Response};
 
-use super::aitalk::IMMERSIVE_RATE_MAX;
 use super::talk::first_boot::FIRST_CLOSE_TALK;
-use super::talk::randomtalk::moving_to_library_talk_parts;
 
 #[derive(Debug, Clone, Copy, FromPrimitive, ToPrimitive)]
 #[repr(u32)]
@@ -94,7 +92,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
       format!(
         "\
         \\_l[0,1.5em]\
-        \\![*]\\q[{},OnAiTalk]\\n\
+        \\![*]\\q[なにか話して,OnAiTalk]\\n\
         {}\
         \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
         \\![*]\\q[回想,OnStoryHistoryMenu]\
@@ -107,11 +105,6 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\1{}\
         \\0\\_l[0,0]\
         ",
-        if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
-          "耳を澄ます"
-        } else {
-          "なにか話して"
-        },
         if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
           "".to_string()
         } else {
@@ -798,11 +791,6 @@ pub fn on_story_history_menu(_req: &Request) -> Response {
       .unwrap()
       .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)),
   ));
-  events.push((
-    "初回独白モード移行".to_string(),
-    PendingEvent::FirstPlaceChange,
-    FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange),
-  ));
 
   let mut m = "\\_q\\b[2]イベント回想\\n\\n".to_string();
   for event in events {
@@ -840,30 +828,6 @@ pub fn on_story_history_exec(req: &Request) -> Result<Response, ShioriError> {
         unlock_servents_comments(),
         TranslateOption::with_shadow_completion(),
       ),
-      PendingEvent::FirstPlaceChange => {
-        // 没入度を実際に変更しないと影の描写が再現されない
-        // トーク再生中にembedでsmooth_blinkが入りそのタイミングでも没入度が参照されるため、
-        // この時点で戻すわけにもいかない
-        // この回想を見ると独白モードへ移行するという仕様にする
-        *IMMERSIVE_DEGREES.write().unwrap() = IMMERSIVE_RATE_MAX;
-        *TALKING_PLACE.write().unwrap() = TalkingPlace::Library;
-
-        let parts = moving_to_library_talk_parts(true)?;
-        match all_combo(&parts).first() {
-          Some(v) => (
-            format!(
-              "\\p[2]{}\\0{}{}",
-              render_immersive_icon(),
-              IMMERSIVE_DEGREES.read().unwrap(),
-              v
-            ),
-            TranslateOption::with_shadow_completion(),
-          ),
-          None => {
-            return Err(ShioriError::InvalidEvent);
-          }
-        }
-      }
       _ => {
         return Err(ShioriError::InvalidEvent);
       }

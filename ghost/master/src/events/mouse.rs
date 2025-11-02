@@ -4,8 +4,6 @@ use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
-use crate::events::randomtalk::moving_to_library_talk_parts;
-use crate::events::randomtalk::moving_to_living_room_talk;
 use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
@@ -13,7 +11,8 @@ use crate::events::IMMERSIVE_RATE_MAX;
 use crate::status::Status;
 use crate::variables::{
   EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES,
-  IS_IMMERSIVE_DEGREES_FIXED, LAST_TOUCH_INFO, TALKING_PLACE, TOUCH_INFO,
+  IS_IMMERSIVE_DEGREES_FIXED, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX,
+  TALKING_PLACE, TOUCH_INFO,
 };
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -22,45 +21,6 @@ use super::talk::TalkType;
 
 const SOUND_LIGHT_CANDLE: &str = "マッチで火をつける.mp3";
 const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
-
-pub(crate) enum BodyPart {
-  Head,
-  Face,
-  Mouth,
-  Bust,
-  Shoulder,
-  Skirt,
-  Hand,
-}
-
-impl BodyPart {
-  pub fn from_str(s: &str) -> Option<Self> {
-    match s {
-      "head" => Some(BodyPart::Head),
-      "face" => Some(BodyPart::Face),
-      "mouth" => Some(BodyPart::Mouth),
-      "bust" => Some(BodyPart::Bust),
-      "shoulder" => Some(BodyPart::Shoulder),
-      "skirt" => Some(BodyPart::Skirt),
-      "hand" => Some(BodyPart::Hand),
-      _ => None,
-    }
-  }
-}
-
-impl std::fmt::Display for BodyPart {
-  fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-    match self {
-      BodyPart::Head => write!(f, "頭"),
-      BodyPart::Face => write!(f, "顔"),
-      BodyPart::Mouth => write!(f, "口"),
-      BodyPart::Bust => write!(f, "胸"),
-      BodyPart::Shoulder => write!(f, "肩"),
-      BodyPart::Skirt => write!(f, "スカート"),
-      BodyPart::Hand => write!(f, "手"),
-    }
-  }
-}
 
 #[macro_export]
 macro_rules! get_touch_info {
@@ -347,18 +307,74 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if *IMMERSIVE_DEGREES.read().unwrap() < threshold {
       *IMMERSIVE_DEGREES.write().unwrap() = threshold;
-      // 没入度最大なら書斎へ移動
-      let m = if threshold == IMMERSIVE_RATE_MAX {
-        *TALKING_PLACE.write().unwrap() = TalkingPlace::Library;
-        let mut parts = match moving_to_library_talk_parts(
-          !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange),
-        ) {
-          Ok(v) => v,
-          Err(e) => return Some(Err(e)),
-        };
-        let messages = if FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
-          // すでに開放済みならそのまま
-          all_combo(&parts)
+      // セリフ
+      let dialogs = vec![
+        vec![
+          "h1111206少し、薄暗くなってきたかしら。".to_string(), // 1本目：光の変化への気づき
+          "h1111210明るい時には見えなかったものが、影の中から浮かび上がってくる。\\nh1111105光は、案外多くのものを隠しているのね。".to_string(), // 2本目：隠されたものの露呈
+          "h1111110闇の中では、境界線が溶けて曖昧になる。\\nh1111306人と物、肌と空気、自分と他人。\\nやがて、自分がどこにいるのかも分からなくなる。".to_string(), // 3本目：輪郭の喪失
+          "h1111105でも、その曖昧さが心地よくもある。\\nh1111204はっきりしているのは、ときに苦痛なことだから。".to_string(), // 4本目：曖昧さへの逃避
+          "h1111110見えなくなって、ようやく分かることもある。\\nh1111204光の中では、気づけなかった感覚に。".to_string(), // 5本目：闇が暴く真実
+        ],
+        vec![
+          "h1111204静かね。そう、とても静か。".to_string(), // 1本目：静寂への気づき
+          "h1111210外の音が聞こえなくなると、\\nh1111105かえって心の中の声が大きく響くの。".to_string(), // 2本目：内なる音の増幅
+          "h1111110その声は、いつも同じことを囁いている。\\nh1111306私にだけ聞こえるように、\\nでも、確かに。".to_string(), // 3本目：孤独な内声
+          "h1111105静寂って、実は最も騒がしいもの。\\nh1111102聞きたくない音で溢れかえっているの。".to_string(), // 4本目：静寂の欺瞞
+          "h1111110静寂が責めている。\\nh1111204逃れられない真実を、突きつけてくるのよ。".to_string(), // 5本目：静寂による審判
+        ],
+        vec![
+          "h1111210寒さは感じないけれど、\\n肌が疼くような、あの感覚はしばしばあるの。".to_string(), // 1本目：温度変化への気づき
+          "h1111306温もりとは、失ってから気づくもの。\\nh1111105当たり前だと思っていたのに、案外脆いものね。".to_string(), // 2本目：温もりの脆さ
+          "h1111110冷たさが染み込んでくると、感覚が鈍くなる。\\nh1111204痛みも、喜びも、全て遠くなっていく。".to_string(), // 3本目：感覚の鈍化
+          "h1111105もしかすると、それは悪いことではないのかもしれない。\\nh1111102感じないということは、傷つかないということだから。".to_string(), // 4本目：麻痺への逃避
+          "h1111110でも、感じられないということは、\\nh1111204生きていないということと、同じなのかもしれないわね。".to_string(), // 5本目：無感覚と死の等価性
+        ],
+        vec![
+          "h1111206植物って、静かに成長していくものね。".to_string(), // 1本目：成長への着目
+          "h1111210でも、いつかは成長も止まる。\\nh1111105満開の花も、やがては散っていくもの。".to_string(), // 2本目：成長の限界
+          "h1111110枯れていく過程にも、独特の美しさがある。\\nh1111306生命力を失っていく、その静謐さ。".to_string(), // 3本目：枯死の美学
+          "h1111105成長し続けることの方が、実は不自然なのかもしれない。\\nh1111204立ち止まり、枯れることこそ摂理。".to_string(), // 4本目：停滞の正当化
+          "h1111110私も、とっくに枯れ始めているのかもしれない。\\nh1111204気づかないふりをしているだけで。".to_string(), // 5本目：自己の枯死への気づき
+        ],
+        vec![
+          "h1111211色とりどりのものを見ていると、目が疲れるときがあるの。".to_string(), // 1本目：色彩への疲労
+          "h1111105鮮やかな色って、時として攻撃的よね。\\nh1111110主張が強すぎて、心が休まらない。".to_string(), // 2本目：色彩の攻撃性
+          "h1111204色が褪せていく過程は、どこか安らかで。\\nh1111306争いがなくなって、静寂が訪れるみたい。".to_string(), // 3本目：褪色の安らぎ
+          "h1111105無彩色の世界なら、もっと穏やかでいられるかもしれない。\\nh1111110白と黒と灰色、それだけでいい。".to_string(), // 4本目：単調さへの憧れ
+          "h1111102色を失った世界で、\\nh1111204ようやく自分の輪郭が見えなくなるのかもしれないわ。".to_string(), // 5本目：自己の消失への憧れ
+        ],
+        vec![
+          "h1111204記憶って、時として重いものね。".to_string(), // 1本目：記憶の重さ
+          "h1111210覚えていたいものほど曖昧になって、\\nh1111105忘れたいものほど鮮明に残っている。".to_string(), // 2本目：記憶の皮肉
+          "h1111110記憶は編集される。都合よく、都合悪く。\\nh1111306真実なんて、どこにもないのかもしれない。".to_string(), // 3本目：記憶の不確実性
+          "h1111105忘れることができれば、どれだけ楽になれるでしょう。\\nh1111102過去に縛られずに、ただ今を生きられるのに。".to_string(), // 4本目：忘却への憧れ
+          "h1111110けれど、過去と現在は地続き。\\nh1111204過去だけを捨てることなど、できない。".to_string(), // 5本目：忘却の代償
+        ],
+        vec![
+          "h1111210言葉って、不思議なものよね。".to_string(), // 1本目：言葉への着目
+          "h1111306伝えたいことほど、うまく言葉にならない。\\nh1111105言葉にした瞬間、何かが失われてしまう気がするの。".to_string(), // 2本目：言葉の限界
+          "h1111110話せば話すほど、真意から遠ざかっていく。\\nh1111204言葉は、時として真実を覆い隠すのね。".to_string(), // 3本目：言葉の欺瞞性
+          "h1111105沈黙の中にこそ、本当の理解があるのかもしれない。\\nh1111102言葉なんて、所詮は表面的なもの。".to_string(), // 4本目：沈黙の価値
+          "h1111110結局、誰にも伝わらない。\\nh1111205ならば、最初から何も言わなければ良いの？".to_string(), // 5本目：コミュニケーションの絶望
+        ],
+      ];
+      // 前回とは別のセリフ群になるようにする
+      if i == 1 {
+        *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.write().unwrap() += 1;
+        if *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap() as usize >= dialogs.len() {
+          *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.write().unwrap() = 0;
+        }
+      }
+      let dialog = dialogs[*LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap() as usize]
+        [(i - 1) as usize]
+        .to_owned();
+
+      // 話題解放メッセージ
+      let system_message = if threshold == IMMERSIVE_RATE_MAX {
+        *TALKING_PLACE.write().unwrap() = TalkingPlace::Library; // 没入度最大なら書斎へ移動
+        let message = if FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
+          "".to_string()
         } else {
           // 初回は抽象・過去トークの開放を通知
           FLAGS.write().unwrap().done(EventFlag::FirstPlaceChange);
@@ -370,35 +386,21 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
             .iter()
             .map(|t| render_achievement_message(*t))
             .collect::<Vec<_>>();
-          parts.push(vec![format!(
-            "\\1\\n\\n{}",
-            achievements_messages.join("\\n")
-          )]);
-          all_combo(&parts)
+          achievements_messages.join("\\n")
         };
-        let index = match choose_one(&messages, true).ok_or(ShioriError::TalkNotFound) {
-          Ok(v) => v,
-          Err(e) => return Some(Err(e)),
-        };
-        messages[index].to_owned()
-      } else if !FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
-        match i {
-          1 => "\\1火を消した。\\nなんだか胸騒ぎがする。".to_string(),
-          2 => "h1111105\\1ハイネの目線が虚ろになってきている気がする。".to_string(),
-          4 => "h1111105\\1残り一本だ……".to_string(),
-          _ => "".to_string(),
-        }
+        format!("\\1（話題の傾向が変わりました）\\n{}", message)
       } else {
         "".to_string()
       };
       return Some(new_response_with_value_with_translate(
         format!(
-          "\\_v[{}]\\0{}{}\\p[2]{}{}",
+          "\\_v[{}]\\0{}{}\\p[2]{}{}{}",
           SOUND_BLOW_CANDLE,
           render_shadow(true),
           render_immersive_icon(),
           shake_with_notext(),
-          m
+          dialog,
+          system_message,
         ),
         TranslateOption::with_shadow_completion(),
       ));
@@ -418,15 +420,13 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
       // 没入度0なら居間へ移動
       let m = if threshold == 0 && *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
         *TALKING_PLACE.write().unwrap() = TalkingPlace::LivingRoom;
-        let messages = match moving_to_living_room_talk() {
-          Ok(v) => v,
-          Err(e) => return Some(Err(e)),
-        };
-        let index = match choose_one(&messages, true).ok_or(ShioriError::TalkNotFound) {
-          Ok(v) => v,
-          Err(e) => return Some(Err(e)),
-        };
-        messages[index].to_owned()
+        format!(
+          "\\0\\b[{}]h1111705……。h1111101\\n\
+          ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
+          \\n\\n[half](トーク傾向が元に戻りました)",
+          TalkingPlace::Library.balloon_surface(),
+          TalkingPlace::LivingRoom.balloon_surface(),
+        )
       } else {
         "".to_string()
       };

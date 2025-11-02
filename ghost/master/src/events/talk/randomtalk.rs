@@ -1,9 +1,6 @@
 use std::collections::HashMap;
 
-use crate::error::ShioriError;
-use crate::events::replace_dialog_for_nomouthmove;
 use crate::events::talk::{Talk, TalkType};
-use crate::events::TalkingPlace;
 
 use super::DerivaliveTalk;
 
@@ -11,7 +8,7 @@ use super::DerivaliveTalk;
 // 僕/主様: 30代のおとなしい男
 // わたし/主さま: 20代の活発な女
 // ぼく/ご主人さま: 10代の男の子
-pub(crate) const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 22] = [
+pub(crate) const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 11] = [
   "霧が濃い。",
   "彼女の声は低いがよく通る。",
   "彼女の赤い瞳の奥の思考は伺い知れない。",
@@ -21,33 +18,24 @@ pub(crate) const RANDOMTALK_COMMENTS_LIVING_ROOM: [&str; 22] = [
   "「主さま、美貌……そう、美貌」",
   "「主さま、優しいわがまま？優しい」",
   "「ご主人さま、元気ない時……ある」",
-  "「パン屋……良い香り……だった」",
-  "「コーヒー、あったかい……喫茶店……」",
-  "「花、色とりどり……どこだったか……」",
-  "「昔、ここで……何をしていた？」",
-  "「街角、角……角で何を見た？」",
-  "「青い空、白い雲……それと、それと……」",
+  // "「パン屋……良い香り……だった」",
+  // "「コーヒー、あったかい……喫茶店……」",
+  // "「花、色とりどり……どこだったか……」",
+  // "「昔、ここで……何をしていた？」",
+  // "「街角、角……角で何を見た？」",
+  // "「青い空、白い雲……それと、それと……」",
   "「ハイネ様、ハイネ様……」",
-  "「何をするんでしたっけ」",
-  "「はい、はい、わかりました」",
-  "「疲れた……でも、続けなきゃ」",
-  "「昔の名前、思い出せない……」",
-  "「大切なこと、忘れてしまった」",
+  // "「何をするんでしたっけ」",
+  // "「はい、はい、わかりました」",
+  // "「疲れた……でも、続けなきゃ」",
+  // "「昔の名前、思い出せない……」",
+  // "「大切なこと、忘れてしまった」",
   "「主様だけが、覚えていてくれる」",
 ];
 
-// 上の空のハイネに対するユーザの行動を一人称視点で
-pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_ACTIVE: [&str; 5] = [
-  "目の前で手を振っても、彼女には見えていないようだ。",
-  "常軌を逸した集中力だ。……幽霊だからというより、彼女の才能だろう。",
-  "これが彼女の言っていた思索だとしても、真似できる気はしない。",
-  "放置するとこうなってしまうらしい。……次はもっと話しかけようか。",
-  "無駄かもしれないが、肩を揺さぶる。",
-];
-
 pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
-  "ハイネの口からは不明瞭な呟きが漏れている。",
-  "おとなしく待つだけでは、彼女は我に返らないだろう。",
+  "薄暗い中に、彼女の声だけが響く。",
+  "彼女の目は、ここではないどこかを見ている。",
   "",
   "",
   "",
@@ -846,9 +834,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             h1111310過去は記憶の中にしかない。\\n\
             h1111305未来は想像の中にしかない。\\n\
             h1112305我々が立っているのは今ここだけ。\\n\
-            私たちが感じられるのは現在だけ。\\n\
+            わたしたちが感じられるのは現在だけ。\\n\
             h1112310ひどい過去も、おぞましい未来も、\\n\
-            h1112305いま私が立つこの瞬間には存在しないの。\
+            h1112305いまわたしが立つこの瞬間には存在しないの。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -873,7 +861,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           text: "\
             h1111110因果が巡ってきた。\\n\
             過去が現在を刈り取りに来た。\\n\
-            私は報いを受けたのだ。\\n\\n[half]\
+            わたしは報いを受けたのだ。\\n\\n[half]\
             ……h1111105それが、自分を納得させるための妄想だったとしたら？\
             ".to_string(),
           required_condition: None,
@@ -943,7 +931,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             h1111105沈んでいく。\\n\
             手がどうしても動かなくて、目の前の希望を掴めない。\\n\
             身体が重い。浅い呼吸のなかで、沈んでいく自分の身体を感じていることしかできない。\\n\
-            私は、私を救うことを諦めているみたい。\\n\
+            わたしは、わたしを救うことを諦めているみたい。\\n\
             h1111110どうして。\\n\
             h1111105どうして、こうなってしまったのだろう。\
             ".to_string(),
@@ -1034,7 +1022,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "唯一の視点".to_string(),
           text: "\
-            h1111106私たちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
+            h1111106わたしたちは、自我という色眼鏡を通してしか世界を観測できない。\\n\
             h1111105隣り合う二つの魂があろうとも、\\n\
             互いの内なる世界を覗き見ることは決してできないの。\\n\
             h1112110それって、この上なく残酷なことだわ。\
@@ -1047,10 +1035,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           id: "一つの個としての限界".to_string(),
           text: "\
             h1111103世界が複雑で曖昧すぎるから、\\n\
-            私たちは認識したものを理解できる形に歪めてしまう。\\n\
+            わたしたちは認識したものを理解できる形に歪めてしまう。\\n\
             h1111110既存の分類に当て嵌めて、安心を優先するの。\\n\
             それは曇る視界と引き換えに。\\n\
-            ……h1111105あの子には、私はどう見えているのかしら？\\n\
+            ……h1111105あなたには、わたしはどう見えているのかしら？\\n\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -1075,8 +1063,8 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           id: "自分の理解者は自分だけ".to_string(),
           text: "\
             h1111110「なぜみんな私をわかってくれないの？」と誰もが思う。\\n\
-            h1111105答えは簡単。他人があなたではなく、あなたが他人でないからよ。\\n\
-            畢竟、あなた以外にあなたを理解できるひとはいない。\
+            h1111105答えは簡単。他人がわたしではなく、わたしが他人でないからよ。\\n\
+            わたし以外にわたしを理解できるひとはいない。\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -1086,8 +1074,8 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           id: "得ることは失うこと".to_string(),
           text: "\
             h1111110ひとつ得るとき、ひとつ失う。\\n\
-            h1111106あなたは今日、なにを失った？\\n\
-            h1111105その喪失は、なにをあなたに齎した？\
+            h1111106わたしは今日、なにを失った？\\n\
+            h1111105その喪失は、なにをわたしに齎した？\
             ".to_string(),
           required_condition: None,
           callback: None,
@@ -1275,53 +1263,4 @@ pub(crate) fn get_parent_talk(derivative_talk: &DerivaliveTalk) -> Talk {
         derivative_talk.parent_id
       )
     })
-}
-
-pub(crate) fn moving_to_library_talk_parts(
-  is_first_change: bool,
-) -> Result<Vec<Vec<String>>, ShioriError> {
-  let mut parts: Vec<Vec<String>> = vec![vec![format!(
-    "\\0\\b[{}]h1113705……。\\1ハイネ……？\\0\\n…………。\\1\\n反応が鈍い……。\\n思考に没頭してる……？\\0\\b[{}]",
-    TalkingPlace::LivingRoom.balloon_surface(),
-    TalkingPlace::Library.balloon_surface(),
-  )]];
-  if is_first_change {
-    // 初回
-    parts.push(vec![replace_dialog_for_nomouthmove(
-      "\
-      \\0\\c\\1\\b[-1]h1000000───────────────\\_w[1200]\\c\
-      h1111705(……ふわふわした気持ち……。\\n\
-       ……h1111706{user_name}が……呼んでる？\\n\
-       ……音がくぐもって、水の中にいるみたい。\\n\
-       h1111705外のことは……h1111110今は放っておこう。\\n\
-       この瞬間は、この流れに身を任せていたい……)。\
-      "
-      .to_string(),
-    )?]);
-  } else {
-    parts.push(vec![
-      "\\0\\c\\1\\b[-1]h1000000───────────────\\_w[1200]\\ch1111705".to_string(),
-    ]);
-  }
-  parts.push(vec!["\\1\\c(没入モードに入りました)".to_string()]);
-
-  Ok(parts)
-}
-
-pub(crate) fn moving_to_living_room_talk() -> Result<Vec<String>, ShioriError> {
-  Ok(vec![format!(
-    "\\0\\b[{}]h1111705……。\\n\
-    \\1ネ……\\n\
-    イネ……。\
-    \\0\\b[{}]hr1141112φ！\
-    \\1\\n（ハイネ！）\
-    \\0…………\\n\\n[half]\
-    h1111101……h1111204あら、{{user_name}}。\\n\
-    \\1\\n\\n[half]……戻ってきたようだ。\\n\
-    \\0\\n……h1111210いつものことよ。そんなに心配しないで。\
-    \\1\\n……『心配しないのは無理だと思う……』\
-    \\1\\n\\n[half](没入モードが解除されました)",
-    TalkingPlace::Library.balloon_surface(),
-    TalkingPlace::LivingRoom.balloon_surface(),
-  )])
 }
