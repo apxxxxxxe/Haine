@@ -65,6 +65,15 @@ impl TranslateOption {
   }
 }
 
+pub(crate) fn add_notice_description(res: &mut Response, error: &str) {
+  res
+    .headers
+    .insert(HeaderName::from("ErrorDescription"), error.to_string());
+  res
+    .headers
+    .insert(HeaderName::from("ErrorLevel"), "notice".to_string());
+}
+
 pub(crate) fn add_error_description(res: &mut Response, error: &str) {
   res
     .headers
@@ -334,7 +343,7 @@ pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   const EYE_INDEX_DIGIT: u32 = 2;
   let eye_index_digit_pow = 10_i32.pow(EYE_INDEX_DIGIT);
 
-  let mut err = String::new();
+  let mut notice = String::new();
   let refs = get_references(req);
   let dest_surface = check_error!(refs[0].parse::<i32>(), ShioriError::ParseIntError);
   let is_complete = check_error!(refs[1].parse::<i32>(), ShioriError::ParseIntError) == 1;
@@ -375,10 +384,10 @@ pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
       }
       cuts.extend(dest.to_close.clone().iter().rev().map(|i| dest_remain + i));
     } else {
-      err = format!("目線の変更先が不正です: {}", dest_eyes);
+      notice = format!("目線の変更先が不正です: {}", dest_eyes);
     }
   } else {
-    err = format!("目線の変更元が不正です: {}", from_eyes);
+    notice = format!("目線の変更元が不正です: {}", from_eyes);
   }
 
   cuts.push(dest_surface);
@@ -397,10 +406,10 @@ pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
     .join(delay.as_str());
 
   let mut res = new_response_with_value_with_notranslate(animation, TranslateOption::none());
-  if !err.is_empty() {
-    add_error_description(
+  if !notice.is_empty() {
+    add_notice_description(
       &mut res,
-      format!("まばたき補完中にエラーが発生しました: {}", err).as_str(),
+      format!("まばたき補完中にエラーが発生しました: {}", notice).as_str(),
     );
   }
   Ok(res)

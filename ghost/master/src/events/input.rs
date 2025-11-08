@@ -53,8 +53,12 @@ fn input_user_name(text: String) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
-pub(crate) fn on_window_state_restore(_req: &Request) -> Response {
+pub(crate) fn on_window_state_restore(_req: &Request) -> Result<Response, ShioriError> {
   // トーク間隔をリセット
   *LAST_RANDOM_TALK_TIME.write().unwrap() = *GHOST_UP_TIME.read().unwrap();
-  new_response_nocontent()
+
+  new_response_with_value_with_translate(
+    "\\p[2]\\s[10000000]\\0\\s[1111110]h1111204".to_string(),
+    TranslateOption::simple_translate(),
+  )
 }
