@@ -474,7 +474,7 @@ pub(crate) fn render_immersive_icon() -> String {
   let immersive_degrees = *IMMERSIVE_DEGREES.read().unwrap();
   let icon_count_float =
     immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
-  let icon_count = if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  let current_icon_count = if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     // 繰り上げ
     icon_count_float.ceil() as u32
   } else {
@@ -484,21 +484,15 @@ pub(crate) fn render_immersive_icon() -> String {
   let mut candles = *CANDLES.write().unwrap();
   let mut v = String::new();
   for i in 1..=IMMERSIVE_ICON_COUNT {
-    let enabled = i <= icon_count;
-    let a = if enabled != candles[i as usize - 1] {
-      // 煙のアニメーションを再生
-      format!(
-        "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
-        i,
-        if enabled { 0 } else { 1 },
-        i,
-        if !enabled { 0 } else { 1 }
-      )
-    } else {
-      format!("\\![bind,icon,没入度{},{}]", i, if enabled { 0 } else { 1 })
-    };
-    v.push_str(&a);
-    candles[i as usize - 1] = enabled;
+    let blowed = i <= current_icon_count;
+    v.push_str(&format!(
+      "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
+      i,
+      if blowed { 0 } else { 1 },
+      i,
+      if blowed { 1 } else { 0 }
+    ));
+    candles[i as usize - 1] = blowed;
   }
   format!("\\p[2]{}\\0", v)
 }
