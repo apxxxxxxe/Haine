@@ -22,6 +22,7 @@ _CATALOG.VIX
 profile/
 var/
 __MACOSX/
+.vscode/
 XtraStuf.mac/
 
 /developer_options.txt
