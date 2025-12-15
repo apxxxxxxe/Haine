@@ -51,7 +51,7 @@ struct RandomTalk {
 
 pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
   let strings: Vec<RandomTalk> = match talk_type {
-      TalkType::SelfIntroduce => vec![
+      TalkType::AboutMe => vec![
         RandomTalk {
           id: "別れの悲しみ".to_string(),
           text: "\

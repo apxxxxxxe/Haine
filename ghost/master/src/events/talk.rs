@@ -87,7 +87,7 @@ impl Talk {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
 pub(crate) enum TalkType {
-  SelfIntroduce,
+  AboutMe,
   WithYou,
   Servant,
   Lore,
@@ -98,7 +98,7 @@ pub(crate) enum TalkType {
 impl Display for TalkType {
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     let s = match self {
-      Self::SelfIntroduce => "ハイネ自身の話題",
+      Self::AboutMe => "ハイネ自身の話題",
       Self::Lore => "ロア/オカルト",
       Self::Servant => "従者について",
       Self::Past => "ハイネの過去についての話題",
@@ -146,7 +146,7 @@ impl TalkingPlace {
   pub fn talk_types(&self) -> Vec<TalkType> {
     match self {
       Self::LivingRoom => vec![
-        TalkType::SelfIntroduce,
+        TalkType::AboutMe,
         TalkType::Lore,
         TalkType::WithYou,
         TalkType::Servant,

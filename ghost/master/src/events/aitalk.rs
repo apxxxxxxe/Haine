@@ -166,7 +166,7 @@ fn first_random_talk_response(
     .unwrap()
     .done(EventFlag::FirstRandomTalkDone(i as u32));
   let m = if i == text_count - 1 {
-    let achieved_talk_types = [TalkType::SelfIntroduce, TalkType::WithYou];
+    let achieved_talk_types = [TalkType::AboutMe, TalkType::WithYou];
     achieved_talk_types.iter().for_each(|t| {
       FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
     });
@@ -317,7 +317,7 @@ mod test {
     assert!(!FLAGS
       .read()
       .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::SelfIntroduce)));
+      .check(&EventFlag::TalkTypeUnlock(TalkType::AboutMe)));
     assert!(!FLAGS
       .read()
       .unwrap()
@@ -332,7 +332,7 @@ mod test {
     assert!(FLAGS
       .read()
       .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::SelfIntroduce)));
+      .check(&EventFlag::TalkTypeUnlock(TalkType::AboutMe)));
     assert!(FLAGS
       .read()
       .unwrap()
