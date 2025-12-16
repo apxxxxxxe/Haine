@@ -274,7 +274,9 @@ pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
     flags: FLAGS.read().unwrap().clone(),
     pending_event_talk: PENDING_EVENT_TALK.read().unwrap().clone(),
     derivative_talk_requestable: Some(*DERIVATIVE_TALK_REQUESTABLE.read().unwrap()),
-    library_transition_sequense_dialog_index: Some(*LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap())
+    library_transition_sequense_dialog_index: Some(
+      *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap(),
+    ),
   };
 
   raw_vars.save()?;

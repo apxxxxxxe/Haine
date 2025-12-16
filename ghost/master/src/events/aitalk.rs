@@ -348,7 +348,10 @@ mod test {
     // 初回終了時に独白モードだったときトークが特別なものになるかのテスト
     assert!(!FLAGS.read().unwrap().check(&EventFlag::FirstClose));
     let res = on_close(&on_second_change_req)?;
-    let value = res.headers.get_by_header_name(&HeaderName::from("Value")).ok_or("Failed to get value")?;
+    let value = res
+      .headers
+      .get_by_header_name(&HeaderName::from("Value"))
+      .ok_or("Failed to get value")?;
     assert!(value.contains(CLOSE_TALK_IN_LIBRARY_PART)); // 独白モード終了トークが含まれていることの確認
     assert!(value.contains(FIRST_CLOSE_TALK_PART)); // 初回終了トークが含まれていることの確認
     assert!(FLAGS.read().unwrap().check(&EventFlag::FirstClose));
@@ -400,12 +403,18 @@ mod test {
     FLAGS.write().unwrap().delete(EventFlag::FirstClose);
     assert!(!FLAGS.read().unwrap().check(&EventFlag::FirstClose));
     let res = on_close(&on_second_change_req)?;
-    let value = res.headers.get_by_header_name(&HeaderName::from("Value")).ok_or("Failed to get value")?;
+    let value = res
+      .headers
+      .get_by_header_name(&HeaderName::from("Value"))
+      .ok_or("Failed to get value")?;
     assert!(value.contains(FIRST_CLOSE_TALK_PART)); // 初回終了トークが含まれていることの確認
 
     // 2回目以降の終了時トークが再生されることの確認
     let res = on_close(&on_second_change_req)?;
-    let value = res.headers.get_by_header_name(&HeaderName::from("Value")).ok_or("Failed to get value")?;
+    let value = res
+      .headers
+      .get_by_header_name(&HeaderName::from("Value"))
+      .ok_or("Failed to get value")?;
     assert!(value.contains(SECOND_CLOSE_TALK_PART)); // 2回目以降の終了トークが含まれていることの確認
 
     Ok(())

@@ -161,7 +161,9 @@ pub(crate) fn on_costume_menu_exec(req: &Request) -> Result<Response, ShioriErro
     x if x == HalloweenCostumeTrigger::GoatHorn as u32 => {
       "h1111210悪魔の象徴。h1111204拐かしてあげましょうか？".to_string()
     }
-    x if x == HalloweenCostumeTrigger::WitchHat as u32 => "h1111210魔法、ではないけれど、近いことはできるわね。\\n\\n".to_string(),
+    x if x == HalloweenCostumeTrigger::WitchHat as u32 => {
+      "h1111210魔法、ではないけれど、近いことはできるわね。\\n\\n".to_string()
+    }
     x if x == HalloweenCostumeTrigger::BlackRedCape as u32 => {
       "h1111205吸血鬼かしら。\\nh1111206血は別に好みではないのだけど。\\n\\n".to_string()
     }
