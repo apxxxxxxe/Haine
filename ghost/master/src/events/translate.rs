@@ -138,8 +138,25 @@ fn translate_dialog(dialog: &mut Dialog) {
     ),
     Replacee::new("」", "」\\_w[600]", PHI, ")）", None),
     Replacee::new("』", "』\\_w[600]", PHI, ")）」", None),
-    Replacee::new("\\n\\n", "\\n\\n\\_w[700]", PHI, "", None),
   ];
+
+  // tagsのquicksection状態を事前計算
+  let mut in_quicksection_states: Vec<bool> = Vec::new();
+  let mut in_qs = false;
+  for tag in tags.iter() {
+    in_quicksection_states.push(in_qs);
+    if QUICK_SECTION_START.is_match(tag) {
+      in_qs = true;
+    } else if QUICK_SECTION_END.is_match(tag) {
+      in_qs = false;
+    } else if *tag == "\\_q" {
+      in_qs = !in_qs;
+    }
+  }
+
+  // tagsの置換を適用
+  let replaced_tags = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
   let mut result = String::new();
   let mut in_quicksection = false;
   for (i, splitted) in splitted_texts.iter().enumerate() {
@@ -158,7 +175,9 @@ fn translate_dialog(dialog: &mut Dialog) {
       println!("toggle quicksection");
       in_quicksection = !in_quicksection;
     }
-    result.push_str(tag);
+    if let Some(t) = replaced_tags.get(i) {
+      result.push_str(t);
+    }
   }
 
   dialog.text = result;
@@ -288,7 +307,58 @@ impl Replacee {
   }
 }
 
+struct TagReplacee {
+  patterns: &'static [&'static str],
+  replacement: &'static str,
+}
+
 static WAIT: Lazy<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
+
+fn replace_tags(
+  tags: &[&str],
+  splitted_texts: &[&str],
+  in_quicksection_states: &[bool],
+) -> Vec<String> {
+  static TAG_REPLACES: &[TagReplacee] = &[TagReplacee {
+    patterns: &["\\n", "\\n[half]"],
+    replacement: "\\n\\n[half]\\_w[700]",
+  }];
+
+  let mut result: Vec<String> = Vec::new();
+  let mut i = 0;
+  while i < tags.len() {
+    let mut matched = false;
+    for r in TAG_REPLACES.iter() {
+      let pattern_len = r.patterns.len();
+      if i + pattern_len <= tags.len() {
+        let slice = &tags[i..i + pattern_len];
+        // パターンが一致し、かつ間のsplitted_textsが全て空文字（元テキストで連続）
+        let is_contiguous = (1..pattern_len)
+          .all(|offset| splitted_texts.get(i + offset).is_some_and(|s| s.is_empty()));
+        if slice == r.patterns && is_contiguous {
+          let in_qs = in_quicksection_states.get(i).copied().unwrap_or(false);
+          let replaced = if in_qs {
+            WAIT.replace_all(r.replacement, "").to_string()
+          } else {
+            r.replacement.to_string()
+          };
+          result.push(replaced);
+          for _ in 1..pattern_len {
+            result.push(String::new());
+          }
+          i += pattern_len;
+          matched = true;
+          break;
+        }
+      }
+    }
+    if !matched {
+      result.push(tags[i].to_string());
+      i += 1;
+    }
+  }
+  result
+}
 
 fn replace_with_check(
   text_part: &str,
@@ -362,4 +432,106 @@ pub(crate) fn replace_dialog_for_nomouthmove(text: String) -> Result<String, Shi
     "\\![quicksection,1]@@@@@{}\\![quicksection,0]@@@@@",
     result
   ))
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_replace_tags_contiguous_pattern() {
+    // \\n\\n[half] が連続している場合 → 置換される
+    let tags = vec!["\\n", "\\n[half]"];
+    let splitted_texts = vec!["あいう", "", "えお"];
+    let in_quicksection_states = vec![false, false];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 2);
+    assert_eq!(result[0], "\\n\\n[half]\\_w[700]");
+    assert_eq!(result[1], ""); // 2番目は空文字
+  }
+
+  #[test]
+  fn test_replace_tags_non_contiguous_pattern() {
+    // \\n と \\n[half] の間にテキストがある場合 → 置換されない
+    let tags = vec!["\\n", "\\n[half]"];
+    let splitted_texts = vec!["あいう", "かきく", "えお"];
+    let in_quicksection_states = vec![false, false];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 2);
+    assert_eq!(result[0], "\\n");
+    assert_eq!(result[1], "\\n[half]");
+  }
+
+  #[test]
+  fn test_replace_tags_in_quicksection() {
+    // quicksection内の場合 → ウェイトが除去される
+    let tags = vec!["\\n", "\\n[half]"];
+    let splitted_texts = vec!["あいう", "", "えお"];
+    let in_quicksection_states = vec![true, true];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 2);
+    assert_eq!(result[0], "\\n\\n[half]"); // ウェイトが除去される
+    assert_eq!(result[1], "");
+  }
+
+  #[test]
+  fn test_replace_tags_no_match() {
+    // パターンにマッチしない場合 → そのまま
+    let tags = vec!["\\n", "\\s[10]"];
+    let splitted_texts = vec!["あいう", "", "えお"];
+    let in_quicksection_states = vec![false, false];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 2);
+    assert_eq!(result[0], "\\n");
+    assert_eq!(result[1], "\\s[10]");
+  }
+
+  #[test]
+  fn test_replace_tags_single_element() {
+    // 単一要素の場合
+    let tags = vec!["\\n[half]"];
+    let splitted_texts = vec!["あいう", "えお"];
+    let in_quicksection_states = vec![false];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 1);
+    assert_eq!(result[0], "\\n[half]");
+  }
+
+  #[test]
+  fn test_replace_tags_empty() {
+    // 空の場合
+    let tags: Vec<&str> = vec![];
+    let splitted_texts: Vec<&str> = vec!["テスト"];
+    let in_quicksection_states: Vec<bool> = vec![];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 0);
+  }
+
+  #[test]
+  fn test_replace_tags_multiple_patterns() {
+    // 複数のパターンが連続する場合
+    let tags = vec!["\\n", "\\n[half]", "\\n", "\\n[half]"];
+    let splitted_texts = vec!["あ", "", "い", "", "う"];
+    let in_quicksection_states = vec![false, false, false, false];
+
+    let result = replace_tags(&tags, &splitted_texts, &in_quicksection_states);
+
+    assert_eq!(result.len(), 4);
+    assert_eq!(result[0], "\\n\\n[half]\\_w[700]");
+    assert_eq!(result[1], "");
+    assert_eq!(result[2], "\\n\\n[half]\\_w[700]");
+    assert_eq!(result[3], "");
+  }
 }
