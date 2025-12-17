@@ -2,7 +2,13 @@
 
 manual_exclude_patterns=("haine.dll", "install.txt")
 
-range=$(git rev-parse --abbrev-ref HEAD)@{upstream}..HEAD
+# upstreamとの共通祖先を取得（force push時に誤検出を防ぐため）
+base=$(git merge-base @{upstream} HEAD 2>/dev/null)
+if [ -z "$base" ]; then
+  echo "upstreamとの共通祖先が見つかりません。バリデーションをスキップします。"
+  exit 0
+fi
+range="${base}..HEAD"
 
 # $1: リモート名、$2: リモートブランチ名
 remote="$1"
