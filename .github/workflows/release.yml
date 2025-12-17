@@ -35,6 +35,12 @@ jobs:
             | grep -v "Merge pull request" \
             | grep -v "Merge branch" \
             | grep -v "Merge remote-tracking" \
+            | grep -v ♻️" \
+            | grep -v 🔖" \
+            | grep -v 🔧" \
+            | grep -v 🔨" \
+            | grep -v ✅" \
+            | grep -v 💚" \
             | sed -e 's/^/- /'
         else
           git log --pretty=format:"%s" \
@@ -42,6 +48,12 @@ jobs:
             | grep -v "Merge pull request" \
             | grep -v "Merge branch" \
             | grep -v "Merge remote-tracking" \
+            | grep -v ♻️" \
+            | grep -v 🔖" \
+            | grep -v 🔧" \
+            | grep -v 🔨" \
+            | grep -v ✅" \
+            | grep -v 💚" \
             | sed -e 's/^/- /' \
             | head -n ${{ env.FETCH_DEPTH }}
         fi
@@ -53,6 +65,12 @@ jobs:
               | grep -v "Merge pull request" \
               | grep -v "Merge branch" \
               | grep -v "Merge remote-tracking" \
+              | grep -v ♻️" \
+              | grep -v 🔖" \
+              | grep -v 🔧" \
+              | grep -v 🔨" \
+              | grep -v ✅" \
+              | grep -v 💚" \
               | sed -e 's/^/- /'
             echo "EOF"
           else
@@ -61,6 +79,12 @@ jobs:
               | grep -v "Merge pull request" \
               | grep -v "Merge branch" \
               | grep -v "Merge remote-tracking" \
+              | grep -v ♻️" \
+              | grep -v 🔖" \
+              | grep -v 🔧" \
+              | grep -v 🔨" \
+              | grep -v ✅" \
+              | grep -v 💚" \
               | sed -e 's/^/- /' \
               | head -n 5
             echo "EOF"
