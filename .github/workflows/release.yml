@@ -93,7 +93,13 @@ jobs:
 
     - name: Zip output
       run: |
-        zip -r ${{ env.NAR_NAME }}.nar * -x readme.md -x .git/\* -x .github/\* -x .git* -x ${{ env.NAR_NAME }}.nar -x ghost/master/rustfmt.toml -x ghost/master/.cargo\* -x ghost/master/Cargo\* -x ghost/master/src/\* -x ghost/master/ipadic\* -x md5buildignore.txt -x build\*
+        mkdir -p /tmp/nar_temp
+        rsync -av --filter=':- md5buildignore.txt' . /tmp/nar_temp/
+        echo "=== Files to be included in NAR ==="
+        find /tmp/nar_temp -type f | sort
+        echo "==================================="
+        cd /tmp/nar_temp
+        zip -r $GITHUB_WORKSPACE/${{ env.NAR_NAME }}.nar *
 
     - name: Upload Release Asset(with tag)
       uses: softprops/action-gh-release@v2

@@ -35,6 +35,7 @@ sagyou/
 ipadic*/
 target/
 src/
+bin/
 Cargo.*
 .cargo/
 rustfmt.toml
