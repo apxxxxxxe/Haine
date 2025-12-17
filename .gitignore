@@ -26,6 +26,8 @@ vars.json
 ghost/master/debug
 *.bincode
 
+target/
+
 .mise.toml
 .claude/
 .serena/

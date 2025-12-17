@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::events::talk::{Talk, TalkType};
+use crate::variables::{EventFlag, FLAGS};
 
 use super::DerivaliveTalk;
 
@@ -254,6 +255,145 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 
       TalkType::WithYou => vec![
         RandomTalk {
+          id: "食事中の読書".to_string(),
+          text: "\
+            h1111105……。\\n\
+            \\1ハイネは器用に菓子を切り分けながら、片手で本を開いている。\\n\
+            行儀が良いとは言えない姿だ。\
+            h1111204……何か言いたそうね。\\n\
+            h1111310分かっているわ。お行儀が悪いって。\\n\\n[half]\
+            h1111206昔は怒られたものよ。\\n\
+            h1111205だから今は、一人のときだけ。\\n\
+            h1111304……あなたの前では、\\n\
+            一人のときと同じで良いでしょう？\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "夜明けを待つ".to_string(),
+          text: "\
+            h1111206夜が長いと感じることはある？\\n\
+            h1111205私はここで過ごすうち、\\n\
+			何もしない時間を過ごすのが得意になったわ。\\n\
+            h1111210星を眺めていると、そのうち空が白んでくる。\\n\
+            h1111206夜と朝の境目。どちらでもない、曖昧な時間。\\n\\n[half]\
+            h1111204一日の中で、一番好きなの。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "朝の髪".to_string(),
+          text: "\
+            h1111204……あなたの髪、寝癖がついているわ。\\n\
+            h1000000直してあげましょうか。\\n\\n[half]\
+            \\1ハイネの指が、乱れた髪をそっと整える。\\n\
+            手つきは意外なほど丁寧で、慣れている。\\n\\n[half]\
+            ……h1121310私も、起きたときはひどいものなのよ。\\n\
+            h1111205ただでさえくせ毛なところに、寝癖も重なってね。\\n\
+            h1111306何度も櫛を通して、やっとこの程度なの。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "早口".to_string(),
+          text: "\
+            h1113205……\\![set,balloonwait,0.7]それでねφ、\\_w[500]だからこそこの仕組みが成り立つのφ。\\_w[700]\\n\
+            h1113204ここまでは良いかしらφ？\\_w[700]h1113206それで、次に重要なのが……\\![set,balloonwait,1]\\n\\n[half]\
+            \\1矢継ぎ早の説明についていけずφ、h1111101\\1\\n曖昧に頷いてしまう。\
+            \\0……h1121204ごめんなさい。少し早口だったわね。\\n\
+            h1111205普通に話すと速いと言われるものだから\\n\
+            ゆっくり話すよう心がけているのだけれど……\\n\
+            h1113310熱が入ると、だめね。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "舌やけど".to_string(),
+          text: "\
+            h1113105……。\\n\
+            \\1本を読みながら、ハイネはお茶を口に運ぶ。\\n\
+            湯気が立っていることに気づいていない様子で、そのまま……\
+            h1000000っ……。\\n\
+            h1122205……熱かったわ。\\n\\n[half]\
+            h1121205ぼんやりしているとよくやるの。\\n\
+            h1121310何度も繰り返しているのだから、学べばいいのにね。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "取れたボタン".to_string(),
+          text: "\
+            h1113105……。\\n\
+            \\1そういえば、ハイネの服が前着ていたものと違う。\\n\
+            シルエットはほとんど同じだが、細部のデザインが異なっているのだ。\\n\\n[half]\
+            『服、いつものと違う？』\
+            h1111204あら、よく気づいたわね。\\n\
+            h1111205そう、前のものはボタンが取れてしまったから、家のものに直させているの。\\n\\n[half]\
+            h1113206彼女は針仕事がとても上手でね。\\n\
+            h1111210私もできなくはないけれど、はるかに早くて正確。繕いものは任せているのよ。\
+          ".to_string(),
+          required_condition: Some(|| FLAGS.read().unwrap().check(&EventFlag::FirstClose)),
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "リップクリーム".to_string(),
+          text: "\
+            h1111201あら、それは何？\\n\
+            h1111101リップクリーム……h1111104唇の保湿をするのね。\\n\\n[half]\
+            h1111204それ、借りても良いかしら？初めて見たの。\\n\
+            h1000000\\1スティックタイプのものを渡すと、\\n\
+            ハイネは見様見真似で自分の唇に塗る。\\n\\n[half]\
+            塗り終えると、唇を小指で拭った。\
+            h1113102\\n[half]ふむ……。h1113105保湿のためとはいえ、べたつくのは少し嫌ね。\\n\\n[half]\
+            h1111204ありがとう、返すわ。h1111205\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "くしゃみ".to_string(),
+          text: "\
+            h1000000……っくしゅん！\\n\\n[half]\
+            ……h1112105ごめんなさい、ホコリか何かが……。h1111106空気を入れ替えましょう。\\n\\n[half]\
+            \\1窓がかすかに開く。新鮮な空気がすっと入ってきた。\\n\\n[half]\
+            『くしゃみするとき、目閉じないんだね』\
+            h1111101……h1111102言われてみれば、そうね。\\n\
+            h1121204ずっと見てたの？\\n\
+            h1121206少し、気恥ずかしいわ。\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
+          id: "食べ物の好き嫌い".to_string(),
+          text: "\
+            h1111205あら、レーズンは嫌い？\\n\
+            嫌なら端によけておいてちょうだい。\\n\
+            h1111206あとで、誰か欲しがるものがいるかも知れないわ。\\n\\n[half]\
+            h1111210ちなみに私も嫌い。\\n\
+            ……h1111304けれど、そうね、今は挑戦したい気分だわ。\\n\
+            h1111206昔は気まぐれだと文句を言われたものけれど、\\n\
+            そのとき食べたいのだから仕方ないわよね。\\n\\n[half]\
+            h1111205ねえ、h1111310それ、いただいても良いかしら？\
+          ".to_string(),
+          required_condition: None,
+          callback: None,
+        },
+
+        RandomTalk {
           id: "訪問の意図".to_string(),
           text: "\
             h1111210想うという意味では、嫌悪も愛慕も変わらないと思うの。\\n\
@@ -265,6 +405,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           required_condition: None,
           callback: None,
         },
+
         RandomTalk{
           id: "知って、祓う".to_string(),
           text: "\
@@ -1103,24 +1244,41 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 }
 
 pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
-  vec![DerivaliveTalk {
-    parent_id: "生前の記録".to_string(),
-    id: "生前の記録・過去".to_string(),
-    summary: "『読んでみたい』".to_string(),
-    text: "\
-          \\0h1111204……それは、できない相談ね。\\n\
-          h1111210他人に見せるために書いたものではないもの。\\n\
-          h1112205私の記憶は、私だけのもの。\\n\
-          h1112204従者にも、あなたにも、見せるつもりはないわ。\\n\
-          h1111310……それに、興味本位で読むには長すぎるの。\\n\
-          忘れないうちにと書き始めたけれど、\\n\
-          気づけば三百を超えてしまって。\\n\
-          h1111206冊数がね。置き場所にも困っているわ。\
-          "
-    .to_string(),
-    required_condition: None,
-    callback: None,
-  },
+  vec![
+    DerivaliveTalk {
+      parent_id: "舌やけど".to_string(),
+      id: "舌やけど・熱さの感じ方".to_string(),
+      summary: "『幽霊でも熱いの？』".to_string(),
+      text: "\
+            h1111205基本的には、熱さや冷たさには鈍いのだけれどね。\\n\
+            食事やお茶に関しては、少し勝手が違うの。\\n\
+            温かさ、味、香り……\\n\
+            全て感じられるように訓練したのよ。\\n\\n[half]\
+            h1123310その結果、こうして熱さも余さず\\n\
+            味わえるようになったというわけ。\
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
+    },
+    DerivaliveTalk {
+      parent_id: "生前の記録".to_string(),
+      id: "生前の記録・過去".to_string(),
+      summary: "『読んでみたい』".to_string(),
+      text: "\
+            \\0h1111204……それは、できない相談ね。\\n\
+            h1111210他人に見せるために書いたものではないもの。\\n\
+            h1112205私の記憶は、私だけのもの。\\n\
+            h1112204従者にも、あなたにも、見せるつもりはないわ。\\n\
+            h1111310……それに、興味本位で読むには長すぎるの。\\n\
+            忘れないうちにと書き始めたけれど、\\n\
+            気づけば三百を超えてしまって。\\n\
+            h1111206冊数がね。置き場所にも困っているわ。\
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
+    },
     DerivaliveTalk {
         parent_id: "服装へのこだわり".to_string(),
         id: "服装へのこだわり・昔から".to_string(),
