@@ -131,7 +131,7 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
 pub extern "cdecl" fn unload() -> BOOL {
   debug!("unload");
 
-  let status = *LOAD_STATUS.read().unwrap();
+  let status = LOAD_STATUS.read().unwrap().clone();
   if status.should_save() {
     if let Err(e) = save_global_variables() {
       error!("{}", e);

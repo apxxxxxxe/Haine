@@ -92,6 +92,18 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     );
   }
 
+  if let LoadStatus::PartialSuccess(ref failed_fields) = *LOAD_STATUS.read().unwrap() {
+    let field_names = failed_fields.join(", ");
+    add_error_description(
+      &mut res,
+      &format!(
+        "セーブデータの一部が読み込めなかったため、初期値を使用しました。お手数ですがバグ報告をお願いいたします。詳細: {}",
+        field_names
+      ),
+    );
+  }
+  debug!("hoge,{:?}", LOAD_STATUS.read().unwrap());
+
   Ok(res)
 }
 

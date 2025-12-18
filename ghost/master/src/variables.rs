@@ -33,15 +33,16 @@ pub(crate) static DERIVATIVE_TALK_REQUESTABLE: LazyLock<RwLock<bool>> =
   LazyLock::new(|| RwLock::new(false));
 pub(crate) static LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX: LazyLock<RwLock<u32>> =
   LazyLock::new(|| RwLock::new(1000));
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub(crate) enum LoadStatus {
   #[default]
   NotLoaded, // まだロードしていない（初期状態）
-  FirstBoot,          // 初回起動（セーブファイルなし）
-  Success,            // 正常ロード（バックアップあり）
-  SuccessNoBackup,    // 正常ロード（バックアップなし）
-  RestoredFromBackup, // メインが失敗、バックアップから復元
-  FailedNoBackup,     // ロード失敗、バックアップもなし
+  FirstBoot,                   // 初回起動（セーブファイルなし）
+  Success,                     // 正常ロード（バックアップあり）
+  SuccessNoBackup,             // 正常ロード（バックアップなし）
+  RestoredFromBackup,          // メインが失敗、バックアップから復元
+  FailedNoBackup,              // ロード失敗、バックアップもなし
+  PartialSuccess(Vec<String>), // 部分成功、失敗フィールド名を保持
 }
 
 impl LoadStatus {
@@ -114,58 +115,116 @@ impl PendingEvent {
   }
 }
 
-#[derive(Serialize, Deserialize, Default)]
-pub(crate) struct RawVariables {
-  total_boot_count: u64,
-  total_time: Option<u64>,
-  random_talk_interval: Option<u64>,
-  user_name: Option<String>,
-  talk_collection: HashMap<TalkType, HashSet<String>>,
-  cumulative_talk_count: u64,
-  flags: EventFlags,
-  pending_event_talk: Option<PendingEvent>,
-  derivative_talk_requestable: Option<bool>,
-  library_transition_sequense_dialog_index: Option<u32>,
+/// RawVariables 構造体と load_partial_from メソッドを生成するマクロ
+///
+/// フィールドを追加する場合はこのマクロ呼び出しを編集してください。
+/// 構造体定義と部分パース処理が自動的に同期されます。
+macro_rules! define_raw_variables {
+  (
+    primitives: { $($prim_field:ident : $prim_type:ty),* $(,)? },
+    options: { $($opt_field:ident : $opt_inner:ty),* $(,)? },
+    custom: { $($custom_field:ident : $custom_type:ty => $parser:expr),* $(,)? }
+  ) => {
+    #[derive(Serialize, Deserialize, Default)]
+    pub(crate) struct RawVariables {
+      $($prim_field: $prim_type,)*
+      $($opt_field: Option<$opt_inner>,)*
+      $($custom_field: $custom_type,)*
+    }
+
+    impl RawVariables {
+      /// 部分的にロード。失敗したフィールドはデフォルト値を使用
+      /// 戻り値: (RawVariables, 失敗したフィールド名のリスト)
+      pub fn load_partial_from(path: &str) -> Result<(Self, Vec<String>), Box<dyn std::error::Error>> {
+        if !std::path::Path::new(path).exists() {
+          return Ok((Self::default(), vec![]));
+        }
+
+        let json_str = std::fs::read_to_string(path)?;
+        let value: serde_json::Value = serde_json::from_str(&json_str)?;
+
+        let obj = value
+          .as_object()
+          .ok_or("JSON root is not an object")?;
+
+        let mut result = Self::default();
+        let mut failed_fields = Vec::new();
+
+        // プリミティブフィールドのパース
+        $(
+          if let Some(v) = obj.get(stringify!($prim_field)) {
+            match serde_json::from_value::<$prim_type>(v.clone()) {
+              Ok(val) => result.$prim_field = val,
+              Err(e) => {
+                warn!("{} のパースに失敗: {}", stringify!($prim_field), e);
+                failed_fields.push(stringify!($prim_field).to_string());
+              }
+            }
+          }
+        )*
+
+        // Option フィールドのパース
+        $(
+          if let Some(v) = obj.get(stringify!($opt_field)) {
+            if !v.is_null() {
+              match serde_json::from_value::<$opt_inner>(v.clone()) {
+                Ok(val) => result.$opt_field = Some(val),
+                Err(e) => {
+                  warn!("{} のパースに失敗: {}", stringify!($opt_field), e);
+                  failed_fields.push(stringify!($opt_field).to_string());
+                }
+              }
+            }
+          }
+        )*
+
+        // カスタムパーサーフィールドのパース
+        $(
+          if let Some(v) = obj.get(stringify!($custom_field)) {
+            match $parser(v) {
+              Ok((val, warnings)) => {
+                result.$custom_field = val;
+                // スキップした項目があれば警告として記録
+                for w in warnings {
+                  failed_fields.push(format!("{}: {}", stringify!($custom_field), w));
+                }
+              }
+              Err(e) => {
+                warn!("{} のパースに失敗: {}", stringify!($custom_field), e);
+                failed_fields.push(stringify!($custom_field).to_string());
+              }
+            }
+          }
+        )*
+
+        Ok((result, failed_fields))
+      }
+    }
+  };
+}
+
+// RawVariables 構造体の定義
+// フィールドを追加・変更する場合はここを編集
+define_raw_variables! {
+  primitives: {
+    total_boot_count: u64,
+    cumulative_talk_count: u64,
+  },
+  options: {
+    total_time: u64,
+    random_talk_interval: u64,
+    user_name: String,
+    pending_event_talk: PendingEvent,
+    derivative_talk_requestable: bool,
+    library_transition_sequense_dialog_index: u32,
+  },
+  custom: {
+    talk_collection: HashMap<TalkType, HashSet<String>> => parse_talk_collection_lenient,
+    flags: EventFlags => parse_event_flags_lenient,
+  }
 }
 
 impl RawVariables {
-  pub fn load() -> Result<Self, Box<dyn Error>> {
-    Self::load_from(VAR_PATH)
-  }
-
-  pub fn load_from(path: &str) -> Result<Self, Box<dyn Error>> {
-    if !std::path::Path::new(path).exists() {
-      return Ok(Self::default());
-    }
-
-    let json_str = std::fs::read_to_string(path)?;
-    let vars: RawVariables = serde_json::from_str(&json_str)?;
-    Ok(vars)
-  }
-
-  pub fn load_backup() -> Result<Self, Box<dyn Error>> {
-    Self::load_backup_from(VAR_BACKUP_PATH)
-  }
-
-  pub fn load_backup_from(path: &str) -> Result<Self, Box<dyn Error>> {
-    let json_str = std::fs::read_to_string(path)?;
-    let vars: RawVariables = serde_json::from_str(&json_str)?;
-    Ok(vars)
-  }
-
-  pub fn load_from_with_backup(main_path: &str, backup_path: &str) -> Result<Self, Box<dyn Error>> {
-    match Self::load_from(main_path) {
-      Ok(vars) => Ok(vars),
-      Err(e) => {
-        // バックアップからの復元を試みる
-        match Self::load_backup_from(backup_path) {
-          Ok(backup_vars) => Ok(backup_vars),
-          Err(_) => Err(e),
-        }
-      }
-    }
-  }
-
   pub fn save(&self) -> Result<(), Box<dyn Error>> {
     self.save_to(VAR_PATH, VAR_BACKUP_PATH)
   }
@@ -179,6 +238,86 @@ impl RawVariables {
     std::fs::write(path, json_str_indent)?;
     Ok(())
   }
+}
+
+/// TalkType のキーが一部無効でも、有効なものだけを読み込む
+/// 戻り値: (パース結果, スキップした項目の警告リスト)
+fn parse_talk_collection_lenient(
+  value: &serde_json::Value,
+) -> Result<(HashMap<TalkType, HashSet<String>>, Vec<String>), String> {
+  use crate::events::talk::TalkType;
+
+  let obj = value
+    .as_object()
+    .ok_or("talk_collection is not an object")?;
+
+  let mut result = HashMap::new();
+  let mut warnings = Vec::new();
+
+  for (key, val) in obj {
+    // TalkType のパースを試みる
+    match serde_json::from_value::<TalkType>(serde_json::Value::String(key.clone())) {
+      Ok(talk_type) => {
+        // HashSet<String> のパース
+        match serde_json::from_value::<HashSet<String>>(val.clone()) {
+          Ok(ids) => {
+            result.insert(talk_type, ids);
+          }
+          Err(e) => {
+            let msg = format!("talk_collection[{}] の値のパースに失敗: {}", key, e);
+            warn!("{}", msg);
+            warnings.push(msg);
+          }
+        }
+      }
+      Err(_) => {
+        // 不明なキーはスキップするが、データは失われる
+        let msg = format!("不明なTalkType '{}' をスキップ", key);
+        warn!("{}", msg);
+        warnings.push(msg);
+      }
+    }
+  }
+
+  Ok((result, warnings))
+}
+
+/// EventFlag のバリアントが一部無効でも、有効なものだけを読み込む
+/// 旧形式 {"flags": [...]} と新形式 [...] の両方に対応
+/// 戻り値: (パース結果, スキップした項目の警告リスト)
+fn parse_event_flags_lenient(
+  value: &serde_json::Value,
+) -> Result<(EventFlags, Vec<String>), String> {
+  // 新形式: 配列そのまま
+  // 旧形式: {"flags": [...]} からflagsを取り出す
+  let arr = if let Some(obj) = value.as_object() {
+    obj
+      .get("flags")
+      .and_then(|v| v.as_array())
+      .ok_or("flags.flags is not an array (old format)")?
+  } else if let Some(arr) = value.as_array() {
+    arr
+  } else {
+    return Err("flags is neither an object nor an array".to_string());
+  };
+
+  let mut valid_flags = HashSet::new();
+  let mut warnings = Vec::new();
+
+  for flag_value in arr {
+    match serde_json::from_value::<EventFlag>(flag_value.clone()) {
+      Ok(flag) => {
+        valid_flags.insert(flag);
+      }
+      Err(_) => {
+        let msg = format!("不明なEventFlag をスキップ: {:?}", flag_value);
+        warn!("{}", msg);
+        warnings.push(msg);
+      }
+    }
+  }
+
+  Ok((EventFlags { flags: valid_flags }, warnings))
 }
 
 #[derive(Serialize, Deserialize, Hash, Eq, PartialEq, Clone, Debug)]
@@ -196,6 +335,7 @@ pub(crate) enum EventFlag {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Default)]
+#[serde(transparent)]
 pub(crate) struct EventFlags {
   flags: HashSet<EventFlag>,
 }
@@ -247,26 +387,42 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
   let main_exists = std::path::Path::new(VAR_PATH).exists();
   let backup_exists = std::path::Path::new(VAR_BACKUP_PATH).exists();
 
-  let raw_vars = match RawVariables::load() {
-    Ok(vars) => {
+  // メインファイルから部分パースを試行
+  let raw_vars = match RawVariables::load_partial_from(VAR_PATH) {
+    Ok((vars, failed_fields)) => {
       if !main_exists {
         // ファイルが存在しない場合は FirstBoot
         *LOAD_STATUS.write().unwrap() = LoadStatus::FirstBoot;
-      } else if backup_exists {
-        // バックアップありで正常ロード
-        *LOAD_STATUS.write().unwrap() = LoadStatus::Success;
+      } else if failed_fields.is_empty() {
+        // 全フィールド成功
+        if backup_exists {
+          *LOAD_STATUS.write().unwrap() = LoadStatus::Success;
+        } else {
+          *LOAD_STATUS.write().unwrap() = LoadStatus::SuccessNoBackup;
+        }
       } else {
-        // バックアップなしで正常ロード
-        *LOAD_STATUS.write().unwrap() = LoadStatus::SuccessNoBackup;
+        // 一部フィールドが失敗
+        warn!("部分パースで失敗したフィールド: {:?}", failed_fields);
+        *LOAD_STATUS.write().unwrap() = LoadStatus::PartialSuccess(failed_fields);
       }
       vars
     }
     Err(e) => {
-      // バックアップからの復元を試みる
-      match RawVariables::load_backup() {
-        Ok(backup_vars) => {
-          warn!("メインファイルのロードに失敗。バックアップから復元: {}", e);
-          *LOAD_STATUS.write().unwrap() = LoadStatus::RestoredFromBackup;
+      // メイン部分パースも失敗 → バックアップから部分パースを試行
+      warn!("メインファイルのパースに失敗: {}", e);
+
+      match RawVariables::load_partial_from(VAR_BACKUP_PATH) {
+        Ok((backup_vars, backup_failed_fields)) => {
+          if backup_failed_fields.is_empty() {
+            warn!("バックアップから復元");
+            *LOAD_STATUS.write().unwrap() = LoadStatus::RestoredFromBackup;
+          } else {
+            warn!(
+              "バックアップから部分復元、失敗フィールド: {:?}",
+              backup_failed_fields
+            );
+            *LOAD_STATUS.write().unwrap() = LoadStatus::PartialSuccess(backup_failed_fields);
+          }
           backup_vars
         }
         Err(_) => {
@@ -513,13 +669,15 @@ mod tests {
     // メインファイルを破損
     fs::write(&main_path, "invalid json").unwrap();
 
+    // メインからの部分パースは失敗（不正なJSON）
+    let result = RawVariables::load_partial_from(main_path.to_str().unwrap());
+    assert!(result.is_err());
+
     // バックアップから復元
-    let loaded = RawVariables::load_from_with_backup(
-      main_path.to_str().unwrap(),
-      backup_path.to_str().unwrap(),
-    )
-    .unwrap();
+    let (loaded, failed_fields) =
+      RawVariables::load_partial_from(backup_path.to_str().unwrap()).unwrap();
     assert_eq!(loaded.total_boot_count, 42);
+    assert!(failed_fields.is_empty());
   }
 
   #[test]
@@ -532,11 +690,12 @@ mod tests {
     fs::write(&main_path, "invalid").unwrap();
     fs::write(&backup_path, "also invalid").unwrap();
 
-    let result = RawVariables::load_from_with_backup(
-      main_path.to_str().unwrap(),
-      backup_path.to_str().unwrap(),
-    );
-    assert!(result.is_err());
+    // 両方とも部分パースに失敗
+    let main_result = RawVariables::load_partial_from(main_path.to_str().unwrap());
+    assert!(main_result.is_err());
+
+    let backup_result = RawVariables::load_partial_from(backup_path.to_str().unwrap());
+    assert!(backup_result.is_err());
   }
 
   #[test]
@@ -564,11 +723,12 @@ mod tests {
       .unwrap();
 
     // バックアップには前回のデータ（10）が残っている
-    let backup_loaded = RawVariables::load_backup_from(backup_path.to_str().unwrap()).unwrap();
+    let (backup_loaded, _) =
+      RawVariables::load_partial_from(backup_path.to_str().unwrap()).unwrap();
     assert_eq!(backup_loaded.total_boot_count, 10);
 
     // メインには新しいデータ（20）がある
-    let main_loaded = RawVariables::load_from(main_path.to_str().unwrap()).unwrap();
+    let (main_loaded, _) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(main_loaded.total_boot_count, 20);
   }
 
@@ -577,7 +737,141 @@ mod tests {
     let dir = TempDir::new().unwrap();
     let main_path = dir.path().join("nonexistent.json");
 
-    let loaded = RawVariables::load_from(main_path.to_str().unwrap()).unwrap();
+    let (loaded, failed_fields) =
+      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(loaded.total_boot_count, 0); // default値
+    assert!(failed_fields.is_empty());
+  }
+
+  #[test]
+  fn test_partial_load_with_unknown_talk_type() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+
+    // 不明なTalkType "UnknownType" を含むJSON
+    let json = r#"{
+      "total_boot_count": 100,
+      "cumulative_talk_count": 50,
+      "talk_collection": {
+        "AboutMe": ["talk1", "talk2"],
+        "UnknownType": ["talk3"],
+        "WithYou": ["talk4"]
+      },
+      "flags": {"flags": []}
+    }"#;
+    fs::write(&main_path, json).unwrap();
+
+    // 部分パースは成功し、UnknownTypeだけスキップ
+    let (vars, failed_fields) =
+      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(vars.total_boot_count, 100);
+    assert_eq!(vars.cumulative_talk_count, 50);
+    assert!(vars.talk_collection.contains_key(&TalkType::AboutMe));
+    assert!(vars.talk_collection.contains_key(&TalkType::WithYou));
+    // スキップした項目が警告として記録されている
+    assert!(
+      failed_fields
+        .iter()
+        .any(|f| f.contains("talk_collection") && f.contains("UnknownType")),
+      "failed_fields should contain warning about UnknownType: {:?}",
+      failed_fields
+    );
+  }
+
+  #[test]
+  fn test_partial_load_with_unknown_event_flag() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+
+    // 不明なEventFlag を含むJSON
+    let json = r#"{
+      "total_boot_count": 200,
+      "cumulative_talk_count": 0,
+      "talk_collection": {},
+      "flags": {
+        "flags": [
+          "FirstBoot",
+          {"UnknownFlag": "some_value"},
+          "FirstClose"
+        ]
+      }
+    }"#;
+    fs::write(&main_path, json).unwrap();
+
+    // 部分パースは成功し、不明なフラグだけスキップ
+    let (vars, failed_fields) =
+      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(vars.total_boot_count, 200);
+    assert!(vars.flags.check(&EventFlag::FirstBoot));
+    assert!(vars.flags.check(&EventFlag::FirstClose));
+    // スキップした項目が警告として記録されている
+    assert!(
+      failed_fields
+        .iter()
+        .any(|f| f.contains("flags") && f.contains("UnknownFlag")),
+      "failed_fields should contain warning about UnknownFlag: {:?}",
+      failed_fields
+    );
+  }
+
+  #[test]
+  fn test_partial_load_with_corrupted_field() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+
+    // total_time が不正な型（文字列）になっているJSON
+    let json = r#"{
+      "total_boot_count": 300,
+      "total_time": "not_a_number",
+      "cumulative_talk_count": 25,
+      "talk_collection": {},
+      "flags": {"flags": []}
+    }"#;
+    fs::write(&main_path, json).unwrap();
+
+    // 部分パースは成功し、total_time だけデフォルト値
+    let (vars, failed_fields) =
+      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(vars.total_boot_count, 300);
+    assert_eq!(vars.cumulative_talk_count, 25);
+    assert!(vars.total_time.is_none()); // デフォルト値
+    assert!(failed_fields.contains(&"total_time".to_string()));
+  }
+
+  #[test]
+  fn test_partial_load_returns_empty_failed_fields_on_valid_json() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+
+    // 正常なJSONを保存
+    let vars = RawVariables {
+      total_boot_count: 500,
+      cumulative_talk_count: 100,
+      ..Default::default()
+    };
+    vars
+      .save_to(
+        main_path.to_str().unwrap(),
+        dir.path().join("backup.json").to_str().unwrap(),
+      )
+      .unwrap();
+
+    // 部分パースでも全フィールド成功
+    let (loaded, failed_fields) =
+      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(loaded.total_boot_count, 500);
+    assert_eq!(loaded.cumulative_talk_count, 100);
+    assert!(failed_fields.is_empty());
+  }
+
+  #[test]
+  fn test_partial_load_nonexistent_file_returns_default() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("nonexistent.json");
+
+    let (vars, failed_fields) =
+      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(vars.total_boot_count, 0);
+    assert!(failed_fields.is_empty());
   }
 }

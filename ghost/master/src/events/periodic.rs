@@ -2,6 +2,7 @@ use crate::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
 use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
+use crate::events::talk::TalkType;
 use crate::status::Status;
 use crate::variables::{
   EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME, IDLE_SECONDS,
@@ -158,6 +159,15 @@ pub(crate) fn on_surface_change(req: &Request) -> Result<Response, ShioriError> 
 }
 
 pub(crate) fn check_story_events() {
+  // 何らかの理由で初期トークタイプがセーブデータから欠落した場合を考え、初回起動が終わっているならUnlockを毎回する
+  if FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+    (FIRST_RANDOMTALKS.len() - 1) as u32,
+  )) {
+    [TalkType::AboutMe, TalkType::WithYou].iter().for_each(|t| {
+      FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
+    });
+  }
+
   if !FLAGS
     .read()
     .unwrap()
