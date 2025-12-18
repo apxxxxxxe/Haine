@@ -131,8 +131,13 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
 pub extern "cdecl" fn unload() -> BOOL {
   debug!("unload");
 
-  if let Err(e) = save_global_variables() {
-    error!("{}", e);
+  let status = *LOAD_STATUS.read().unwrap();
+  if status.should_save() {
+    if let Err(e) = save_global_variables() {
+      error!("{}", e);
+    }
+  } else {
+    warn!("セーブデータのロードに失敗したため、保存をスキップしました");
   }
 
   TRUE

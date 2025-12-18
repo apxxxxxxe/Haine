@@ -42,6 +42,8 @@ rustfmt.toml
 clippy.toml
 clippy.toml
 build.*
+vars.json
+vars.json.bak
 
 CLAUDE.md
 .claude/

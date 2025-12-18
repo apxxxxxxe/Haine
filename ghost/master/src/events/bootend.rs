@@ -13,6 +13,16 @@ use shiorust::message::{parts::HeaderName, Response, *};
 pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   *TOTAL_BOOT_COUNT.write().unwrap() += 1;
 
+  // ロード失敗かつバックアップもないなら何もしない
+  if *LOAD_STATUS.read().unwrap() == LoadStatus::FailedNoBackup {
+    let mut res = new_response_nocontent();
+    add_error_description(
+      &mut res,
+      "ロードに失敗しました。ゴーストを終了し、お手数ですがゴーストフォルダ内のhaine.logの内容とともにバグ報告をお願い致します。",
+    );
+    return Ok(res);
+  }
+
   // 初回起動
   if !FLAGS.read().unwrap().check(&EventFlag::FirstBoot) {
     FLAGS.write().unwrap().done(EventFlag::FirstBoot);
@@ -73,7 +83,16 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     randomize_underwear(),
     talk_content,
   );
-  new_response_with_value_with_translate(v, TranslateOption::simple_translate())
+  let mut res = new_response_with_value_with_translate(v, TranslateOption::simple_translate())?;
+
+  if *LOAD_STATUS.read().unwrap() == LoadStatus::RestoredFromBackup {
+    add_notice_description(
+      &mut res,
+      "セーブデータが破損していたため、バックアップから復元しました。",
+    );
+  }
+
+  Ok(res)
 }
 
 pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
@@ -107,10 +126,20 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   }
   let talks = all_combo(&parts);
   let index = choose_one(&talks, true).ok_or(ShioriError::ArrayAccessError)?;
-  new_response_with_value_with_translate(
+  let mut res = new_response_with_value_with_translate(
     format!("{}{}\\-", RESET_BINDS, talks[index].clone()),
     TranslateOption::simple_translate(),
-  )
+  )?;
+
+  // ロード状態に応じた通知
+  if *LOAD_STATUS.read().unwrap() == LoadStatus::FailedNoBackup {
+    add_error_description(
+      &mut res,
+      "セーブデータのロードに失敗していたため、保存をスキップしました。",
+    );
+  }
+
+  Ok(res)
 }
 
 pub(crate) fn on_vanish_selecting(_req: &Request) -> Response {

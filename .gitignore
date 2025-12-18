@@ -23,6 +23,7 @@ ghost_bak/
 
 ghost/master/target/
 vars.json
+vars.json.bak
 ghost/master/debug
 *.bincode
 

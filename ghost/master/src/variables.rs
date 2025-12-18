@@ -16,6 +16,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 pub(crate) const GHOST_NAME: &str = "Crave The Grave";
 const VAR_PATH: &str = "vars.json";
+const VAR_BACKUP_PATH: &str = "vars.json.bak";
 pub(crate) static TOTAL_BOOT_COUNT: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static TOTAL_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static RANDOM_TALK_INTERVAL: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(180));
@@ -32,6 +33,29 @@ pub(crate) static DERIVATIVE_TALK_REQUESTABLE: LazyLock<RwLock<bool>> =
   LazyLock::new(|| RwLock::new(false));
 pub(crate) static LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX: LazyLock<RwLock<u32>> =
   LazyLock::new(|| RwLock::new(1000));
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub(crate) enum LoadStatus {
+  #[default]
+  NotLoaded, // まだロードしていない（初期状態）
+  FirstBoot,          // 初回起動（セーブファイルなし）
+  Success,            // 正常ロード（バックアップあり）
+  SuccessNoBackup,    // 正常ロード（バックアップなし）
+  RestoredFromBackup, // メインが失敗、バックアップから復元
+  FailedNoBackup,     // ロード失敗、バックアップもなし
+}
+
+impl LoadStatus {
+  pub fn is_failed(&self) -> bool {
+    matches!(self, LoadStatus::FailedNoBackup)
+  }
+
+  pub fn should_save(&self) -> bool {
+    !self.is_failed()
+  }
+}
+
+pub(crate) static LOAD_STATUS: LazyLock<RwLock<LoadStatus>> =
+  LazyLock::new(|| RwLock::new(LoadStatus::NotLoaded));
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub(crate) enum PendingEvent {
@@ -106,18 +130,53 @@ pub(crate) struct RawVariables {
 
 impl RawVariables {
   pub fn load() -> Result<Self, Box<dyn Error>> {
-    if !std::path::Path::new(VAR_PATH).exists() {
+    Self::load_from(VAR_PATH)
+  }
+
+  pub fn load_from(path: &str) -> Result<Self, Box<dyn Error>> {
+    if !std::path::Path::new(path).exists() {
       return Ok(Self::default());
     }
 
-    let json_str = std::fs::read_to_string(VAR_PATH)?;
+    let json_str = std::fs::read_to_string(path)?;
     let vars: RawVariables = serde_json::from_str(&json_str)?;
     Ok(vars)
   }
 
+  pub fn load_backup() -> Result<Self, Box<dyn Error>> {
+    Self::load_backup_from(VAR_BACKUP_PATH)
+  }
+
+  pub fn load_backup_from(path: &str) -> Result<Self, Box<dyn Error>> {
+    let json_str = std::fs::read_to_string(path)?;
+    let vars: RawVariables = serde_json::from_str(&json_str)?;
+    Ok(vars)
+  }
+
+  pub fn load_from_with_backup(main_path: &str, backup_path: &str) -> Result<Self, Box<dyn Error>> {
+    match Self::load_from(main_path) {
+      Ok(vars) => Ok(vars),
+      Err(e) => {
+        // バックアップからの復元を試みる
+        match Self::load_backup_from(backup_path) {
+          Ok(backup_vars) => Ok(backup_vars),
+          Err(_) => Err(e),
+        }
+      }
+    }
+  }
+
   pub fn save(&self) -> Result<(), Box<dyn Error>> {
+    self.save_to(VAR_PATH, VAR_BACKUP_PATH)
+  }
+
+  pub fn save_to(&self, path: &str, backup_path: &str) -> Result<(), Box<dyn Error>> {
+    // 既存ファイルをバックアップ
+    if std::path::Path::new(path).exists() {
+      std::fs::copy(path, backup_path)?;
+    }
     let json_str_indent = serde_json::to_string_pretty(&self)?;
-    std::fs::write(VAR_PATH, json_str_indent)?;
+    std::fs::write(path, json_str_indent)?;
     Ok(())
   }
 }
@@ -185,7 +244,39 @@ impl EventFlags {
 pub(crate) const TRANSPARENT_SURFACE: i32 = 1000000;
 
 pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
-  let raw_vars = RawVariables::load()?;
+  let main_exists = std::path::Path::new(VAR_PATH).exists();
+  let backup_exists = std::path::Path::new(VAR_BACKUP_PATH).exists();
+
+  let raw_vars = match RawVariables::load() {
+    Ok(vars) => {
+      if !main_exists {
+        // ファイルが存在しない場合は FirstBoot
+        *LOAD_STATUS.write().unwrap() = LoadStatus::FirstBoot;
+      } else if backup_exists {
+        // バックアップありで正常ロード
+        *LOAD_STATUS.write().unwrap() = LoadStatus::Success;
+      } else {
+        // バックアップなしで正常ロード
+        *LOAD_STATUS.write().unwrap() = LoadStatus::SuccessNoBackup;
+      }
+      vars
+    }
+    Err(e) => {
+      // バックアップからの復元を試みる
+      match RawVariables::load_backup() {
+        Ok(backup_vars) => {
+          warn!("メインファイルのロードに失敗。バックアップから復元: {}", e);
+          *LOAD_STATUS.write().unwrap() = LoadStatus::RestoredFromBackup;
+          backup_vars
+        }
+        Err(_) => {
+          *LOAD_STATUS.write().unwrap() = LoadStatus::FailedNoBackup;
+          return Err(e);
+        }
+      }
+    }
+  };
+  debug!("load status: {:?}", *LOAD_STATUS.read().unwrap());
 
   *TOTAL_BOOT_COUNT.write().unwrap() = raw_vars.total_boot_count;
   if let Some(time) = raw_vars.total_time {
@@ -371,5 +462,122 @@ impl TouchInfo {
   pub fn add(&mut self) {
     self.count += 1;
     self.last_unixtime = SystemTime::now();
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+  use std::fs;
+  use tempfile::TempDir;
+
+  #[test]
+  fn test_save_creates_backup() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+    let backup_path = dir.path().join("vars.json.bak");
+
+    // 初回保存（バックアップなし）
+    let vars = RawVariables::default();
+    vars
+      .save_to(main_path.to_str().unwrap(), backup_path.to_str().unwrap())
+      .unwrap();
+    assert!(main_path.exists());
+    assert!(!backup_path.exists()); // 初回はバックアップなし
+
+    // 2回目保存（バックアップ作成）
+    vars
+      .save_to(main_path.to_str().unwrap(), backup_path.to_str().unwrap())
+      .unwrap();
+    assert!(backup_path.exists()); // バックアップが作成される
+  }
+
+  #[test]
+  fn test_load_backup_on_main_file_corruption() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+    let backup_path = dir.path().join("vars.json.bak");
+
+    // 正常なデータを保存（2回保存してバックアップを作成）
+    let vars = RawVariables {
+      total_boot_count: 42,
+      ..Default::default()
+    };
+    vars
+      .save_to(main_path.to_str().unwrap(), backup_path.to_str().unwrap())
+      .unwrap();
+    vars
+      .save_to(main_path.to_str().unwrap(), backup_path.to_str().unwrap())
+      .unwrap();
+
+    // メインファイルを破損
+    fs::write(&main_path, "invalid json").unwrap();
+
+    // バックアップから復元
+    let loaded = RawVariables::load_from_with_backup(
+      main_path.to_str().unwrap(),
+      backup_path.to_str().unwrap(),
+    )
+    .unwrap();
+    assert_eq!(loaded.total_boot_count, 42);
+  }
+
+  #[test]
+  fn test_load_fails_when_both_files_corrupted() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+    let backup_path = dir.path().join("vars.json.bak");
+
+    // 両方を破損
+    fs::write(&main_path, "invalid").unwrap();
+    fs::write(&backup_path, "also invalid").unwrap();
+
+    let result = RawVariables::load_from_with_backup(
+      main_path.to_str().unwrap(),
+      backup_path.to_str().unwrap(),
+    );
+    assert!(result.is_err());
+  }
+
+  #[test]
+  fn test_backup_preserves_previous_data() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("vars.json");
+    let backup_path = dir.path().join("vars.json.bak");
+
+    // 最初のデータを保存
+    let vars1 = RawVariables {
+      total_boot_count: 10,
+      ..Default::default()
+    };
+    vars1
+      .save_to(main_path.to_str().unwrap(), backup_path.to_str().unwrap())
+      .unwrap();
+
+    // 2回目のデータを保存（vars1がバックアップされる）
+    let vars2 = RawVariables {
+      total_boot_count: 20,
+      ..Default::default()
+    };
+    vars2
+      .save_to(main_path.to_str().unwrap(), backup_path.to_str().unwrap())
+      .unwrap();
+
+    // バックアップには前回のデータ（10）が残っている
+    let backup_loaded = RawVariables::load_backup_from(backup_path.to_str().unwrap()).unwrap();
+    assert_eq!(backup_loaded.total_boot_count, 10);
+
+    // メインには新しいデータ（20）がある
+    let main_loaded = RawVariables::load_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(main_loaded.total_boot_count, 20);
+  }
+
+  #[test]
+  fn test_load_from_nonexistent_file_returns_default() {
+    let dir = TempDir::new().unwrap();
+    let main_path = dir.path().join("nonexistent.json");
+
+    let loaded = RawVariables::load_from(main_path.to_str().unwrap()).unwrap();
+    assert_eq!(loaded.total_boot_count, 0); // default値
   }
 }
