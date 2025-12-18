@@ -87,6 +87,7 @@ impl Talk {
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize, Hash, EnumIter)]
 pub(crate) enum TalkType {
+  #[serde(alias = "SelfIntroduce")]
   AboutMe,
   WithYou,
   Servant,
