@@ -3,11 +3,11 @@ pub(crate) mod first_boot;
 pub(crate) mod randomtalk;
 
 use crate::check_error;
-use crate::error::ShioriError;
-use crate::events::common::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use crate::events::talk::randomtalk::random_talks;
-use crate::roulette::RouletteCell;
-use crate::variables::TALK_COLLECTION;
+use crate::system::roulette::RouletteCell;
+use crate::system::variables::TALK_COLLECTION;
 use core::fmt::{Display, Formatter};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};

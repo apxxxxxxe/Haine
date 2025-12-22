@@ -1,12 +1,12 @@
-use crate::error::ShioriError;
-use crate::events::common::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use crate::events::first_boot::{FIRST_BOOT_TALK, FIRST_RANDOMTALKS};
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::{derivative_talks_per_talk_type, random_talks};
 use crate::events::TalkType;
 use crate::events::TalkingPlace;
-use crate::variables::PendingEvent;
-use crate::variables::{
+use crate::system::variables::PendingEvent;
+use crate::system::variables::{
   EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
   TALKING_PLACE, TALK_COLLECTION, USER_NAME,
 };
@@ -66,7 +66,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
   );
 
   // ハロウィン専用メニュー項目
-  let local_time = crate::windows::get_local_time();
+  let local_time = crate::system::windows::get_local_time();
   let halloween_menu = if local_time.wMonth == 10 && local_time.wDay == 31 {
     format!(
       "\\_l[0,@1.5em]\\![*]\\q[仮装してもらう,OnCostumeMenuExec,{}]\\n",

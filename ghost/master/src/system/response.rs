@@ -1,12 +1,12 @@
 use crate::check_error;
-use crate::error::ShioriError;
+use crate::system::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_RATE_MAX;
 use crate::events::talk::TalkType;
 use crate::events::translate::on_translate;
-use crate::events::TalkingPlace;
-use crate::events::IMMERSIVE_ICON_COUNT;
-use crate::roulette::RouletteCell;
-use crate::variables::*;
+use crate::events::talk::TalkingPlace;
+use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
+use crate::system::roulette::RouletteCell;
+use crate::system::variables::*;
 use core::fmt::{Display, Formatter};
 use std::collections::HashSet;
 
@@ -415,6 +415,7 @@ pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
   Ok(res)
 }
 
+#[allow(dead_code)]
 pub(crate) enum Icon {
   Cog,
   Cross,

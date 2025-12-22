@@ -1,5 +1,3 @@
-use crate::error::ShioriError;
-use crate::events::common::*;
 use crate::events::randomtalk::RANDOMTALK_COMMENTS_LIVING_ROOM;
 use crate::events::talk::anchor::anchor_talks;
 use crate::events::talk::randomtalk::random_talks;
@@ -8,7 +6,9 @@ use crate::events::{
   first_boot::{FIRST_BOOT_MARKER, FIRST_RANDOMTALKS},
   randomtalk::RANDOMTALK_COMMENTS_LIBRARY_INACTIVE,
 };
-use crate::variables::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
 use shiorust::message::{parts::*, Request, Response};
 use vibrato::errors::Result;
 
@@ -135,11 +135,14 @@ pub fn render_talk(talk: &Talk) -> String {
   let derivative_talk_anchors = if let Some(dtalks) = derivative_talk_by_id(&talk.id) {
     let mut anchors = "\\1\\_q".to_string();
     for (i, dtalk) in dtalks.iter().enumerate() {
-      if i > 0 {
-        anchors += "\\_w[1em]";
+      // TODO: \1にすでに文章がある場合も\_lで表示位置を調整する必要がある
+      if i == 0 && talk.to_string().contains("\\1") {
+        anchors += "\\_l[0,@1.5em]";
+      } else if i > 0 {
+        anchors += "\\_l[0,@1em]";
       }
       anchors += &format!(
-        "\\![*]\\_a[DerivativeTalk,{}]{}\\_a\\n",
+        "\\![*]\\_a[DerivativeTalk,{}]{}\\_a",
         dtalk.id, dtalk.summary,
       );
     }
@@ -262,9 +265,9 @@ mod test {
   use crate::events::on_story_event;
   use crate::events::TALK_UNLOCK_COUNT_LORE;
   use crate::events::TALK_UNLOCK_COUNT_SERVANT;
-  use crate::variables::PendingEvent;
-  use crate::variables::INSERTER;
-  use crate::variables::USER_NAME;
+  use crate::system::variables::PendingEvent;
+  use crate::system::variables::INSERTER;
+  use crate::system::variables::USER_NAME;
   use shiorust::message::Request;
 
   #[test]

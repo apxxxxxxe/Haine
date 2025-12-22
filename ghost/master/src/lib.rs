@@ -1,17 +1,9 @@
 #[macro_use]
-mod events;
+pub mod events;
+pub mod system;
 
-mod autobreakline;
-mod error;
-mod roulette;
-mod status;
-mod variables;
-
-#[cfg(windows)]
-mod windows;
-
-use crate::events::common::{add_error_description, new_response_nocontent};
-use crate::variables::*;
+use crate::system::response::{add_error_description, new_response_nocontent};
+use crate::system::variables::*;
 
 use std::fs::{metadata, File};
 use std::panic;

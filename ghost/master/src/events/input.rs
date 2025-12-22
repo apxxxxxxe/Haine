@@ -1,6 +1,6 @@
-use crate::error::ShioriError;
-use crate::events::common::*;
-use crate::variables::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
 use shiorust::message::{Request, Response};
 use std::fmt;
 use std::fmt::{Display, Formatter};

@@ -1,9 +1,9 @@
 use crate::check_error;
-use crate::error::ShioriError;
-use crate::events::common::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use crate::events::mouse::*;
-use crate::status::Status;
-use crate::variables::*;
+use crate::system::status::Status;
+use crate::system::variables::*;
 use shiorust::message::{Request, Response};
 use std::time::SystemTime;
 

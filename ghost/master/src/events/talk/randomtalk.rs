@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::events::talk::{Talk, TalkType};
-use crate::variables::{EventFlag, FLAGS};
+use crate::system::variables::{EventFlag, FLAGS};
 
 use super::DerivaliveTalk;
 
@@ -623,9 +623,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         RandomTalk {
           id: "冥界の渡し賃".to_string(),
           text: "\
-            h1111206古代ギリシャでは死者に銅貨を持たせて葬っていたの。\\n\
+            h1111206古代ギリシャでは、死者に銅貨を持たせて葬っていたの。\\n\
             h1111210冥界には川を渡っていかなければならなかったから、\\n\
-            渡し賃を持たせて快適な旅を願う……ということね。\\n\\n[half]\
+            渡し賃を持たせて快適な旅を願っていたのよ。\\n\\n[half]\
             h1111205死者が川を越えていくという伝承は世界中で見られるわ。\\n\
             彼らにとって、境界線といえばまず川が連想されたのかしら。\\n\
             h1111210あなたなら、あの世とこの世の間にはなにがあると思う？\

@@ -1,12 +1,12 @@
-use crate::autobreakline::Inserter;
+use crate::system::autobreakline::Inserter;
 use crate::check_error;
-use crate::error::ShioriError;
+use crate::system::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
-use crate::events::common::TranslateOption;
+use crate::system::response::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::{derivative_talks, random_talks};
 use crate::events::talk::{TalkType, TalkingPlace};
-use crate::roulette::TalkBias;
+use crate::system::roulette::TalkBias;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
@@ -366,6 +366,7 @@ impl EventFlags {
   }
 
   /// 指定した月日の季節イベントを過去に何回見たか取得
+  #[allow(dead_code)]
   pub fn count_season_event(&self, month: u32, day: u32) -> usize {
     self
       .flags

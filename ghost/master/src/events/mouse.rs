@@ -1,6 +1,6 @@
 use crate::check_error;
-use crate::error::ShioriError;
-use crate::events::common::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
@@ -8,8 +8,8 @@ use crate::events::render_immersive_icon;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE_MAX;
-use crate::status::Status;
-use crate::variables::{
+use crate::system::status::Status;
+use crate::system::variables::{
   EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES,
   IS_IMMERSIVE_DEGREES_FIXED, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX,
   TALKING_PLACE, TOUCH_INFO,
@@ -29,7 +29,7 @@ macro_rules! get_touch_info {
       .write()
       .unwrap()
       .entry($info.to_string())
-      .or_insert($crate::variables::TouchInfo::new())
+      .or_insert($crate::system::variables::TouchInfo::new())
   };
 }
 

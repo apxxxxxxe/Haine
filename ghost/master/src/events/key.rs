@@ -1,9 +1,9 @@
-use crate::error::ShioriError;
+use crate::system::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
-use crate::events::common::*;
+use crate::system::response::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::talk::random_talks_analysis;
-use crate::variables::*;
+use crate::system::variables::*;
 use shiorust::message::{Request, Response};
 use std::collections::HashMap;
 

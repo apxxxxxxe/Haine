@@ -1,15 +1,15 @@
-use crate::error::ShioriError;
+use crate::system::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
-use crate::events::common::*;
+use crate::system::response::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::talk::TalkType;
-use crate::status::Status;
-use crate::variables::{
+use crate::system::status::Status;
+use crate::system::variables::{
   EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME, IDLE_SECONDS,
   LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
 };
-use crate::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
-use crate::windows::get_local_time;
+use crate::system::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
+use crate::system::windows::get_local_time;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 

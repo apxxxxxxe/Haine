@@ -1,7 +1,7 @@
-use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
-use crate::error::ShioriError;
-use crate::events::common::*;
-use crate::variables::*;
+use crate::system::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
 use crate::{lazy_fancy_regex, lazy_regex};
 use core::fmt::{Display, Formatter};
 use fancy_regex::Regex as FancyRegex;
@@ -39,7 +39,7 @@ pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String
   INSERTER.write().unwrap().run(balloonnum_reset)
 }
 
-fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
+pub fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   static IGNORING_TRANSLATE_RANGE: Lazy<Regex> = lazy_regex!(r"@@@@@(.*?)@@@@@");
   static CHANGE_SCOPE_RE_PREFIX: Lazy<FancyRegex> =
     lazy_fancy_regex!(r"^(\\[01])(?!w)|(\\p\[\d+\])");

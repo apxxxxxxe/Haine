@@ -1,4 +1,4 @@
-use crate::events::common::*;
+use crate::system::response::*;
 use shiorust::message::{Request, Response};
 
 pub(crate) fn on_balloon_tooltip(_req: &Request) -> Response {

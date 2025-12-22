@@ -1,12 +1,12 @@
-use crate::error::ShioriError;
+use crate::system::error::ShioriError;
 use crate::events::check_story_events;
-use crate::events::common::*;
+use crate::system::response::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
 use crate::events::TalkingPlace;
-use crate::variables::*;
-use crate::windows::get_local_time;
+use crate::system::variables::*;
+use crate::system::windows::get_local_time;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
@@ -68,7 +68,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     talks[index].clone()
   };
 
-  let local_time = crate::windows::get_local_time();
+  let local_time = crate::system::windows::get_local_time();
   let unset_halloween = if local_time.wMonth != 10 || local_time.wDay != 31 {
     "\\![bind,頭,ヤギ角,0]\\![bind,頭,魔女帽,0]\\![bind,トップス+,黒赤マント,0]"
   } else {

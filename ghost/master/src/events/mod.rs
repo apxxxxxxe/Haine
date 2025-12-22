@@ -1,6 +1,5 @@
 pub(crate) mod aitalk;
 mod bootend;
-pub(crate) mod common;
 mod input;
 mod key;
 mod menu;
@@ -9,14 +8,14 @@ pub(crate) mod mouse_core;
 mod periodic;
 pub(crate) mod talk;
 mod tooltip;
-pub(crate) mod translate;
+pub mod translate;
 mod update;
 mod webclap;
 
-use crate::error::ShioriError;
+use crate::system::error::ShioriError;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
-use crate::events::common::*;
+use crate::system::response::*;
 use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
@@ -27,7 +26,7 @@ use crate::events::tooltip::*;
 use crate::events::translate::*;
 use crate::events::update::*;
 use crate::events::webclap::*;
-use crate::variables::*;
+use crate::system::variables::*;
 use shiorust::message::{parts::*, traits::*, Request, Response};
 use std::fs;
 
