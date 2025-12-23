@@ -105,8 +105,6 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
     debug!("{}", panic_info);
   }));
 
-  INSERTER.write().unwrap().start_init();
-
   if let Err(e) = load_global_variables() {
     error!("{}", e);
   }

@@ -1,4 +1,3 @@
-use crate::system::autobreakline::Inserter;
 use crate::check_error;
 use crate::system::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
@@ -553,8 +552,6 @@ pub(crate) static LAST_WHEEL_PART: LazyLock<RwLock<String>> =
 pub(crate) static FIRST_SEXIAL_TOUCH: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
 pub(crate) static LAST_TOUCH_INFO: LazyLock<RwLock<String>> =
   LazyLock::new(|| RwLock::new("".to_string()));
-pub(crate) static INSERTER: LazyLock<RwLock<Inserter>> =
-  LazyLock::new(|| RwLock::new(Inserter::new(22.0)));
 pub(crate) static TALK_BIAS: LazyLock<RwLock<TalkBias>> =
   LazyLock::new(|| RwLock::new(TalkBias::new()));
 pub(crate) static CURRENT_SURFACE: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));

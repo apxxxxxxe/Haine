@@ -7,7 +7,6 @@ pub enum ShioriError {
   SystemTimeError,
   FieldAccessError,
   ArrayAccessError,
-  TranslaterNotReadyError,
   TalkNotFound,
   ParseRequestError,
   NotSetScopeError(String),
@@ -31,10 +30,6 @@ impl fmt::Display for ShioriError {
       ShioriError::ArrayAccessError => {
         write!(f, "[ArrayAccessError]配列の範囲外アクセスが発生しました")
       }
-      ShioriError::TranslaterNotReadyError => write!(
-        f,
-        "[TranslaterNotReadyError]トランスレータのセットアップが完了していません"
-      ),
       ShioriError::TalkNotFound => write!(f, "[TalkNotFound]指定されたトークが見つかりません"),
       ShioriError::ParseRequestError => write!(
         f,

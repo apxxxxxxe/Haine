@@ -10,7 +10,6 @@ use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::variables::*;
 use shiorust::message::{parts::*, Request, Response};
-use vibrato::errors::Result;
 
 use super::talk::randomtalk::{derivative_talk_by_id, derivative_talks};
 use super::talk::Talk;
@@ -266,7 +265,6 @@ mod test {
   use crate::events::TALK_UNLOCK_COUNT_LORE;
   use crate::events::TALK_UNLOCK_COUNT_SERVANT;
   use crate::system::variables::PendingEvent;
-  use crate::system::variables::INSERTER;
   use crate::system::variables::USER_NAME;
   use shiorust::message::Request;
 
@@ -303,13 +301,6 @@ mod test {
 
     // テスト中は常に非アイドル状態
     *IDLE_SECONDS.write().unwrap() = IDLE_THRESHOLD - 1;
-
-    // Inserterの初期化を別スレッドで開始(本来はloadで行われる)
-    INSERTER.write().unwrap().start_init();
-    // translatorの初期化を待つ
-    while !INSERTER.read().unwrap().is_ready() {
-      std::thread::sleep(std::time::Duration::from_millis(100));
-    }
 
     // 初回起動時のフラグチェック
     assert!(!FLAGS.read().unwrap().check(&EventFlag::FirstBoot));

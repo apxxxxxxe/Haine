@@ -134,12 +134,7 @@ pub(crate) fn new_response_with_value_with_translate(
   };
 
   let v = if option.contains(&TranslateOption::DoTranslate) {
-    if INSERTER.read().unwrap().is_ready() {
-      on_translate(value, option.contains(&TranslateOption::CompleteShadow))?
-    } else {
-      *WAITING_TALK.write().unwrap() = Some((value, option));
-      "\\1\\_qLoading...\\_w[1000]\\![raise,OnWaitTranslater]".to_string()
-    }
+    on_translate(value, option.contains(&TranslateOption::CompleteShadow))?
   } else {
     value
   };

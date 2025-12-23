@@ -1,4 +1,3 @@
-use crate::system::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
 use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::variables::*;
@@ -8,13 +7,43 @@ use fancy_regex::Regex as FancyRegex;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use shiorust::message::{Request, Response};
-use std::thread;
-use std::time::Duration;
+
+// ============================================================
+// スコープ処理
+// ============================================================
+
+static CHANGE_SCOPE_RE: Lazy<FancyRegex> =
+  lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
+
+fn find_change_scope(text: &str) -> Option<String> {
+  if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {
+    if let Some(scope) = captures.get(1) {
+      return Some(scope.as_str().to_string());
+    } else if let Some(scope) = captures.get(2) {
+      return Some(scope.as_str().to_string());
+    }
+  }
+  None
+}
+
+fn extract_scope(text: &str) -> Option<usize> {
+  static RE_NOT_NUMBER: Lazy<Regex> = lazy_regex!(r"[^\d]");
+
+  if let Some(scope_tag) = find_change_scope(text) {
+    debug!("scope_tag: {}", scope_tag);
+    if let Ok(s) = RE_NOT_NUMBER.replace_all(&scope_tag, "").parse::<usize>() {
+      debug!("scope: {}", s);
+      return Some(s);
+    }
+  }
+  None
+}
+
+// ============================================================
+// 翻訳処理
+// ============================================================
 
 pub(crate) fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
-  while !INSERTER.read().unwrap().is_ready() {
-    thread::sleep(Duration::from_millis(100));
-  }
   let has_waiting_talk = WAITING_TALK.read().unwrap().is_some();
   let m = if has_waiting_talk {
     WAITING_TALK.read().unwrap().clone().unwrap()
@@ -31,12 +60,7 @@ pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String
 
   let translated = translate(text, complete_shadow)?;
 
-  let balloonnum_reset = format!("{}{}", REMOVE_BALLOON_NUM, translated);
-
-  if !INSERTER.read().unwrap().is_ready() {
-    return Err(ShioriError::TranslaterNotReadyError);
-  }
-  INSERTER.write().unwrap().run(balloonnum_reset)
+  Ok(format!("{}{}", REMOVE_BALLOON_NUM, translated))
 }
 
 pub fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
