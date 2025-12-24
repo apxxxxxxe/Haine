@@ -1,4 +1,3 @@
-use crate::check_error;
 use crate::system::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_RATE_MAX;
 use crate::events::talk::TalkType;
@@ -219,22 +218,22 @@ pub(crate) fn render_shadow(is_complete: bool) -> String {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-enum BlinkDirection {
+pub(crate) enum BlinkDirection {
   Here,
   Down,
   There,
   None,
 }
 
-struct BlinkTransition {
-  base: i32,
-  is_closed: bool,
-  direction: BlinkDirection,
-  to_close: Vec<i32>,
+pub(crate) struct BlinkTransition {
+  pub base: i32,
+  pub is_closed: bool,
+  pub direction: BlinkDirection,
+  pub to_close: Vec<i32>,
 }
 
 impl BlinkTransition {
-  fn all() -> Vec<Self> {
+  pub(crate) fn all() -> Vec<Self> {
     vec![
       BlinkTransition {
         base: 1,
@@ -330,84 +329,78 @@ impl BlinkTransition {
   }
 }
 
-// サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完する関数
-pub(crate) fn on_smooth_blink(req: &Request) -> Result<Response, ShioriError> {
+/// サーフェス変更の際に目線が動くとき、なめらかに見えるようにまばたきのサーフェスを補完するスクリプトを生成
+///
+/// # Arguments
+/// * `from_surface` - 変更元のサーフェスID
+/// * `dest_surface` - 変更先のサーフェスID
+/// * `shadow_script` - 事前計算された影スクリプト（render_shadow()の結果）
+/// * `ignore_upper_completion` - 閉じる過程をスキップするか（hrプレフィックス時）
+///
+/// # Returns
+/// 目線補完のさくらスクリプト。補完不要な場合は直接遷移のスクリプト。
+pub(crate) fn generate_blink_animation(
+  from_surface: i32,
+  dest_surface: i32,
+  shadow_script: &str,
+  ignore_upper_completion: bool,
+) -> String {
   let transitions = BlinkTransition::all();
   const DELAY: i32 = 100;
   const CLOSE_EYES_INDEX: i32 = 10;
   const EYE_INDEX_DIGIT: u32 = 2;
   let eye_index_digit_pow = 10_i32.pow(EYE_INDEX_DIGIT);
 
-  let mut notice = String::new();
-  let refs = get_references(req);
-  let dest_surface = check_error!(refs[0].parse::<i32>(), ShioriError::ParseIntError);
-  let is_complete = check_error!(refs[1].parse::<i32>(), ShioriError::ParseIntError) == 1;
-  let ignore_upper_completion =
-    check_error!(refs[2].parse::<i32>(), ShioriError::ParseIntError) == 1;
   let dest_eyes = dest_surface % eye_index_digit_pow;
   let dest_remain = dest_surface - dest_eyes;
-  let from_surface = *CURRENT_SURFACE.read().unwrap();
   let from_eyes = from_surface % eye_index_digit_pow;
-  let direct_res = new_response_with_value_with_notranslate(
-    format!(
-      "\\![lock,repaint]\\s[{}]{}\\![unlock,repaint]",
-      dest_surface,
-      render_shadow(is_complete)
-    ),
-    TranslateOption::none(),
+
+  // 直接遷移スクリプト
+  let direct_script = format!(
+    "\\0\\![lock,repaint]\\s[{}]{}\\![unlock,repaint]",
+    dest_surface, shadow_script
   );
 
+  // 目コードが0または同一サーフェスの場合は直接遷移
   if from_eyes == 0 || dest_eyes == 0 {
-    return Ok(direct_res);
+    return direct_script;
   }
   if from_surface == dest_surface {
-    return Ok(new_response_nocontent());
+    // 同じサーフェスでも話者0への切り替えは必要
+    return "\\0".to_string();
   }
 
   let mut cuts = vec![];
   if let Some(from) = transitions.iter().find(|t| t.base == from_eyes) {
     if let Some(dest) = transitions.iter().find(|t| t.base == dest_eyes) {
+      // 同じ視線方向なら直接遷移
       if from.direction == dest.direction {
-        return Ok(direct_res);
+        return direct_script;
       }
       if !ignore_upper_completion {
         cuts.push(from_surface);
-        cuts.extend(from.to_close.clone().iter().map(|i| dest_remain + i));
+        cuts.extend(from.to_close.iter().map(|i| dest_remain + i));
         if !from.is_closed && !dest.is_closed {
           cuts.push(dest_remain + CLOSE_EYES_INDEX);
         }
       }
-      cuts.extend(dest.to_close.clone().iter().rev().map(|i| dest_remain + i));
-    } else {
-      notice = format!("目線の変更先が不正です: {}", dest_eyes);
+      cuts.extend(dest.to_close.iter().rev().map(|i| dest_remain + i));
     }
-  } else {
-    notice = format!("目線の変更元が不正です: {}", from_eyes);
   }
 
   cuts.push(dest_surface);
 
   let delay = format!("\\_w[{}]", DELAY);
-  let animation = cuts
+  cuts
     .iter()
     .map(|s| {
       format!(
         "\\0\\![lock,repaint]\\s[{}]{}\\![unlock,repaint]",
-        s,
-        render_shadow(is_complete)
+        s, shadow_script
       )
     })
     .collect::<Vec<String>>()
-    .join(delay.as_str());
-
-  let mut res = new_response_with_value_with_notranslate(animation, TranslateOption::none());
-  if !notice.is_empty() {
-    add_notice_description(
-      &mut res,
-      format!("まばたき補完中にエラーが発生しました: {}", notice).as_str(),
-    );
-  }
-  Ok(res)
+    .join(&delay)
 }
 
 #[allow(dead_code)]
@@ -491,4 +484,96 @@ pub(crate) fn render_immersive_icon() -> String {
     candles[i as usize - 1] = blowed;
   }
   format!("\\p[2]{}\\0", v)
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_generate_blink_animation_same_surface() {
+    // 同一サーフェスの場合でも話者0への切り替えは必要
+    let result = generate_blink_animation(1111201, 1111201, "", false);
+    assert_eq!(result, "\\0");
+  }
+
+  #[test]
+  fn test_generate_blink_animation_zero_eye_code() {
+    // 目コードが0の場合は直接遷移
+    let result = generate_blink_animation(1111200, 1111201, "", false);
+    assert!(result.contains("\\s[1111201]"));
+    assert!(!result.contains("\\_w[")); // 遅延なし（直接遷移）
+  }
+
+  #[test]
+  fn test_generate_blink_animation_same_direction() {
+    // 同じ視線方向（Here: 1, 4, 7）の場合は直接遷移
+    // 1（開き目Here）→ 4（半眼Here）は同方向
+    let result = generate_blink_animation(1111201, 1111204, "", false);
+    assert!(result.contains("\\s[1111204]"));
+    assert!(!result.contains("\\_w[")); // 遅延なし
+  }
+
+  #[test]
+  fn test_generate_blink_animation_different_direction() {
+    // 異なる視線方向の場合はアニメーション補完
+    // 1（Here）→ 3（There）は異方向
+    let result = generate_blink_animation(1111201, 1111203, "", false);
+
+    // 遅延があること（アニメーション）
+    assert!(result.contains("\\_w[100]"));
+
+    // 最終的に目的サーフェスに到達
+    assert!(result.contains("\\s[1111203]"));
+
+    // 中間フレームが含まれる（閉じ目10を経由）
+    assert!(result.contains("\\s[1111210]"));
+  }
+
+  #[test]
+  fn test_generate_blink_animation_with_half_blink() {
+    // ignore_upper_completion=true の場合は閉じる過程をスキップ
+    let result_full = generate_blink_animation(1111201, 1111203, "", false);
+    let result_half = generate_blink_animation(1111201, 1111203, "", true);
+
+    // 半まばたきの方がフレーム数が少ない
+    let full_frames = result_full.matches("\\s[").count();
+    let half_frames = result_half.matches("\\s[").count();
+    assert!(half_frames < full_frames);
+  }
+
+  #[test]
+  fn test_generate_blink_animation_with_shadow_script() {
+    // 影スクリプトが各フレームに埋め込まれる
+    let shadow = "\\![bind,ex,没入度用,1]";
+    let result = generate_blink_animation(1111201, 1111203, shadow, false);
+
+    // 影スクリプトが含まれる
+    assert!(result.contains(shadow));
+
+    // 各フレームに影スクリプトが埋め込まれているか確認
+    let frame_count = result.matches("\\s[").count();
+    let shadow_count = result.matches(shadow).count();
+    assert_eq!(frame_count, shadow_count);
+  }
+
+  #[test]
+  fn test_generate_blink_animation_here_to_down() {
+    // Here（1）→ Down（2）の遷移
+    let result = generate_blink_animation(1111201, 1111202, "", false);
+
+    // アニメーションが生成される
+    assert!(result.contains("\\_w[100]"));
+    assert!(result.contains("\\s[1111202]"));
+  }
+
+  #[test]
+  fn test_generate_blink_animation_closed_eyes() {
+    // 閉じ目（10）からの遷移
+    let result = generate_blink_animation(1111210, 1111201, "", false);
+
+    // 直接遷移ではなくアニメーション
+    // 閉じ目からHereへ開く
+    assert!(result.contains("\\s[1111201]"));
+  }
 }

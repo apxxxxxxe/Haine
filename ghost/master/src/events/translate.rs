@@ -101,16 +101,46 @@ pub fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriEr
 fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
 
-  let text = RE_SURFACE_SNIPPET
-    .replace_all(&text, |caps: &regex::Captures| {
+  // 変数を translate 時点で1回だけ読み取り（副作用を最小化）
+  let current_surface = *CURRENT_SURFACE.read().unwrap();
+  let shadow_script = render_shadow(complete_shadow);
+
+  // 全サーフェス記法を検出し、位置情報付きで収集
+  let matches: Vec<_> = RE_SURFACE_SNIPPET.captures_iter(&text).collect();
+
+  let text = if matches.is_empty() {
+    text
+  } else {
+    // 前後関係を追跡しながら置換
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut prev_surface = current_surface;
+
+    for caps in matches.iter() {
+      let full_match = caps.get(0).unwrap();
       let use_half_blink = caps.get(1).is_some();
-      let surface_id = caps.get(2).unwrap().as_str();
-      format!(
-        "\\0\\![embed,OnSmoothBlink,{},{},{}]",
-        surface_id, complete_shadow as i32, use_half_blink as i32,
-      )
-    })
-    .to_string();
+      let surface_id: i32 = caps.get(2).unwrap().as_str().parse().unwrap();
+
+      // マッチ前のテキストを追加
+      result.push_str(&text[last_end..full_match.start()]);
+
+      // 目線補完スクリプトを生成
+      let script = generate_blink_animation(
+        prev_surface,
+        surface_id,
+        &shadow_script,
+        use_half_blink,
+      );
+      result.push_str(&script);
+
+      prev_surface = surface_id;
+      last_end = full_match.end();
+    }
+
+    // 残りのテキストを追加
+    result.push_str(&text[last_end..]);
+    result
+  };
 
   let mut dialogs = Dialog::from_text(&text);
 
@@ -557,5 +587,92 @@ mod tests {
     assert_eq!(result[1], "");
     assert_eq!(result[2], "\\n\\n[half]\\_w[700]");
     assert_eq!(result[3], "");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_basic() {
+    // サーフェス記法の正規表現テスト
+    static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    // 基本パターン
+    let text = "h1111201";
+    let caps = RE_SURFACE_SNIPPET.captures(text).unwrap();
+    assert!(caps.get(1).is_none()); // r なし
+    assert_eq!(caps.get(2).unwrap().as_str(), "1111201");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_half_blink() {
+    // hr プレフィックスのテスト
+    static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "hr1111203";
+    let caps = RE_SURFACE_SNIPPET.captures(text).unwrap();
+    assert!(caps.get(1).is_some()); // r あり
+    assert_eq!(caps.get(2).unwrap().as_str(), "1111203");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_multiple() {
+    // 複数のサーフェス記法
+    static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "こんにちはh1111201。元気ですか？h1111203";
+    let matches: Vec<_> = RE_SURFACE_SNIPPET.captures_iter(text).collect();
+
+    assert_eq!(matches.len(), 2);
+    assert_eq!(matches[0].get(2).unwrap().as_str(), "1111201");
+    assert_eq!(matches[1].get(2).unwrap().as_str(), "1111203");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_position() {
+    // 位置情報の取得テスト
+    static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "ABCh1111201DEF";
+    let caps = RE_SURFACE_SNIPPET.captures(text).unwrap();
+    let full_match = caps.get(0).unwrap();
+
+    assert_eq!(full_match.start(), 3); // "ABC"の後
+    assert_eq!(full_match.end(), 11); // "h1111201"の終わり
+    assert_eq!(&text[..full_match.start()], "ABC");
+    assert_eq!(&text[full_match.end()..], "DEF");
+  }
+
+  #[test]
+  fn test_surface_replacement_logic() {
+    // サーフェス置換ロジックの統合テスト
+    static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "あいうh1111201かきくh1111203さしす".to_string();
+    let matches: Vec<_> = RE_SURFACE_SNIPPET.captures_iter(&text).collect();
+
+    // 前後関係を追跡しながら置換するロジックをシミュレート
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut prev_surface = 1111200i32; // 初期サーフェス（目コード0）
+
+    for caps in matches.iter() {
+      let full_match = caps.get(0).unwrap();
+      let surface_id: i32 = caps.get(2).unwrap().as_str().parse().unwrap();
+
+      // マッチ前のテキストを追加
+      result.push_str(&text[last_end..full_match.start()]);
+
+      // プレースホルダーとして [FROM->TO] を追加
+      result.push_str(&format!("[{}->{}]", prev_surface, surface_id));
+
+      prev_surface = surface_id;
+      last_end = full_match.end();
+    }
+    result.push_str(&text[last_end..]);
+
+    // 結果を確認
+    assert!(result.contains("あいう[1111200->1111201]かきく"));
+    assert!(result.contains("かきく[1111201->1111203]さしす"));
+
+    // 2番目のサーフェスは1番目のサーフェスを変更元として使用
+    assert!(result.contains("[1111201->1111203]"));
   }
 }
