@@ -6,7 +6,6 @@ use core::fmt::{Display, Formatter};
 use fancy_regex::Regex as FancyRegex;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use shiorust::message::{Request, Response};
 
 // ============================================================
 // スコープ処理
@@ -42,16 +41,6 @@ fn extract_scope(text: &str) -> Option<usize> {
 // ============================================================
 // 翻訳処理
 // ============================================================
-
-pub(crate) fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
-  let has_waiting_talk = WAITING_TALK.read().unwrap().is_some();
-  let m = if has_waiting_talk {
-    WAITING_TALK.read().unwrap().clone().unwrap()
-  } else {
-    return Err(ShioriError::ArrayAccessError);
-  };
-  new_response_with_value_with_translate(m.0, m.1)
-}
 
 pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   if text.is_empty() {

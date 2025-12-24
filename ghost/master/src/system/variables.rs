@@ -1,7 +1,6 @@
 use crate::check_error;
 use crate::system::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
-use crate::system::response::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::{derivative_talks, random_talks};
 use crate::events::talk::{TalkType, TalkingPlace};
@@ -557,8 +556,6 @@ pub(crate) static TALK_BIAS: LazyLock<RwLock<TalkBias>> =
 pub(crate) static CURRENT_SURFACE: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IDLE_SECONDS: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IMMERSIVE_DEGREES: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(0));
-pub(crate) static WAITING_TALK: LazyLock<RwLock<Option<(String, HashSet<TranslateOption>)>>> =
-  LazyLock::new(|| RwLock::new(None));
 pub(crate) static TOUCH_INFO: LazyLock<RwLock<HashMap<String, TouchInfo>>> =
   LazyLock::new(|| RwLock::new(HashMap::new()));
 pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> =
@@ -567,8 +564,6 @@ pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> =
   LazyLock::new(|| RwLock::new(None));
 pub(crate) static CANDLES: LazyLock<RwLock<[bool; IMMERSIVE_ICON_COUNT as usize]>> =
   LazyLock::new(|| RwLock::new([false; IMMERSIVE_ICON_COUNT as usize]));
-pub(crate) static IS_IMMERSIVE_DEGREES_FIXED: LazyLock<RwLock<bool>> =
-  LazyLock::new(|| RwLock::new(false));
 
 pub(crate) const IDLE_THRESHOLD: i32 = 60 * 5;
 
