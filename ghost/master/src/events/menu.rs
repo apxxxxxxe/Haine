@@ -7,8 +7,8 @@ use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::system::variables::PendingEvent;
 use crate::system::variables::{
-  EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
-  TALKING_PLACE, TALK_COLLECTION, USER_NAME,
+  EventFlag, FLAGS, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE, TALK_COLLECTION,
+  USER_NAME,
 };
 use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE};
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -760,16 +760,6 @@ pub(crate) fn on_derivative_talk_request_button_toggled(req: &Request) -> Respon
   *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = !is_derivative_talks_enabled;
 
   on_config_menu_exec(req)
-}
-
-pub(crate) fn on_immersive_degree_toggled(req: &Request) -> Response {
-  let i;
-  {
-    i = *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap();
-  }
-  *IS_IMMERSIVE_DEGREES_FIXED.write().unwrap() = !i;
-
-  on_menu_exec(req)
 }
 
 pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {

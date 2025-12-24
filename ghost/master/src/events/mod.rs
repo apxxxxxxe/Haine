@@ -7,7 +7,6 @@ mod mouse;
 pub(crate) mod mouse_core;
 mod periodic;
 pub(crate) mod talk;
-mod tooltip;
 pub mod translate;
 mod update;
 mod webclap;
@@ -22,8 +21,6 @@ use crate::events::menu::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::talk::*;
-use crate::events::tooltip::*;
-use crate::events::translate::*;
 use crate::events::update::*;
 use crate::events::webclap::*;
 use crate::system::variables::*;
@@ -136,16 +133,12 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnWebClapInput" => Some(EventHandler::MayFailure(on_web_clap_input)),
     "OnExecuteHTTPComplete" => Some(EventHandler::MayFailure(on_execute_http_complete)),
     "OnExecuteHTTPFailure" => Some(EventHandler::MayFailure(on_execute_http_failure)),
-    "balloon_tooltip" => Some(EventHandler::AlwaysSuccess(balloon_tooltip)),
-    "OnBalloonTooltip" => Some(EventHandler::AlwaysSuccess(on_balloon_tooltip)),
     "OnStickSurface" => Some(EventHandler::AlwaysSuccess(on_stick_surface)),
-    "OnWaitTranslater" => Some(EventHandler::MayFailure(on_wait_translater)),
     "OnCheckTalkCollection" => Some(EventHandler::AlwaysSuccess(on_check_talk_collection)),
     "OnCheckUnseenTalks" => Some(EventHandler::MayFailure(on_check_unseen_talks)),
     "OnWindowStateRestore" => Some(EventHandler::MayFailure(on_window_state_restore)),
     "OnUserInput" => Some(EventHandler::MayFailure(on_user_input)),
     "OnChangingUserName" => Some(EventHandler::MayFailure(on_changing_user_name)),
-    "OnImmersiveDegreeToggled" => Some(EventHandler::AlwaysSuccess(on_immersive_degree_toggled)),
     "OnStoryEvent" => Some(EventHandler::MayFailure(on_story_event)),
     "OnUpdateBegin" => Some(EventHandler::AlwaysSuccess(on_update_begin)),
     "OnUpdateResultEx" => Some(EventHandler::AlwaysSuccess(on_update_result_ex)),

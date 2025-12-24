@@ -11,8 +11,7 @@ use crate::system::response::*;
 use crate::system::status::Status;
 use crate::system::variables::{
   EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES,
-  IS_IMMERSIVE_DEGREES_FIXED, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX,
-  TALKING_PLACE, TOUCH_INFO,
+  LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX, TALKING_PLACE, TOUCH_INFO,
 };
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -295,10 +294,6 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
 }
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  // 没入度固定時は何もしない
-  if *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap() {
-    return None;
-  }
   if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
     light_candle_fire()
   } else {
@@ -415,7 +410,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
 
 // 没入度を下げ、ろうそくを点ける
 fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
-  if *IMMERSIVE_DEGREES.read().unwrap() == 0 || *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap() {
+  if *IMMERSIVE_DEGREES.read().unwrap() == 0 {
     return None;
   }
   for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
