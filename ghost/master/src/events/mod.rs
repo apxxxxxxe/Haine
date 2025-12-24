@@ -121,7 +121,6 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnMinuteChange" => Some(EventHandler::AlwaysSuccess(on_minute_change)),
     "OnSecondChange" => Some(EventHandler::MayFailure(on_second_change)),
     "OnSurfaceChange" => Some(EventHandler::MayFailure(on_surface_change)),
-    "OnSmoothBlink" => Some(EventHandler::MayFailure(on_smooth_blink)),
     "OnMenuExec" => Some(EventHandler::AlwaysSuccess(on_menu_exec)),
     "OnConfigMenuExec" => Some(EventHandler::AlwaysSuccess(on_config_menu_exec)),
     "OnCostumeMenuExec" => Some(EventHandler::MayFailure(on_costume_menu_exec)),
