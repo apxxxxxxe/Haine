@@ -115,12 +115,8 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         buttons,
         {
           let hoge = get_read(&PENDING_EVENT_TALK);
-          if hoge.is_some() {
-            format!(
-              "\\![*]\\q[{},OnStoryEvent,{}]",
-              hoge.as_ref().unwrap(),
-              hoge.as_ref().unwrap()
-            )
+          if let Some(ref event) = *hoge {
+            format!("\\![*]\\q[{},OnStoryEvent,{}]", event, event)
           } else {
             "".to_string()
           }
@@ -154,7 +150,7 @@ pub(crate) fn on_config_menu_exec(_req: &Request) -> Response {
 
 pub(crate) fn on_costume_menu_exec(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let dialog = match refs[0].parse::<u32>().unwrap() {
+  let dialog = match check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError) {
     x if x == HalloweenCostumeTrigger::AskToWear as u32 => {
       "h1113101着てほしいもの？h1113204また面白いことを考えるのね。".to_string()
     }
@@ -266,7 +262,10 @@ impl Question {
       Question::I_DREW_YOUR_PORTRAIT => "似顔絵を描いた".to_string(),
       Question::LET_ME_PLAY => "遊びに行こう".to_string(),
       Question::CAN_I_PET_YOU => "なでていい？".to_string(),
-      _ => unreachable!(),
+      _ => {
+        error!("Unknown question theme: {:?}", self);
+        String::new()
+      }
     }
   }
 
@@ -638,7 +637,10 @@ impl Question {
     h1111210それでも、温かい。\
     "
       .to_string(),
-      _ => unreachable!(),
+      _ => {
+        error!("Unknown question talk: {:?}", self);
+        String::new()
+      }
     };
     m + "\\x\\![raise,OnTalk]"
   }
@@ -786,26 +788,22 @@ pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
     };
     match hoge {
       PendingEvent::ConfessionOfSuicide => {
-        unreachable!();
+        error!("Unexpected ConfessionOfSuicide");
+        return Err(ShioriError::InvalidEvent);
       }
       PendingEvent::UnlockingLoreTalks => {
-        FLAGS
-          .write()
-          .unwrap()
-          .done(EventFlag::TalkTypeUnlock(TalkType::Lore));
+        get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(TalkType::Lore));
         callback();
         unlock_lore_talks()
       }
       PendingEvent::UnlockingServantsComments => {
-        FLAGS
-          .write()
-          .unwrap()
-          .done(EventFlag::TalkTypeUnlock(TalkType::Servant));
+        get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(TalkType::Servant));
         callback();
         unlock_servents_comments()
       }
       _ => {
-        unreachable!();
+        error!("Unexpected pending event: {:?}", hoge);
+        return Err(ShioriError::InvalidEvent);
       }
     }
   } else {
@@ -831,18 +829,12 @@ pub fn on_story_history_menu(_req: &Request) -> Response {
   events.push((
     "ロアトーク開放".to_string(),
     PendingEvent::UnlockingLoreTalks,
-    FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)),
+    get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Lore)),
   ));
   events.push((
     "従者コメント開放".to_string(),
     PendingEvent::UnlockingServantsComments,
-    FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)),
+    get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)),
   ));
 
   let mut m = "\\_q\\b[2]イベント回想\\n\\n".to_string();
@@ -902,11 +894,7 @@ fn unlock_lore_talks() -> String {
     いくつか不思議な話を知っているの。\\n\
     話の種に、語ってみましょうか。{}\
     ",
-    if !FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore))
-    {
+    if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Lore)) {
       render_achievement_message(TalkType::Lore)
     } else {
       "".to_string()
@@ -930,11 +918,7 @@ fn unlock_servents_comments() -> String {
     彼らの声が聞こえることもあるんじゃない？\\n\
     私を通して彼らとも縁ができているはずだから。{}\
     ",
-    if !FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
-    {
+    if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
       render_achievement_message(TalkType::Servant)
     } else {
       "".to_string()

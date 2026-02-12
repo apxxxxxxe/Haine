@@ -1496,10 +1496,14 @@ pub(crate) fn derivative_talks_per_talk_type() -> HashMap<TalkType, Vec<Derivali
         continue;
       }
     };
-    talks
-      .entry(parent_talk.talk_type.unwrap())
-      .or_default()
-      .push(talk);
+    if let Some(tt) = parent_talk.talk_type {
+      talks.entry(tt).or_default().push(talk);
+    } else {
+      error!(
+        "Parent talk {} has no talk_type, skipping derivative",
+        parent_talk.id
+      );
+    }
   }
   talks
 }

@@ -167,18 +167,12 @@ pub(crate) fn check_story_events() {
     });
   }
 
-  if !FLAGS
-    .read()
-    .unwrap()
-    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
+  if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
     && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_SERVANT
   {
     // 従者コメント開放
     *get_write(&PENDING_EVENT_TALK) = Some(PendingEvent::UnlockingServantsComments);
-  } else if !FLAGS
-    .read()
-    .unwrap()
-    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
+  } else if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
     && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_LORE
   {
     // ロアトーク開放
@@ -198,9 +192,7 @@ pub(crate) fn check_story_events() {
   }
 
   // 変数に過去トークの情報が入っている場合消去する
-  if TALK_COLLECTION
-    .write()
-    .unwrap()
+  if get_write(&TALK_COLLECTION)
     .remove(&super::TalkType::Past)
     .is_some()
   {

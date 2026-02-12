@@ -164,7 +164,7 @@ fn randomize_underwear() -> String {
   let candidates = ["A", "B"];
   format!(
     "\\0\\![bind,下着,{},1]",
-    candidates.choose(&mut rng).unwrap()
+    candidates.choose(&mut rng).unwrap_or(&"A")
   )
 }
 

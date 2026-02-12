@@ -25,9 +25,7 @@ const SOUND_BLOW_CANDLE: &str = "マッチの火を吹き消す.mp3";
 #[macro_export]
 macro_rules! get_touch_info {
   ($info:expr) => {
-    TOUCH_INFO
-      .write()
-      .unwrap()
+    get_write(&TOUCH_INFO)
       .entry($info.to_string())
       .or_insert($crate::system::variables::TouchInfo::new())
   };
@@ -46,11 +44,7 @@ pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response
   };
 
   if i != get_read(&LAST_TOUCH_INFO).as_str() {
-    if let Some(touch_info) = TOUCH_INFO
-      .write()
-      .unwrap()
-      .get_mut(get_read(&LAST_TOUCH_INFO).as_str())
-    {
+    if let Some(touch_info) = get_write(&TOUCH_INFO).get_mut(get_read(&LAST_TOUCH_INFO).as_str()) {
       touch_info.reset_if_timeover()?;
     }
     *get_write(&LAST_TOUCH_INFO) = i.clone();
@@ -73,9 +67,7 @@ pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response
   let response = mouse_dialogs(req, i.clone())?;
 
   // 一括で回数を増やす
-  TOUCH_INFO
-    .write()
-    .unwrap()
+  get_write(&TOUCH_INFO)
     .entry(i)
     .or_insert(TouchInfo::new())
     .add();
@@ -465,7 +457,10 @@ pub(crate) fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (V
       return (phased_talk_list[i].clone(), false);
     }
   }
-  (phased_talk_list.last().unwrap().to_owned(), true)
+  (
+    phased_talk_list.last().unwrap_or(&Vec::new()).to_owned(),
+    true,
+  )
 }
 
 const DUMMY_REQUEST: &str = "GET SHIORI/3.0\r\n\

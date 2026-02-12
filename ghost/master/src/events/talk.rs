@@ -160,7 +160,7 @@ impl TalkingPlace {
 pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let talk_type_num = check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError);
-  let talk_type = TalkType::from_u32(talk_type_num).unwrap();
+  let talk_type = TalkType::from_u32(talk_type_num).ok_or(ShioriError::BadRequest)?;
   let choosed_talk;
   {
     let talk_collection = get_read(&TALK_COLLECTION);

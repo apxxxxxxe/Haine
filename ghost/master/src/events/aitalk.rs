@@ -28,11 +28,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   // 初回ランダムトーク
   let text_count = FIRST_RANDOMTALKS.len();
   for (i, text) in FIRST_RANDOMTALKS.iter().enumerate() {
-    if !FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::FirstRandomTalkDone(i as u32))
-    {
+    if !get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(i as u32)) {
       return first_random_talk_response(text.to_string(), i, text_count);
     }
   }
@@ -46,7 +42,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   if talk_lists.clone().any(|t| t.is_none()) {
     return Err(ShioriError::TalkNotFound);
   };
-  let talks = talk_lists.flat_map(|t| t.unwrap()).collect::<Vec<_>>();
+  let talks = talk_lists.flatten().flatten().collect::<Vec<_>>();
   let len_after_flatten = talks.len();
   let index = if let Some(v) = choose_one(&talks, if_consume_talk_bias) {
     v
@@ -75,11 +71,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
     RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index].to_string()
   } else {
     // 居間では従者トーク解禁済みの場合コメントを表示
-    if FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
-    {
+    if get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
       let index =
         choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
       RANDOMTALK_COMMENTS_LIVING_ROOM[index].to_string()
@@ -93,10 +85,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   if *get_read(&TALKING_PLACE) == TalkingPlace::LivingRoom {
     let new_rate;
     {
-      new_rate = IMMERSIVE_DEGREES
-        .read()
-        .unwrap()
-        .saturating_sub(IMMERSIVE_RATE);
+      new_rate = get_read(&IMMERSIVE_DEGREES).saturating_sub(IMMERSIVE_RATE);
     }
     *get_write(&IMMERSIVE_DEGREES) = new_rate;
   } else {
@@ -163,10 +152,7 @@ fn first_random_talk_response(
   i: usize,
   text_count: usize,
 ) -> Result<Response, ShioriError> {
-  FLAGS
-    .write()
-    .unwrap()
-    .done(EventFlag::FirstRandomTalkDone(i as u32));
+  get_write(&FLAGS).done(EventFlag::FirstRandomTalkDone(i as u32));
   let m = if i == text_count - 1 {
     let achieved_talk_types = [TalkType::AboutMe, TalkType::WithYou];
     achieved_talk_types.iter().for_each(|t| {
@@ -231,7 +217,9 @@ fn derivative_talk_dialog(id: &str) -> Result<Response, ShioriError> {
         .find(|t| t.is_some())
         .and_then(|t| t);
       if let Some(parent) = parent_talk {
-        register_talk_collection(id, parent.talk_type.unwrap())?;
+        if let Some(talk_type) = parent.talk_type {
+          register_talk_collection(id, talk_type)?;
+        }
       }
       new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())
     }
@@ -308,29 +296,14 @@ mod test {
     assert!(get_read(&FLAGS).check(&EventFlag::FirstBoot));
 
     // 初回ランダムトークのフラグチェック
-    assert!(!FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::AboutMe)));
-    assert!(!FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
+    assert!(!get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::AboutMe)));
+    assert!(!get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
     for i in 0..FIRST_RANDOMTALKS.len() {
       on_ai_talk(&on_second_change_req)?;
-      assert!(FLAGS
-        .read()
-        .unwrap()
-        .check(&EventFlag::FirstRandomTalkDone(i as u32)));
+      assert!(get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(i as u32)));
     }
-    assert!(FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::AboutMe)));
-    assert!(FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
+    assert!(get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::AboutMe)));
+    assert!(get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::WithYou)));
 
     // 初回没入度マックス時の場所変更
     assert!(!get_read(&FLAGS).check(&EventFlag::FirstPlaceChange));
@@ -362,17 +335,12 @@ mod test {
       on_ai_talk(&on_second_change_req)?;
     }
     on_minute_change(&on_second_change_req);
-    let story_event = if get_read(&PENDING_EVENT_TALK).is_some() {
-      get_read(&PENDING_EVENT_TALK).clone().unwrap()
-    } else {
-      return Err("Failed to get story event".into());
-    };
+    let story_event = get_read(&PENDING_EVENT_TALK)
+      .clone()
+      .ok_or("Failed to get story event")?;
     assert_eq!(story_event, PendingEvent::UnlockingServantsComments);
     on_story_event(&make_story_event_request(story_event))?;
-    assert!(FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)));
+    assert!(get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)));
     assert!(get_read(&PENDING_EVENT_TALK).is_none());
 
     // ロア関連トークの開放確認
@@ -380,17 +348,12 @@ mod test {
       on_ai_talk(&on_second_change_req)?;
     }
     on_minute_change(&on_second_change_req);
-    let story_event = if get_read(&PENDING_EVENT_TALK).is_some() {
-      get_read(&PENDING_EVENT_TALK).clone().unwrap()
-    } else {
-      return Err("Failed to get story event".into());
-    };
+    let story_event = get_read(&PENDING_EVENT_TALK)
+      .clone()
+      .ok_or("Failed to get story event")?;
     assert_eq!(story_event, PendingEvent::UnlockingLoreTalks);
     on_story_event(&make_story_event_request(story_event))?;
-    assert!(FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
+    assert!(get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Lore)));
     assert!(get_read(&PENDING_EVENT_TALK).is_none());
 
     // 初回終了時に通常モードだったときのトークが再生されるかのテスト
