@@ -11,10 +11,8 @@ pub mod translate;
 mod update;
 mod webclap;
 
-use crate::system::error::ShioriError;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
-use crate::system::response::*;
 use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
@@ -23,6 +21,8 @@ use crate::events::periodic::*;
 use crate::events::talk::*;
 use crate::events::update::*;
 use crate::events::webclap::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use crate::system::variables::*;
 use shiorust::message::{parts::*, traits::*, Request, Response};
 use std::fs;
@@ -80,7 +80,7 @@ fn name(_req: &Request) -> Response {
 }
 
 fn log_path(_req: &Request) -> Response {
-  let log_path = LOG_PATH.read().unwrap().clone();
+  let log_path = get_read(&LOG_PATH).clone();
   new_response_with_value_with_notranslate(log_path, TranslateOption::none())
 }
 

@@ -4,7 +4,8 @@ use once_cell::sync::Lazy;
 pub(crate) const FIRST_BOOT_MARKER: &str = "邂逅";
 
 pub(crate) static FIRST_BOOT_TALK: Lazy<String> = Lazy::new(|| {
-  format!("\\t\\*\
+  format!(
+    "\\t\\*\
     h1000000\\1\\b[10]────今夜、私は死にに行く。\
     \\x\
     \\1\\b[10]短い遺書を書き、身支度を終え、\\n\
@@ -333,13 +334,21 @@ pub(crate) static FIRST_BOOT_TALK: Lazy<String> = Lazy::new(|| {
     h1111204幽霊の淹れるお茶を飲んだことはあるかしら？h1111211\
     \\1彼女の微笑みは謎めいて親しげだった。\
     ",
-    (0..IMMERSIVE_ICON_COUNT).map(|i| format!("\\![bind,icon,消え{},1]", i+1)).collect::<Vec<String>>().join(""),
+    (0..IMMERSIVE_ICON_COUNT)
+      .map(|i| format!("\\![bind,icon,消え{},1]", i + 1))
+      .collect::<Vec<String>>()
+      .join(""),
     shake("あなたはなぜここへ来たの？"),
-    (0..IMMERSIVE_ICON_COUNT).map(|i| format!("\\![bind,icon,没入度{},1]", i+1)).collect::<Vec<String>>().join(""),)
+    (0..IMMERSIVE_ICON_COUNT)
+      .map(|i| format!("\\![bind,icon,没入度{},1]", i + 1))
+      .collect::<Vec<String>>()
+      .join(""),
+  )
 });
 
 pub(crate) static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
-  vec!["\
+  vec![
+    "\
       h1111206いま、別の者にお茶の準備をさせているわ。\\n\
       \\n\
       h1111201さて。\\n\
@@ -390,9 +399,9 @@ pub(crate) static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
       必要ならばいくらか手助けもしましょう。\\n\
       ただ、それまでは私の話し相手になってもらうわ。\\n\
       いいわねφ？\\_w[750]{user_name}。\
-      ".to_string(),
-
-      "\
+      "
+    .to_string(),
+    "\
       \\1(コンコン)\\_w[1250]\\n\
       h1111203入りなさい。\\n\
       \\1ハイネの後方、客室のドアが開き、\\n\
@@ -440,7 +449,8 @@ pub(crate) static FIRST_RANDOMTALKS: Lazy<Vec<String>> = Lazy::new(|| {
       ……h1111211これで、私の好物を1つ知れたわね。\\n\
       h1111204全て、このように。\\n\
       じっくり、互いを知っていけばいいのよ。\
-      ".to_string()
+      "
+    .to_string(),
   ]
 });
 

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::events::talk::{Talk, TalkType};
-use crate::system::variables::{EventFlag, FLAGS};
+use crate::system::variables::{get_read, EventFlag, FLAGS};
 
 use super::DerivaliveTalk;
 
@@ -364,7 +364,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
             h1111210私もできなくはないけれど、はるかに早くて正確。\\n\
             繕いものは任せているのよ。\
           ".to_string(),
-          required_condition: Some(|| FLAGS.read().unwrap().check(&EventFlag::FirstClose)),
+          required_condition: Some(|| get_read(&FLAGS).check(&EventFlag::FirstClose)),
           callback: None,
         },
 
@@ -1388,22 +1388,23 @@ pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
       callback: None,
     },
     DerivaliveTalk {
-        parent_id: "服装へのこだわり".to_string(),
-        id: "服装へのこだわり・昔から".to_string(),
-        summary: "『つまり、その服装は昔から？』".to_string(),
-        text: "\
+      parent_id: "服装へのこだわり".to_string(),
+      id: "服装へのこだわり・昔から".to_string(),
+      summary: "『つまり、その服装は昔から？』".to_string(),
+      text: "\
             h1111205ええ、そうよ。\\n\
             h1111211けれど、あなたのファッションを見る限りでは\\n\
             それほど浮世離れしているわけではなさそうね。\
-            ".to_string(),
-        required_condition: None,
-        callback: None,
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
     },
     DerivaliveTalk {
-        parent_id: "服装へのこだわり".to_string(),
-        id: "服装へのこだわり・違う服".to_string(),
-        summary: "『たまには違う服も着てみない？』".to_string(),
-        text: "\
+      parent_id: "服装へのこだわり".to_string(),
+      id: "服装へのこだわり・違う服".to_string(),
+      summary: "『たまには違う服も着てみない？』".to_string(),
+      text: "\
             h1113205……そうね、たまにはいいかもしれないわ。\\n\
             h1111204あなた、選んでくれる？\\n\
             h1111210…だって、\\n\
@@ -1411,15 +1412,16 @@ pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
             h1111206従者にクローゼットの中身を\\n\
             持って来させましょう。\\n\
             h1111204あなたのセンスをh1111211信じているわ。\
-            ".to_string(),
-        required_condition: None,
-        callback: None,
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
     },
     DerivaliveTalk {
-        parent_id: "生家の広さ".to_string(),
-        id: "生家の広さ・思い出".to_string(),
-        summary: "『思い出の品や場所はある？』".to_string(),
-        text: "\
+      parent_id: "生家の広さ".to_string(),
+      id: "生家の広さ・思い出".to_string(),
+      summary: "『思い出の品や場所はある？』".to_string(),
+      text: "\
             h1111206ここへ来るまでの階段の下に、\\n\
             スペースがあったでしょう。\\n\
             h1111210あそこに隠れるのが好きでね。\\n\
@@ -1428,15 +1430,16 @@ pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
             秘密基地を作っていたのよ。\\n\
             h1111205大きくなるにつれて縁遠くなったけれど、\\n\
             h1111210今でもあのわくわくする気持ちは思い出せるの。\
-            ".to_string(),
-        required_condition: None,
-        callback: None,
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
     },
     DerivaliveTalk {
-        parent_id: "生前の食事事情".to_string(),
-        id: "生前の食事事情・好きな食べ物".to_string(),
-        summary: "『何か好きな食べ物はなかった？』".to_string(),
-        text: "\
+      parent_id: "生前の食事事情".to_string(),
+      id: "生前の食事事情・好きな食べ物".to_string(),
+      summary: "『何か好きな食べ物はなかった？』".to_string(),
+      text: "\
             h1111205……そうね、硬い焼き菓子が好きよ。\\n\
             甘さが控えめのものが、特に。\\n\
             長持ちするし、口の中に味が残りにくいから\\n\
@@ -1448,15 +1451,16 @@ pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
             考え事をするとき、歩き回る癖があって……\\n\
             h1221206進んで汚したいわけではないのだけど、\\n\
             どうしてもやめられなくて。\
-            ".to_string(),
-        required_condition: None,
-        callback: None,
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
     },
     DerivaliveTalk {
-        parent_id: "身体が弱い".to_string(),
-        id: "身体が弱い・お使い".to_string(),
-        summary: "『かわりにお使いをしようか？』".to_string(),
-        text: "\
+      parent_id: "身体が弱い".to_string(),
+      id: "身体が弱い・お使い".to_string(),
+      summary: "『かわりにお使いをしようか？』".to_string(),
+      text: "\
             h1111101……h1111210やさしいのね。\\n\
             h1111210ありがたいけれど、結構よ。\\n\
             h1111206定期的な買い出しは既にしているし、\\n\
@@ -1469,9 +1473,10 @@ pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
             あなたにお茶菓子を用意してもらいましょう。\\n\
             h1111204私の好みはわかっているでしょう？\\n\
             h1111211お願いね、{user_name}。\
-            ".to_string(),
-        required_condition: None,
-        callback: None,
+            "
+      .to_string(),
+      required_condition: None,
+      callback: None,
     },
   ]
 }
@@ -1484,10 +1489,13 @@ pub(crate) fn derivative_talks_per_talk_type() -> HashMap<TalkType, Vec<Derivali
     .collect::<Vec<_>>();
   let mut talks: HashMap<TalkType, Vec<DerivaliveTalk>> = HashMap::new();
   for talk in derivative_talks() {
-    let parent_talk = all_talks
-      .iter()
-      .find(|t| t.id == talk.parent_id)
-      .unwrap_or_else(|| panic!("Parent talk with id {} not found", talk.parent_id));
+    let parent_talk = match all_talks.iter().find(|t| t.id == talk.parent_id) {
+      Some(t) => t,
+      None => {
+        error!("Parent talk with id {} not found, skipping", talk.parent_id);
+        continue;
+      }
+    };
     talks
       .entry(parent_talk.talk_type.unwrap())
       .or_default()
@@ -1510,19 +1518,20 @@ pub(crate) fn derivative_talk_by_id(parent_id: &str) -> Option<Vec<DerivaliveTal
     .into()
 }
 
-pub(crate) fn get_parent_talk(derivative_talk: &DerivaliveTalk) -> Talk {
+pub(crate) fn get_parent_talk(derivative_talk: &DerivaliveTalk) -> Option<Talk> {
   let all_talks = TalkType::all()
     .iter()
     .map(|t| random_talks(*t))
     .flat_map(|t| t.unwrap_or_default())
     .collect::<Vec<_>>();
-  all_talks
+  let result = all_talks
     .into_iter()
-    .find(|t| t.id == derivative_talk.parent_id)
-    .unwrap_or_else(|| {
-      panic!(
-        "Parent talk with id {} not found",
-        derivative_talk.parent_id
-      )
-    })
+    .find(|t| t.id == derivative_talk.parent_id);
+  if result.is_none() {
+    error!(
+      "Parent talk with id {} not found",
+      derivative_talk.parent_id
+    );
+  }
+  result
 }

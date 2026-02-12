@@ -1,9 +1,9 @@
-use crate::system::error::ShioriError;
+use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
 use crate::events::aitalk::IMMERSIVE_RATE_MAX;
 use crate::events::talk::TalkType;
-use crate::events::translate::on_translate;
 use crate::events::talk::TalkingPlace;
-use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
+use crate::events::translate::on_translate;
+use crate::system::error::ShioriError;
 use crate::system::roulette::RouletteCell;
 use crate::system::variables::*;
 use core::fmt::{Display, Formatter};
@@ -106,7 +106,7 @@ pub(crate) fn new_response_with_value_with_notranslate(
   option: HashSet<TranslateOption>,
 ) -> Response {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", TALKING_PLACE.read().unwrap().balloon_surface())
+    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
   } else {
     String::new()
   };
@@ -127,7 +127,7 @@ pub(crate) fn new_response_with_value_with_translate(
   option: HashSet<TranslateOption>,
 ) -> Result<Response, ShioriError> {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", TALKING_PLACE.read().unwrap().balloon_surface())
+    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
   } else {
     String::new()
   };
@@ -153,7 +153,7 @@ pub(crate) fn choose_one(values: &[impl RouletteCell], update_weight: bool) -> O
   if values.is_empty() {
     return None;
   }
-  let u = TALK_BIAS.write().unwrap().roulette(values, update_weight);
+  let u = get_write(&TALK_BIAS).roulette(values, update_weight);
   u
 }
 
@@ -206,7 +206,7 @@ pub(crate) fn render_shadow(is_complete: bool) -> String {
   const DEFAULT_Y: i32 = -700;
   const MAX_Y: i32 = -200;
   if is_complete {
-    let degree = *IMMERSIVE_DEGREES.read().unwrap();
+    let degree = *get_read(&IMMERSIVE_DEGREES);
     format!(
       "\\0\\![bind,ex,没入度用,1]\\![anim,offset,800100,0,{}]",
       ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32
@@ -460,17 +460,17 @@ pub(crate) fn shake_with_notext() -> String {
 }
 
 pub(crate) fn render_immersive_icon() -> String {
-  let immersive_degrees = *IMMERSIVE_DEGREES.read().unwrap();
+  let immersive_degrees = *get_read(&IMMERSIVE_DEGREES);
   let icon_count_float =
     immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
-  let current_icon_count = if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  let current_icon_count = if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     // 繰り上げ
     icon_count_float.ceil() as u32
   } else {
     // 切り捨て
     icon_count_float.floor() as u32
   };
-  let mut candles = *CANDLES.write().unwrap();
+  let mut candles = *get_write(&CANDLES);
   let mut v = String::new();
   for i in 1..=IMMERSIVE_ICON_COUNT {
     let blowed = i <= current_icon_count;

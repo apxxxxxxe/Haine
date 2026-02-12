@@ -1,20 +1,20 @@
-use crate::system::error::ShioriError;
 use crate::events::check_story_events;
-use crate::system::response::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
 use crate::events::TalkingPlace;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use crate::system::variables::*;
 use crate::system::windows::get_local_time;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
 pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
-  *TOTAL_BOOT_COUNT.write().unwrap() += 1;
+  *get_write(&TOTAL_BOOT_COUNT) += 1;
 
   // ロード失敗かつバックアップもないなら何もしない
-  if *LOAD_STATUS.read().unwrap() == LoadStatus::FailedNoBackup {
+  if *get_read(&LOAD_STATUS) == LoadStatus::FailedNoBackup {
     let mut res = new_response_nocontent();
     add_error_description(
       &mut res,
@@ -24,8 +24,8 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   }
 
   // 初回起動
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstBoot) {
-    FLAGS.write().unwrap().done(EventFlag::FirstBoot);
+  if !get_read(&FLAGS).check(&EventFlag::FirstBoot) {
+    get_write(&FLAGS).done(EventFlag::FirstBoot);
     let mut res = new_response_with_value_with_translate(
       FIRST_BOOT_TALK.to_string(),
       TranslateOption::simple_translate(),
@@ -85,14 +85,14 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   );
   let mut res = new_response_with_value_with_translate(v, TranslateOption::simple_translate())?;
 
-  if *LOAD_STATUS.read().unwrap() == LoadStatus::RestoredFromBackup {
+  if *get_read(&LOAD_STATUS) == LoadStatus::RestoredFromBackup {
     add_notice_description(
       &mut res,
       "セーブデータが破損していたため、バックアップから復元しました。",
     );
   }
 
-  if let LoadStatus::PartialSuccess(ref failed_fields) = *LOAD_STATUS.read().unwrap() {
+  if let LoadStatus::PartialSuccess(ref failed_fields) = *get_read(&LOAD_STATUS) {
     let field_names = failed_fields.join(", ");
     add_error_description(
       &mut res,
@@ -102,7 +102,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
       ),
     );
   }
-  debug!("hoge,{:?}", LOAD_STATUS.read().unwrap());
+  debug!("hoge,{:?}", get_read(&LOAD_STATUS));
 
   Ok(res)
 }
@@ -110,7 +110,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
 pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   let mut parts = vec![vec![RESET_BINDS.to_string()]];
 
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     parts.push(vec![format!(
       "\\0\\b[{}]h1111705……。h1111101\\n\
       ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
@@ -119,8 +119,8 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
       TalkingPlace::LivingRoom.balloon_surface(),
     )]);
   }
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstClose) {
-    FLAGS.write().unwrap().done(EventFlag::FirstClose);
+  if !get_read(&FLAGS).check(&EventFlag::FirstClose) {
+    get_write(&FLAGS).done(EventFlag::FirstClose);
     parts.push(vec![FIRST_CLOSE_TALK.to_string()]);
   } else {
     parts.extend(vec![
@@ -144,7 +144,7 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   )?;
 
   // ロード状態に応じた通知
-  if *LOAD_STATUS.read().unwrap() == LoadStatus::FailedNoBackup {
+  if *get_read(&LOAD_STATUS) == LoadStatus::FailedNoBackup {
     add_error_description(
       &mut res,
       "セーブデータのロードに失敗していたため、保存をスキップしました。",
@@ -175,7 +175,7 @@ fn check_date_event_talk() -> Option<String> {
   let day = st.wDay as u32;
 
   // 既に今年のイベントを閲覧済みならスキップ
-  if FLAGS.read().unwrap().check_season_event(year, month, day) {
+  if get_read(&FLAGS).check_season_event(year, month, day) {
     return None;
   }
 
@@ -190,7 +190,7 @@ fn check_date_event_talk() -> Option<String> {
 
   // イベントトークがあれば閲覧済みフラグを立てる
   if talk.is_some() {
-    FLAGS.write().unwrap().mark_season_event(year, month, day);
+    get_write(&FLAGS).mark_season_event(year, month, day);
   }
 
   talk

@@ -11,8 +11,7 @@ use regex::Regex;
 // スコープ処理
 // ============================================================
 
-static CHANGE_SCOPE_RE: Lazy<FancyRegex> =
-  lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
+static CHANGE_SCOPE_RE: Lazy<FancyRegex> = lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
 
 fn find_change_scope(text: &str) -> Option<String> {
   if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {
@@ -91,7 +90,7 @@ fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriE
   static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
 
   // 変数を translate 時点で1回だけ読み取り（副作用を最小化）
-  let current_surface = *CURRENT_SURFACE.read().unwrap();
+  let current_surface = *get_read(&CURRENT_SURFACE);
   let shadow_script = render_shadow(complete_shadow);
 
   // 全サーフェス記法を検出し、位置情報付きで収集
@@ -114,12 +113,8 @@ fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriE
       result.push_str(&text[last_end..full_match.start()]);
 
       // 目線補完スクリプトを生成
-      let script = generate_blink_animation(
-        prev_surface,
-        surface_id,
-        &shadow_script,
-        use_half_blink,
-      );
+      let script =
+        generate_blink_animation(prev_surface, surface_id, &shadow_script, use_half_blink);
       result.push_str(&script);
 
       prev_surface = surface_id;
@@ -233,7 +228,7 @@ fn translate_whole(text: String) -> Result<String, ShioriError> {
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
-  let user_name = USER_NAME.read().unwrap().clone();
+  let user_name = get_read(&USER_NAME).clone();
   translated = translated.replace("{user_name}", &user_name);
 
   Ok(translated)

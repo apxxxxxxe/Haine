@@ -10,8 +10,9 @@ use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::status::Status;
 use crate::system::variables::{
-  EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES,
-  LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX, TALKING_PLACE, TOUCH_INFO,
+  get_read, get_write, EventFlag, TouchInfo, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME,
+  IMMERSIVE_DEGREES, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX, TALKING_PLACE,
+  TOUCH_INFO,
 };
 use once_cell::sync::Lazy;
 use shiorust::message::{Parser, Request, Response};
@@ -44,18 +45,18 @@ pub(crate) fn new_mouse_response(req: &Request, info: String) -> Result<Response
     info.clone()
   };
 
-  if i != LAST_TOUCH_INFO.read().unwrap().as_str() {
+  if i != get_read(&LAST_TOUCH_INFO).as_str() {
     if let Some(touch_info) = TOUCH_INFO
       .write()
       .unwrap()
-      .get_mut(LAST_TOUCH_INFO.read().unwrap().as_str())
+      .get_mut(get_read(&LAST_TOUCH_INFO).as_str())
     {
       touch_info.reset_if_timeover()?;
     }
-    *LAST_TOUCH_INFO.write().unwrap() = i.clone();
+    *get_write(&LAST_TOUCH_INFO) = i.clone();
   }
 
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+  if !get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
     FIRST_RANDOMTALKS.len() as u32 - 1,
   )) {
     if info.as_str().contains("doubleclick") && !status.talking {
@@ -119,9 +120,9 @@ static DIALOG_SEXIAL_AKIRE: Lazy<Vec<String>> = Lazy::new(|| {
 });
 
 fn is_first_sexial_allowed() -> bool {
-  !*FIRST_SEXIAL_TOUCH.read().unwrap()
-    && *GHOST_UP_TIME.read().unwrap() < 30
-    && FLAGS.read().unwrap().check(&EventFlag::FirstClose)
+  !*get_read(&FIRST_SEXIAL_TOUCH)
+    && *get_read(&GHOST_UP_TIME) < 30
+    && get_read(&FLAGS).check(&EventFlag::FirstClose)
 }
 
 pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriError> {
@@ -153,7 +154,7 @@ pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, Shi
 }
 
 fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
@@ -166,7 +167,7 @@ fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
@@ -179,7 +180,7 @@ fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
@@ -208,13 +209,13 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     return None;
   }
 
   let mut conbo_parts: Vec<Vec<String>> = vec![vec!["hr2144402……！h1141102\\n".to_string()]];
   if is_first_sexial_allowed() {
-    *FIRST_SEXIAL_TOUCH.write().unwrap() = true;
+    *get_write(&FIRST_SEXIAL_TOUCH) = true;
     conbo_parts.push(DIALOG_SEXIAL_FIRST.clone());
   } else {
     conbo_parts.push(vec![
@@ -255,14 +256,14 @@ fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, Shi
 }
 
 fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     return Some(on_ai_talk(req));
   }
 
   let zero_bust_touch_threshold = 12;
   let mut zero_bust_touch = Vec::new();
   if is_first_sexial_allowed() {
-    *FIRST_SEXIAL_TOUCH.write().unwrap() = true;
+    *get_write(&FIRST_SEXIAL_TOUCH) = true;
     zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
   } else if count < zero_bust_touch_threshold / 3 {
     zero_bust_touch.extend(vec![
@@ -294,7 +295,7 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
 }
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     light_candle_fire()
   } else {
     blow_candle_fire()
@@ -304,8 +305,8 @@ fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Respons
 fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
   for i in 0..=IMMERSIVE_ICON_COUNT {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
-    if *IMMERSIVE_DEGREES.read().unwrap() < threshold {
-      *IMMERSIVE_DEGREES.write().unwrap() = threshold;
+    if *get_read(&IMMERSIVE_DEGREES) < threshold {
+      *get_write(&IMMERSIVE_DEGREES) = threshold;
       // セリフ
       let dialogs = [
         [
@@ -360,26 +361,26 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
       ];
       // 前回とは別のセリフ群になるようにする
       if i == 1 {
-        *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.write().unwrap() += 1;
-        if *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap() as usize >= dialogs.len() {
-          *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.write().unwrap() = 0;
+        *get_write(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) += 1;
+        if *get_read(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) as usize >= dialogs.len() {
+          *get_write(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) = 0;
         }
       }
-      let dialog = dialogs[*LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap() as usize]
+      let dialog = dialogs[*get_read(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) as usize]
         [(i - 1) as usize]
         .to_owned();
 
       // 話題解放メッセージ
       let system_message = if threshold == IMMERSIVE_RATE_MAX {
-        *TALKING_PLACE.write().unwrap() = TalkingPlace::Library; // 没入度最大なら書斎へ移動
-        let message = if FLAGS.read().unwrap().check(&EventFlag::FirstPlaceChange) {
+        *get_write(&TALKING_PLACE) = TalkingPlace::Library; // 没入度最大なら書斎へ移動
+        let message = if get_read(&FLAGS).check(&EventFlag::FirstPlaceChange) {
           "".to_string()
         } else {
           // 初回は抽象・過去トークの開放を通知
-          FLAGS.write().unwrap().done(EventFlag::FirstPlaceChange);
+          get_write(&FLAGS).done(EventFlag::FirstPlaceChange);
           let achieved_talk_types = [TalkType::Abstract];
           achieved_talk_types.iter().for_each(|t| {
-            FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
+            get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(*t));
           });
           let achievements_messages = achieved_talk_types
             .iter()
@@ -410,15 +411,15 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
 
 // 没入度を下げ、ろうそくを点ける
 fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
-  if *IMMERSIVE_DEGREES.read().unwrap() == 0 {
+  if *get_read(&IMMERSIVE_DEGREES) == 0 {
     return None;
   }
   for i in (0..=IMMERSIVE_ICON_COUNT).rev() {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
-    if *IMMERSIVE_DEGREES.read().unwrap() > threshold {
+    if *get_read(&IMMERSIVE_DEGREES) > threshold {
       // 没入度0なら居間へ移動
-      let m = if threshold == 0 && *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
-        *TALKING_PLACE.write().unwrap() = TalkingPlace::LivingRoom;
+      let m = if threshold == 0 && *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+        *get_write(&TALKING_PLACE) = TalkingPlace::LivingRoom;
         format!(
           "\\0\\b[{}]h1111705……。h1111101\\n\
           ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
@@ -429,7 +430,7 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
       } else {
         "".to_string()
       };
-      *IMMERSIVE_DEGREES.write().unwrap() = threshold;
+      *get_write(&IMMERSIVE_DEGREES) = threshold;
       return Some(new_response_with_value_with_translate(
         format!(
           "\\_v[{}]\\0{}{}\\p[2]{}{}",
