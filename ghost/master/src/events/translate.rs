@@ -59,7 +59,7 @@ pub fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriEr
   let translate_targets = IGNORING_TRANSLATE_RANGE.split(&text).collect::<Vec<&str>>();
   let ignoring_ranges = IGNORING_TRANSLATE_RANGE
     .captures_iter(&text)
-    .map(|c| c.get(1).unwrap().as_str())
+    .filter_map(|c| c.get(1).map(|m| m.as_str()))
     .collect::<Vec<&str>>();
 
   if translate_targets.len() != 1 || !ignoring_ranges.is_empty() {
@@ -105,9 +105,13 @@ fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriE
     let mut prev_surface = current_surface;
 
     for caps in matches.iter() {
-      let full_match = caps.get(0).unwrap();
+      let Some(full_match) = caps.get(0) else {
+        continue;
+      };
       let use_half_blink = caps.get(1).is_some();
-      let surface_id: i32 = caps.get(2).unwrap().as_str().parse().unwrap();
+      let Some(surface_id) = caps.get(2).and_then(|m| m.as_str().parse::<i32>().ok()) else {
+        continue;
+      };
 
       // マッチ前のテキストを追加
       result.push_str(&text[last_end..full_match.start()]);
@@ -254,7 +258,7 @@ impl Dialog {
   pub fn from_text(text: &str) -> Vec<Self> {
     let mut scopes = CHANGE_SCOPE_RE
       .captures_iter(text)
-      .map(|c| extract_scope(&c.unwrap()[0]).unwrap())
+      .filter_map(|c| c.ok().and_then(|caps| extract_scope(&caps[0])))
       .collect::<Vec<_>>();
 
     let delim = "\x01";
