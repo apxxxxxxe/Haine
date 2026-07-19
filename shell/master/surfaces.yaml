@@ -395,7 +395,7 @@ characters:
             animation500300.pattern0,overlay,201,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,5,0,0
+            animation800004.pattern0,overlayfast,5,0,0,0
 
         - name: 上の空
           text: |
@@ -403,7 +403,7 @@ characters:
             animation500300.pattern0,overlay,202,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,5,0,0
+            animation800004.pattern0,overlayfast,5,0,0,0
 
         - name: あっち目
           text: |
@@ -411,7 +411,7 @@ characters:
             animation500300.pattern0,overlay,203,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,5,0,0
+            animation800004.pattern0,overlayfast,5,0,0,0
 
         - name: こっち半目
           text: |
@@ -419,7 +419,7 @@ characters:
             animation500300.pattern0,overlay,204,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,4,0,0
+            animation800004.pattern0,overlayfast,4,0,0,0
 
         - name: 上の空半目
           text: |
@@ -427,7 +427,7 @@ characters:
             animation500300.pattern0,overlay,205,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,4,0,0
+            animation800004.pattern0,overlayfast,4,0,0,0
 
         - name: あっち半目
           text: |
@@ -435,7 +435,7 @@ characters:
             animation500300.pattern0,overlay,206,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,4,0,0
+            animation800004.pattern0,overlayfast,4,0,0,0
 
         - name: こっち半半目
           text: |
@@ -443,7 +443,7 @@ characters:
             animation500300.pattern0,overlay,213,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: 上の空半半目
           text: |
@@ -451,7 +451,7 @@ characters:
             animation500300.pattern0,overlay,214,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: あっち半半目
           text: |
@@ -459,7 +459,7 @@ characters:
             animation500300.pattern0,overlay,215,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: 閉じ目
           text: |
@@ -467,7 +467,7 @@ characters:
             animation500300.pattern0,overlay,209,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: にこ目
           text: |
@@ -475,7 +475,7 @@ characters:
             animation500300.pattern0,overlay,207,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: 驚き目
           text: |
@@ -483,7 +483,7 @@ characters:
             animation500300.pattern0,overlay,208,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,5,0,0
+            animation800004.pattern0,overlayfast,5,0,0,0
 
         - name: 皮肉目
           text: |
@@ -491,7 +491,7 @@ characters:
             animation500300.pattern0,overlay,210,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: びっくり目
           text: |
@@ -499,7 +499,7 @@ characters:
             animation500300.pattern0,overlay,211,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
         - name: あっち皮肉目
           text: |
@@ -507,7 +507,7 @@ characters:
             animation500300.pattern0,overlay,212,0,0,0
 
             animation800004.interval,bind
-            animation800004.pattern0,overlayfast,3,0,0
+            animation800004.pattern0,overlayfast,3,0,0,0
 
     base: |
       collisionex12,bust,polygon,228,327,271,304,316,325,318,347,311,378,231,375,225,349
@@ -793,14 +793,14 @@ characters:
       animation750000.pattern3,overlay,55000,1500,0,0
 
       animation800001.interval,bind
-      animation800001.pattern0,overlayfast,1,0,0
+      animation800001.pattern0,overlayfast,1,0,0,0
       animation800002.interval,bind
-      animation800002.pattern0,overlayfast,60000,0,0
+      animation800002.pattern0,overlayfast,60000,0,0,0
       animation800003.interval,bind
-      animation800003.pattern0,overlayfast,60002,0,0
+      animation800003.pattern0,overlayfast,60002,0,0,0
       animation800100.interval,bind
-      animation800100.pattern0,overlayfast,60002,0,0
+      animation800100.pattern0,overlayfast,60002,0,0,0
       animation801000.interval,bind
-      animation801000.pattern0,overlayfast,2,0,0
+      animation801000.pattern0,overlayfast,2,0,0,0
       animation500601.interval,bind
       animation500601.pattern0,overlay,110,0,0,0
