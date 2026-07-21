@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### 開発 `.claude/dev/`
 - `architecture.md` — プロジェクト構造・イベント系・ビルド工程・テスト方針
-- `mouse_interaction.md` — マウス反応の実装詳細（単層モデル R1）
+- `mouse_interaction.md` — マウス反応の実装詳細（ランダム選択＋連続タッチ回数）
 
 ### トーク指針
 - 旧 `talk-guide` スキルは 2026-07-02 に**意図的に廃止**（品質向上に寄与しない制約の増築で汚染されたため。同じ増築を繰り返さない）。

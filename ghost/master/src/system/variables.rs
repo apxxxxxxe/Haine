@@ -589,6 +589,7 @@ pub(crate) static LAST_WHEEL_COUNT_UNIXTIME: LazyLock<RwLock<SystemTime>> =
   LazyLock::new(|| RwLock::new(UNIX_EPOCH));
 pub(crate) static LAST_WHEEL_PART: LazyLock<RwLock<String>> =
   LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static FIRST_SEXIAL_TOUCH: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
 pub(crate) static LAST_TOUCH_INFO: LazyLock<RwLock<String>> =
   LazyLock::new(|| RwLock::new("".to_string()));
 pub(crate) static LAST_SELFTALK_PHRASE: LazyLock<RwLock<String>> =
