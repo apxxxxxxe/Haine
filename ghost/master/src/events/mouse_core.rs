@@ -1,9 +1,9 @@
 use crate::check_error;
-use crate::error::ShioriError;
-use crate::events::common::*;
 use crate::events::mouse::*;
-use crate::status::Status;
-use crate::variables::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::status::Status;
+use crate::system::variables::*;
 use shiorust::message::{Request, Response};
 use std::time::SystemTime;
 
@@ -41,7 +41,7 @@ pub(crate) fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let now = SystemTime::now();
   let dur = check_error!(
-    now.duration_since(*LAST_WHEEL_COUNT_UNIXTIME.read().unwrap()),
+    now.duration_since(*get_read(&LAST_WHEEL_COUNT_UNIXTIME)),
     ShioriError::SystemTimeError
   )
   .as_millis();
@@ -52,19 +52,19 @@ pub(crate) fn on_mouse_wheel(req: &Request) -> Result<Response, ShioriError> {
     Direction::Down
   };
 
-  if *LAST_WHEEL_PART.read().unwrap() != refs[4] || dur > WHEEL_LIFETIME {
-    *WHEEL_COUNTER.write().unwrap() = 1;
+  if *get_read(&LAST_WHEEL_PART) != refs[4] || dur > WHEEL_LIFETIME {
+    *get_write(&WHEEL_COUNTER) = 1;
   } else {
-    *WHEEL_COUNTER.write().unwrap() += 1;
+    *get_write(&WHEEL_COUNTER) += 1;
   }
 
-  if *WHEEL_COUNTER.read().unwrap() >= WHEEL_THRESHOLD {
-    *WHEEL_COUNTER.write().unwrap() = 0;
+  if *get_read(&WHEEL_COUNTER) >= WHEEL_THRESHOLD {
+    *get_write(&WHEEL_COUNTER) = 0;
     new_mouse_response(req, format!("{}{}{}", refs[3], refs[4], d.to_str()))
   } else {
-    *LAST_WHEEL_COUNT_UNIXTIME.write().unwrap() = now;
-    *LAST_WHEEL_PART.write().unwrap() = refs[4].to_string();
-    *WHEEL_DIRECTION.write().unwrap() = d;
+    *get_write(&LAST_WHEEL_COUNT_UNIXTIME) = now;
+    *get_write(&LAST_WHEEL_PART) = refs[4].to_string();
+    *get_write(&WHEEL_DIRECTION) = d;
     Ok(new_response_nocontent())
   }
 }
@@ -90,26 +90,26 @@ pub(crate) fn on_mouse_move(req: &Request) -> Result<Response, ShioriError> {
     Ok(new_response_nocontent())
   } else {
     let now = SystemTime::now();
-    if *LAST_NADE_PART.read().unwrap() == refs[4] {
+    if *get_read(&LAST_NADE_PART) == refs[4] {
       let dur = check_error!(
-        now.duration_since(*LAST_NADE_COUNT_UNIXTIME.read().unwrap()),
+        now.duration_since(*get_read(&LAST_NADE_COUNT_UNIXTIME)),
         ShioriError::SystemTimeError
       )
       .as_millis();
       if dur > NADE_LIFETIME {
-        *NADE_COUNTER.write().unwrap() = 1;
-        *LAST_NADE_COUNT_UNIXTIME.write().unwrap() = now;
+        *get_write(&NADE_COUNTER) = 1;
+        *get_write(&LAST_NADE_COUNT_UNIXTIME) = now;
       } else if dur >= NADE_DURATION {
-        *NADE_COUNTER.write().unwrap() += 1;
-        *LAST_NADE_COUNT_UNIXTIME.write().unwrap() = now;
+        *get_write(&NADE_COUNTER) += 1;
+        *get_write(&LAST_NADE_COUNT_UNIXTIME) = now;
       }
-      debug!("{} {} {}", refs[4], dur, *NADE_COUNTER.read().unwrap());
+      debug!("{} {} {}", refs[4], dur, *get_read(&NADE_COUNTER));
     } else {
-      *NADE_COUNTER.write().unwrap() = 1;
+      *get_write(&NADE_COUNTER) = 1;
     }
-    *LAST_NADE_PART.write().unwrap() = refs[4].to_string();
-    if *NADE_COUNTER.read().unwrap() > NADE_THRESHOLD {
-      *NADE_COUNTER.write().unwrap() = 0;
+    *get_write(&LAST_NADE_PART) = refs[4].to_string();
+    if *get_read(&NADE_COUNTER) > NADE_THRESHOLD {
+      *get_write(&NADE_COUNTER) = 0;
       new_mouse_response(req, format!("{}{}nade", refs[3], refs[4]))
     } else {
       Ok(new_response_nocontent())
