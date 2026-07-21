@@ -1,20 +1,12 @@
 #[macro_use]
-mod events;
+pub mod events;
+pub mod system;
 
-mod autobreakline;
-mod error;
-mod roulette;
-mod status;
-mod variables;
-
-#[cfg(windows)]
-mod windows;
-
-use crate::events::common::{add_error_description, new_response_nocontent};
-use crate::variables::*;
+use crate::system::response::{add_error_description, new_response_nocontent};
+use crate::system::variables::*;
 
 use std::fs::{metadata, File};
-use std::panic;
+use std::panic::{self, catch_unwind, AssertUnwindSafe};
 use std::path::PathBuf;
 
 use shiori_hglobal::*;
@@ -31,24 +23,32 @@ use simplelog::*;
 
 #[no_mangle]
 pub extern "cdecl" fn loadu(h: HGLOBAL, len: c_long) -> BOOL {
-  let v = GStr::capture(h, len as usize);
-  let s = match v.to_utf8_str() {
-    Ok(st) => {
-      // UTF-8に変換
-      st.to_string()
+  match catch_unwind(AssertUnwindSafe(|| {
+    let v = GStr::capture(h, len as usize);
+    let s = match v.to_utf8_str() {
+      Ok(st) => {
+        // UTF-8に変換
+        st.to_string()
+      }
+      Err(e) => {
+        eprintln!("Failed to convert HGLOBAL to UTF-8: {:?}", e);
+        return FALSE;
+      }
+    };
+    match common_load_procedure(&s) {
+      Ok(_) => {
+        debug!("loadu");
+        TRUE
+      }
+      Err(_) => {
+        error!("error while loading");
+        FALSE
+      }
     }
-    Err(e) => {
-      eprintln!("Failed to convert HGLOBAL to UTF-8: {:?}", e);
-      return FALSE;
-    }
-  };
-  match common_load_procedure(&s) {
-    Ok(_) => {
-      debug!("loadu");
-      TRUE
-    }
+  })) {
+    Ok(result) => result,
     Err(_) => {
-      error!("error while loading");
+      eprintln!("loadu: panic caught at FFI boundary");
       FALSE
     }
   }
@@ -56,45 +56,66 @@ pub extern "cdecl" fn loadu(h: HGLOBAL, len: c_long) -> BOOL {
 
 #[no_mangle]
 pub extern "cdecl" fn load(h: HGLOBAL, len: c_long) -> BOOL {
-  let v = GStr::capture(h, len as usize);
-  let s: String;
-  match v.to_utf8_str() {
-    Ok(st) => {
-      // UTF-8に変換
-      s = st.to_string();
-    }
-    Err(e) => {
-      eprintln!("Failed to convert HGLOBAL to UTF-8: {:?}", e);
-      match v.to_ansi_str() {
-        Ok(st) => {
-          // ANSIに変換
-          s = st.to_string_lossy().to_string();
-        }
-        Err(e) => {
-          eprintln!("Failed to convert HGLOBAL to ANSI: {:?}", e);
-          return FALSE;
+  match catch_unwind(AssertUnwindSafe(|| {
+    let v = GStr::capture(h, len as usize);
+    let s: String;
+    match v.to_utf8_str() {
+      Ok(st) => {
+        // UTF-8に変換
+        s = st.to_string();
+      }
+      Err(e) => {
+        eprintln!("Failed to convert HGLOBAL to UTF-8: {:?}", e);
+        match v.to_ansi_str() {
+          Ok(st) => {
+            // ANSIに変換
+            s = st.to_string_lossy().to_string();
+          }
+          Err(e) => {
+            eprintln!("Failed to convert HGLOBAL to ANSI: {:?}", e);
+            return FALSE;
+          }
         }
       }
-    }
-  };
+    };
 
-  match common_load_procedure(&s) {
-    Ok(_) => {
-      debug!("load");
-      TRUE
+    match common_load_procedure(&s) {
+      Ok(_) => {
+        debug!("load");
+        TRUE
+      }
+      Err(_) => {
+        error!("error while loading");
+        FALSE
+      }
     }
+  })) {
+    Ok(result) => result,
     Err(_) => {
-      error!("error while loading");
+      eprintln!("load: panic caught at FFI boundary");
       FALSE
     }
   }
 }
 
 fn common_load_procedure(path: &str) -> Result<(), ()> {
+  // パニックフックを最初に設定（ロガー未初期化でもeprintlnで出力可能にする）
+  panic::set_hook(Box::new(|panic_info| {
+    eprintln!("PANIC: {}", panic_info);
+    debug!("{}", panic_info);
+  }));
+
   // ログの設定
   // Windows(UTF-16)を想定しPathBufでパスを作成
   let log_path = PathBuf::from(path).join("haine.log");
-  *LOG_PATH.write().unwrap() = log_path.to_str().unwrap().to_string();
+  let log_path_str = match log_path.to_str() {
+    Some(s) => s.to_string(),
+    None => {
+      eprintln!("Log path contains non-Unicode characters");
+      return Err(());
+    }
+  };
+  *get_write(&LOG_PATH) = log_path_str;
   let fp = if let Ok(fp) = File::create(log_path) {
     fp
   } else {
@@ -109,19 +130,13 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
     }
   }
 
-  panic::set_hook(Box::new(|panic_info| {
-    debug!("{}", panic_info);
-  }));
-
-  INSERTER.write().unwrap().start_init();
-
   if let Err(e) = load_global_variables() {
     error!("{}", e);
   }
 
   // ./debugが存在するならデバッグモード
   if metadata("./debug").is_ok() {
-    *DEBUG_MODE.write().unwrap() = true;
+    *get_write(&DEBUG_MODE) = true;
   }
 
   Ok(())
@@ -129,18 +144,28 @@ fn common_load_procedure(path: &str) -> Result<(), ()> {
 
 #[no_mangle]
 pub extern "cdecl" fn unload() -> BOOL {
-  debug!("unload");
+  match catch_unwind(AssertUnwindSafe(|| {
+    debug!("unload");
 
-  let status = LOAD_STATUS.read().unwrap().clone();
-  if status.should_save() {
-    if let Err(e) = save_global_variables() {
-      error!("{}", e);
+    let status = get_read(&LOAD_STATUS).clone();
+    if status.should_save() {
+      if let Err(e) = save_global_variables() {
+        error!("{}", e);
+      }
+    } else {
+      warn!("セーブデータのロードに失敗したため、保存をスキップしました");
     }
-  } else {
-    warn!("セーブデータのロードに失敗したため、保存をスキップしました");
-  }
 
-  TRUE
+    reset_volatile_variables();
+
+    TRUE
+  })) {
+    Ok(result) => result,
+    Err(_) => {
+      eprintln!("unload: panic caught at FFI boundary");
+      TRUE
+    }
+  }
 }
 
 #[macro_export]
@@ -157,7 +182,7 @@ macro_rules! check_error {
 #[macro_export]
 macro_rules! lazy_regex {
   ($e:expr) => {
-    Lazy::new(|| Regex::new($e).unwrap())
+    std::sync::LazyLock::new(|| Regex::new($e).unwrap())
   };
 }
 
@@ -165,55 +190,67 @@ macro_rules! lazy_regex {
 #[macro_export]
 macro_rules! lazy_fancy_regex {
   ($e:expr) => {
-    Lazy::new(|| FancyRegex::new($e).unwrap())
+    std::sync::LazyLock::new(|| FancyRegex::new($e).unwrap())
   };
 }
 
 #[allow(clippy::missing_safety_doc)]
 #[no_mangle]
 pub extern "cdecl" fn request(h: HGLOBAL, len: &mut c_long) -> HGLOBAL {
-  // リクエストの取得
-  let v = GStr::capture(h, *len as usize);
+  match catch_unwind(AssertUnwindSafe(|| {
+    // リクエストの取得
+    let v = GStr::capture(h, *len as usize);
 
-  let s = if let Ok(s) = v.to_utf8_str() {
-    s
-  } else {
-    let err = "error while decoding request";
-    error!("{}", err);
-    let mut res = new_response_nocontent();
-    add_error_description(&mut res, err);
-    let bytes = res.to_string().into_bytes();
-    let response_gstr = GStr::clone_from_slice_nofree(&bytes);
-    *len = response_gstr.len() as c_long;
-    return response_gstr.handle();
-  };
+    let s = if let Ok(s) = v.to_utf8_str() {
+      s
+    } else {
+      let err = "error while decoding request";
+      error!("{}", err);
+      let mut res = new_response_nocontent();
+      add_error_description(&mut res, err);
+      let bytes = res.to_string().into_bytes();
+      let response_gstr = GStr::clone_from_slice_nofree(&bytes);
+      *len = response_gstr.len() as c_long;
+      return response_gstr.handle();
+    };
 
-  let r = if let Ok(req) = Request::parse(s) {
-    req
-  } else {
-    let err = format!("error while parsing request: {}", s);
-    error!("{}", err);
-    let mut res = new_response_nocontent();
-    add_error_description(&mut res, err.as_str());
-    let bytes = res.to_string().into_bytes();
-    let response_gstr = GStr::clone_from_slice_nofree(&bytes);
-    *len = response_gstr.len() as c_long;
-    return response_gstr.handle();
-  };
-
-  let response = match events::handle_request(&r) {
-    Ok(res) => res,
-    Err(e) => {
-      let err = format!("error while making response: {}", e);
+    let r = if let Ok(req) = Request::parse(s) {
+      req
+    } else {
+      let err = format!("error while parsing request: {}", s);
       error!("{}", err);
       let mut res = new_response_nocontent();
       add_error_description(&mut res, err.as_str());
-      res
-    }
-  };
+      let bytes = res.to_string().into_bytes();
+      let response_gstr = GStr::clone_from_slice_nofree(&bytes);
+      *len = response_gstr.len() as c_long;
+      return response_gstr.handle();
+    };
 
-  let bytes = response.to_string().into_bytes();
-  let response_gstr = GStr::clone_from_slice_nofree(&bytes);
-  *len = response_gstr.len() as c_long;
-  response_gstr.handle()
+    let response = match events::handle_request(&r) {
+      Ok(res) => res,
+      Err(e) => {
+        let err = format!("error while making response: {}", e);
+        error!("{}", err);
+        let mut res = new_response_nocontent();
+        add_error_description(&mut res, err.as_str());
+        res
+      }
+    };
+
+    let bytes = response.to_string().into_bytes();
+    let response_gstr = GStr::clone_from_slice_nofree(&bytes);
+    *len = response_gstr.len() as c_long;
+    response_gstr.handle()
+  })) {
+    Ok(result) => result,
+    Err(_) => {
+      eprintln!("request: panic caught at FFI boundary");
+      let res = new_response_nocontent();
+      let bytes = res.to_string().into_bytes();
+      let response_gstr = GStr::clone_from_slice_nofree(&bytes);
+      *len = response_gstr.len() as c_long;
+      response_gstr.handle()
+    }
+  }
 }

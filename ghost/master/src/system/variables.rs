@@ -1,18 +1,30 @@
-use crate::autobreakline::Inserter;
 use crate::check_error;
-use crate::error::ShioriError;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
-use crate::events::common::TranslateOption;
 use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::{derivative_talks, random_talks};
 use crate::events::talk::{TalkType, TalkingPlace};
-use crate::roulette::TalkBias;
+use crate::system::error::ShioriError;
+use crate::system::roulette::TalkBias;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::error::Error;
 use std::sync::LazyLock;
-use std::sync::RwLock;
+use std::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
+pub(crate) fn get_read<T>(lock: &RwLock<T>) -> RwLockReadGuard<'_, T> {
+  lock.read().unwrap_or_else(|poisoned| {
+    error!("RwLock poisoned (read), recovering");
+    poisoned.into_inner()
+  })
+}
+
+pub(crate) fn get_write<T>(lock: &RwLock<T>) -> RwLockWriteGuard<'_, T> {
+  lock.write().unwrap_or_else(|poisoned| {
+    error!("RwLock poisoned (write), recovering");
+    poisoned.into_inner()
+  })
+}
 
 pub(crate) const GHOST_NAME: &str = "Crave The Grave";
 const VAR_PATH: &str = "vars.json";
@@ -92,10 +104,12 @@ impl PendingEvent {
       Self::FIRST_CLOSE => Some(Self::FirstClose),
       Self::FIRST_PLACE_CHANGE => Some(Self::FirstPlaceChange),
       _ => {
-        if !title.starts_with(Self::FIRST_RANDOMTALK) {
-          None
-        } else if let Ok(a) = title.replace(Self::FIRST_RANDOMTALK, "").parse::<u32>() {
-          Some(Self::FirstRandomTalk(a))
+        if title.starts_with(Self::FIRST_RANDOMTALK) {
+          title
+            .replace(Self::FIRST_RANDOMTALK, "")
+            .parse::<u32>()
+            .ok()
+            .map(Self::FirstRandomTalk)
         } else {
           None
         }
@@ -366,6 +380,7 @@ impl EventFlags {
   }
 
   /// 指定した月日の季節イベントを過去に何回見たか取得
+  #[allow(dead_code)]
   pub fn count_season_event(&self, month: u32, day: u32) -> usize {
     self
       .flags
@@ -392,18 +407,18 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
     Ok((vars, failed_fields)) => {
       if !main_exists {
         // ファイルが存在しない場合は FirstBoot
-        *LOAD_STATUS.write().unwrap() = LoadStatus::FirstBoot;
+        *get_write(&LOAD_STATUS) = LoadStatus::FirstBoot;
       } else if failed_fields.is_empty() {
         // 全フィールド成功
         if backup_exists {
-          *LOAD_STATUS.write().unwrap() = LoadStatus::Success;
+          *get_write(&LOAD_STATUS) = LoadStatus::Success;
         } else {
-          *LOAD_STATUS.write().unwrap() = LoadStatus::SuccessNoBackup;
+          *get_write(&LOAD_STATUS) = LoadStatus::SuccessNoBackup;
         }
       } else {
         // 一部フィールドが失敗
         warn!("部分パースで失敗したフィールド: {:?}", failed_fields);
-        *LOAD_STATUS.write().unwrap() = LoadStatus::PartialSuccess(failed_fields);
+        *get_write(&LOAD_STATUS) = LoadStatus::PartialSuccess(failed_fields);
       }
       vars
     }
@@ -415,38 +430,38 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
         Ok((backup_vars, backup_failed_fields)) => {
           if backup_failed_fields.is_empty() {
             warn!("バックアップから復元");
-            *LOAD_STATUS.write().unwrap() = LoadStatus::RestoredFromBackup;
+            *get_write(&LOAD_STATUS) = LoadStatus::RestoredFromBackup;
           } else {
             warn!(
               "バックアップから部分復元、失敗フィールド: {:?}",
               backup_failed_fields
             );
-            *LOAD_STATUS.write().unwrap() = LoadStatus::PartialSuccess(backup_failed_fields);
+            *get_write(&LOAD_STATUS) = LoadStatus::PartialSuccess(backup_failed_fields);
           }
           backup_vars
         }
         Err(_) => {
-          *LOAD_STATUS.write().unwrap() = LoadStatus::FailedNoBackup;
+          *get_write(&LOAD_STATUS) = LoadStatus::FailedNoBackup;
           return Err(e);
         }
       }
     }
   };
-  debug!("load status: {:?}", *LOAD_STATUS.read().unwrap());
+  debug!("load status: {:?}", *get_read(&LOAD_STATUS));
 
-  *TOTAL_BOOT_COUNT.write().unwrap() = raw_vars.total_boot_count;
+  *get_write(&TOTAL_BOOT_COUNT) = raw_vars.total_boot_count;
   if let Some(time) = raw_vars.total_time {
-    *TOTAL_TIME.write().unwrap() = time;
+    *get_write(&TOTAL_TIME) = time;
   }
   if let Some(interval) = raw_vars.random_talk_interval {
-    *RANDOM_TALK_INTERVAL.write().unwrap() = interval;
+    *get_write(&RANDOM_TALK_INTERVAL) = interval;
   }
   if let Some(name) = raw_vars.user_name {
-    *USER_NAME.write().unwrap() = name;
+    *get_write(&USER_NAME) = name;
   }
-  *CUMULATIVE_TALK_COUNT.write().unwrap() = raw_vars.cumulative_talk_count;
-  *FLAGS.write().unwrap() = raw_vars.flags;
-  *PENDING_EVENT_TALK.write().unwrap() = raw_vars.pending_event_talk;
+  *get_write(&CUMULATIVE_TALK_COUNT) = raw_vars.cumulative_talk_count;
+  *get_write(&FLAGS) = raw_vars.flags;
+  *get_write(&PENDING_EVENT_TALK) = raw_vars.pending_event_talk;
   let mut raw_talk_collection: HashMap<TalkType, HashSet<String>> = HashMap::new();
   let mut all_talk_ids = TalkType::all()
     .into_iter()
@@ -500,11 +515,11 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
       .collect::<HashSet<String>>();
     raw_talk_collection.insert(talk_type, existing_and_seen_talk_ids);
   }
-  *TALK_COLLECTION.write().unwrap() = raw_talk_collection;
+  *get_write(&TALK_COLLECTION) = raw_talk_collection;
   if let Some(derivative_talk_requestable) = raw_vars.derivative_talk_requestable {
-    *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = derivative_talk_requestable;
+    *get_write(&DERIVATIVE_TALK_REQUESTABLE) = derivative_talk_requestable;
   } else {
-    *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = false;
+    *get_write(&DERIVATIVE_TALK_REQUESTABLE) = false;
   }
 
   Ok(())
@@ -512,23 +527,48 @@ pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
 
 pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
   let raw_vars = RawVariables {
-    total_boot_count: *TOTAL_BOOT_COUNT.read().unwrap(),
-    total_time: Some(*TOTAL_TIME.read().unwrap()),
-    random_talk_interval: Some(*RANDOM_TALK_INTERVAL.read().unwrap()),
-    user_name: Some(USER_NAME.read().unwrap().clone()),
-    talk_collection: TALK_COLLECTION.read().unwrap().clone(),
-    cumulative_talk_count: *CUMULATIVE_TALK_COUNT.read().unwrap(),
-    flags: FLAGS.read().unwrap().clone(),
-    pending_event_talk: PENDING_EVENT_TALK.read().unwrap().clone(),
-    derivative_talk_requestable: Some(*DERIVATIVE_TALK_REQUESTABLE.read().unwrap()),
-    library_transition_sequense_dialog_index: Some(
-      *LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX.read().unwrap(),
-    ),
+    total_boot_count: *get_read(&TOTAL_BOOT_COUNT),
+    total_time: Some(*get_read(&TOTAL_TIME)),
+    random_talk_interval: Some(*get_read(&RANDOM_TALK_INTERVAL)),
+    user_name: Some(get_read(&USER_NAME).clone()),
+    talk_collection: get_read(&TALK_COLLECTION).clone(),
+    cumulative_talk_count: *get_read(&CUMULATIVE_TALK_COUNT),
+    flags: get_read(&FLAGS).clone(),
+    pending_event_talk: get_read(&PENDING_EVENT_TALK).clone(),
+    derivative_talk_requestable: Some(*get_read(&DERIVATIVE_TALK_REQUESTABLE)),
+    library_transition_sequense_dialog_index: Some(*get_read(
+      &LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX,
+    )),
   };
 
   raw_vars.save()?;
 
   Ok(())
+}
+
+pub(crate) fn reset_volatile_variables() {
+  *get_write(&DEBUG_MODE) = false;
+  *get_write(&LOG_PATH) = String::new();
+  *get_write(&GHOST_UP_TIME) = 0;
+  *get_write(&LAST_RANDOM_TALK_TIME) = 0;
+  *get_write(&NADE_COUNTER) = 0;
+  *get_write(&LAST_NADE_COUNT_UNIXTIME) = UNIX_EPOCH;
+  *get_write(&LAST_NADE_PART) = String::new();
+  *get_write(&WHEEL_DIRECTION) = Direction::Up;
+  *get_write(&WHEEL_COUNTER) = 0;
+  *get_write(&LAST_WHEEL_COUNT_UNIXTIME) = UNIX_EPOCH;
+  *get_write(&LAST_WHEEL_PART) = String::new();
+  *get_write(&LAST_TOUCH_INFO) = String::new();
+  *get_write(&CHAIN_TALK_STATE) = None;
+  *get_write(&TALK_BIAS) = TalkBias::new();
+  *get_write(&CURRENT_SURFACE) = 0;
+  *get_write(&IDLE_SECONDS) = 0;
+  *get_write(&IMMERSIVE_DEGREES) = 0;
+  *get_write(&TOUCH_INFO) = HashMap::new();
+  *get_write(&TALKING_PLACE) = TalkingPlace::LivingRoom;
+  *get_write(&LAST_ANCHOR_ID) = None;
+  *get_write(&CANDLES) = [false; IMMERSIVE_ICON_COUNT as usize];
+  *get_write(&LAST_SELFTALK_PHRASE) = String::new();
 }
 
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
@@ -549,18 +589,32 @@ pub(crate) static LAST_WHEEL_COUNT_UNIXTIME: LazyLock<RwLock<SystemTime>> =
   LazyLock::new(|| RwLock::new(UNIX_EPOCH));
 pub(crate) static LAST_WHEEL_PART: LazyLock<RwLock<String>> =
   LazyLock::new(|| RwLock::new("".to_string()));
-pub(crate) static FIRST_SEXIAL_TOUCH: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
 pub(crate) static LAST_TOUCH_INFO: LazyLock<RwLock<String>> =
   LazyLock::new(|| RwLock::new("".to_string()));
-pub(crate) static INSERTER: LazyLock<RwLock<Inserter>> =
-  LazyLock::new(|| RwLock::new(Inserter::new(22.0)));
+pub(crate) static LAST_SELFTALK_PHRASE: LazyLock<RwLock<String>> =
+  LazyLock::new(|| RwLock::new("".to_string()));
+
+/// チェイントーク待機状態
+/// (対象部位のイベント名, チェイントーク内容, 期限のGHOST_UP_TIME, コールバック)
+pub(crate) static CHAIN_TALK_STATE: LazyLock<RwLock<Option<ChainTalkState>>> =
+  LazyLock::new(|| RwLock::new(None));
+
+#[derive(Clone)]
+pub(crate) struct ChainTalkState {
+  /// 対象部位のイベント名（例: "0handnade"）
+  pub target_part: String,
+  /// チェイン発火時に表示するトーク内容
+  pub chain_text: String,
+  /// 期限（GHOST_UP_TIME がこの値を超えたら無効）
+  pub expires_at: u64,
+  /// 発火時に実行するコールバック（ゲートフラグ等）
+  pub callback: Option<fn()>,
+}
 pub(crate) static TALK_BIAS: LazyLock<RwLock<TalkBias>> =
   LazyLock::new(|| RwLock::new(TalkBias::new()));
 pub(crate) static CURRENT_SURFACE: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IDLE_SECONDS: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IMMERSIVE_DEGREES: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(0));
-pub(crate) static WAITING_TALK: LazyLock<RwLock<Option<(String, HashSet<TranslateOption>)>>> =
-  LazyLock::new(|| RwLock::new(None));
 pub(crate) static TOUCH_INFO: LazyLock<RwLock<HashMap<String, TouchInfo>>> =
   LazyLock::new(|| RwLock::new(HashMap::new()));
 pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> =
@@ -569,8 +623,6 @@ pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> =
   LazyLock::new(|| RwLock::new(None));
 pub(crate) static CANDLES: LazyLock<RwLock<[bool; IMMERSIVE_ICON_COUNT as usize]>> =
   LazyLock::new(|| RwLock::new([false; IMMERSIVE_ICON_COUNT as usize]));
-pub(crate) static IS_IMMERSIVE_DEGREES_FIXED: LazyLock<RwLock<bool>> =
-  LazyLock::new(|| RwLock::new(false));
 
 pub(crate) const IDLE_THRESHOLD: i32 = 60 * 5;
 

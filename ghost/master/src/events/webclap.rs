@@ -1,11 +1,15 @@
-use crate::error::ShioriError;
-use crate::events::common::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
 use shiorust::message::{Request, Response};
 
 use super::talk::Talk;
 
 pub(crate) fn derivative_talk_request_open(event_id: &str) -> Result<Response, ShioriError> {
-  let last_talk = match Talk::all_talks().unwrap().iter().find(|t| t.id == event_id) {
+  let last_talk = match Talk::all_talks()
+    .ok_or(ShioriError::TalkNotFound)?
+    .iter()
+    .find(|t| t.id == event_id)
+  {
     Some(t) => t.text.clone(),
     None => "".to_string(),
   };

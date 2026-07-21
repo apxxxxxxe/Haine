@@ -1,33 +1,29 @@
 pub(crate) mod aitalk;
 mod bootend;
-pub(crate) mod common;
 mod input;
 mod key;
 mod menu;
-mod mouse;
+pub(crate) mod mouse;
 pub(crate) mod mouse_core;
 mod periodic;
 pub(crate) mod talk;
-mod tooltip;
-pub(crate) mod translate;
+pub mod translate;
 mod update;
 mod webclap;
 
-use crate::error::ShioriError;
 use crate::events::aitalk::*;
 use crate::events::bootend::*;
-use crate::events::common::*;
 use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::talk::*;
-use crate::events::tooltip::*;
-use crate::events::translate::*;
 use crate::events::update::*;
 use crate::events::webclap::*;
-use crate::variables::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
 use shiorust::message::{parts::*, traits::*, Request, Response};
 use std::fs;
 
@@ -84,7 +80,7 @@ fn name(_req: &Request) -> Response {
 }
 
 fn log_path(_req: &Request) -> Response {
-  let log_path = LOG_PATH.read().unwrap().clone();
+  let log_path = get_read(&LOG_PATH).clone();
   new_response_with_value_with_notranslate(log_path, TranslateOption::none())
 }
 
@@ -115,14 +111,15 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "uniqueid" => Some(EventHandler::MayFailure(uniqueid)),
     "OnBoot" => Some(EventHandler::MayFailure(on_boot)),
     "OnClose" => Some(EventHandler::MayFailure(on_close)),
-    "OnVanishSelecting" => Some(EventHandler::AlwaysSuccess(on_vanish_selecting)),
+    "OnVanishSelecting" => Some(EventHandler::MayFailure(on_vanish_selecting)),
+    "OnVanishSelected" => Some(EventHandler::MayFailure(on_vanish_selected)),
+    "OnVanishCancel" => Some(EventHandler::MayFailure(on_vanish_cancel)),
     "OnAiTalk" => Some(EventHandler::MayFailure(on_ai_talk)),
     "OnAnchorSelectEx" => Some(EventHandler::MayFailure(on_anchor_select_ex)),
     "OnNotifyUserInfo" => Some(EventHandler::AlwaysSuccess(on_notify_user_info)),
     "OnMinuteChange" => Some(EventHandler::AlwaysSuccess(on_minute_change)),
     "OnSecondChange" => Some(EventHandler::MayFailure(on_second_change)),
     "OnSurfaceChange" => Some(EventHandler::MayFailure(on_surface_change)),
-    "OnSmoothBlink" => Some(EventHandler::MayFailure(on_smooth_blink)),
     "OnMenuExec" => Some(EventHandler::AlwaysSuccess(on_menu_exec)),
     "OnConfigMenuExec" => Some(EventHandler::AlwaysSuccess(on_config_menu_exec)),
     "OnCostumeMenuExec" => Some(EventHandler::MayFailure(on_costume_menu_exec)),
@@ -138,16 +135,12 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnWebClapInput" => Some(EventHandler::MayFailure(on_web_clap_input)),
     "OnExecuteHTTPComplete" => Some(EventHandler::MayFailure(on_execute_http_complete)),
     "OnExecuteHTTPFailure" => Some(EventHandler::MayFailure(on_execute_http_failure)),
-    "balloon_tooltip" => Some(EventHandler::AlwaysSuccess(balloon_tooltip)),
-    "OnBalloonTooltip" => Some(EventHandler::AlwaysSuccess(on_balloon_tooltip)),
     "OnStickSurface" => Some(EventHandler::AlwaysSuccess(on_stick_surface)),
-    "OnWaitTranslater" => Some(EventHandler::MayFailure(on_wait_translater)),
     "OnCheckTalkCollection" => Some(EventHandler::AlwaysSuccess(on_check_talk_collection)),
     "OnCheckUnseenTalks" => Some(EventHandler::MayFailure(on_check_unseen_talks)),
     "OnWindowStateRestore" => Some(EventHandler::MayFailure(on_window_state_restore)),
     "OnUserInput" => Some(EventHandler::MayFailure(on_user_input)),
     "OnChangingUserName" => Some(EventHandler::MayFailure(on_changing_user_name)),
-    "OnImmersiveDegreeToggled" => Some(EventHandler::AlwaysSuccess(on_immersive_degree_toggled)),
     "OnStoryEvent" => Some(EventHandler::MayFailure(on_story_event)),
     "OnUpdateBegin" => Some(EventHandler::AlwaysSuccess(on_update_begin)),
     "OnUpdateResultEx" => Some(EventHandler::AlwaysSuccess(on_update_result_ex)),

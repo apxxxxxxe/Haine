@@ -1,9 +1,9 @@
-use crate::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
-use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::talk::random_talks_analysis;
-use crate::variables::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
 use shiorust::message::{Request, Response};
 use std::collections::HashMap;
 
@@ -12,8 +12,12 @@ use super::bootend::halloween_boot_talk;
 pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   match refs[0] {
+    "a" => new_response_with_value_with_translate(
+      "h1113205".to_string(),
+      TranslateOption::simple_translate(),
+    ),
     "t" => {
-      if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+      if !get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
         FIRST_RANDOMTALKS.len() as u32 - 1,
       )) {
         Ok(new_response_nocontent())
@@ -22,7 +26,7 @@ pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
       }
     }
     "c" => {
-      if *DEBUG_MODE.read().unwrap() {
+      if *get_read(&DEBUG_MODE) {
         Ok(new_response_with_value_with_notranslate(
           random_talks_analysis(),
           TranslateOption::balloon_surface_only(),
@@ -32,7 +36,7 @@ pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
       }
     }
     "h" => {
-      if *DEBUG_MODE.read().unwrap() {
+      if *get_read(&DEBUG_MODE) {
         let v = format!(
           "\\0\\s[{}]{}\\![embed,OnStickSurface]{}",
           TRANSPARENT_SURFACE,
@@ -45,16 +49,16 @@ pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
       }
     }
     "d" => {
-      if *DEBUG_MODE.read().unwrap() {
+      if *get_read(&DEBUG_MODE) {
         // 全変数をリセット
-        *TOTAL_BOOT_COUNT.write().unwrap() = 0;
-        *TOTAL_TIME.write().unwrap() = 0;
-        *RANDOM_TALK_INTERVAL.write().unwrap() = 0;
-        *USER_NAME.write().unwrap() = "".to_string();
-        *TALK_COLLECTION.write().unwrap() = HashMap::new();
-        *CUMULATIVE_TALK_COUNT.write().unwrap() = 0;
-        *FLAGS.write().unwrap() = EventFlags::default();
-        *PENDING_EVENT_TALK.write().unwrap() = None;
+        *get_write(&TOTAL_BOOT_COUNT) = 0;
+        *get_write(&TOTAL_TIME) = 0;
+        *get_write(&RANDOM_TALK_INTERVAL) = 0;
+        *get_write(&USER_NAME) = "".to_string();
+        *get_write(&TALK_COLLECTION) = HashMap::new();
+        *get_write(&CUMULATIVE_TALK_COUNT) = 0;
+        *get_write(&FLAGS) = EventFlags::default();
+        *get_write(&PENDING_EVENT_TALK) = None;
         Ok(new_response_with_value_with_notranslate(
           format!("\\![change,ghost,{}]", GHOST_NAME),
           TranslateOption::none(),

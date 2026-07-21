@@ -1,15 +1,15 @@
-use crate::error::ShioriError;
 use crate::events::aitalk::on_ai_talk;
-use crate::events::common::*;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::talk::TalkType;
-use crate::status::Status;
-use crate::variables::{
-  EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME, IDLE_SECONDS,
-  LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::status::Status;
+use crate::system::variables::{
+  get_read, get_write, EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME,
+  IDLE_SECONDS, LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
 };
-use crate::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
-use crate::windows::get_local_time;
+use crate::system::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
+use crate::system::windows::get_local_time;
 use rand::prelude::SliceRandom;
 use shiorust::message::{Request, Response};
 
@@ -18,7 +18,7 @@ pub(crate) const TALK_UNLOCK_COUNT_LORE: u64 = 10;
 
 pub(crate) fn on_notify_user_info(req: &Request) -> Response {
   let refs = get_references(req);
-  *USER_NAME.write().unwrap() = refs[0].to_string();
+  *get_write(&USER_NAME) = refs[0].to_string();
   new_response_nocontent()
 }
 
@@ -29,11 +29,11 @@ pub(crate) fn on_minute_change(_req: &Request) -> Response {
 
 pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   // 最小化中かどうかに関わらず実行する処理
-  *TOTAL_TIME.write().unwrap() += 1;
-  *GHOST_UP_TIME.write().unwrap() += 1;
+  *get_write(&TOTAL_TIME) += 1;
+  *get_write(&GHOST_UP_TIME) += 1;
 
   // 初回起動イベントが終わるまではランダムトークなし
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+  if !get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
     FIRST_RANDOMTALKS.len() as u32 - 1,
   )) {
     return Ok(new_response_nocontent());
@@ -44,16 +44,15 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
     Ok(v) => v,
     Err(_) => return Err(ShioriError::ParseIntError),
   };
-  *IDLE_SECONDS.write().unwrap() = idle_secs;
+  *get_write(&IDLE_SECONDS) = idle_secs;
 
   let status = Status::from_request(req);
 
   debug!("status: {}", status);
   {
-    let random_talk_interval = *RANDOM_TALK_INTERVAL.read().unwrap();
+    let random_talk_interval = *get_read(&RANDOM_TALK_INTERVAL);
     if random_talk_interval > 0
-      && (*GHOST_UP_TIME.read().unwrap() - *LAST_RANDOM_TALK_TIME.read().unwrap())
-        >= random_talk_interval
+      && (*get_read(&GHOST_UP_TIME) - *get_read(&LAST_RANDOM_TALK_TIME)) >= random_talk_interval
       && !status.minimizing
     {
       return on_ai_talk(req);
@@ -62,7 +61,7 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
 
   let mut text = String::new();
   {
-    if *GHOST_UP_TIME.read().unwrap() % 60 == 0 && !status.talking {
+    if (*get_read(&GHOST_UP_TIME)).is_multiple_of(60) && !status.talking {
       // 1分ごとにサーフェスを重ね直す
       text += STICK_SURFACE;
     }
@@ -71,7 +70,7 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   let now = get_local_time();
   if now.wMinute == 0
     && now.wSecond == 0
-    && FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+    && get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
       FIRST_RANDOMTALKS.len() as u32 - 1,
     ))
   {
@@ -153,55 +152,47 @@ pub(crate) fn on_surface_change(req: &Request) -> Result<Response, ShioriError> 
     Err(_) => return Err(ShioriError::ParseIntError),
   };
 
-  *CURRENT_SURFACE.write().unwrap() = surface;
+  *get_write(&CURRENT_SURFACE) = surface;
 
   Ok(new_response_nocontent())
 }
 
 pub(crate) fn check_story_events() {
   // 何らかの理由で初期トークタイプがセーブデータから欠落した場合を考え、初回起動が終わっているならUnlockを毎回する
-  if FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+  if get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
     (FIRST_RANDOMTALKS.len() - 1) as u32,
   )) {
     [TalkType::AboutMe, TalkType::WithYou].iter().for_each(|t| {
-      FLAGS.write().unwrap().done(EventFlag::TalkTypeUnlock(*t));
+      get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(*t));
     });
   }
 
-  if !FLAGS
-    .read()
-    .unwrap()
-    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
-    && *CUMULATIVE_TALK_COUNT.read().unwrap() >= TALK_UNLOCK_COUNT_SERVANT
+  if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
+    && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_SERVANT
   {
     // 従者コメント開放
-    *PENDING_EVENT_TALK.write().unwrap() = Some(PendingEvent::UnlockingServantsComments);
-  } else if !FLAGS
-    .read()
-    .unwrap()
-    .check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
-    && *CUMULATIVE_TALK_COUNT.read().unwrap() >= TALK_UNLOCK_COUNT_LORE
+    *get_write(&PENDING_EVENT_TALK) = Some(PendingEvent::UnlockingServantsComments);
+  } else if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
+    && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_LORE
   {
     // ロアトーク開放
-    *PENDING_EVENT_TALK.write().unwrap() = Some(PendingEvent::UnlockingLoreTalks);
-  } else if *PENDING_EVENT_TALK.read().unwrap() == Some(PendingEvent::ConfessionOfSuicide) {
+    *get_write(&PENDING_EVENT_TALK) = Some(PendingEvent::UnlockingLoreTalks);
+  } else if *get_read(&PENDING_EVENT_TALK) == Some(PendingEvent::ConfessionOfSuicide) {
     // 仕様変更のため解禁されないように
     // すでにPendingEventにConfessionOfSuicideがセットされている場合は消す
-    *PENDING_EVENT_TALK.write().unwrap() = None;
+    *get_write(&PENDING_EVENT_TALK) = None;
   }
 
   // 過去トークの解禁がされている場合、再び閉じる
   {
-    let mut flags = FLAGS.write().unwrap();
+    let mut flags = get_write(&FLAGS);
     if flags.check(&EventFlag::TalkTypeUnlock(super::TalkType::Past)) {
       flags.delete(EventFlag::TalkTypeUnlock(super::TalkType::Past));
     }
   }
 
   // 変数に過去トークの情報が入っている場合消去する
-  if TALK_COLLECTION
-    .write()
-    .unwrap()
+  if get_write(&TALK_COLLECTION)
     .remove(&super::TalkType::Past)
     .is_some()
   {

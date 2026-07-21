@@ -1,14 +1,14 @@
-use crate::error::ShioriError;
-use crate::events::common::*;
 use crate::events::first_boot::{FIRST_BOOT_TALK, FIRST_RANDOMTALKS};
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::{derivative_talks_per_talk_type, random_talks};
 use crate::events::TalkType;
 use crate::events::TalkingPlace;
-use crate::variables::PendingEvent;
-use crate::variables::{
-  EventFlag, FLAGS, IS_IMMERSIVE_DEGREES_FIXED, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL,
-  TALKING_PLACE, TALK_COLLECTION, USER_NAME,
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::PendingEvent;
+use crate::system::variables::{
+  get_read, get_write, EventFlag, FLAGS, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE,
+  TALK_COLLECTION, USER_NAME,
 };
 use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE};
 use num_derive::{FromPrimitive, ToPrimitive};
@@ -26,7 +26,7 @@ enum HalloweenCostumeTrigger {
 }
 
 pub(crate) fn on_menu_exec(_req: &Request) -> Response {
-  let current_talk_interval = *RANDOM_TALK_INTERVAL.read().unwrap();
+  let current_talk_interval = *get_read(&RANDOM_TALK_INTERVAL);
   let mut selections = Vec::new();
 
   for i in [1, 3, 5, 7, 10, 0].iter() {
@@ -55,7 +55,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
 
   let buttons = format!(
     "\\_l[0,0]\\f[align,right]{}\\__q[script:\\e]{}\\__q",
-    if FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+    if get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
       (FIRST_RANDOMTALKS.len() - 1) as u32,
     )) {
       format!("\\__q[OnConfigMenuExec]{}\\__q ", Icon::Cog)
@@ -66,7 +66,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
   );
 
   // ハロウィン専用メニュー項目
-  let local_time = crate::windows::get_local_time();
+  let local_time = crate::system::windows::get_local_time();
   let halloween_menu = if local_time.wMonth == 10 && local_time.wDay == 31 {
     format!(
       "\\_l[0,@1.5em]\\![*]\\q[仮装してもらう,OnCostumeMenuExec,{}]\\n",
@@ -79,7 +79,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
   let m = format!(
     "\\_q{}{}",
     REMOVE_BALLOON_NUM,
-    if !FLAGS.read().unwrap().check(&EventFlag::FirstRandomTalkDone(
+    if !get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
       (FIRST_RANDOMTALKS.len() - 1) as u32,
     )) {
       "\
@@ -105,7 +105,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         \\1{}\
         \\0\\_l[0,0]\
         ",
-        if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+        if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
           "".to_string()
         } else {
           "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
@@ -114,13 +114,9 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
         talk_interval_selector,
         buttons,
         {
-          let hoge = PENDING_EVENT_TALK.read().unwrap();
-          if hoge.is_some() {
-            format!(
-              "\\![*]\\q[{},OnStoryEvent,{}]",
-              hoge.as_ref().unwrap(),
-              hoge.as_ref().unwrap()
-            )
+          let hoge = get_read(&PENDING_EVENT_TALK);
+          if let Some(ref event) = *hoge {
+            format!("\\![*]\\q[{},OnStoryEvent,{}]", event, event)
           } else {
             "".to_string()
           }
@@ -142,7 +138,7 @@ pub(crate) fn on_config_menu_exec(_req: &Request) -> Response {
     ",
     Icon::ArrowLeft,
     Icon::Cross,
-    if *DERIVATIVE_TALK_REQUESTABLE.read().unwrap() {
+    if *get_read(&DERIVATIVE_TALK_REQUESTABLE) {
       "表示"
     } else {
       "非表示"
@@ -154,7 +150,7 @@ pub(crate) fn on_config_menu_exec(_req: &Request) -> Response {
 
 pub(crate) fn on_costume_menu_exec(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let dialog = match refs[0].parse::<u32>().unwrap() {
+  let dialog = match check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError) {
     x if x == HalloweenCostumeTrigger::AskToWear as u32 => {
       "h1113101着てほしいもの？h1113204また面白いことを考えるのね。".to_string()
     }
@@ -196,7 +192,7 @@ fn show_minute(m: &u64) -> String {
 pub(crate) fn on_talk_interval_changed(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let v = check_error!(refs[0].parse::<u64>(), ShioriError::ParseIntError);
-  *RANDOM_TALK_INTERVAL.write().unwrap() = v;
+  *get_write(&RANDOM_TALK_INTERVAL) = v;
 
   Ok(on_menu_exec(req))
 }
@@ -266,7 +262,10 @@ impl Question {
       Question::I_DREW_YOUR_PORTRAIT => "似顔絵を描いた".to_string(),
       Question::LET_ME_PLAY => "遊びに行こう".to_string(),
       Question::CAN_I_PET_YOU => "なでていい？".to_string(),
-      _ => unreachable!(),
+      _ => {
+        error!("Unknown question theme: {:?}", self);
+        String::new()
+      }
     }
   }
 
@@ -280,7 +279,8 @@ impl Question {
       h1111104\\1『幽霊ということは、一度死んだんだよね？\\n\
       どんな感じだった？何か思うことはある？』\
       h1111204いいえ、何も。\\n\
-      h1111205私の求める変化はそこには無いし、何より私はまだ死ねていない。\\n\
+      h1111205私の求める変化はそこには無いし、\\n\
+      何より私はまだ死ねていない。\\n\
       自我を手放してこその死でしょう？\\n\
       h1111210だから、これからよ。\\n\
       "
@@ -288,7 +288,8 @@ impl Question {
       Question::FATIGUE_OF_LIFE => "\
       \\1『生きるのは苦しい。どうしていいかわからない』\\n\
       h1111205そう、そうね。\\n\
-      …………h1111204悪いけれど、私はその答えを持っていない。\\n\
+      …………h1111204悪いけれど、\\n\
+      私はその答えを持っていない。\\n\
       \\n\
       h1111204あなたが満足できるまで話を聞くわ。\\n\
       h1111210それから、どうするかを自分で決めなさい。\
@@ -300,8 +301,10 @@ impl Question {
       ……h1111210おおよそ、と言ったのは、\\n\
       生前の身長だから。\\n\
       h1111206今の身長は、測っても無駄なの。\\n\
-      霊体は常に揺らめいていて、大きさが変動し続ける。\\n\
-      h1111310……まあ、平均的にはそのくらいだと思ってちょうだい。\
+      霊体は常に揺らめいていて、大\\n\
+      きさが変動し続ける。\\n\
+      h1111310……まあ、\\n\
+      平均的にはそのくらいだと思ってちょうだい。\
       "
       .to_string(),
       Question::HOW_WEIGHT_ARE_YOU => "\
@@ -335,8 +338,10 @@ impl Question {
       良い茶葉を扱う店に、買い物を。\\n\
       \\n\
       h1111205勿論、対価も払わなければならない。\\n\
-      それは自由に動ける代わりに、長い休眠を必要とするの。\\n\
-      h1111210取引をする者たちはあれが無防備な間、身の安全を保障する契約なのよ。\
+      それは自由に動ける代わりに、\\n\
+      長い休眠を必要とするの。\\n\
+      h1111210取引をする者たちはあれが無防備な間、\\n\
+      身の安全を保障する契約なのよ。\
       "
       .to_string(),
       Question::DO_SERVENTS_HAVE_NAMES => "\
@@ -344,10 +349,12 @@ impl Question {
       h1111210ええ、もちろん。\\n\
       でも、教えることはできないわ。\\n\
       \\n\
-      h1111206霊にとって、自分が何者であるかは文字通り死活問題なの。\\n\
-      肉の器がない分、簡単に存在が揺らいでしまうから。\\n\
+      h1111206霊にとって、\\n\
+      自分が何者であるかは文字通り死活問題なの。\\n\
+      肉の器がない分、\\n\
+      簡単に存在が揺らいでしまうから。\\n\
       h1111210必要なときは偽名や通り名を名乗り、\\n\
-      真の名前は基本的には契約する相手にしか明かさないのよ。\\n\
+      真の名前は契約する相手にしか明かさないのよ。\\n\
       \\n\
       ……h1111204「寂しい」って思った？……h1111211ふふ。\\n\
       h1111204あなたに教えた私の名前は偽名ではないわ。\\n\
@@ -365,15 +372,18 @@ impl Question {
       h1111205なにかに身を委ねるのは簡単だけれどね。\\n\
       自分の手綱は自分で握るものよ。\\n\
       h1111210自分の意志でここにいる。\\n\
-      そんなあなただから、こうして一緒にいるのよ。\
+      そういうあなたで、いてちょうだい。\
       "
       .to_string(),
       Question::WHAT_DO_YOU_DO_WHEN_YOU_ARE_ALONE => "\
       \\1『ひとりのときは何をして過ごしてる？』\\n\
       h1111105……ひとりのときというと、仕事がないときね。\\n\
-      h1111204大抵は書斎で本を読むか、私室でお茶を飲んで休むか、\\n\
-      h1111206ああ、ここで従者たちの相手をすることもあるわね。\\n\
-      彼らも仕事の息抜きを欲しているから、定期的にね。\\n\
+      h1111204大抵は書斎で本を読むか、\\n\
+      私室でお茶を飲んで休むか、\\n\
+      h1111206ああ、\\n\
+      ここで従者たちの相手をすることもあるわね。\\n\
+      彼らも仕事の息抜きを欲しているから、\\n\
+      定期的にね。\\n\
       ……h1111105これはひとりのときではないか。\\n\
       h1111204まあ、好きなように過ごしているわ。\
       "
@@ -390,9 +400,11 @@ impl Question {
       h1111104\\1『そうしたいのは山々だけど、\\n\
       生活があるから…』\\n\
       \\0…………h1111205ええ、そうよね。\\n\
+      h1111206あなたには、帰る場所と、続いていく日々がある。\\n\
+      それを手放させるわけにはいかないもの。\\n\
       \\n\
       h1111204部屋にはあとで案内させるわ。\\n\
-      h1111210くつろいでちょうだい。\
+      h1111210今夜だけは、ゆっくりしてちょうだい。\
       "
       .to_string(),
       Question::IS_THERE_A_PLACE_TO_VISIT => "\
@@ -423,93 +435,132 @@ impl Question {
 	  h1111205生前はそういう言葉をよく聞いたのよ。\\n\
 	  \\n\
 	  h1113210それにしても慣れないものね。\\n\
-	  h1113204参考までに、私のどこを「かわいい」と感じたのか聞いても良いかしら？\
-      ".to_string(),
-	  Question::YOU_ARE_BEAUTIFUL => "\
+	  h1113204参考までに、私のどこを\\n\
+    「かわいい」と感じたのか聞いても良いかしら？\
+      "
+      .to_string(),
+      Question::YOU_ARE_BEAUTIFUL => "\
 	  \\1『美人』\\n\
-	  h1111210……まあ、「かわいい」よりは言われ慣れているわね。\\n\
-	  h1111206着飾るのも、それを見せるのもあまり興味がないうえ、\\n\
+	  h1111210……まあ、\\n\
+    「かわいい」よりは言われ慣れているわね。\\n\
+	  h1111206着飾るのも、\\n\
+    それを見せるのもあまり興味がないうえ、\\n\
 	  不必要に言い寄られることもあったものだから……\\n\
 	  h1111205あまり好ましいとは思わないのだけれど。\\n\
-	  h1111210……それでも、こうしてあなたを喜ばせられているのならば、それはきっと良いことなのでしょうね。\
-	  ".to_string(),
-	  Question::I_AM_HUNGRY => "\
+	  h1111210……それでも、\\n\
+    こうしてあなたを喜ばせられているのならば、\\n\
+    それはきっと良いことなのでしょうね。\
+	  "
+      .to_string(),
+      Question::I_AM_HUNGRY => "\
 	  \\1『お腹が空いた』\\n\
 	  h1111104あら、もうそんな時間？\\n\
 	  h1111206……悪いけれど、ここには食事の用意はないの。\\n\
-	  h1111210私たちの食事はもっぱら娯楽として行うもので、それも茶菓子程度だから。\\n\
+	  h1111210私たちの食事はもっぱら娯楽として行うもので、\\n\
+    それも茶菓子程度だから。\\n\
 	  \\n\
-	  だから、あなた自身で外から持って来てもらうことになるのだけど……\\n\
-	  h1111205…………その、できればここで食べて見せてほしいわ。\\n\
-	  h1111210……娯楽だけでない、生きる糧としての食事を眺めていたいの。\
-	  ".to_string(),
-    Question::CAN_I_TALK_TO_YOUR_SERVANTS => "\
+	  だから、あなた自身で\\n\
+    外から持って来てもらうことになるのだけど……\\n\
+	  h1111205…………その、\\n\
+    できればここで食べて見せてほしいわ。\\n\
+	  h1111210……娯楽だけでない、\\n\
+    生きる糧としての食事を眺めていたいの。\
+	  "
+      .to_string(),
+      Question::CAN_I_TALK_TO_YOUR_SERVANTS => "\
     \\1『従者たちと話してもいい？』\\n\
     h1111101それは……h1111104許容しかねるわ。\\n\
     h1111110彼らは外部からの影響に弱いの。\\n\
-    h1113206挨拶程度なら構わないけれど、それ以上…ただの雑談だとしても、\\n\
-    あなたから漏れる悪意なき偏見が、彼らの存在を不可逆に再定義してしまうかもしれない。\\n\
-    h1113210生者から死者へ言葉を送るという行為がもつ意味は、\\n\
+    h1113206挨拶程度なら構わないけれど、\\n\
+    それ以上…ただの雑談だとしても、\\n\
+    あなたから漏れる悪意なき偏見が、彼らの存在を\\n\
+    不可逆に再定義してしまうかもしれない。\\n\
+    h1113210生者から死者へ言葉を送る\\n\
+    という行為がもつ意味は、\\n\
     あなたが想像するより遥かに重いの。\\n\
     この、互いの声が漏れ聞こえている状況が限界点。\\n\
     h1111204分かってちょうだいね。\
-    ".to_string(),
-    Question::CALL_YOU_HAINE_1 => "\
+    "
+      .to_string(),
+      Question::CALL_YOU_HAINE_1 => "\
     \\1『ハイネ』\\n\
     h1111201ええ、何？\
-    ".to_string(),
-    Question::CALL_YOU_HAINE_2 => "\
+    "
+      .to_string(),
+      Question::CALL_YOU_HAINE_2 => "\
     \\1『ハイネさん』\\n\
     h1111204……どうしたの、かしこまって。\\n\
-    ".to_string(),
-    Question::CALL_YOU_HAINE_3 => "\
+    "
+      .to_string(),
+      Question::CALL_YOU_HAINE_3 => "\
     \\1『ハイネちゃん』\\n\
     h1111210うん……h1111201うん？\
-    ".to_string(),
-    Question::WHEN_DO_YOU_WAKE_UP => "\
+    "
+      .to_string(),
+      Question::WHEN_DO_YOU_WAKE_UP => "\
     \\1『ふだん何時に寝起きしてる？』\\n\
-    h1111204……質問に答えるなら、数日起きて、数日寝ているわ。\\n\
+    h1111204……質問に答えるなら、\\n\
+    数日起きて、数日寝ているわ。\\n\
     h1111206私も彼らも、必要ならば何日でも活動し続ける。\\n\
     h1111210霊は基本的に眠りを必要としないから、\\n\
-    起きていようと思えばいくらでも起きていられるのよ。\\n\
+    起きていようと思えば\\n\
+    いくらでも起きていられるのよ。\\n\
     \\n\
     h1121211とはいえ、それでは倦んでしまうから。\\n\
-    h1111210必要に応じて…というか、起きている必要のないときは眠るの。\\n\
+    h1111210必要に応じて…というか、\\n\
+    起きている必要のないときは眠るの。\\n\
     \\n\
-    h1111204……最近は、ある人間のおかげで退屈しなくて済んでいるけれど、ね。\\n\
-    ".to_string(),
-    Question::WHY_IS_YOUR_BODY_COLD => "\
+    h1111204……最近は、ある人間のおかげで\\n\
+    起きている理由ができているけれど、ね。\\n\
+    "
+      .to_string(),
+      Question::WHY_IS_YOUR_BODY_COLD => "\
     \\1『どうして体温が低い？』\\n\
     h1113205一言で言えば、血が通っていないからでしょうね。\\n\
-    生物に体温があるのは、代謝……生存のための化学反応に温度が必要だから。\\n\
-    h1113204血液を回し、酸素を通わせ、栄養をエネルギーに、そして熱に変える。\\n\
-    h1113206一方で……私達がどのような原理で存在しているのかは未解明だけれど、温度を必要としない在り方なのでしょう。\\n\
-    h1113204まあ、そのせいであなたには冷たい思いをさせてしまうけれど。\\n\
-    h1113205……私の手をろうそくで炙れば、少しは温かくなるかしら？\\n\
+    生物に体温があるのは、代謝……\\n\
+    生存のための化学反応に温度が必要だから。\\n\
+    h1113204血液を回し、酸素を通わせ、\\n\
+    栄養をエネルギーに、そして熱に変える。\\n\
+    h1113206一方で……\\n\
+    私達がどのような原理で存在しているのかは\\n\
+    未解明だけれど、\\n\
+    温度を必要としない在り方なのでしょう。\\n\
+    h1113204まあ、そのせいであなたには\\n\
+    冷たい思いをさせてしまうけれど。\\n\
+    h1113205……私の手をろうそくで炙れば、\\n\
+    少しは温かくなるかしら？\\n\
     痛覚もさほどh1113101……h1121210冗談よ。そんな顔しないで。\
-    ".to_string(),
-    Question::AM_I_BOTHERING_YOU => "\
+    "
+      .to_string(),
+      Question::AM_I_BOTHERING_YOU => "\
     \\1『迷惑じゃない？』\\n\
     h1111204……今更よ、そんなこと。\\n\
-    h1111210この場所は私のもの。h1111204ここにいるのは、私が必要とするものだけよ。\\n\
-    h1111204あなたが必要だから、あなたはここにいるの。\\n\
+    h1111210ここは私の館。誰を置くかは、私が決めるの。\\n\
+    h1111204出ていけと、一度でも言ったかしら。\\n\
     \\n\
     \\_w[1200]h1111210さあ、くだらないことを考えるのはおしまい。\\n\
-    h1111204いつものように、あなたの話を聞かせてちょうだい。\
-    ".to_string(),
-    Question::CALL_YOU_MOTHER => "\
+    h1111204いつものように、\\n\
+    あなたの話を聞かせてちょうだい。\
+    "
+      .to_string(),
+      Question::CALL_YOU_MOTHER => "\
     \\1『お母さん』\\n\
     h1111101……h1111304聞き間違いかしら？\\n\
-    h1111210先生のことを間違えてそう呼んでしまうという笑い話はよく聞くけれど。\\n\
-    h1111204まさか、私を母親と間違えたわけではないでしょう？\\n\
-    h1111210私に母親の素質なんてないものね。\\n\
-    ".to_string(),
-    Question::CALL_YOU_SISTER => "\
+    h1111210先生のことを間違えてそう呼んでしまう\\n\
+    という笑い話はよく聞くけれど。\\n\
+    h1111204まさか、\\n\
+    私を母親と間違えたわけではないでしょう？\\n\
+    h1111210私にそんな素質などないものね。\\n\
+    "
+      .to_string(),
+      Question::CALL_YOU_SISTER => "\
     \\1『お姉ちゃん』\\n\
     h1111204……h1111210きょうだいにしては、歳が離れているわね。\\n\
-    そういう戯れの気分なのかしら？h1111204{user_name}ちゃん。\
-    ".to_string(),
-    Question::WHAT_IS_YOUR_FAVORITE_SNACK => "\
+    そういう戯れの気分なのかしら？\\n\
+    h1111204{user_name}ちゃん。\
+    "
+      .to_string(),
+      Question::WHAT_IS_YOUR_FAVORITE_SNACK => "\
     \\1『好きなお茶菓子は何？』\\n\
     h1111205そうね……硬く焼き締めた菓子が好きなの。\\n\
     h1111206ビスケットやラスクのような、\\n\
@@ -519,7 +570,8 @@ impl Question {
     h1111210食事の時間になっても席を立たず、\\n\
     家政婦を困らせていたのよ。\\n\
     \\n\
-    h1111206見かねた彼女が、作業をしながらでも食べられるように\\n\
+    h1111206見かねた彼女が、\\n\
+    作業をしながらでも食べられるように\\n\
     硬く焼いた菓子を用意してくれたの。\\n\
     h1111210それが思いのほか美味しくて、\\n\
     読書の合間につまむのが習慣になったわ。\\n\
@@ -527,40 +579,48 @@ impl Question {
     h1111205……あれは私の体調を案じてくれた\\n\
     優しい工夫だったのでしょう。\\n\
     h1111206だからこそ、今でもあの味を懐かしく思うのよ。\
-    ".to_string(),
-    Question::I_DREW_YOUR_PORTRAIT => "\
+    "
+      .to_string(),
+      Question::I_DREW_YOUR_PORTRAIT => "\
     \\1『似顔絵を描いた』\\n\
     h1111101あら、私を？\\n\
     h1111204……見せてもらえるかしら？\\n\
     \\n\
     h1111210\\1手に持っていたスケッチブックを見せると、\\n\
-    ハイネがゆっくりと手を伸ばしてページをめくった。\\n\
+    ハイネがゆっくりと手を伸ばして\\n\
+    ページをめくった。\\n\
     \\0h1111205……h1111206なるほど。\\n\
     あなたの目には、私はこんな風に映っているのね。\\n\
     \\n\
     h1111210絵の技術もなかなかのものだけど、\\n\
-    h1111204それよりも、あなたが私を見つめていた時間を思うと……\\n\
+    h1111204それよりも、\\n\
+    あなたが私を見つめていた時間を思うと……\\n\
     h1111205少し照れくさいわね。h1111210ありがとう。\\n\
     \\n\
     h1111204大切にしてちょうだい。\\n\
     私にとっても、あなたにとっても、\\n\
     この瞬間の証になるものだから。\
-    ".to_string(),
-    Question::LET_ME_PLAY => "\
+    "
+      .to_string(),
+      Question::LET_ME_PLAY => "\
     \\1『遊びに行こう』\\n\
     h1111210……遊び。\\n\
     h1111204その「遊び」とは、どのようなものかしら。\\n\
-    h1111206私にとっての娯楽といえば、読書や音楽鑑賞程度だけれど、\\n\
-    h1111205生きている人間の「遊び」は、もっと動的なものでしょう？\\n\
+    h1111206私にとっての娯楽といえば、\\n\
+    読書や音楽鑑賞程度だけれど、\\n\
+    h1111205生きている人間の「遊び」は、\\n\
+    もっと活動的なものでしょう？\\n\
     \\n\
     h1111210……でも、面白そうね。\\n\
     h1111204あなたがどのような遊びを望むのか、\\n\
     聞かせてちょうだい。\\n\
-    h1111204この館の中でできることなら、私も一緒に楽しませてもらうわ。\\n\
+    h1111204この館の中でできることなら、\\n\
+    私も一緒に楽しませてもらうわ。\\n\
     h1111206……もしくは、見学させてもらうかしら。\\n\
     h1111210霊体では制約も多いものだから。\
-    ".to_string(),
-    Question::CAN_I_PET_YOU => "\
+    "
+      .to_string(),
+      Question::CAN_I_PET_YOU => "\
     \\1『なでていい？』\\n\
     h1111101……h1111201なでる？\\n\
     h1111204ああ、頭のことね。\\n\
@@ -576,8 +636,12 @@ impl Question {
     h1111205あなたの手は温かいのね。\\n\
     私が冷たいからそう感じるのかもしれないけれど、\\n\
     h1111210それでも、温かい。\
-    ".to_string(),
-      _ => unreachable!(),
+    "
+      .to_string(),
+      _ => {
+        error!("Unknown question talk: {:?}", self);
+        String::new()
+      }
     };
     m + "\\x\\![raise,OnTalk]"
   }
@@ -642,13 +706,13 @@ pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
   let mut sum = 0;
   let mut all_sum = 0;
   const DIMMED_COLOR: &str = "\\f[color,150,150,130]";
-  let talk_collection = TALK_COLLECTION.read().unwrap();
-  let talking_place = TALKING_PLACE.read().unwrap();
+  let talk_collection = get_read(&TALK_COLLECTION);
+  let talking_place = get_read(&TALKING_PLACE);
   lines.push(format!("[トーク統計: {}]\\n", talking_place));
   let talk_types = talking_place.talk_types();
   let is_unlocked_checks = talk_types
     .iter()
-    .map(|t| FLAGS.read().unwrap().check(&EventFlag::TalkTypeUnlock(*t)))
+    .map(|t| get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(*t)))
     .collect::<Vec<_>>();
   for i in 0..talk_types.len() {
     let talk_type = talk_types[i];
@@ -701,7 +765,7 @@ pub(crate) fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriEr
     format!(
       "\\_q\\![open,inputbox,{},0]新しい呼び名を入力してください。\\n現在:{}",
       InputId::UserName,
-      *USER_NAME.read().unwrap()
+      *get_read(&USER_NAME)
     ),
     TranslateOption::with_shadow_completion(),
   )
@@ -710,51 +774,37 @@ pub(crate) fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriEr
 pub(crate) fn on_derivative_talk_request_button_toggled(req: &Request) -> Response {
   let is_derivative_talks_enabled;
   {
-    is_derivative_talks_enabled = *DERIVATIVE_TALK_REQUESTABLE.read().unwrap();
+    is_derivative_talks_enabled = *get_read(&DERIVATIVE_TALK_REQUESTABLE);
   }
-  *DERIVATIVE_TALK_REQUESTABLE.write().unwrap() = !is_derivative_talks_enabled;
+  *get_write(&DERIVATIVE_TALK_REQUESTABLE) = !is_derivative_talks_enabled;
 
   on_config_menu_exec(req)
-}
-
-pub(crate) fn on_immersive_degree_toggled(req: &Request) -> Response {
-  let i;
-  {
-    i = *IS_IMMERSIVE_DEGREES_FIXED.read().unwrap();
-  }
-  *IS_IMMERSIVE_DEGREES_FIXED.write().unwrap() = !i;
-
-  on_menu_exec(req)
 }
 
 pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let s = if let Some(hoge) = PendingEvent::from_str(refs[0]) {
     let callback = || {
-      *PENDING_EVENT_TALK.write().unwrap() = None;
+      *get_write(&PENDING_EVENT_TALK) = None;
     };
     match hoge {
       PendingEvent::ConfessionOfSuicide => {
-        unreachable!();
+        error!("Unexpected ConfessionOfSuicide");
+        return Err(ShioriError::InvalidEvent);
       }
       PendingEvent::UnlockingLoreTalks => {
-        FLAGS
-          .write()
-          .unwrap()
-          .done(EventFlag::TalkTypeUnlock(TalkType::Lore));
+        get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(TalkType::Lore));
         callback();
         unlock_lore_talks()
       }
       PendingEvent::UnlockingServantsComments => {
-        FLAGS
-          .write()
-          .unwrap()
-          .done(EventFlag::TalkTypeUnlock(TalkType::Servant));
+        get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(TalkType::Servant));
         callback();
         unlock_servents_comments()
       }
       _ => {
-        unreachable!();
+        error!("Unexpected pending event: {:?}", hoge);
+        return Err(ShioriError::InvalidEvent);
       }
     }
   } else {
@@ -775,23 +825,17 @@ pub fn on_story_history_menu(_req: &Request) -> Response {
   events.push((
     "初回終了".to_string(),
     PendingEvent::FirstClose,
-    FLAGS.read().unwrap().check(&EventFlag::FirstClose),
+    get_read(&FLAGS).check(&EventFlag::FirstClose),
   ));
   events.push((
     "ロアトーク開放".to_string(),
     PendingEvent::UnlockingLoreTalks,
-    FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore)),
+    get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Lore)),
   ));
   events.push((
     "従者コメント開放".to_string(),
     PendingEvent::UnlockingServantsComments,
-    FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant)),
+    get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)),
   ));
 
   let mut m = "\\_q\\b[2]イベント回想\\n\\n".to_string();
@@ -846,15 +890,12 @@ fn unlock_lore_talks() -> String {
     h1111201死について。深く考えることはある？\\n\
     h1111206……あなたには聞くまでもないわよね。\\n\
     h1111205私もそうなの。\\n\
-    生きていたころから、なぜ生きるのか、死ぬとはどういうことかをずっと考えていたわ。\\n\
+    生きていたころから、なぜ生きるのか、\\n\
+    死ぬとはどういうことかをずっと考えていたわ。\\n\
     いくつか不思議な話を知っているの。\\n\
     話の種に、語ってみましょうか。{}\
     ",
-    if !FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Lore))
-    {
+    if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Lore)) {
       render_achievement_message(TalkType::Lore)
     } else {
       "".to_string()
@@ -868,18 +909,17 @@ fn unlock_servents_comments() -> String {
     \\1……h1111101\\1お茶がなくなってしまった。\\n\
     最初にハイネに言われたのを思いだし、\\n\
     部屋の隅に向って手を上げてみせる。\\n\
-    h1111204\\1するとポットが浮き上がり、空になっていたカップにお茶が注がれた。\\n\
+    h1111204\\1するとポットが浮き上がり、\\n\
+    空になっていたカップにお茶が注がれた。\\n\
     \\0……h1111206彼らは私のことを「主」と呼ぶの。\\n\
-    契約関係としては対等なのだけれど、彼ら自身がそう呼ぶのを好むのよ。\\n\
+    契約関係としては対等なのだけれど、\\n\
+    彼ら自身がそう呼ぶのを好むのよ。\\n\
     \\n\
-    h1111209耳を澄ませていれば、彼らの声が聞こえることもあるんじゃない？\\n\
+    h1111209耳を澄ませていれば、\\n\
+    彼らの声が聞こえることもあるんじゃない？\\n\
     私を通して彼らとも縁ができているはずだから。{}\
     ",
-    if !FLAGS
-      .read()
-      .unwrap()
-      .check(&EventFlag::TalkTypeUnlock(TalkType::Servant))
-    {
+    if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
       render_achievement_message(TalkType::Servant)
     } else {
       "".to_string()

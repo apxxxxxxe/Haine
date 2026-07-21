@@ -3,11 +3,11 @@ pub(crate) mod first_boot;
 pub(crate) mod randomtalk;
 
 use crate::check_error;
-use crate::error::ShioriError;
-use crate::events::common::*;
 use crate::events::talk::randomtalk::random_talks;
-use crate::roulette::RouletteCell;
-use crate::variables::TALK_COLLECTION;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::roulette::RouletteCell;
+use crate::system::variables::{get_read, get_write, TALK_COLLECTION};
 use core::fmt::{Display, Formatter};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -20,6 +20,7 @@ use self::randomtalk::{derivative_talks_per_talk_type, get_parent_talk};
 
 use super::aitalk::render_talk;
 
+#[allow(unused)]
 #[derive(Clone)]
 pub(crate) struct Talk {
   pub talk_type: Option<TalkType>,
@@ -29,8 +30,8 @@ pub(crate) struct Talk {
 }
 
 impl RouletteCell for Talk {
-  fn key(&self) -> String {
-    self.id.to_string()
+  fn key(&self) -> &str {
+    &self.id
   }
 }
 
@@ -160,17 +161,17 @@ impl TalkingPlace {
 pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let talk_type_num = check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError);
-  let talk_type = TalkType::from_u32(talk_type_num).unwrap();
+  let talk_type = TalkType::from_u32(talk_type_num).ok_or(ShioriError::BadRequest)?;
   let choosed_talk;
   {
-    let talk_collection = TALK_COLLECTION.read().unwrap();
+    let talk_collection = get_read(&TALK_COLLECTION);
     let empty_hashset = HashSet::new();
     let seen_talks = talk_collection.get(&talk_type).unwrap_or(&empty_hashset);
     let talks = Talk::get_unseen_talks(talk_type, seen_talks).ok_or(ShioriError::TalkNotFound)?;
     let derivative_talks = DerivaliveTalk::get_unseen_talks(talk_type, seen_talks)
       .unwrap_or_default()
       .iter()
-      .map(get_parent_talk)
+      .filter_map(get_parent_talk)
       .collect::<Vec<Talk>>();
     let combined_talks = talks
       .into_iter()
@@ -190,7 +191,7 @@ pub(crate) fn on_check_unseen_talks(req: &Request) -> Result<Response, ShioriErr
 }
 
 pub(crate) fn register_talk_collection(id: &str, talk_type: TalkType) -> Result<(), ShioriError> {
-  let mut talk_collection = TALK_COLLECTION.write().unwrap();
+  let mut talk_collection = get_write(&TALK_COLLECTION);
   match talk_collection.get_mut(&talk_type) {
     Some(t) => {
       let key = id.to_string();
@@ -303,11 +304,12 @@ mod tests {
       }
     }
     for derivative_talk in derivative_talks().iter() {
-      let parent_talk = get_parent_talk(derivative_talk);
-      write(format!(
-        "{}\\1{}{}",
-        parent_talk.text, derivative_talk.summary, derivative_talk.text
-      ));
+      if let Some(parent_talk) = get_parent_talk(derivative_talk) {
+        write(format!(
+          "{}\\1{}{}",
+          parent_talk.text, derivative_talk.summary, derivative_talk.text
+        ));
+      }
     }
     for t in RANDOMTALK_COMMENTS_LIVING_ROOM.iter() {
       write(t.to_string());
