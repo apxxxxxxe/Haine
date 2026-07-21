@@ -404,6 +404,14 @@ pub(crate) fn face_color_name(code: i32) -> &'static str {
   }
 }
 
+pub(crate) fn skirt_status_name(code: i32) -> &'static str {
+  match code {
+    1 => "通常",
+    2 => "めくれ",
+    _ => "通常",
+  }
+}
+
 /// 7桁サーフェスコードをデコードし、bind命令群を生成する
 pub(crate) fn generate_bind_script(
   from_surface: i32,
@@ -420,10 +428,12 @@ pub(crate) fn generate_bind_script(
   let dest_arm = (dest_surface / 1000) % 10;
   let dest_eyebrow = (dest_surface / 10000) % 10;
   let dest_face = (dest_surface / 100000) % 10;
+  let dest_skirt = (dest_surface / 1000000) % 10;
 
   // 非目パーツのbind命令を構築
   let non_eye_binds = format!(
-    "\\![bind,眉,{},1]\\![bind,顔色,{},1]\\![bind,腕,{},1]\\![bind,口,{},1]",
+    "\\![bind,スカート状態,{},1]\\![bind,眉,{},1]\\![bind,顔色,{},1]\\![bind,腕,{},1]\\![bind,口,{},1]",
+    skirt_status_name(dest_skirt),
     eyebrow_name(dest_eyebrow),
     face_color_name(dest_face),
     arm_name(dest_arm),
