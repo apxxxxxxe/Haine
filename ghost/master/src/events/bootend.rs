@@ -1,20 +1,20 @@
-use crate::error::ShioriError;
 use crate::events::check_story_events;
-use crate::events::common::*;
 use crate::events::first_boot::{
   FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
 };
 use crate::events::TalkingPlace;
-use crate::variables::*;
-use crate::windows::get_local_time;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
+use crate::system::windows::get_local_time;
 use rand::seq::SliceRandom;
 use shiorust::message::{parts::HeaderName, Response, *};
 
 pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
-  *TOTAL_BOOT_COUNT.write().unwrap() += 1;
+  *get_write(&TOTAL_BOOT_COUNT) += 1;
 
   // ロード失敗かつバックアップもないなら何もしない
-  if *LOAD_STATUS.read().unwrap() == LoadStatus::FailedNoBackup {
+  if *get_read(&LOAD_STATUS) == LoadStatus::FailedNoBackup {
     let mut res = new_response_nocontent();
     add_error_description(
       &mut res,
@@ -24,8 +24,8 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   }
 
   // 初回起動
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstBoot) {
-    FLAGS.write().unwrap().done(EventFlag::FirstBoot);
+  if !get_read(&FLAGS).check(&EventFlag::FirstBoot) {
+    get_write(&FLAGS).done(EventFlag::FirstBoot);
     let mut res = new_response_with_value_with_translate(
       FIRST_BOOT_TALK.to_string(),
       TranslateOption::simple_translate(),
@@ -68,7 +68,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     talks[index].clone()
   };
 
-  let local_time = crate::windows::get_local_time();
+  let local_time = crate::system::windows::get_local_time();
   let unset_halloween = if local_time.wMonth != 10 || local_time.wDay != 31 {
     "\\![bind,頭,ヤギ角,0]\\![bind,頭,魔女帽,0]\\![bind,トップス+,黒赤マント,0]"
   } else {
@@ -85,14 +85,14 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
   );
   let mut res = new_response_with_value_with_translate(v, TranslateOption::simple_translate())?;
 
-  if *LOAD_STATUS.read().unwrap() == LoadStatus::RestoredFromBackup {
+  if *get_read(&LOAD_STATUS) == LoadStatus::RestoredFromBackup {
     add_notice_description(
       &mut res,
       "セーブデータが破損していたため、バックアップから復元しました。",
     );
   }
 
-  if let LoadStatus::PartialSuccess(ref failed_fields) = *LOAD_STATUS.read().unwrap() {
+  if let LoadStatus::PartialSuccess(ref failed_fields) = *get_read(&LOAD_STATUS) {
     let field_names = failed_fields.join(", ");
     add_error_description(
       &mut res,
@@ -102,7 +102,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
       ),
     );
   }
-  debug!("hoge,{:?}", LOAD_STATUS.read().unwrap());
+  debug!("hoge,{:?}", get_read(&LOAD_STATUS));
 
   Ok(res)
 }
@@ -110,7 +110,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
 pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   let mut parts = vec![vec![RESET_BINDS.to_string()]];
 
-  if *TALKING_PLACE.read().unwrap() == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     parts.push(vec![format!(
       "\\0\\b[{}]h1111705……。h1111101\\n\
       ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
@@ -119,8 +119,8 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
       TalkingPlace::LivingRoom.balloon_surface(),
     )]);
   }
-  if !FLAGS.read().unwrap().check(&EventFlag::FirstClose) {
-    FLAGS.write().unwrap().done(EventFlag::FirstClose);
+  if !get_read(&FLAGS).check(&EventFlag::FirstClose) {
+    get_write(&FLAGS).done(EventFlag::FirstClose);
     parts.push(vec![FIRST_CLOSE_TALK.to_string()]);
   } else {
     parts.extend(vec![
@@ -144,7 +144,7 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   )?;
 
   // ロード状態に応じた通知
-  if *LOAD_STATUS.read().unwrap() == LoadStatus::FailedNoBackup {
+  if *get_read(&LOAD_STATUS) == LoadStatus::FailedNoBackup {
     add_error_description(
       &mut res,
       "セーブデータのロードに失敗していたため、保存をスキップしました。",
@@ -154,9 +154,48 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   Ok(res)
 }
 
-pub(crate) fn on_vanish_selecting(_req: &Request) -> Response {
-  let m = "\\1※Vanishイベントは未実装です。".to_string();
-  new_response_with_value_with_notranslate(m, TranslateOption::none())
+// アンインストール（消滅）＝エンディング。プレイヤーがハイネを去る行為そのもの。
+// ここでハイネは読んだ唯一の者を失う。縋らず・責めず、最後にもう一度読んで手を離す。
+// 設計の意図は .claude/lore/haine_vs_user.md「唯一の帰結は OnVanishSelecting」を参照。
+
+// 消滅が選択された瞬間。確認ダイアログの前。決意を読むが、引き止めない。
+pub(crate) fn on_vanish_selecting(_req: &Request) -> Result<Response, ShioriError> {
+  let m = "\
+    h1111105\\1ハイネが顔を上げて、こちらを見た。\\n\
+    \\0……h1111205あなた、決めたのね。\\n\
+    h1111210顔に書いてあるもの。\\n\\n[half]\
+    h1111206止めはしないわ。あなたの選んだことだもの。\
+  "
+  .to_string();
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
+}
+
+// 消滅が確定したとき。最後の言葉。読まれなかった者同士の答え合わせ。
+pub(crate) fn on_vanish_selected(_req: &Request) -> Result<Response, ShioriError> {
+  let m = "\
+    \\0h1111205……行くのね。\\n\\n[half]\
+    h1111210ずっと、独り言ばかりだったの。\\n\
+    h1111204あなたは、黙って聞いていたでしょう。\\n\\n[half]\
+    h1111206\\1ハイネの輪郭が、すこし薄い。\\n\
+    \\0h1111210……さあ、お行きなさい。\\n\\n[half]\
+    h1111204あなたは、ちゃんと見られていた。\\n\
+    それだけ、覚えていて。\
+  "
+  .to_string();
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
+}
+
+// 消滅が取り消されたとき。赦免。言葉は平静、身体が安堵を漏らす。
+pub(crate) fn on_vanish_cancel(_req: &Request) -> Result<Response, ShioriError> {
+  let m = "\
+    \\0h1111204……やめたのね。\\n\
+    h1111210いいのよ、揺れたって。\\n\
+    \\1ハイネの肩から、力が抜けた。\\n\\n[half]\
+    h1111205……まだ、ここにいるわ。\\n\
+    あなたが、そうしたいうちは。\
+  "
+  .to_string();
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
 fn randomize_underwear() -> String {
@@ -164,7 +203,7 @@ fn randomize_underwear() -> String {
   let candidates = ["A", "B"];
   format!(
     "\\0\\![bind,下着,{},1]",
-    candidates.choose(&mut rng).unwrap()
+    candidates.choose(&mut rng).unwrap_or(&"A")
   )
 }
 
@@ -175,7 +214,7 @@ fn check_date_event_talk() -> Option<String> {
   let day = st.wDay as u32;
 
   // 既に今年のイベントを閲覧済みならスキップ
-  if FLAGS.read().unwrap().check_season_event(year, month, day) {
+  if get_read(&FLAGS).check_season_event(year, month, day) {
     return None;
   }
 
@@ -190,7 +229,7 @@ fn check_date_event_talk() -> Option<String> {
 
   // イベントトークがあれば閲覧済みフラグを立てる
   if talk.is_some() {
-    FLAGS.write().unwrap().mark_season_event(year, month, day);
+    get_write(&FLAGS).mark_season_event(year, month, day);
   }
 
   talk
@@ -199,7 +238,8 @@ fn check_date_event_talk() -> Option<String> {
 pub(crate) fn halloween_boot_talk() -> String {
   "\
     h1000000\\1\\b[10]今日も館に足を運ぶ。\\n\
-    空は薄曇りで、街並みがいつもより静寂に包まれている。\\n\
+    空は薄曇りで、\\n\
+    街並みがいつもより静寂に包まれている。\\n\
     \\n[half]\
     いつもの重い門をくぐり、石畳を歩く。\\n\
     落ち葉が足元で小さく音を立てた。\\n\
@@ -209,17 +249,21 @@ pub(crate) fn halloween_boot_talk() -> String {
     \\n[half]\
     …………。\\n\
     \\n[half]\
-    いつもならハイネが迎えてくれるはずだが、返事がない。\\n\
+    いつもならハイネが迎えてくれるはずだが、\\n\
+    返事がない。\\n\
     今まで留守ということはなかったのだが……。\\n\
     \\n[half]\
-    今日は帰ろうか、と考えたその瞬間……ギィ、と扉が開いた。\\n\
-    そこには誰もいない。しかし、入れと言われていることは明白だった。\\n\
+    今日は帰ろうか、と考えたその瞬間……\\n\
+    ギィ、と扉が開いた。\\n\
+    そこには誰もいない。\\n\
+    しかし、入れと言われていることは明白だった。\\n\
     \\n[half]\
     今日は少し冷える。従者の誰かが\\n\
     気を利かせてくれたのだろうか……。\\x\
     \\1\\b[10]開いた扉の隙間を抜け、館に入る。\\n\
     背後で静かに扉が閉まり、\\n\
-    静まり返った玄関ホールが薄闇の中にぼんやりと見えた。\\n\
+    静まり返った玄関ホールが\\n\
+    薄闇の中にぼんやりと見えた。\\n\
     \\n[half]\
     勝手に客間に入っていいものだろうか……。\\n\
     迷いつつ一歩踏み出したそのとき、\\b[-1]\\n\
@@ -237,7 +281,8 @@ pub(crate) fn halloween_boot_talk() -> String {
     h1223210ふふ、 ごめんなさい。\\n\
     ……h1223205あら、腰が抜けてしまったの？\\n\
     h1000000ほら、手に捕まって。\\n\
-    \\1支えにするには頼りない腕に捕まり、なんとか立ち上がる。\\n\
+    \\1支えにするには頼りない腕に捕まり、\\n\
+    なんとか立ち上がる。\\n\
     h1211201\\1なぜ、こんな真似を……。\\n\
     \\n[half]\
     h1211201なぜって、今日はハロウィンでしょう？ \\n\
@@ -246,7 +291,8 @@ pub(crate) fn halloween_boot_talk() -> String {
     ハイネの頬が珍しく紅潮している。\\n\
     \\n[half]\
     今日はハロウィン……。すっかり忘れていた。\\n\
-    そういえば、街中でそれらしい装飾を見かけたような気もする。\\n\
+    そういえば、\\n\
+    街中でそれらしい装飾を見かけたような気もする。\\n\
     \\n[half]\
     それにしても、なんというか……無邪気な悪戯だ。\\n\
     『あなたはこういうことしないと思ってた』\\_w[1200]\\n\
@@ -256,10 +302,13 @@ pub(crate) fn halloween_boot_talk() -> String {
     h1211206お祭りも悪戯も、嫌いじゃないのよ。\\n\
     \\n[half]\
     h1211204\\1ハイネは満足そうに微笑んでいる。\\n\
-    よく見ると、屋敷はいつもより華やかな装いをしているようだった。\\n\
-    いつも重たい印象のカーテンには、橙色の飾りが軽やかに下がっている。\\n\
+    よく見ると、屋敷はいつもより華やかな装いを\\n\
+    しているようだった。\\n\
+    いつも重たい印象のカーテンには、\\n\
+    橙色の飾りが軽やかに下がっている。\\n\
     \\n[half]\
-    h1211204今夜は特別なのよ。年に一度、死者と生者の境界が曖昧になる夜。\\n\
+    h1211204今夜は特別なのよ。\\n\
+    年に一度、死者と生者の境界が曖昧になる夜。\\n\
     h1211206私たちにとっても無縁ではない、唯一の宴。\\n\
     \\n[half]\
     \\1客間には、嗅ぎ慣れない甘い香りが漂っている。\\n\
@@ -267,10 +316,13 @@ pub(crate) fn halloween_boot_talk() -> String {
     h1211206お菓子を用意したの。\\n\
     生者の世界の伝統に倣ってね。\\n\
     私に用意できるものは限られているけれど……\\n\
-    それでも、この夜を一緒に過ごせることが嬉しいわ。\\n\
+    それでも、\\n\
+    この夜を一緒に過ごせることが嬉しいわ。\\n\
     \\n[half]\
-    \\1テーブルの上には、普段あまり目にしない美しい菓子が並んでいた。\\n\
-    ぼんやりと照らされるさまは幻想的で、どこかこの世ならざる雰囲気を感じる。\\n\
+    \\1テーブルの上には、\\n\
+    普段あまり目にしない美しい菓子が並んでいた。\\n\
+    ぼんやりと照らされるさまは幻想的で、\\n\
+    どこかこの世ならざる雰囲気を感じる。\\n\
     \\_w[1200]\\n[half]\
     h1211204\\1ハイネは優雅に手を差し出した。\\n\
     \\n[half]\
