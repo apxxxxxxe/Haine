@@ -37,7 +37,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Primary build**: `pwsh.exe .\build.ps1` or `.\build.bat`
 - **Rust build only**: `cd ghost/master && cargo build --release`
-- **Format code**: `cd ghost/master && cargo fmt`
+- **Format code**: `ghost/master/tools/fmt.sh`（WSL/Unix）または `pwsh ghost/master/tools/fmt.ps1`（Windows）。`cargo fmt` に加え、rustfmt が触れないトーク文字列内部のインデントも正規化する（`tools/normalize_string_indent.py`）
 - **Lint code**: `cd ghost/master && cargo clippy`
 
 ## Development Dependencies
