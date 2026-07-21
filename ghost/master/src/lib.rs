@@ -2,6 +2,9 @@
 pub mod events;
 pub mod system;
 
+// dump_talks バイナリ用の再エクスポート（talk モジュール自体は pub(crate) のまま）
+pub use events::talk::render_all_talks;
+
 use crate::system::response::{add_error_description, new_response_nocontent};
 use crate::system::variables::*;
 

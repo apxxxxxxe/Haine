@@ -33,3 +33,5 @@ target/
 .serena/
 .mcp.json
 .claude/settings.local.json
+
+all_talks.txt

@@ -273,46 +273,41 @@ impl DerivaliveTalk {
   }
 }
 
-#[cfg(test)]
-mod tests {
+/// 全トークを一つのテキストにまとめて返す。
+/// dump_talks バイナリ（`cargo run --bin dump_talks`）から使う開発用ユーティリティ。
+pub fn render_all_talks() -> String {
   use crate::events::menu::QUESTIONS;
   use crate::events::talk::first_boot::{FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS};
-  use crate::events::talk::{random_talks, TalkType};
-  use std::fs::File;
-  use std::io::Write;
+  use randomtalk::{derivative_talks, get_parent_talk, RANDOMTALK_COMMENTS_LIVING_ROOM};
 
-  use super::randomtalk::{derivative_talks, get_parent_talk, RANDOMTALK_COMMENTS_LIVING_ROOM};
-
-  #[test]
-  fn write_all_talks() {
-    let mut all_talks_file = File::create("all_talks.txt").unwrap();
-    let mut write = |text: String| {
-      writeln!(all_talks_file, "{}", text).unwrap();
-    };
-    write(FIRST_BOOT_TALK.to_string());
-    for t in FIRST_RANDOMTALKS.iter() {
-      write(t.to_string());
-    }
-    write(FIRST_CLOSE_TALK.to_string());
-    for q in QUESTIONS.iter() {
-      write(q.talk());
-    }
-    for talk_type in TalkType::all() {
-      let talks = random_talks(talk_type).unwrap();
+  let mut lines: Vec<String> = Vec::new();
+  lines.push(FIRST_BOOT_TALK.to_string());
+  for t in FIRST_RANDOMTALKS.iter() {
+    lines.push(t.to_string());
+  }
+  lines.push(FIRST_CLOSE_TALK.to_string());
+  for q in QUESTIONS.iter() {
+    lines.push(q.talk());
+  }
+  for talk_type in TalkType::all() {
+    if let Some(talks) = random_talks(talk_type) {
       for t in talks {
-        write(t.text);
+        lines.push(t.text);
       }
-    }
-    for derivative_talk in derivative_talks().iter() {
-      if let Some(parent_talk) = get_parent_talk(derivative_talk) {
-        write(format!(
-          "{}\\1{}{}",
-          parent_talk.text, derivative_talk.summary, derivative_talk.text
-        ));
-      }
-    }
-    for t in RANDOMTALK_COMMENTS_LIVING_ROOM.iter() {
-      write(t.to_string());
     }
   }
+  for derivative_talk in derivative_talks().iter() {
+    if let Some(parent_talk) = get_parent_talk(derivative_talk) {
+      lines.push(format!(
+        "{}\\1{}{}",
+        parent_talk.text, derivative_talk.summary, derivative_talk.text
+      ));
+    }
+  }
+  for t in RANDOMTALK_COMMENTS_LIVING_ROOM.iter() {
+    lines.push(t.to_string());
+  }
+  let mut result = lines.join("\n");
+  result.push('\n');
+  result
 }
