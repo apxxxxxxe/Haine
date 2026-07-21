@@ -1,0 +1,33 @@
+{
+  "hooks": {
+		"PostToolUse": [{
+      "matcher": "Write|Edit|MultiEdit",
+      "hooks": [{
+        "type": "command",
+        "command": "jq -r '.tool_input.file_path | select(endswith(\".rs\"))' | xargs -r cargo fmt --"
+      }]
+    }],
+    "Notification": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh.exe .claude/notify.ps1"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh.exe .claude/notify.ps1"
+          }
+        ]
+      }
+    ]
+  }
+}
