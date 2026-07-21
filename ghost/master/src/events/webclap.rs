@@ -14,8 +14,10 @@ pub(crate) fn derivative_talk_request_open(event_id: &str) -> Result<Response, S
     None => "".to_string(),
   };
   new_response_with_value_with_translate(
-    format!("\\1\\![open,inputbox,OnDerivativeTalkRequestInput,0,このトークに対するリアクションの要望を送信できます。,--reference={}]{}", event_id,
-    last_talk),
+    format!(
+      "\\1\\![open,inputbox,OnDerivativeTalkRequestInput,0,このトークに対するリアクションの要望を送信できます。,--reference={}]{}",
+      event_id, last_talk
+    ),
     TranslateOption::simple_translate(),
   )
 }
@@ -33,9 +35,9 @@ pub(crate) fn on_derivative_talk_request_input(req: &Request) -> Result<Response
 
 pub(crate) fn on_web_clap_open(_req: &Request) -> Result<Response, ShioriError> {
   let m = "\
-             \\1\\![open,inputbox,OnWebClapInput,0]Web拍手を送ります。\\n\
-             感想やバグ報告、要望などをお送り下さい。\
-             "
+    \\1\\![open,inputbox,OnWebClapInput,0]Web拍手を送ります。\\n\
+    感想やバグ報告、要望などをお送り下さい。\
+    "
   .to_string();
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }

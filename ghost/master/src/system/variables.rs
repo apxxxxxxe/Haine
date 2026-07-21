@@ -32,19 +32,13 @@ const VAR_BACKUP_PATH: &str = "vars.json.bak";
 pub(crate) static TOTAL_BOOT_COUNT: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static TOTAL_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static RANDOM_TALK_INTERVAL: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(180));
-pub(crate) static USER_NAME: LazyLock<RwLock<String>> =
-  LazyLock::new(|| RwLock::new("".to_string()));
-pub(crate) static TALK_COLLECTION: LazyLock<RwLock<HashMap<TalkType, HashSet<String>>>> =
-  LazyLock::new(|| RwLock::new(HashMap::new()));
+pub(crate) static USER_NAME: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static TALK_COLLECTION: LazyLock<RwLock<HashMap<TalkType, HashSet<String>>>> = LazyLock::new(|| RwLock::new(HashMap::new()));
 pub(crate) static CUMULATIVE_TALK_COUNT: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
-pub(crate) static FLAGS: LazyLock<RwLock<EventFlags>> =
-  LazyLock::new(|| RwLock::new(EventFlags::default()));
-pub(crate) static PENDING_EVENT_TALK: LazyLock<RwLock<Option<PendingEvent>>> =
-  LazyLock::new(|| RwLock::new(None));
-pub(crate) static DERIVATIVE_TALK_REQUESTABLE: LazyLock<RwLock<bool>> =
-  LazyLock::new(|| RwLock::new(false));
-pub(crate) static LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX: LazyLock<RwLock<u32>> =
-  LazyLock::new(|| RwLock::new(1000));
+pub(crate) static FLAGS: LazyLock<RwLock<EventFlags>> = LazyLock::new(|| RwLock::new(EventFlags::default()));
+pub(crate) static PENDING_EVENT_TALK: LazyLock<RwLock<Option<PendingEvent>>> = LazyLock::new(|| RwLock::new(None));
+pub(crate) static DERIVATIVE_TALK_REQUESTABLE: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
+pub(crate) static LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(1000));
 #[derive(Clone, Debug, PartialEq, Eq, Default)]
 pub(crate) enum LoadStatus {
   #[default]
@@ -67,8 +61,7 @@ impl LoadStatus {
   }
 }
 
-pub(crate) static LOAD_STATUS: LazyLock<RwLock<LoadStatus>> =
-  LazyLock::new(|| RwLock::new(LoadStatus::NotLoaded));
+pub(crate) static LOAD_STATUS: LazyLock<RwLock<LoadStatus>> = LazyLock::new(|| RwLock::new(LoadStatus::NotLoaded));
 
 #[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 pub(crate) enum PendingEvent {
@@ -256,9 +249,7 @@ impl RawVariables {
 
 /// TalkType のキーが一部無効でも、有効なものだけを読み込む
 /// 戻り値: (パース結果, スキップした項目の警告リスト)
-fn parse_talk_collection_lenient(
-  value: &serde_json::Value,
-) -> Result<(HashMap<TalkType, HashSet<String>>, Vec<String>), String> {
+fn parse_talk_collection_lenient(value: &serde_json::Value) -> Result<(HashMap<TalkType, HashSet<String>>, Vec<String>), String> {
   use crate::events::talk::TalkType;
 
   let obj = value
@@ -299,9 +290,7 @@ fn parse_talk_collection_lenient(
 /// EventFlag のバリアントが一部無効でも、有効なものだけを読み込む
 /// 旧形式 {"flags": [...]} と新形式 [...] の両方に対応
 /// 戻り値: (パース結果, スキップした項目の警告リスト)
-fn parse_event_flags_lenient(
-  value: &serde_json::Value,
-) -> Result<(EventFlags, Vec<String>), String> {
+fn parse_event_flags_lenient(value: &serde_json::Value) -> Result<(EventFlags, Vec<String>), String> {
   // 新形式: 配列そのまま
   // 旧形式: {"flags": [...]} からflagsを取り出す
   let arr = if let Some(obj) = value.as_object() {
@@ -536,9 +525,7 @@ pub fn save_global_variables() -> Result<(), Box<dyn Error>> {
     flags: get_read(&FLAGS).clone(),
     pending_event_talk: get_read(&PENDING_EVENT_TALK).clone(),
     derivative_talk_requestable: Some(*get_read(&DERIVATIVE_TALK_REQUESTABLE)),
-    library_transition_sequense_dialog_index: Some(*get_read(
-      &LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX,
-    )),
+    library_transition_sequense_dialog_index: Some(*get_read(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX)),
   };
 
   raw_vars.save()?;
@@ -573,32 +560,23 @@ pub(crate) fn reset_volatile_variables() {
 
 // ゴーストのグローバル変数のうち、揮発性(起動毎にリセットされる)のもの
 pub(crate) static DEBUG_MODE: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
-pub(crate) static LOG_PATH: LazyLock<RwLock<String>> =
-  LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static LOG_PATH: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
 pub(crate) static GHOST_UP_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static LAST_RANDOM_TALK_TIME: LazyLock<RwLock<u64>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static NADE_COUNTER: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
-pub(crate) static LAST_NADE_COUNT_UNIXTIME: LazyLock<RwLock<SystemTime>> =
-  LazyLock::new(|| RwLock::new(UNIX_EPOCH));
-pub(crate) static LAST_NADE_PART: LazyLock<RwLock<String>> =
-  LazyLock::new(|| RwLock::new("".to_string()));
-pub(crate) static WHEEL_DIRECTION: LazyLock<RwLock<Direction>> =
-  LazyLock::new(|| RwLock::new(Direction::Up));
+pub(crate) static LAST_NADE_COUNT_UNIXTIME: LazyLock<RwLock<SystemTime>> = LazyLock::new(|| RwLock::new(UNIX_EPOCH));
+pub(crate) static LAST_NADE_PART: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static WHEEL_DIRECTION: LazyLock<RwLock<Direction>> = LazyLock::new(|| RwLock::new(Direction::Up));
 pub(crate) static WHEEL_COUNTER: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
-pub(crate) static LAST_WHEEL_COUNT_UNIXTIME: LazyLock<RwLock<SystemTime>> =
-  LazyLock::new(|| RwLock::new(UNIX_EPOCH));
-pub(crate) static LAST_WHEEL_PART: LazyLock<RwLock<String>> =
-  LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static LAST_WHEEL_COUNT_UNIXTIME: LazyLock<RwLock<SystemTime>> = LazyLock::new(|| RwLock::new(UNIX_EPOCH));
+pub(crate) static LAST_WHEEL_PART: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
 pub(crate) static FIRST_SEXIAL_TOUCH: LazyLock<RwLock<bool>> = LazyLock::new(|| RwLock::new(false));
-pub(crate) static LAST_TOUCH_INFO: LazyLock<RwLock<String>> =
-  LazyLock::new(|| RwLock::new("".to_string()));
-pub(crate) static LAST_SELFTALK_PHRASE: LazyLock<RwLock<String>> =
-  LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static LAST_TOUCH_INFO: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
+pub(crate) static LAST_SELFTALK_PHRASE: LazyLock<RwLock<String>> = LazyLock::new(|| RwLock::new("".to_string()));
 
 /// チェイントーク待機状態
 /// (対象部位のイベント名, チェイントーク内容, 期限のGHOST_UP_TIME, コールバック)
-pub(crate) static CHAIN_TALK_STATE: LazyLock<RwLock<Option<ChainTalkState>>> =
-  LazyLock::new(|| RwLock::new(None));
+pub(crate) static CHAIN_TALK_STATE: LazyLock<RwLock<Option<ChainTalkState>>> = LazyLock::new(|| RwLock::new(None));
 
 #[derive(Clone)]
 pub(crate) struct ChainTalkState {
@@ -611,19 +589,14 @@ pub(crate) struct ChainTalkState {
   /// 発火時に実行するコールバック（ゲートフラグ等）
   pub callback: Option<fn()>,
 }
-pub(crate) static TALK_BIAS: LazyLock<RwLock<TalkBias>> =
-  LazyLock::new(|| RwLock::new(TalkBias::new()));
+pub(crate) static TALK_BIAS: LazyLock<RwLock<TalkBias>> = LazyLock::new(|| RwLock::new(TalkBias::new()));
 pub(crate) static CURRENT_SURFACE: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IDLE_SECONDS: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IMMERSIVE_DEGREES: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(0));
-pub(crate) static TOUCH_INFO: LazyLock<RwLock<HashMap<String, TouchInfo>>> =
-  LazyLock::new(|| RwLock::new(HashMap::new()));
-pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> =
-  LazyLock::new(|| RwLock::new(TalkingPlace::LivingRoom));
-pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> =
-  LazyLock::new(|| RwLock::new(None));
-pub(crate) static CANDLES: LazyLock<RwLock<[bool; IMMERSIVE_ICON_COUNT as usize]>> =
-  LazyLock::new(|| RwLock::new([false; IMMERSIVE_ICON_COUNT as usize]));
+pub(crate) static TOUCH_INFO: LazyLock<RwLock<HashMap<String, TouchInfo>>> = LazyLock::new(|| RwLock::new(HashMap::new()));
+pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> = LazyLock::new(|| RwLock::new(TalkingPlace::LivingRoom));
+pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> = LazyLock::new(|| RwLock::new(None));
+pub(crate) static CANDLES: LazyLock<RwLock<[bool; IMMERSIVE_ICON_COUNT as usize]>> = LazyLock::new(|| RwLock::new([false; IMMERSIVE_ICON_COUNT as usize]));
 
 pub(crate) const IDLE_THRESHOLD: i32 = 60 * 5;
 
@@ -649,18 +622,14 @@ impl TouchInfo {
   }
 
   pub fn reset_if_timeover(&mut self) -> Result<(), ShioriError> {
-    if check_error!(self.last_unixtime.elapsed(), ShioriError::SystemTimeError)
-      > TOUCH_RESET_DURATION
-    {
+    if check_error!(self.last_unixtime.elapsed(), ShioriError::SystemTimeError) > TOUCH_RESET_DURATION {
       self.reset();
     }
     Ok(())
   }
 
   pub fn count(&mut self) -> Result<u32, ShioriError> {
-    if check_error!(self.last_unixtime.elapsed(), ShioriError::SystemTimeError)
-      > TOUCH_RESET_DURATION
-    {
+    if check_error!(self.last_unixtime.elapsed(), ShioriError::SystemTimeError) > TOUCH_RESET_DURATION {
       self.count = 0;
       Ok(0)
     } else {
@@ -727,8 +696,7 @@ mod tests {
     assert!(result.is_err());
 
     // バックアップから復元
-    let (loaded, failed_fields) =
-      RawVariables::load_partial_from(backup_path.to_str().unwrap()).unwrap();
+    let (loaded, failed_fields) = RawVariables::load_partial_from(backup_path.to_str().unwrap()).unwrap();
     assert_eq!(loaded.total_boot_count, 42);
     assert!(failed_fields.is_empty());
   }
@@ -776,8 +744,7 @@ mod tests {
       .unwrap();
 
     // バックアップには前回のデータ（10）が残っている
-    let (backup_loaded, _) =
-      RawVariables::load_partial_from(backup_path.to_str().unwrap()).unwrap();
+    let (backup_loaded, _) = RawVariables::load_partial_from(backup_path.to_str().unwrap()).unwrap();
     assert_eq!(backup_loaded.total_boot_count, 10);
 
     // メインには新しいデータ（20）がある
@@ -790,8 +757,7 @@ mod tests {
     let dir = TempDir::new().unwrap();
     let main_path = dir.path().join("nonexistent.json");
 
-    let (loaded, failed_fields) =
-      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    let (loaded, failed_fields) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(loaded.total_boot_count, 0); // default値
     assert!(failed_fields.is_empty());
   }
@@ -815,8 +781,7 @@ mod tests {
     fs::write(&main_path, json).unwrap();
 
     // 部分パースは成功し、UnknownTypeだけスキップ
-    let (vars, failed_fields) =
-      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    let (vars, failed_fields) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(vars.total_boot_count, 100);
     assert_eq!(vars.cumulative_talk_count, 50);
     assert!(vars.talk_collection.contains_key(&TalkType::AboutMe));
@@ -852,8 +817,7 @@ mod tests {
     fs::write(&main_path, json).unwrap();
 
     // 部分パースは成功し、不明なフラグだけスキップ
-    let (vars, failed_fields) =
-      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    let (vars, failed_fields) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(vars.total_boot_count, 200);
     assert!(vars.flags.check(&EventFlag::FirstBoot));
     assert!(vars.flags.check(&EventFlag::FirstClose));
@@ -883,8 +847,7 @@ mod tests {
     fs::write(&main_path, json).unwrap();
 
     // 部分パースは成功し、total_time だけデフォルト値
-    let (vars, failed_fields) =
-      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    let (vars, failed_fields) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(vars.total_boot_count, 300);
     assert_eq!(vars.cumulative_talk_count, 25);
     assert!(vars.total_time.is_none()); // デフォルト値
@@ -910,8 +873,7 @@ mod tests {
       .unwrap();
 
     // 部分パースでも全フィールド成功
-    let (loaded, failed_fields) =
-      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    let (loaded, failed_fields) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(loaded.total_boot_count, 500);
     assert_eq!(loaded.cumulative_talk_count, 100);
     assert!(failed_fields.is_empty());
@@ -922,8 +884,7 @@ mod tests {
     let dir = TempDir::new().unwrap();
     let main_path = dir.path().join("nonexistent.json");
 
-    let (vars, failed_fields) =
-      RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
+    let (vars, failed_fields) = RawVariables::load_partial_from(main_path.to_str().unwrap()).unwrap();
     assert_eq!(vars.total_boot_count, 0);
     assert!(failed_fields.is_empty());
   }

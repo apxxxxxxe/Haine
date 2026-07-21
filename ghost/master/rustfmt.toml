@@ -1,2 +1,17 @@
 hard_tabs = false
 tab_spaces = 2
+
+# 日本語トーク文字列（1文字=幅2換算）を含む行が max_width を超えると、
+# rustfmt はその文全体の整形を黙って放棄する。それを防ぐため上限を広げる。
+# 最長行は menu.rs の幅206（2026-07 時点）。
+max_width = 220
+
+# max_width 引き上げでコードが1行に潰れないよう、
+# 1行化のしきい値は旧デフォルト（max_width=100 時の導出値）に固定する。
+fn_call_width = 60
+attr_fn_like_width = 70
+struct_lit_width = 18
+struct_variant_width = 35
+array_width = 60
+chain_width = 60
+single_line_if_else_max_width = 50

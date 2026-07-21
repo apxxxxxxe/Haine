@@ -5,8 +5,7 @@ use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::status::Status;
 use crate::system::variables::{
-  get_read, get_write, EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME,
-  IDLE_SECONDS, LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
+  get_read, get_write, EventFlag, CUMULATIVE_TALK_COUNT, CURRENT_SURFACE, FLAGS, GHOST_UP_TIME, IDLE_SECONDS, LAST_RANDOM_TALK_TIME, PENDING_EVENT_TALK, TALK_COLLECTION, TOTAL_TIME, USER_NAME,
 };
 use crate::system::variables::{PendingEvent, RANDOM_TALK_INTERVAL};
 use crate::system::windows::get_local_time;
@@ -51,10 +50,7 @@ pub(crate) fn on_second_change(req: &Request) -> Result<Response, ShioriError> {
   debug!("status: {}", status);
   {
     let random_talk_interval = *get_read(&RANDOM_TALK_INTERVAL);
-    if random_talk_interval > 0
-      && (*get_read(&GHOST_UP_TIME) - *get_read(&LAST_RANDOM_TALK_TIME)) >= random_talk_interval
-      && !status.minimizing
-    {
+    if random_talk_interval > 0 && (*get_read(&GHOST_UP_TIME) - *get_read(&LAST_RANDOM_TALK_TIME)) >= random_talk_interval && !status.minimizing {
       return on_ai_talk(req);
     }
   }
@@ -167,14 +163,10 @@ pub(crate) fn check_story_events() {
     });
   }
 
-  if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant))
-    && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_SERVANT
-  {
+  if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Servant)) && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_SERVANT {
     // 従者コメント開放
     *get_write(&PENDING_EVENT_TALK) = Some(PendingEvent::UnlockingServantsComments);
-  } else if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore))
-    && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_LORE
-  {
+  } else if !get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(super::TalkType::Lore)) && *get_read(&CUMULATIVE_TALK_COUNT) >= TALK_UNLOCK_COUNT_LORE {
     // ロアトーク開放
     *get_write(&PENDING_EVENT_TALK) = Some(PendingEvent::UnlockingLoreTalks);
   } else if *get_read(&PENDING_EVENT_TALK) == Some(PendingEvent::ConfessionOfSuicide) {

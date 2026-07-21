@@ -53,8 +53,7 @@ pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String
 
 pub fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   static IGNORING_TRANSLATE_RANGE: LazyLock<Regex> = lazy_regex!(r"@@@@@(.*?)@@@@@");
-  static CHANGE_SCOPE_RE_PREFIX: LazyLock<FancyRegex> =
-    lazy_fancy_regex!(r"^(\\[01])(?!w)|(\\p\[\d+\])");
+  static CHANGE_SCOPE_RE_PREFIX: LazyLock<FancyRegex> = lazy_fancy_regex!(r"^(\\[01])(?!w)|(\\p\[\d+\])");
 
   let translate_targets = IGNORING_TRANSLATE_RANGE.split(&text).collect::<Vec<&str>>();
   let ignoring_ranges = IGNORING_TRANSLATE_RANGE
@@ -148,15 +147,11 @@ fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriE
   )
 }
 
-static QUICK_SECTION_START: LazyLock<Regex> =
-  lazy_regex!(r"^(\\!\[quicksection,true]|\\!\[quicksection,1])");
-static QUICK_SECTION_END: LazyLock<Regex> =
-  lazy_regex!(r"^(\\!\[quicksection,false]|\\!\[quicksection,0])");
+static QUICK_SECTION_START: LazyLock<Regex> = lazy_regex!(r"^(\\!\[quicksection,true]|\\!\[quicksection,1])");
+static QUICK_SECTION_END: LazyLock<Regex> = lazy_regex!(r"^(\\!\[quicksection,false]|\\!\[quicksection,0])");
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-static RE_TEXT_ONLY: LazyLock<Regex> = lazy_regex!(
-  r"\\(\\|q\[.*?\]\[.*?\]|[!&8bcfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])"
-);
+static RE_TEXT_ONLY: LazyLock<Regex> = lazy_regex!(r"\\(\\|q\[.*?\]\[.*?\]|[!&8bcfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])");
 
 // さくらスクリプトで分割されたテキストに対してそれぞれかける置換処理
 fn translate_dialog(dialog: &mut Dialog) {
@@ -205,9 +200,7 @@ fn translate_dialog(dialog: &mut Dialog) {
   let mut in_quicksection = false;
   for (i, splitted) in splitted_texts.iter().enumerate() {
     let tag = tags.get(i).unwrap_or(&"");
-    result.push_str(
-      &replace_with_check(splitted, dialog.scope, &replaces, in_quicksection).replace(PHI, ""),
-    );
+    result.push_str(&replace_with_check(splitted, dialog.scope, &replaces, in_quicksection).replace(PHI, ""));
 
     if QUICK_SECTION_START.is_match(tag) {
       println!("in quicksection");
@@ -309,13 +302,7 @@ struct Replacee {
 }
 
 impl Replacee {
-  fn new(
-    old: &'static str,
-    new: &'static str,
-    exclude_prefix: &'static str,
-    exclude_suffix: &'static str,
-    scope: Option<Vec<usize>>,
-  ) -> Replacee {
+  fn new(old: &'static str, new: &'static str, exclude_prefix: &'static str, exclude_suffix: &'static str, scope: Option<Vec<usize>>) -> Replacee {
     Replacee {
       old,
       new,
@@ -361,11 +348,7 @@ struct TagReplacee {
 
 static WAIT: LazyLock<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
 
-fn replace_tags(
-  tags: &[&str],
-  splitted_texts: &[&str],
-  in_quicksection_states: &[bool],
-) -> Vec<String> {
+fn replace_tags(tags: &[&str], splitted_texts: &[&str], in_quicksection_states: &[bool]) -> Vec<String> {
   static TAG_REPLACES: &[TagReplacee] = &[TagReplacee {
     patterns: &["\\n", "\\n[half]"],
     replacement: "\\n\\n[half]\\_w[700]",
@@ -380,8 +363,7 @@ fn replace_tags(
       if i + pattern_len <= tags.len() {
         let slice = &tags[i..i + pattern_len];
         // パターンが一致し、かつ間のsplitted_textsが全て空文字（元テキストで連続）
-        let is_contiguous = (1..pattern_len)
-          .all(|offset| splitted_texts.get(i + offset).is_some_and(|s| s.is_empty()));
+        let is_contiguous = (1..pattern_len).all(|offset| splitted_texts.get(i + offset).is_some_and(|s| s.is_empty()));
         if slice == r.patterns && is_contiguous {
           let in_qs = in_quicksection_states.get(i).copied().unwrap_or(false);
           let replaced = if in_qs {
@@ -407,12 +389,7 @@ fn replace_tags(
   result
 }
 
-fn replace_with_check(
-  text_part: &str,
-  scope: usize,
-  replaces: &[Replacee],
-  in_quicksection: bool,
-) -> String {
+fn replace_with_check(text_part: &str, scope: usize, replaces: &[Replacee], in_quicksection: bool) -> String {
   let mut translated = String::new();
 
   let text_chars_vec = text_part.char_indices().collect::<Vec<(usize, char)>>();
@@ -422,11 +399,7 @@ fn replace_with_check(
 
     let mut matched_replacee: Option<&Replacee> = None;
     for r in replaces.iter() {
-      if text_slice.starts_with(r.old)
-        && r.is_in_scope(scope)
-        && !r.has_prefix(text_part, checking_cursor)
-        && !r.has_suffix(text_part, checking_cursor)
-      {
+      if text_slice.starts_with(r.old) && r.is_in_scope(scope) && !r.has_prefix(text_part, checking_cursor) && !r.has_suffix(text_part, checking_cursor) {
         matched_replacee = Some(r);
         break;
       }

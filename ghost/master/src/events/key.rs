@@ -12,10 +12,7 @@ use super::bootend::halloween_boot_talk;
 pub(crate) fn on_key_press(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   match refs[0] {
-    "a" => new_response_with_value_with_translate(
-      "h1113205".to_string(),
-      TranslateOption::simple_translate(),
-    ),
+    "a" => new_response_with_value_with_translate("h1113205".to_string(), TranslateOption::simple_translate()),
     "t" => {
       if !get_read(&FLAGS).check(&EventFlag::FirstRandomTalkDone(
         FIRST_RANDOMTALKS.len() as u32 - 1,

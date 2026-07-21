@@ -109,10 +109,7 @@ pub(crate) fn new_response_nocontent() -> Response {
   r
 }
 
-pub(crate) fn new_response_with_value_with_notranslate(
-  value: String,
-  option: HashSet<TranslateOption>,
-) -> Response {
+pub(crate) fn new_response_with_value_with_notranslate(value: String, option: HashSet<TranslateOption>) -> Response {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
     format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
   } else {
@@ -130,10 +127,7 @@ pub(crate) fn new_response_with_value_with_notranslate(
   r
 }
 
-pub(crate) fn new_response_with_value_with_translate(
-  value: String,
-  option: HashSet<TranslateOption>,
-) -> Result<Response, ShioriError> {
+pub(crate) fn new_response_with_value_with_translate(value: String, option: HashSet<TranslateOption>) -> Result<Response, ShioriError> {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
     format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
   } else {
@@ -174,12 +168,7 @@ pub(crate) fn all_combo(values: &Vec<Vec<String>>) -> Vec<String> {
   result.iter().map(|v| v.join("")).collect()
 }
 
-fn all_combo_inner(
-  values: &Vec<Vec<String>>,
-  result: &mut Vec<Vec<String>>,
-  current: &mut Vec<String>,
-  index: usize,
-) {
+fn all_combo_inner(values: &Vec<Vec<String>>, result: &mut Vec<Vec<String>>, current: &mut Vec<String>, index: usize) {
   if index == values.len() {
     result.push(current.clone());
     return;
@@ -217,8 +206,7 @@ pub(crate) fn render_shadow(is_complete: bool) -> String {
     let degree = *get_read(&IMMERSIVE_DEGREES);
     format!(
       "\\0\\![bind,ex,没入度用,1]\\![anim,offset,904000,0,{}]",
-      ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32
-        + DEFAULT_Y,
+      ((MAX_Y - DEFAULT_Y) as f32 * (degree as f32 / (IMMERSIVE_RATE_MAX as f32))) as i32 + DEFAULT_Y,
     )
   } else {
     "\\0\\![bind,ex,没入度用,0]".to_string()
@@ -413,12 +401,7 @@ pub(crate) fn skirt_status_name(code: i32) -> &'static str {
 }
 
 /// 7桁サーフェスコードをデコードし、bind命令群を生成する
-pub(crate) fn generate_bind_script(
-  from_surface: i32,
-  dest_surface: i32,
-  shadow_script: &str,
-  ignore_upper_completion: bool,
-) -> String {
+pub(crate) fn generate_bind_script(from_surface: i32, dest_surface: i32, shadow_script: &str, ignore_upper_completion: bool) -> String {
   const EYE_INDEX_DIGIT: u32 = 2;
   let eye_index_digit_pow = 10_i32.pow(EYE_INDEX_DIGIT);
 
@@ -456,11 +439,7 @@ pub(crate) fn generate_bind_script(
 }
 
 /// 目の遷移アニメーション（まばたき補完）をbind方式で生成
-fn generate_eye_transition(
-  from_eyes: i32,
-  dest_eyes: i32,
-  ignore_upper_completion: bool,
-) -> String {
+fn generate_eye_transition(from_eyes: i32, dest_eyes: i32, ignore_upper_completion: bool) -> String {
   let transitions = BlinkTransition::all();
   const DELAY: i32 = 100;
   const CLOSE_EYES_INDEX: i32 = 10;
@@ -528,10 +507,10 @@ impl Display for Icon {
     write!(
       f,
       "\
-    \\f[height,14]\\f[name,icomoon.ttf]\
-    \\_u[0xE{}]\
-    \\f[name,default]\\f[height,default]\
-    ",
+        \\f[height,14]\\f[name,icomoon.ttf]\
+        \\_u[0xE{}]\
+        \\f[name,default]\\f[height,default]\
+        ",
       self.to_code()
     )
   }
@@ -553,9 +532,9 @@ impl Icon {
 pub(crate) fn render_achievement_message(talk_type: TalkType) -> String {
   format!(
     "\\1\\![quicksection,1]\
-    \\f[align,center]\\f[valign,center]\\f[bold,1]\
-    トークカテゴリ「{}」が解放された。\
-    \\f[default]",
+      \\f[align,center]\\f[valign,center]\\f[bold,1]\
+      トークカテゴリ「{}」が解放された。\
+      \\f[default]",
     talk_type
   )
 }
@@ -571,8 +550,7 @@ pub(crate) fn shake_with_notext() -> String {
 
 pub(crate) fn render_immersive_icon() -> String {
   let immersive_degrees = *get_read(&IMMERSIVE_DEGREES);
-  let icon_count_float =
-    immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
+  let icon_count_float = immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
   let current_icon_count = if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     // 繰り上げ
     icon_count_float.ceil() as u32

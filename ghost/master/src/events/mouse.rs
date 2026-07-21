@@ -10,9 +10,7 @@ use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::status::Status;
 use crate::system::variables::{
-  get_read, get_write, EventFlag, TouchInfo, CHAIN_TALK_STATE, FIRST_SEXIAL_TOUCH, FLAGS,
-  GHOST_UP_TIME, IMMERSIVE_DEGREES, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX,
-  TALKING_PLACE, TOUCH_INFO,
+  get_read, get_write, EventFlag, TouchInfo, CHAIN_TALK_STATE, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX, TALKING_PLACE, TOUCH_INFO,
 };
 use shiorust::message::{Parser, Request, Response};
 use std::sync::LazyLock;
@@ -88,16 +86,15 @@ fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> 
   )
 }
 
-static DIALOG_SEXIAL_FIRST: LazyLock<Vec<String>> =
-  LazyLock::new(|| vec!["h1111205……会って早々これ？\nなんというか……h1111204流石ね。".to_string()]);
+static DIALOG_SEXIAL_FIRST: LazyLock<Vec<String>> = LazyLock::new(|| vec!["h1111205……会って早々これ？\nなんというか……h1111204流石ね。".to_string()]);
 
 static DIALOG_SEXIAL_SCOLD: LazyLock<Vec<String>> = LazyLock::new(|| {
   vec![
-      "h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。".to_string(),
-      "h1111205これがあなたのやりたいこと？h1111204くだらないのね。".to_string(),
-      "h1111205スキンシップにしてはセンスが無いと思うわ。".to_string(),
-      "h1111210情熱的という人もいるでしょうし、\\n野蛮で下劣という人もいるでしょうね。\\n\\nh1111204私は後者よ、お猿さん。".to_string(),
-    ]
+    "h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。".to_string(),
+    "h1111205これがあなたのやりたいこと？h1111204くだらないのね。".to_string(),
+    "h1111205スキンシップにしてはセンスが無いと思うわ。".to_string(),
+    "h1111210情熱的という人もいるでしょうし、\\n野蛮で下劣という人もいるでしょうね。\\n\\nh1111204私は後者よ、お猿さん。".to_string(),
+  ]
 });
 
 static DIALOG_SEXIAL_AKIRE: LazyLock<Vec<String>> = LazyLock::new(|| {
@@ -112,9 +109,7 @@ static DIALOG_SEXIAL_AKIRE: LazyLock<Vec<String>> = LazyLock::new(|| {
 });
 
 fn is_first_sexial_allowed() -> bool {
-  !*get_read(&FIRST_SEXIAL_TOUCH)
-    && *get_read(&GHOST_UP_TIME) < 30
-    && get_read(&FLAGS).check(&EventFlag::FirstClose)
+  !*get_read(&FIRST_SEXIAL_TOUCH) && *get_read(&GHOST_UP_TIME) < 30 && get_read(&FLAGS).check(&EventFlag::FirstClose)
 }
 
 pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, ShioriError> {
@@ -183,14 +178,14 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 
   let dialogs = vec![vec![
     "\
-    h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
-    \\0……手が冷えるわよ。h1111204ほどほどにね。\
-    "
+      h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
+      \\0……手が冷えるわよ。h1111204ほどほどにね。\
+      "
     .to_string(),
     "\
-    h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
-    ……h1111204それは不毛というものよ。\
-    "
+      h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+      ……h1111204それは不毛というものよ。\
+      "
     .to_string(),
     "\
     h1111205\\1彼女の指は長い。\\n\
@@ -217,7 +212,7 @@ fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriE
       "h1111204いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
       "h1111205ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
       "h1111211秘されたものほど暴きたくなるものね。\\n\
-      h1111204……もちろん、相応の代償を払う用意はあるのでしょうね。"
+        h1111204……もちろん、相応の代償を払う用意はあるのでしょうね。"
         .to_string(),
       "h1111304悪餓鬼。".to_string(),
     ]);
@@ -234,14 +229,14 @@ fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, Shi
     .to_string()],
     vec![
       "\
-      h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
-      h1111101……h1111204私はあなたのものじゃないのよ。\\n\
-      "
+        h1111101\\1抱き寄せようとすると、腕は彼女をすり抜けた。\
+        h1111101……h1111204私はあなたのものじゃないのよ。\\n\
+        "
       .to_string(),
       "\
-          h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
-      h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
-      "
+        h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
+        h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
+        "
       .to_string(),
     ],
   ];
@@ -274,11 +269,11 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
   } else if count == zero_bust_touch_threshold {
     zero_bust_touch.push(
       "\
-    h1111205\\1触れようとした手先が、霧に溶けた。\\n\
-    慌てて引っ込めると、手は元通りになった。\
-    h1111201許されていると思ったの？\\n\
-    h1111304残念だけど、それほど気は長くないの。\\n\
-    h1111310わきまえなさい。"
+        h1111205\\1触れようとした手先が、霧に溶けた。\\n\
+        慌てて引っ込めると、手は元通りになった。\
+        h1111201許されていると思ったの？\\n\
+        h1111304残念だけど、それほど気は長くないの。\\n\
+        h1111310わきまえなさい。"
         .to_string(),
     );
   } else {
@@ -333,18 +328,18 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
       // セリフ
       let dialogs = [
         [
-          "h1111206少し、薄暗くなってきたかしら。".to_string(), // 1本目：光の変化への気づき
+          "h1111206少し、薄暗くなってきたかしら。".to_string(),                                                                                        // 1本目：光の変化への気づき
           "h1111210明るい時には見えなかったものが、\\n影の中から浮かび上がってくる。\\nh1111105光は、\\n案外多くのものを隠しているのね。".to_string(), // 2本目：隠されたものの露呈
           "h1111110闇の中では、境界線が溶けて曖昧になる。\\nh1111306人と物、肌と空気、自分と他人。\\nやがて、自分がどこにいるのかも\\n分からなくなる。".to_string(), // 3本目：輪郭の喪失
-          "h1111105でも、その曖昧さが心地よくもある。\\nh1111204はっきりしているのは、\\nときに苦痛なことだから。".to_string(), // 4本目：曖昧さへの逃避
-          "h1111110見えなくなって、ようやく分かることもある。\\nh1111204光の中では、気づけなかった感覚に。".to_string(), // 5本目：闇が暴く真実
+          "h1111105でも、その曖昧さが心地よくもある。\\nh1111204はっきりしているのは、\\nときに苦痛なことだから。".to_string(),                        // 4本目：曖昧さへの逃避
+          "h1111110見えなくなって、ようやく分かることもある。\\nh1111204光の中では、気づけなかった感覚に。".to_string(),                               // 5本目：闇が暴く真実
         ],
         [
-          "h1111204静かね。そう、とても静か。".to_string(), // 1本目：静寂への気づき
-          "h1111210外の音が聞こえなくなると、\\nh1111105かえって心の中の声が大きく響くの。".to_string(), // 2本目：内なる音の増幅
+          "h1111204静かね。そう、とても静か。".to_string(),                                                                 // 1本目：静寂への気づき
+          "h1111210外の音が聞こえなくなると、\\nh1111105かえって心の中の声が大きく響くの。".to_string(),                    // 2本目：内なる音の増幅
           "h1111110その声は、いつも同じことを囁いている。\\nh1111306私にだけ聞こえるように、\\nでも、確かに。".to_string(), // 3本目：孤独な内声
-          "h1111105静寂って、実は最も騒がしいもの。\\nh1111102聞きたくない音で溢れかえっているの。".to_string(), // 4本目：静寂の欺瞞
-          "h1111110静寂が責めている。\\nh1111204逃れられない真実を、突きつけてくるのよ。".to_string(), // 5本目：静寂による審判
+          "h1111105静寂って、実は最も騒がしいもの。\\nh1111102聞きたくない音で溢れかえっているの。".to_string(),            // 4本目：静寂の欺瞞
+          "h1111110静寂が責めている。\\nh1111204逃れられない真実を、突きつけてくるのよ。".to_string(),                      // 5本目：静寂による審判
         ],
         [
           "h1111210寒さは感じないけれど、\\n肌が疼くような、あの感覚はしばしばあるの。".to_string(), // 1本目：温度変化への気づき
@@ -354,32 +349,32 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
           "h1111110でも、感じられないということは、\\nh1111204生きていないということと、\\n同じなのかもしれないわね。".to_string(), // 5本目：無感覚と死の等価性
         ],
         [
-          "h1111206植物って、静かに成長していくものね。".to_string(), // 1本目：成長への着目
-          "h1111210でも、いつかは成長も止まる。\\nh1111105満開の花も、やがては散っていくもの。".to_string(), // 2本目：成長の限界
-          "h1111110枯れていく過程にも、独特の美しさがある。\\nh1111306生命力を失っていく、その静謐さ。".to_string(), // 3本目：枯死の美学
+          "h1111206植物って、静かに成長していくものね。".to_string(),                                                               // 1本目：成長への着目
+          "h1111210でも、いつかは成長も止まる。\\nh1111105満開の花も、やがては散っていくもの。".to_string(),                        // 2本目：成長の限界
+          "h1111110枯れていく過程にも、独特の美しさがある。\\nh1111306生命力を失っていく、その静謐さ。".to_string(),                // 3本目：枯死の美学
           "h1111105成長し続けることの方が、\\n実は不自然なのかもしれない。\\nh1111204立ち止まり、枯れることこそ摂理。".to_string(), // 4本目：停滞の正当化
-          "h1111110私も、とっくに枯れ始めているのかもしれない。\\nh1111204気づかないふりをしているだけで。".to_string(), // 5本目：自己の枯死への気づき
+          "h1111110私も、とっくに枯れ始めているのかもしれない。\\nh1111204気づかないふりをしているだけで。".to_string(),            // 5本目：自己の枯死への気づき
         ],
         [
-          "h1111211色とりどりのものを見ていると、\\n目が疲れるときがあるの。".to_string(), // 1本目：色彩への疲労
-          "h1111105鮮やかな色って、時として攻撃的よね。\\nh1111110主張が強すぎて、心が休まらない。".to_string(), // 2本目：色彩の攻撃性
+          "h1111211色とりどりのものを見ていると、\\n目が疲れるときがあるの。".to_string(),                               // 1本目：色彩への疲労
+          "h1111105鮮やかな色って、時として攻撃的よね。\\nh1111110主張が強すぎて、心が休まらない。".to_string(),         // 2本目：色彩の攻撃性
           "h1111204色が褪せていく過程は、どこか安らかで。\\nh1111306争いがなくなって、静寂が訪れるみたい。".to_string(), // 3本目：褪色の安らぎ
           "h1111105無彩色の世界なら、\\nもっと穏やかでいられるかもしれない。\\nh1111110白と黒と灰色、それだけでいい。".to_string(), // 4本目：単調さへの憧れ
-          "h1111102色を失った世界で、h1111204ようやく\\n自分の輪郭が見えなくなるのかもしれないわ。".to_string(), // 5本目：自己の消失への憧れ
+          "h1111102色を失った世界で、h1111204ようやく\\n自分の輪郭が見えなくなるのかもしれないわ。".to_string(),         // 5本目：自己の消失への憧れ
         ],
         [
-          "h1111204記憶って、時として重いものね。".to_string(), // 1本目：記憶の重さ
-          "h1111210覚えていたいものほど曖昧になって、\\nh1111105忘れたいものほど鮮明に残っている。".to_string(), // 2本目：記憶の皮肉
-          "h1111110記憶は編集される。都合よく、都合悪く。\\nh1111306真実なんて、どこにもないのかもしれない。".to_string(), // 3本目：記憶の不確実性
+          "h1111204記憶って、時として重いものね。".to_string(),                                                                             // 1本目：記憶の重さ
+          "h1111210覚えていたいものほど曖昧になって、\\nh1111105忘れたいものほど鮮明に残っている。".to_string(),                            // 2本目：記憶の皮肉
+          "h1111110記憶は編集される。都合よく、都合悪く。\\nh1111306真実なんて、どこにもないのかもしれない。".to_string(),                  // 3本目：記憶の不確実性
           "h1111105忘れることができれば、\\nどれだけ楽になれるでしょう。\\nh1111102過去に縛られずに、ただ今を生きられるのに。".to_string(), // 4本目：忘却への憧れ
-          "h1111110けれど、過去と現在は地続き。\\nh1111204過去だけを捨てることなど、できない。".to_string(), // 5本目：忘却の代償
+          "h1111110けれど、過去と現在は地続き。\\nh1111204過去だけを捨てることなど、できない。".to_string(),                                // 5本目：忘却の代償
         ],
         [
-          "h1111210言葉って、不思議なものよね。".to_string(), // 1本目：言葉への着目
+          "h1111210言葉って、不思議なものよね。".to_string(),                                                                           // 1本目：言葉への着目
           "h1111306伝えたいことほど、うまく言葉にならない。\\nh1111105言葉にした瞬間、\\n何かが失われてしまう気がするの。".to_string(), // 2本目：言葉の限界
-          "h1111110話せば話すほど、真意から遠ざかっていく。\\nh1111204言葉は、時として真実を覆い隠すのね。".to_string(), // 3本目：言葉の欺瞞性
-          "h1111105沈黙の中にこそ、\\n本当の理解があるのかもしれない。\\nh1111102言葉なんて、所詮は表面的なもの。".to_string(), // 4本目：沈黙の価値
-          "h1111110結局、誰にも伝わらない。\\nh1111205ならば、最初から何も言わなければ良いの？".to_string(), // 5本目：コミュニケーションの絶望
+          "h1111110話せば話すほど、真意から遠ざかっていく。\\nh1111204言葉は、時として真実を覆い隠すのね。".to_string(),                // 3本目：言葉の欺瞞性
+          "h1111105沈黙の中にこそ、\\n本当の理解があるのかもしれない。\\nh1111102言葉なんて、所詮は表面的なもの。".to_string(),         // 4本目：沈黙の価値
+          "h1111110結局、誰にも伝わらない。\\nh1111205ならば、最初から何も言わなければ良いの？".to_string(),                            // 5本目：コミュニケーションの絶望
         ],
       ];
       // 前回とは別のセリフ群になるようにする
@@ -389,9 +384,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
           *get_write(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) = 0;
         }
       }
-      let dialog = dialogs[*get_read(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) as usize]
-        [(i - 1) as usize]
-        .to_owned();
+      let dialog = dialogs[*get_read(&LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX) as usize][(i - 1) as usize].to_owned();
 
       // 話題解放メッセージ
       let system_message = if threshold == IMMERSIVE_RATE_MAX {
@@ -445,8 +438,8 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
         *get_write(&TALKING_PLACE) = TalkingPlace::LivingRoom;
         format!(
           "\\0\\b[{}]h1111705……。h1111101\\n\
-          ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
-          \\n\\n[half](トーク傾向が元に戻りました)",
+            ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
+            \\n\\n[half](トーク傾向が元に戻りました)",
           TalkingPlace::Library.balloon_surface(),
           TalkingPlace::LivingRoom.balloon_surface(),
         )
@@ -492,14 +485,14 @@ pub(crate) fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (V
 }
 
 const DUMMY_REQUEST: &str = "GET SHIORI/3.0\r\n\
-Charset: UTF-8\r\n\
-Sender: SSP\r\n\
-SenderType: internal,raise\r\n\
-SecurityLevel: local\r\n\
-Status: choosing,balloon(0=0)\r\n\
-ID: OnFirstBoot\r\n\
-BaseID: OnBoot\r\n\
-Reference0: 1\r\n\r\n";
+  Charset: UTF-8\r\n\
+  Sender: SSP\r\n\
+  SenderType: internal,raise\r\n\
+  SecurityLevel: local\r\n\
+  Status: choosing,balloon(0=0)\r\n\
+  ID: OnFirstBoot\r\n\
+  BaseID: OnBoot\r\n\
+  Reference0: 1\r\n\r\n";
 
 #[cfg(test)]
 mod tests {

@@ -45,9 +45,9 @@ fn input_user_name(text: String) -> Result<Response, ShioriError> {
   *get_write(&USER_NAME) = text.clone();
   let m = format!(
     "\
-    h1111204そう、h1111210ならばそう呼ぶことにしましょう。\
-    \\1\\_q(ユーザ名を{}に設定しました)\
-    ",
+      h1111204そう、h1111210ならばそう呼ぶことにしましょう。\
+      \\1\\_q(ユーザ名を{}に設定しました)\
+      ",
     text
   );
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())

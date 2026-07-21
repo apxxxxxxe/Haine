@@ -66,14 +66,12 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   // バルーン右下に表示するコメントを取得
   let comment = if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     // 書斎では能動的に話しかけたかどうかで異なるコメントを表示
-    let index =
-      choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
+    let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
     RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index].to_string()
   } else {
     // 居間では従者トーク解禁済みの場合コメントを表示
     if get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::Servant)) {
-      let index =
-        choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
+      let index = choose_one(&RANDOMTALK_COMMENTS_LIVING_ROOM, false).ok_or(ShioriError::TalkNotFound)?;
       RANDOMTALK_COMMENTS_LIVING_ROOM[index].to_string()
     } else {
       "".to_string()
@@ -108,9 +106,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
 }
 
 pub fn render_talk(talk: &Talk) -> String {
-  let derivative_talk_request_button = if *get_read(&DERIVATIVE_TALK_REQUESTABLE)
-    && *get_read(&TALKING_PLACE) == TalkingPlace::LivingRoom
-  {
+  let derivative_talk_request_button = if *get_read(&DERIVATIVE_TALK_REQUESTABLE) && *get_read(&TALKING_PLACE) == TalkingPlace::LivingRoom {
     format!(
       "\\0\\f[default]\\f[anchornotselectfontcolor,default.plain]\\_a[DerivativeTalkRequest,{}]{}\\_a\\f[anchornotselectfontcolor,default]\\_l[0,@1.5em]",
       talk.id,
@@ -147,11 +143,7 @@ pub fn render_talk(talk: &Talk) -> String {
   )
 }
 
-fn first_random_talk_response(
-  text: String,
-  i: usize,
-  text_count: usize,
-) -> Result<Response, ShioriError> {
+fn first_random_talk_response(text: String, i: usize, text_count: usize) -> Result<Response, ShioriError> {
   get_write(&FLAGS).done(EventFlag::FirstRandomTalkDone(i as u32));
   let m = if i == text_count - 1 {
     let achieved_talk_types = [TalkType::AboutMe, TalkType::WithYou];
@@ -170,8 +162,7 @@ fn first_random_talk_response(
   } else {
     text.clone()
   };
-  let mut res =
-    new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())?;
+  let mut res = new_response_with_value_with_translate(m, TranslateOption::with_shadow_completion())?;
   res.headers.insert_by_header_name(
     HeaderName::from("Marker"),
     format!("{}({}/{})", FIRST_BOOT_MARKER, i + 2, text_count + 1),

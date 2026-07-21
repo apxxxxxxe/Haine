@@ -52,12 +52,7 @@ impl Talk {
 
 #[allow(dead_code)]
 impl Talk {
-  pub fn new(
-    talk_type: Option<TalkType>,
-    id: String,
-    text: String,
-    callback: Option<fn()>,
-  ) -> Self {
+  pub fn new(talk_type: Option<TalkType>, id: String, text: String, callback: Option<fn()>) -> Self {
     Self {
       talk_type,
       text,
@@ -245,10 +240,7 @@ impl DerivaliveTalk {
     self.text.clone()
   }
 
-  pub fn get_unseen_talks(
-    talk_type: TalkType,
-    seen: &HashSet<String>,
-  ) -> Option<Vec<DerivaliveTalk>> {
+  pub fn get_unseen_talks(talk_type: TalkType, seen: &HashSet<String>) -> Option<Vec<DerivaliveTalk>> {
     let talks = derivative_talks_per_talk_type()
       .get(&talk_type)
       .cloned()

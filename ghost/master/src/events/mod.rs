@@ -149,9 +149,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnDerivativeTalkRequestButtonToggled" => Some(EventHandler::AlwaysSuccess(
       on_derivative_talk_request_button_toggled,
     )),
-    "OnDerivativeTalkRequestInput" => {
-      Some(EventHandler::MayFailure(on_derivative_talk_request_input))
-    }
+    "OnDerivativeTalkRequestInput" => Some(EventHandler::MayFailure(on_derivative_talk_request_input)),
     _ => None,
   }
 }

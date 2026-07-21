@@ -1,7 +1,5 @@
 use crate::events::check_story_events;
-use crate::events::first_boot::{
-  FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS,
-};
+use crate::events::first_boot::{FIRST_BOOT_MARKER, FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS};
 use crate::events::TalkingPlace;
 use crate::system::error::ShioriError;
 use crate::system::response::*;
@@ -48,9 +46,9 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
       vec!["h1113105\\1今日も、霧が濃い。".to_string()],
       vec![format!(
         "\
-        h1113105……h1113101\\_w[300]h1113201あら。\\n\
-        h1111204{}、{{user_name}}。\
-        ",
+          h1113105……h1113101\\_w[300]h1113201あら。\\n\
+          h1111204{}、{{user_name}}。\
+          ",
         {
           let st = get_local_time();
           let hour = st.wHour;
@@ -113,8 +111,8 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
     parts.push(vec![format!(
       "\\0\\b[{}]h1111705……。h1111101\\n\
-      ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
-      h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
+        ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
+        h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
       TalkingPlace::Library.balloon_surface(),
       TalkingPlace::LivingRoom.balloon_surface(),
     )]);
@@ -165,7 +163,7 @@ pub(crate) fn on_vanish_selecting(_req: &Request) -> Result<Response, ShioriErro
     \\0……h1111205あなた、決めたのね。\\n\
     h1111210顔に書いてあるもの。\\n\\n[half]\
     h1111206止めはしないわ。あなたの選んだことだもの。\
-  "
+    "
   .to_string();
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
@@ -180,7 +178,7 @@ pub(crate) fn on_vanish_selected(_req: &Request) -> Result<Response, ShioriError
     \\0h1111210……さあ、お行きなさい。\\n\\n[half]\
     h1111204あなたは、ちゃんと見られていた。\\n\
     それだけ、覚えていて。\
-  "
+    "
   .to_string();
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
@@ -193,7 +191,7 @@ pub(crate) fn on_vanish_cancel(_req: &Request) -> Result<Response, ShioriError> 
     \\1ハイネの肩から、力が抜けた。\\n\\n[half]\
     h1111205……まだ、ここにいるわ。\\n\
     あなたが、そうしたいうちは。\
-  "
+    "
   .to_string();
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
@@ -330,5 +328,6 @@ pub(crate) fn halloween_boot_talk() -> String {
     Trick or Treat……h1111204今度はあなたの番よ。\\n\
     何か面白いことを見せてくれる？h1111210それとも……。h1111204\
     \\1\\cハイネの瞳が、いつもより輝いて見えた.\
-  ".to_string()
+    "
+  .to_string()
 }
