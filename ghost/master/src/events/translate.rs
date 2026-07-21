@@ -1,28 +1,45 @@
-use crate::autobreakline::{extract_scope, CHANGE_SCOPE_RE};
-use crate::error::ShioriError;
-use crate::events::common::*;
-use crate::variables::*;
+use crate::system::error::ShioriError;
+use crate::system::response::*;
+use crate::system::variables::*;
 use crate::{lazy_fancy_regex, lazy_regex};
 use core::fmt::{Display, Formatter};
 use fancy_regex::Regex as FancyRegex;
-use once_cell::sync::Lazy;
 use regex::Regex;
-use shiorust::message::{Request, Response};
-use std::thread;
-use std::time::Duration;
+use std::sync::LazyLock;
 
-pub(crate) fn on_wait_translater(_req: &Request) -> Result<Response, ShioriError> {
-  while !INSERTER.read().unwrap().is_ready() {
-    thread::sleep(Duration::from_millis(100));
+// ============================================================
+// スコープ処理
+// ============================================================
+
+static CHANGE_SCOPE_RE: LazyLock<FancyRegex> = lazy_fancy_regex!(r"(\\[01])(?!w)|(\\p\[\d+\])");
+
+fn find_change_scope(text: &str) -> Option<String> {
+  if let Ok(Some(captures)) = CHANGE_SCOPE_RE.captures(text) {
+    if let Some(scope) = captures.get(1) {
+      return Some(scope.as_str().to_string());
+    } else if let Some(scope) = captures.get(2) {
+      return Some(scope.as_str().to_string());
+    }
   }
-  let has_waiting_talk = WAITING_TALK.read().unwrap().is_some();
-  let m = if has_waiting_talk {
-    WAITING_TALK.read().unwrap().clone().unwrap()
-  } else {
-    return Err(ShioriError::ArrayAccessError);
-  };
-  new_response_with_value_with_translate(m.0, m.1)
+  None
 }
+
+fn extract_scope(text: &str) -> Option<usize> {
+  static RE_NOT_NUMBER: LazyLock<Regex> = lazy_regex!(r"[^\d]");
+
+  if let Some(scope_tag) = find_change_scope(text) {
+    debug!("scope_tag: {}", scope_tag);
+    if let Ok(s) = RE_NOT_NUMBER.replace_all(&scope_tag, "").parse::<usize>() {
+      debug!("scope: {}", s);
+      return Some(s);
+    }
+  }
+  None
+}
+
+// ============================================================
+// 翻訳処理
+// ============================================================
 
 pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
   if text.is_empty() {
@@ -31,23 +48,18 @@ pub(crate) fn on_translate(text: String, complete_shadow: bool) -> Result<String
 
   let translated = translate(text, complete_shadow)?;
 
-  let balloonnum_reset = format!("{}{}", REMOVE_BALLOON_NUM, translated);
-
-  if !INSERTER.read().unwrap().is_ready() {
-    return Err(ShioriError::TranslaterNotReadyError);
-  }
-  INSERTER.write().unwrap().run(balloonnum_reset)
+  Ok(format!("{}{}", REMOVE_BALLOON_NUM, translated))
 }
 
-fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
-  static IGNORING_TRANSLATE_RANGE: Lazy<Regex> = lazy_regex!(r"@@@@@(.*?)@@@@@");
-  static CHANGE_SCOPE_RE_PREFIX: Lazy<FancyRegex> =
+pub fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
+  static IGNORING_TRANSLATE_RANGE: LazyLock<Regex> = lazy_regex!(r"@@@@@(.*?)@@@@@");
+  static CHANGE_SCOPE_RE_PREFIX: LazyLock<FancyRegex> =
     lazy_fancy_regex!(r"^(\\[01])(?!w)|(\\p\[\d+\])");
 
   let translate_targets = IGNORING_TRANSLATE_RANGE.split(&text).collect::<Vec<&str>>();
   let ignoring_ranges = IGNORING_TRANSLATE_RANGE
     .captures_iter(&text)
-    .map(|c| c.get(1).unwrap().as_str())
+    .filter_map(|c| c.get(1).map(|m| m.as_str()))
     .collect::<Vec<&str>>();
 
   if translate_targets.len() != 1 || !ignoring_ranges.is_empty() {
@@ -75,18 +87,50 @@ fn translate(text: String, complete_shadow: bool) -> Result<String, ShioriError>
 }
 
 fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriError> {
-  static RE_SURFACE_SNIPPET: Lazy<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+  static RE_SURFACE_SNIPPET: LazyLock<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
 
-  let text = RE_SURFACE_SNIPPET
-    .replace_all(&text, |caps: &regex::Captures| {
+  // 変数を translate 時点で1回だけ読み取り（副作用を最小化）
+  let current_surface = *get_read(&CURRENT_SURFACE);
+  let shadow_script = render_shadow(complete_shadow);
+
+  // 全サーフェス記法を検出し、位置情報付きで収集
+  let matches: Vec<_> = RE_SURFACE_SNIPPET.captures_iter(&text).collect();
+
+  let text = if matches.is_empty() {
+    text
+  } else {
+    // 前後関係を追跡しながら置換
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut prev_surface = current_surface;
+
+    for caps in matches.iter() {
+      let Some(full_match) = caps.get(0) else {
+        continue;
+      };
       let use_half_blink = caps.get(1).is_some();
-      let surface_id = caps.get(2).unwrap().as_str();
-      format!(
-        "\\0\\![embed,OnSmoothBlink,{},{},{}]",
-        surface_id, complete_shadow as i32, use_half_blink as i32,
-      )
-    })
-    .to_string();
+      let Some(surface_id) = caps.get(2).and_then(|m| m.as_str().parse::<i32>().ok()) else {
+        continue;
+      };
+
+      // マッチ前のテキストを追加
+      result.push_str(&text[last_end..full_match.start()]);
+
+      // bind命令スクリプトを生成
+      let script = generate_bind_script(prev_surface, surface_id, &shadow_script, use_half_blink);
+      result.push_str(&script);
+
+      prev_surface = surface_id;
+      last_end = full_match.end();
+    }
+
+    // CURRENT_SURFACEを手動更新（bind方式ではOnSurfaceChangeが発火しないため）
+    *get_write(&CURRENT_SURFACE) = prev_surface;
+
+    // 残りのテキストを追加
+    result.push_str(&text[last_end..]);
+    result
+  };
 
   let mut dialogs = Dialog::from_text(&text);
 
@@ -104,13 +148,13 @@ fn translate_core(text: String, complete_shadow: bool) -> Result<String, ShioriE
   )
 }
 
-static QUICK_SECTION_START: Lazy<Regex> =
+static QUICK_SECTION_START: LazyLock<Regex> =
   lazy_regex!(r"^(\\!\[quicksection,true]|\\!\[quicksection,1])");
-static QUICK_SECTION_END: Lazy<Regex> =
+static QUICK_SECTION_END: LazyLock<Regex> =
   lazy_regex!(r"^(\\!\[quicksection,false]|\\!\[quicksection,0])");
 
 // 参考：http://emily.shillest.net/ayaya/?cmd=read&page=Tips%2FOnTranslate%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9&word=OnTranslate
-static RE_TEXT_ONLY: Lazy<Regex> = lazy_regex!(
+static RE_TEXT_ONLY: LazyLock<Regex> = lazy_regex!(
   r"\\(\\|q\[.*?\]\[.*?\]|[!&8bcfijmpqsn]\[.*?\]|[-*+1014567bcehntuvxz]|_[ablmsuvw]\[.*?\]|__(t|[qw]\[.*?\])|_[!?+nqsV]|[sipw][0-9])"
 );
 
@@ -184,14 +228,17 @@ fn translate_dialog(dialog: &mut Dialog) {
 }
 
 fn translate_whole(text: String) -> Result<String, ShioriError> {
-  static RE_LAST_WAIT: Lazy<Regex> = lazy_regex!(r"\\_w\[([0-9]+)\]$");
+  static RE_LAST_WAIT: LazyLock<Regex> = lazy_regex!(r"\\_w\[([0-9]+)\]$");
 
   let mut translated = text.clone();
 
   translated = RE_LAST_WAIT.replace(&translated, "").to_string();
 
-  let user_name = USER_NAME.read().unwrap().clone();
+  let user_name = get_read(&USER_NAME).clone();
   translated = translated.replace("{user_name}", &user_name);
+
+  let last_selftalk_phrase = get_read(&LAST_SELFTALK_PHRASE).clone();
+  translated = translated.replace("{last_selftalk_phrase}", &last_selftalk_phrase);
 
   Ok(translated)
 }
@@ -216,7 +263,7 @@ impl Dialog {
   pub fn from_text(text: &str) -> Vec<Self> {
     let mut scopes = CHANGE_SCOPE_RE
       .captures_iter(text)
-      .map(|c| extract_scope(&c.unwrap()[0]).unwrap())
+      .filter_map(|c| c.ok().and_then(|caps| extract_scope(&caps[0])))
       .collect::<Vec<_>>();
 
     let delim = "\x01";
@@ -312,7 +359,7 @@ struct TagReplacee {
   replacement: &'static str,
 }
 
-static WAIT: Lazy<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
+static WAIT: LazyLock<Regex> = lazy_regex!(r"(\\_w\[[0-9]+\]|\\w[1-9])");
 
 fn replace_tags(
   tags: &[&str],
@@ -533,5 +580,92 @@ mod tests {
     assert_eq!(result[1], "");
     assert_eq!(result[2], "\\n\\n[half]\\_w[700]");
     assert_eq!(result[3], "");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_basic() {
+    // サーフェス記法の正規表現テスト
+    static RE_SURFACE_SNIPPET: LazyLock<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    // 基本パターン
+    let text = "h1111201";
+    let caps = RE_SURFACE_SNIPPET.captures(text).unwrap();
+    assert!(caps.get(1).is_none()); // r なし
+    assert_eq!(caps.get(2).unwrap().as_str(), "1111201");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_half_blink() {
+    // hr プレフィックスのテスト
+    static RE_SURFACE_SNIPPET: LazyLock<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "hr1111203";
+    let caps = RE_SURFACE_SNIPPET.captures(text).unwrap();
+    assert!(caps.get(1).is_some()); // r あり
+    assert_eq!(caps.get(2).unwrap().as_str(), "1111203");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_multiple() {
+    // 複数のサーフェス記法
+    static RE_SURFACE_SNIPPET: LazyLock<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "こんにちはh1111201。元気ですか？h1111203";
+    let matches: Vec<_> = RE_SURFACE_SNIPPET.captures_iter(text).collect();
+
+    assert_eq!(matches.len(), 2);
+    assert_eq!(matches[0].get(2).unwrap().as_str(), "1111201");
+    assert_eq!(matches[1].get(2).unwrap().as_str(), "1111203");
+  }
+
+  #[test]
+  fn test_surface_snippet_regex_position() {
+    // 位置情報の取得テスト
+    static RE_SURFACE_SNIPPET: LazyLock<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "ABCh1111201DEF";
+    let caps = RE_SURFACE_SNIPPET.captures(text).unwrap();
+    let full_match = caps.get(0).unwrap();
+
+    assert_eq!(full_match.start(), 3); // "ABC"の後
+    assert_eq!(full_match.end(), 11); // "h1111201"の終わり
+    assert_eq!(&text[..full_match.start()], "ABC");
+    assert_eq!(&text[full_match.end()..], "DEF");
+  }
+
+  #[test]
+  fn test_surface_replacement_logic() {
+    // サーフェス置換ロジックの統合テスト
+    static RE_SURFACE_SNIPPET: LazyLock<Regex> = lazy_regex!(r"h(r)?([0-9]{7})");
+
+    let text = "あいうh1111201かきくh1111203さしす".to_string();
+    let matches: Vec<_> = RE_SURFACE_SNIPPET.captures_iter(&text).collect();
+
+    // 前後関係を追跡しながら置換するロジックをシミュレート
+    let mut result = String::new();
+    let mut last_end = 0;
+    let mut prev_surface = 1111200i32; // 初期サーフェス（目コード0）
+
+    for caps in matches.iter() {
+      let full_match = caps.get(0).unwrap();
+      let surface_id: i32 = caps.get(2).unwrap().as_str().parse().unwrap();
+
+      // マッチ前のテキストを追加
+      result.push_str(&text[last_end..full_match.start()]);
+
+      // プレースホルダーとして [FROM->TO] を追加
+      result.push_str(&format!("[{}->{}]", prev_surface, surface_id));
+
+      prev_surface = surface_id;
+      last_end = full_match.end();
+    }
+    result.push_str(&text[last_end..]);
+
+    // 結果を確認
+    assert!(result.contains("あいう[1111200->1111201]かきく"));
+    assert!(result.contains("かきく[1111201->1111203]さしす"));
+
+    // 2番目のサーフェスは1番目のサーフェスを変更元として使用
+    assert!(result.contains("[1111201->1111203]"));
   }
 }
