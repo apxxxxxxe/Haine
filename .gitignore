@@ -30,6 +30,6 @@ ghost/master/debug
 target/
 
 .mise.toml
-.claude/
 .serena/
 .mcp.json
+.claude/settings.local.json
