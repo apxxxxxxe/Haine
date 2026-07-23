@@ -1,10 +1,11 @@
 use crate::get_write;
+use crate::system::windows::get_local_time;
 use crate::LAST_SELFTALK_PHRASE;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashMap;
 
-use crate::system::variables::{get_read, EventFlag, FLAGS};
+use crate::system::variables::{get_read, GHOST_UP_TIME};
 
 use crate::events::talk::{Talk, TalkType};
 
@@ -36,6 +37,24 @@ pub(crate) const RANDOMTALK_COMMENTS_LIBRARY_INACTIVE: [&str; 6] = [
   "",
   "",
 ];
+
+fn is_near_night() -> bool {
+  let st = get_local_time();
+  let hour = st.wHour;
+  (17..=19).contains(&hour)
+}
+
+fn is_night() -> bool {
+  let st = get_local_time();
+  let hour = st.wHour;
+  hour <= 3 || hour >= 19
+}
+
+fn is_winter() -> bool {
+  let st = get_local_time();
+  let month = st.wMonth;
+  month == 12 || month <= 2
+}
 
 struct RandomTalk {
   id: String,
@@ -290,7 +309,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1111204……近頃は、あまり聞こえないの。\
           "
         .to_string(),
-        required_condition: None,
+        required_condition: Some(is_night),
         callback: None,
       },
       RandomTalk {
@@ -309,25 +328,6 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         required_condition: None,
         callback: None,
       },
-      // RandomTalk {
-      //   id: "喧嘩のお誘い".to_string(),
-      //   text: "\
-      //     h1111204口喧嘩をしましょう、{user_name}。\\n\
-      //     \\1『急に何？』\\n\
-      //     h1111210あなた、ここに着てからずっと、\\n\
-      //     私の言うことを聞いてばかりでしょう。\\n\
-      //     不満が溜まっているだろうと思ってね。\\n\
-      //     h1111204さあ、言いたいことをぶつけ合いましょう。\\n\
-      //     h1111101……特に無い？h1113105……そんな。\\n\
-      //     \\1……強いて言えば……\\n\
-      //     『もっと雑に扱ってもいいよ。友人なんだから』\\n\
-      //     h1113101……。\\n\
-      //     h1113105……これでも……？\\n\
-      //     h1111104わかった、検討するわ……。\
-      //   ".to_string(),
-      //   required_condition: None,
-      //   callback: None,
-      // },
       RandomTalk {
         id: "科学への興味".to_string(),
         text: "\
@@ -340,9 +340,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1111210女が夢中になるものではない、と\\n\
           何度言われたかしら。\\n\\n[half]\
           h1111204あなたの時代はどう？\\n\
-          ……h1111205そう。\\n\
-          h1111306それを聞けただけで、\\n\
-          今日は良い日だわ。\
+          ……h1111205そう。h1111310それは、いいことだわ。\
           "
         .to_string(),
         required_condition: None,
@@ -373,9 +371,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           \\1ポケットからハンカチを取り出して、そっと拭う。\\n\
           白い布に、小さな花模様の刺繍が入っている。\\n\
           \\1近くで見ると、花の形が少し歪んでいる。\\n\\n[half]\
-          h1111204……ずいぶん昔のものなの。\\n\
-          h1111205刺した人は、あまり得意じゃなかったみたいでね。\\n\
-          h1111210形が歪んでいるところが、好きなの。\
+          h1111204……ずいぶん昔のものよ。\\n\
+          h1111205家政婦は、あまり得意じゃなかったみたいでね。\\n\
+          h1111210形が歪んでいるけれど、それが好きなの。\
           "
         .to_string(),
         required_condition: None,
@@ -387,33 +385,16 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         text: "\
           h1111206私、虫が苦手なの。\\n\
           とりわけ、毛虫はいけないわ。\\n\\n[half]\
-          h1111205幼い頃、極彩色のものに刺されて、\\n\
+          h1121205幼い頃、極彩色のものに刺されて、\\n\
           三日三晩うなされたことがあってね。\\n\\n[half]\
-          h1111210もう刺される肌もないのに、\\n\
-          h1113306見つけると、今でも身がすくむの。\
-          "
-        .to_string(),
-        required_condition: None,
-        callback: None,
-      },
-      // - 霊は眠らずとも過ごせるが、長い眠り（冬眠）も選べる
-      RandomTalk {
-        id: "長い眠り".to_string(),
-        text: "\
-          h1111203霊に眠りは要らないの。\\n\
-          でも、望めば眠れるわ。\\n\
-          h1111210一冬でも、何十年でも。\\n\\n[half]\
-          h1111206一度、そうして長く眠ったことがあってね。\\n\
-          h1111205目が覚めたら、\\n\
-          知っている顔がひとつも残っていなかった。\\n\\n[half]\
-          h1111310それきり、あまり眠らないことにしているの。\
+          h1121210もう刺される肌もないのに、\\n\
+          h1123306見つけると、今でも身がすくむの。\
           "
         .to_string(),
         required_condition: None,
         callback: None,
       },
     ],
-
     TalkType::WithYou => vec![
       RandomTalk {
         id: "食事中の読書".to_string(),
@@ -425,7 +406,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1111310分かっているわ。お行儀が悪いって。\\n\\n[half]\
           昔はこっぴどく怒られたもの。\\n\
           h1111211だから今やるのよ。鬼の居ぬ間にね。\\n\
-          h1111304あなたもまた鬼なのならば、話は別だけれど。\
+          h1111306あなたもまた鬼なのならば、話は別だけれど。\
           "
         .to_string(),
         required_condition: None,
@@ -437,31 +418,12 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1113105……。\\n\
           \\1本を読みながら、\\n\
           ハイネが淹れたてのお茶を口に運ぶ。\\n\
-          h1000000っ……。\\n\\n[half]\
+          h1000000っ……熱……。\\n\\n[half]\
           h1121210はあ。h1121205ぼんやりしているとよくやるの。\\n\
-          ……h1111205続きが、気になるところだったのよ。\
+          ……h1111206続きが、気になるところだったのよ。\
           "
         .to_string(),
         required_condition: None,
-        callback: None,
-      },
-      RandomTalk {
-        id: "取れたボタン".to_string(),
-        text: "\
-          h1113105……。\\n\
-          \\1そういえば、ハイネの服が前着ていたものと違う。\\n\
-          シルエットはほとんど同じだが、\\n\
-          細部のデザインが異なっているのだ。\\n\\n[half]\
-          『服、いつものと違う？』\
-          h1111204あら、よく気づいたわね。\\n\
-          h1111205そう、前のものはボタンが取れてしまったから、\\n\
-          家のものに直させているの。\\n\\n[half]\
-          h1113206彼女は針仕事がとても上手でね。\\n\
-          h1111210私もできなくはないけれど、はるかに早くて正確。\\n\
-          繕いものは任せているのよ。\
-          "
-        .to_string(),
-        required_condition: Some(|| get_read(&FLAGS).check(&EventFlag::FirstClose)),
         callback: None,
       },
       RandomTalk {
@@ -474,7 +436,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           ハイネは見様見真似で自分の唇に塗る。\\n\\n[half]\
           塗り終えると、唇を小指で軽く拭った。\
           h1113102\\n[half]ふむ……。油分で覆って乾燥を防ぐ。\\n\
-          h1113105保湿のためとはいえ、べたつくのは少し嫌ね。\\n\\n[half]\
+          h1213205保湿のためとはいえ、べたつくのは少し嫌ね。\\n\\n[half]\
           h1111204ありがとう、返すわ。h1111205\
           "
         .to_string(),
@@ -484,17 +446,14 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       RandomTalk {
         id: "ピアス".to_string(),
         text: "\
-          h1111201あなたの耳のそれ、ピアスと言うのだったかしら。\\n\
-          h1111204よく見せてくれる？\\n\\n[half]\
+          h1111201あなたはいつも耳飾りをしているのね。\\n\
+          h1111202よく、見せてくれる？h1000000\\n\\n[half]\
           \\1耳元を覗き込んで、ハイネは目を細めた。\\n\
-          h1111202留め具が、ないのね。\\n\
-          h1111101まさか、耳に穴を開けているの？\\n\\n[half]\
-          \\1『開けてるよ』\\n\
-          h1113205……私の頃は、ねじで留める式が\\n\
-          上品とされていたのよ。\\n\
-          穴を開けるのは、いささか野蛮だって。\\n\\n[half]\
-          h1111205開けるとき、痛かったでしょうに。\\n\
-          h1121210私には少し、勇気の要る飾りだわ。\
+          h1111105耳に穴を開けているのね。\\n\\n[half]\
+          h1111206昔、母が開けるのを見たことがあるけれど、\\n\
+          h1111210ひどく顔が歪んでいたのを覚えているわ。\\n\\n[half]\
+          h1111204開けるときは、痛かったでしょう。\\n\
+          h1111104……そうでもない？……h1111210そう、技術の進歩ね。\
           "
         .to_string(),
         required_condition: None,
@@ -510,7 +469,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           新鮮な空気がすっと入ってきた。\\n\\n[half]\
           『くしゃみするとき、目閉じないんだね』\
           h1111101……h1111102言われてみれば、そうね。\\n\
-          h1113105もしかして、生きていた頃から？\\n\
+          h1113105もしかして、昔から？\\n\
           h1121204……あなた、よく見ているのね。\
           "
         .to_string(),
@@ -536,11 +495,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
       RandomTalk {
         id: "蝋燭の交換".to_string(),
         text: "\
-          h1111105\\1燃え尽きた蝋燭を、ハイネが素手で掴む。\\n\
+          h1111105\\1燃え尽きた蝋燭の欠片を、ハイネが素手で摘む。\\n\
           燭台の芯の周りにこびりついた蝋を、\\n\
           指でこそいでいる……。\\n\\n[half]\
           h1111101\\1『熱くないの？』\
-          h1111305平気よ。慣れてるから。\\n\
+          h1111205平気よ。慣れてるから。\\n\
           \\1慣れの問題なのだろうか……。\
           "
         .to_string(),
@@ -555,7 +514,11 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1111210今は手軽に写真が撮れていいわね。\\n\
           h1111205印象的な光景を、いつでも手元に残しておける。\\n\\n[half]\
           ……h1111201あら、私？h1121210光栄だけれど、\\n\
-          残念ながら写真には写らないわ。\
+          残念ながら写真には写らないわ。\\n\
+          h1113206その点では、\\n\
+          彼らのほうが望みがあるというのだから不思議ね。\\n\
+          h1113210見たことあるでしょう？写真の背後に白い影……。\\n\
+          h1113306どういうわけか、低級霊はたまに写るのよ。\
           "
         .to_string(),
         required_condition: None,
@@ -587,10 +550,10 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1111201あなたのその装い……\\n\
           ゴス・ファッション、と言うのよね。\\n\
           h1111202首元の十字架も、爪の先も、黒で。\\n\\n[half]\
-          h1111205黒は、生きた人々が喪に着る色。\\n\
-          h1111206私の頃は、進んで着る色ではなかったわ。\\n\\n[half]\
-          h1111204それを、あなたは自分で選んで着ている。\\n\
-          ……h1111205私の知らない黒色ね。\
+          h1111205……黒は、服喪の色。\\n\
+          h1111206私の頃は、進んで着るものではなかったわ。\\n\\n[half]\
+          h1111204それをあなたは自分で選んで着ている。\\n\
+          h1111205私の知らない黒色ね。\
           "
         .to_string(),
         required_condition: None,
@@ -608,7 +571,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           食そのものにあまり関心がなくてね。\\n\
           h1111205何かに没頭していると、\\n\
           食事をとる時間も惜しく思えてしまって。\\n\
-          ……h1123310思えば、家政婦には随分と世話をかけたものね。\
+          h1123310思えば、家政婦には随分と世話をかけたものね。\
           "
         .to_string(),
         required_condition: None,
@@ -627,22 +590,6 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           私の生きていた頃から考えれば\\n\
           願ってもないことだもの。\\n\
           h1111210描きあげたら、また見せてちょうだい。\
-          "
-        .to_string(),
-        required_condition: None,
-        callback: None,
-      },
-      // 哲学的・抽象的思考からの導入
-      RandomTalk {
-        id: "時間の流れ方".to_string(),
-        text: "\
-          h1111210あなたがここに来て、どのくらい経つかしら。\\n\
-          h1111205……正直、分からないの。\\n\
-          日が昇って、沈んで……\\n\
-          日数は数えているのだけれど、\\n\
-          感覚が伴わないのよ。\\n\\n[half]\
-          h1111204あなたは数えてる？\\n\
-          ……h1111210ならば、それで充分だわ。\
           "
         .to_string(),
         required_condition: None,
@@ -679,21 +626,6 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         callback: None,
       },
       RandomTalk {
-        id: "朝の髪".to_string(),
-        text: "\
-          h1111201……h1111304待って、寝癖が。\\n\\n[half]\
-          \\1ハイネの指が、乱れた髪をそっと整える。\\n\
-          手つきは意外なほど慣れている。\\n\\n[half]\
-          h1111210昔、\\n\
-          家庭教師がよくやってくれたのを思い出したわ。\\n\
-          私は嫌がっていたのに、毎度譲らなくて。\\n\
-          h1111201はい、おしまい。h1111206昔話なんてつまらないわよね。\
-          "
-        .to_string(),
-        required_condition: None,
-        callback: None,
-      },
-      RandomTalk {
         id: "匂い".to_string(),
         text: "\
           h1111105\\1玄関で、濡れた上着を脱いでいると、\\n\
@@ -705,7 +637,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           h1111210……今日は、その必要もなさそうね。\
           "
         .to_string(),
-        required_condition: None,
+        required_condition: Some(|| *get_read(&GHOST_UP_TIME) < 60 * 15), // 起動から15分以内限定のトーク
         callback: None,
       },
       RandomTalk {
@@ -734,7 +666,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           \\1『あと、\\n\
           ハイネなら絶対興味津々になっちゃうと思って』\\n\
           h1121210そっちが本音ね？\\n\
-          ……まったく、h1121206よく分かってるじゃない。\
+          ……まったく、h1121306よく分かってるじゃない。\
           "
         .to_string(),
         required_condition: None,
@@ -745,7 +677,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         text: "\
           h1111105\\1ペンを走らせていると、\\n\
           ハイネが手元をのぞき込んだ。\\n\
-          \\0h1111210……死んだ者の字ばかり、読んできたの。\\n\
+          \\0h1111210……死んだ者の字ばかり、読んでいたの。\\n\
           h1111206どれも掠れて、途中で力尽きている。\\n\\n[half]\
           h1111205あなたのは、急いて、跳ねて、そして穏やかで。\\n\
           h1111210ひと文字ずつ息づいているようだわ。\
@@ -767,22 +699,7 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           \\1白い息が、急に生々しく見えた。\
           "
         .to_string(),
-        required_condition: None,
-        callback: None,
-      },
-      RandomTalk {
-        id: "動く指".to_string(),
-        text: "\
-          h1111105\\1手持ち無沙汰に、指先で膝を叩いていた。\\n\
-          その手元を、ハイネがじっと見ている。\\n\\n[half]\
-          \\0h1111210……死んだ者は、動かないの。\\n\
-          私も、彼らも。止まったまま、ただ在るだけ。\\n\\n[half]\
-          h1111205あなたの指は、意味もなく動くのね。\\n\
-          h1111206誰に見せるでもなく、ただ生きているから。\\n\\n[half]\
-          h1111211……見飽きないわ、その手は。\
-          "
-        .to_string(),
-        required_condition: None,
+        required_condition: Some(is_winter),
         callback: None,
       },
       RandomTalk {
@@ -796,32 +713,31 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           \\1『蝋燭、もったいなくない？』\\n\
           h1111204客に灯りを惜しむ家があるものですか。\\n\\n[half]\
           h1111210私も昔、暗がりで本を読んでは\\n\
-          散々叱られたものよ。\\n\
-          h1111205さあ、続けてちょうだい。\
+          散々叱られたものよ。h1111205……さあ、続けて。\
           "
         .to_string(),
-        required_condition: None,
+        required_condition: Some(is_near_night),
         callback: None,
       },
-      RandomTalk {
-        id: "".to_string(),
-        text: "\
-          \\1少し喉に粉っぽい感覚があり、咳払いをした。\
-          h1111101喉の調子が悪いの？埃が舞っていたかしら。\\n\
-          h1111106あなたが来てからは掃除と換気を\\n\
-          余計にさせているのだけど……。\\n\\n\
-          h1111205ひとまず、飴を渡しておくわ。\\n\
-          すこしはましになるはずよ。\\n\
-          \\1飴？水ではなく…？\\n\
-          h1111104……？飴は嫌いだったかしら。\
-          \\1……後で知ったが、\\n\
-          ハイネの時代に飲み水は今ほど豊富でなく、\\n\
-          口直しには安価な飴が一般的だったらしい。\
-          "
-        .to_string(),
-        required_condition: None,
-        callback: None,
-      },
+      // RandomTalk {
+      //   id: "".to_string(),
+      //   text: "\
+      //     \\1少し喉に粉っぽい感覚があり、咳払いをした。\
+      //     h1111101喉の調子が悪いの？埃が舞っていたかしら。\\n\
+      //     h1111106あなたが来てからは掃除と換気を\\n\
+      //     余計にさせているのだけど……。\\n\\n\
+      //     h1111205ひとまず、飴を渡しておくわ。\\n\
+      //     すこしはましになるはずよ。\\n\
+      //     \\1飴？水ではなく…？\\n\
+      //     h1111104……？飴は嫌いだったかしら。\
+      //     \\1……後で知ったが、\\n\
+      //     ハイネの時代に飲み水は今ほど豊富でなく、\\n\
+      //     口直しには安価な飴が一般的だったらしい。\
+      //     "
+      //   .to_string(),
+      //   required_condition: None,
+      //   callback: None,
+      // },
     ],
     TalkType::Lore => vec![
       RandomTalk {
@@ -1107,9 +1023,9 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
           死者の顔を留めておく方法のひとつだったの。\\n\
           h1111206有名な作曲家や哲学者のものが、\\n\
           博物館に残っていたりするわね。\\n\\n[half]\
-          h1111210……そういえば、\\n\
-          私のデスマスクも取っておけば良かったかしら。\\n\
-          h1111305写真にも写らない身の上だし。\
+          h1111210……私のそれが作られたのかは分からない。\\n\
+          h1111305……まあ、現存していたとしたら\\n\
+          一目見てみたくはあるわね。\
           "
         .to_string(),
         required_condition: None,
@@ -1665,22 +1581,6 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
 
 pub(crate) fn derivative_talks() -> Vec<DerivaliveTalk> {
   vec![
-    DerivaliveTalk {
-      parent_id: "舌やけど".to_string(),
-      id: "舌やけど・熱さの感じ方".to_string(),
-      summary: "『幽霊でも熱いの？』".to_string(),
-      text: "\
-        h1111205基本的には、熱さや冷たさには鈍いのだけれどね。\\n\
-        食事やお茶に関しては、少し勝手が違うの。\\n\
-        温かさ、味、香り……\\n\
-        全て感じられるように訓練したのよ。\\n\\n[half]\
-        h1123310その結果、こうして熱さも余さず\\n\
-        味わえるようになったというわけ。\
-        "
-      .to_string(),
-      required_condition: None,
-      callback: None,
-    },
     DerivaliveTalk {
       parent_id: "生前の記録".to_string(),
       id: "生前の記録・過去".to_string(),

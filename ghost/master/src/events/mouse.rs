@@ -90,9 +90,9 @@ static DIALOG_SEXIAL_FIRST: LazyLock<Vec<String>> = LazyLock::new(|| vec!["h1111
 
 static DIALOG_SEXIAL_SCOLD: LazyLock<Vec<String>> = LazyLock::new(|| {
   vec![
-    "h1111202……いくら他人の目がないとはいえ、h1111204品性を疑うわ。".to_string(),
-    "h1111205これがあなたのやりたいこと？h1111204くだらないのね。".to_string(),
-    "h1111205スキンシップにしてはセンスが無いと思うわ。".to_string(),
+    "h1111202……いくら他人の目がないとはいえ、\\nh1111204品性を疑うわ。".to_string(),
+    "h1111205これがあなたのやりたいこと？\\nh1111204くだらないのね。".to_string(),
+    "h1111205スキンシップにしては\\nセンスが無いと思うわ。".to_string(),
     "h1111210情熱的という人もいるでしょうし、\\n野蛮で下劣という人もいるでしょうね。\\n\\nh1111204私は後者よ、お猿さん。".to_string(),
   ]
 });
@@ -100,11 +100,11 @@ static DIALOG_SEXIAL_SCOLD: LazyLock<Vec<String>> = LazyLock::new(|| {
 static DIALOG_SEXIAL_AKIRE: LazyLock<Vec<String>> = LazyLock::new(|| {
   vec![
     "h1111201さっきからずいぶん必死ね。\\nh1111304ばかみたいな顔してるわよ。".to_string(),
-    "h1111304面白い顔。h1111310鏡で見せてあげたいわ。".to_string(),
+    "h1111304面白い顔。\\nh1111310鏡で見せてあげたいわ。".to_string(),
     "h1111104悪戯がすぎるわよ。".to_string(),
-    "h1111103はあ……h1111106何が楽しいんだか。".to_string(),
-    "h1111204その熱意は買うけれど。……h1111210虚しくないの？".to_string(),
-    "h1111204…………退屈。".to_string(),
+    "h1111103はあ……\\nh1111106何が楽しいんだか。".to_string(),
+    "h1111204その熱意は買うけれど。\\n……h1111210虚しくないの？".to_string(),
+    "h1111204退屈だわ、あなた。".to_string(),
   ]
 });
 
@@ -151,7 +151,7 @@ fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
   }
 
   let dialogs = vec![vec![
-    "h1111210\\1触れた瞬間、冷たい感触が指先に伝わった。\\nh1111204髪も肌も、生きている人間のようには温かくないのよ。\\n……h1111207構わない？h1111310そう、物好きね。".to_string(),
+    "h1111210\\1触れた瞬間、冷たい感触が指先に伝わった。\\nh1111204髪も肌も、生きている人間のようには\\n温かくないのよ。……h1111207構わない？\\nh1111310そう、物好きね。".to_string(),
     "h1111204\\1さらさらだ……。\\nh1111205昔、家政婦がよく私の髪を褒めてくれたわ。\\nh1111210「お嬢様の髪は絹のようで」って。\\n今でも覚えているの。\\n……h1111205懐かしいものね。".to_string(),
     "h1111204\\1恐る恐る髪に触れる。\\nh1111205そんなに遠慮しなくてもいいのに。\\nh1111210中途半端にされる方が\\nくすぐったいのよ。\\nもう少し、しっかりと。".to_string(),
   ]];
@@ -178,12 +178,12 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 
   let dialogs = vec![vec![
     "\
-      h1111205\\1触れた手の感触はゼリーを掴むような頼りなさだった。\
+      h1111205\\1触れた手の感触は\\nゼリーを掴むような頼りなさだった。\
       \\0……手が冷えるわよ。h1111204ほどほどにね。\
       "
     .to_string(),
     "\
-      h1111205あなたが何を伝えたいのかは、なんとなく分かるけれど。\\n\
+      h1111205あなたが何を伝えたいのかは、\\nなんとなく分かるけれど。\\n\
       ……h1111204それは不毛というものよ。\
       "
     .to_string(),
@@ -212,7 +212,7 @@ fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriE
       "h1111204いいもの見たって顔してる。h1111210屈辱だわ。".to_string(),
       "h1111205ああ、ひどい人。h1111210泣いてしまいそうだわ。".to_string(),
       "h1111211秘されたものほど暴きたくなるものね。\\n\
-        h1111204……もちろん、相応の代償を払う用意はあるのでしょうね。"
+        h1111204……もちろん、\\n相応の代償を払う用意はあるのでしょうね。"
         .to_string(),
       "h1111304悪餓鬼。".to_string(),
     ]);
@@ -234,7 +234,7 @@ fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, Shi
         "
       .to_string(),
       "\
-        h1111205\\1背の高い彼女の肩に手をかけると、柔らかい髪が指に触れた。\
+        h1111205\\1背の高い彼女の肩に手をかけると、\\n柔らかい髪が指に触れた。\
         h1111204……それで？h1111210あなたは私をどうしたいのかしら。\
         "
       .to_string(),
@@ -255,12 +255,12 @@ fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriE
     zero_bust_touch.extend(DIALOG_SEXIAL_FIRST.clone());
   } else if count < zero_bust_touch_threshold / 3 {
     zero_bust_touch.extend(vec![
-      "h1111205……ずいぶん嬉しそうだけれど、h1111204そんなにいいものなのかしら？".to_string(),
-      "h1111210気を引きたいだけなら、もっと賢い方法があると思うわ。".to_string(),
-      "h1111204……あなたは、私をそういう対象として見ているの？".to_string(),
+      "h1111205……ずいぶん嬉しそうだけれど、\\nh1111204そんなにいいものなのかしら？".to_string(),
+      "h1111210気を引きたいだけなら、\\nもっと賢い方法があると思うわ。".to_string(),
+      "h1111204……あなたは、\\n私をそういう対象として見ているの？".to_string(),
       "h1111205気安いのね。あまり好きではないわ。".to_string(),
       "h1111304媚びた反応を期待してるの？\\nh1112204この身体にそれを求められても、ね。".to_string(),
-      "h1111205\\1触れた瞬間、彼女は微かに身を引いた。\\nh1111204よくもまあ、躊躇いもなく……。\\nh1111310私が生きていた頃とは、随分と常識も変わったものね。".to_string(),
+      "h1111205\\1触れた瞬間、彼女は微かに身を引いた。\\nh1111204よくもまあ、躊躇いもなく……。\\nh1111310私が生きていた頃とは、\\n随分と常識も変わったものね。".to_string(),
     ]);
   } else if count < zero_bust_touch_threshold / 3 * 2 {
     zero_bust_touch.extend(DIALOG_SEXIAL_SCOLD.clone());
