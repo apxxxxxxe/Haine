@@ -24,71 +24,29 @@ jobs:
     - name: tag name
       run: |
         git pull --tags
-        # から最新タグまでのコミットメッセージを取得してenv.BODYに格納
+        # 直前のタグから最新タグまでのコミットメッセージを取得してenv.BODYに格納
         LATEST_TAG=$(git tag --sort=-creatordate | head -n1 || echo "")
         SEMI_LATEST_TAG=$(git tag --sort=-creatordate | head -n2 | tail -n1 || echo "")
         echo "LATEST_TAG: $LATEST_TAG"
         echo "SEMI_LATEST_TAG: $SEMI_LATEST_TAG"
+        # ユーザに関係のない開発・内部処理寄りのコミットは除外する
+        # (emojiは異体字セレクタの有無に関わらずマッチするよう基底文字で書く)
+        EXCLUDE_PATTERN='update md5|Merge pull request|Merge branch|Merge remote-tracking|♻|🔖|🔧|🔨|✅|💚|🏗|🙈|🧑‍💻|🎨|📝|⏪|🔥|✨|👷'
         if [ -n "$LATEST_TAG" ]; then
-          git log "${SEMI_LATEST_TAG}..${LATEST_TAG}" --pretty=format:"%s" \
-            | grep -v "update md5" \
-            | grep -v "Merge pull request" \
-            | grep -v "Merge branch" \
-            | grep -v "Merge remote-tracking" \
-            | grep -v ♻️" \
-            | grep -v 🔖" \
-            | grep -v 🔧" \
-            | grep -v 🔨" \
-            | grep -v ✅" \
-            | grep -v 💚" \
-            | sed -e 's/^/- /'
+          BODY=$(git log "${SEMI_LATEST_TAG}..${LATEST_TAG}" --pretty=format:"%s" \
+            | { grep -vE "$EXCLUDE_PATTERN" || true; } \
+            | sed -e 's/^/- /')
         else
-          git log --pretty=format:"%s" \
-            | grep -v "update md5" \
-            | grep -v "Merge pull request" \
-            | grep -v "Merge branch" \
-            | grep -v "Merge remote-tracking" \
-            | grep -v ♻️" \
-            | grep -v 🔖" \
-            | grep -v 🔧" \
-            | grep -v 🔨" \
-            | grep -v ✅" \
-            | grep -v 💚" \
+          BODY=$(git log --pretty=format:"%s" \
+            | { grep -vE "$EXCLUDE_PATTERN" || true; } \
             | sed -e 's/^/- /' \
-            | head -n ${{ env.FETCH_DEPTH }}
+            | head -n 5)
         fi
+        echo "$BODY"
         {
           echo "BODY<<EOF"
-          if [ -n "$LATEST_TAG" ]; then
-            git log "${SEMI_LATEST_TAG}..${LATEST_TAG}" --pretty=format:"%s" \
-              | grep -v "update md5" \
-              | grep -v "Merge pull request" \
-              | grep -v "Merge branch" \
-              | grep -v "Merge remote-tracking" \
-              | grep -v ♻️" \
-              | grep -v 🔖" \
-              | grep -v 🔧" \
-              | grep -v 🔨" \
-              | grep -v ✅" \
-              | grep -v 💚" \
-              | sed -e 's/^/- /'
-            echo "EOF"
-          else
-            git log --pretty=format:"%s" \
-              | grep -v "update md5" \
-              | grep -v "Merge pull request" \
-              | grep -v "Merge branch" \
-              | grep -v "Merge remote-tracking" \
-              | grep -v ♻️" \
-              | grep -v 🔖" \
-              | grep -v 🔧" \
-              | grep -v 🔨" \
-              | grep -v ✅" \
-              | grep -v 💚" \
-              | sed -e 's/^/- /' \
-              | head -n 5
-            echo "EOF"
-          fi
+          echo "$BODY"
+          echo "EOF"
         } >> $GITHUB_ENV
 
     - name: Zip output
