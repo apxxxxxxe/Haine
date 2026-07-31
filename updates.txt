@@ -1,14 +1,18 @@
 charset,UTF-8
 file,ghost/master/descript.txt21d97cf2b5d2b327ec8d9fcea3023cfesize=492date=2012-12-21T00:00:00
-file,ghost/master/haine.dll3ee28479a47961c77d7343c3bdcf4058size=49994752date=2012-12-21T00:00:00
+file,ghost/master/haine.dll5b95f17586a3db612912d14736654575size=2192384date=2012-12-21T00:00:00
 file,ghost/master/icomoon.ttffde1c018a75996c6b29b32fa5b35af50size=2364date=2012-12-21T00:00:00
 file,ghost/master/icon.ico947c949ae2333742612f0e07617bd639size=9854date=2012-12-21T00:00:00
 file,ghost/master/icon_minimize.ico22cdfc2d3690254a95ec51029626f724size=9854date=2012-12-21T00:00:00
+file,ghost/master/tools/fmt.ps1a5a35ce367b27597530fd2e01d995539size=311date=2012-12-21T00:00:00
+file,ghost/master/tools/fmt.shcb7b19545799f535e25f4f6ffe5afa64size=238date=2012-12-21T00:00:00
+file,ghost/master/tools/normalize_string_indent.py48401c08f1c0cfb7e882d21f46f030c5size=5852date=2012-12-21T00:00:00
+file,ghost/master/tools/rustfmt_wrapper.pya2866514cec547cdf4eefb508bf9ca1esize=1162date=2012-12-21T00:00:00
 file,ghost/master/マッチで火をつける.mp3688812a2dc0a64753210769252d70016size=7826date=2012-12-21T00:00:00
 file,ghost/master/マッチの火を吹き消す.mp3c67750eae297dcaa17794410f3fc1425size=6051date=2012-12-21T00:00:00
 file,install.txt89cd7457389a7b9d4aa7f3728fd6f741size=98date=2012-12-21T00:00:00
 file,readme.txtb6880caa1364b2b1b283a1c38ed27b1dsize=275date=2012-12-21T00:00:00
-file,shell/master/descript.txt85496cb5e86116dab9ff15d4b1ac4c7fsize=11870date=2012-12-21T00:00:00
+file,shell/master/descript.txt84d635eac15d56a25e3d12579129933asize=14341date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_base.png3796b27994b42a1a038fa3127a7a87ffsize=191821date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_fire_1_0.png5a2d81a7f90f107c82580d213c6d499esize=3652date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_fire_1_1.png1934cbd2d3bbe7b17485e9e3cffd2445size=6486date=2012-12-21T00:00:00
@@ -25,7 +29,7 @@ file,shell/master/immersion_candle_fire_4_2.png1f04097cd6c14936031c7476a2936407
 file,shell/master/immersion_candle_fire_5_0.png40908a06ad4c926010ea8935f3ad96a3size=3896date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_fire_5_1.png44410a721fd6433a64b2344b6db6d365size=6481date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_fire_5_2.png42f141ac6e3d3547ec200f4d86d1059bsize=6375date=2012-12-21T00:00:00
-file,shell/master/immersion_candle_master_collision.pngb2dd7af43ddf37d18b3058722aa64c6csize=22277date=2012-12-21T00:00:00
+file,shell/master/immersion_candle_master_collision.png2b0f76fc93aa7c583404766ef47d09f0size=21023date=2012-12-21T00:00:00
 file,shell/master/immersion_candle_matches.png8a86504323ea4011d46ed40cf12375c2size=5389date=2012-12-21T00:00:00
 file,shell/master/menu_background.pngc41543a1c48e90d317a73ad509c0011dsize=1109date=2012-12-21T00:00:00
 file,shell/master/menu_foreground.pnge57c08f18a349362e1ed3904e5d374desize=89date=2012-12-21T00:00:00
@@ -250,5 +254,4 @@ file,shell/master/surface754.pnge23f2b74fc75fc5f8f907d61a39f38besize=14438dat
 file,shell/master/surface755.png9c14f3c3ec968276a78f74d6bf336274size=6616date=2012-12-21T00:00:00
 file,shell/master/surface756.png79e50860da2d8923093e5bbebb625d59size=5295date=2012-12-21T00:00:00
 file,shell/master/surface90000.png4d2e11d21e81833fa0c80ec0caaf75c3size=3913date=2012-12-21T00:00:00
-file,shell/master/surfaces.txtb7f69f9f147f68f69c07430e3c68e810size=44905date=2012-12-21T00:00:00
-file,shell/master/surfaces.yaml3528bf8bd7774780fb327b02adf169c7size=29843date=2012-12-21T00:00:00
+file,shell/master/surfaces.txtdf7a251229e554bb36f00ca59cd45a7bsize=23594date=2012-12-21T00:00:00
