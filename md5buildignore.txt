@@ -36,6 +36,7 @@ ipadic*/
 target/
 src/
 bin/
+tools/
 Cargo.*
 .cargo/
 rustfmt.toml
