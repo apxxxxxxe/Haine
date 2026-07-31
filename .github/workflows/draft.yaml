@@ -3,17 +3,28 @@ name: release-draft
 on:
   workflow_dispatch:
 
+env:
+  NAR_NAME: Haine
+
 jobs:
   release-draft:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        submodules: 'recursive'
     - name: Zip output
       run: |
-        zip -r release.zip * -x .git/\* -x .github/\* -x release.zip -x Cargo\* -x src/\* -x md5buildignore.txt
-    - name: Archive code coverage results
-      uses: actions/upload-artifact@v3
+        mkdir -p /tmp/nar_temp
+        rsync -av --filter=':- md5buildignore.txt' . /tmp/nar_temp/
+        echo "=== Files to be included in NAR ==="
+        find /tmp/nar_temp -type f | sort
+        echo "==================================="
+        cd /tmp/nar_temp
+        zip -r $GITHUB_WORKSPACE/${{ env.NAR_NAME }}.nar *
+    - name: Upload test NAR
+      uses: actions/upload-artifact@v4
       with:
         name: release-test
-        path: release.zip
+        path: ${{ env.NAR_NAME }}.nar
