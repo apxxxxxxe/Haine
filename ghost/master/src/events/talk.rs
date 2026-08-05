@@ -311,6 +311,14 @@ impl BranchTalk {
     }
   }
 
+  pub(crate) fn choice(label: impl Into<String>, next: BranchTalk) -> BranchChoice {
+    BranchChoice {
+      label: label.into(),
+      next,
+      required_condition: None,
+    }
+  }
+
   /// 選択肢付きのノードを作る
   #[allow(dead_code)]
   pub(crate) fn node(text: impl Into<String>, choices: Vec<BranchChoice>) -> Self {
