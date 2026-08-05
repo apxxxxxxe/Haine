@@ -16,6 +16,7 @@ use crate::events::bootend::*;
 use crate::events::input::*;
 use crate::events::key::*;
 use crate::events::menu::*;
+use crate::events::menu::questions::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::talk::*;
@@ -138,6 +139,7 @@ fn get_event(id: &str) -> Option<EventHandler> {
     "OnStickSurface" => Some(EventHandler::AlwaysSuccess(on_stick_surface)),
     "OnCheckTalkCollection" => Some(EventHandler::AlwaysSuccess(on_check_talk_collection)),
     "OnCheckUnseenTalks" => Some(EventHandler::MayFailure(on_check_unseen_talks)),
+    "OnTalkBranch" => Some(EventHandler::MayFailure(on_talk_branch)),
     "OnWindowStateRestore" => Some(EventHandler::MayFailure(on_window_state_restore)),
     "OnUserInput" => Some(EventHandler::MayFailure(on_user_input)),
     "OnChangingUserName" => Some(EventHandler::MayFailure(on_changing_user_name)),

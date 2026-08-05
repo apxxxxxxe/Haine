@@ -2,7 +2,7 @@ use crate::check_error;
 use crate::events::aitalk::IMMERSIVE_ICON_COUNT;
 use crate::events::mouse_core::Direction;
 use crate::events::talk::randomtalk::{derivative_talks, random_talks};
-use crate::events::talk::{TalkType, TalkingPlace};
+use crate::events::talk::{BranchChoice, TalkType, TalkingPlace};
 use crate::system::error::ShioriError;
 use crate::system::roulette::TalkBias;
 use serde::{Deserialize, Serialize};
@@ -549,6 +549,7 @@ pub(crate) fn reset_volatile_variables() {
   *get_write(&LAST_WHEEL_PART) = String::new();
   *get_write(&LAST_TOUCH_INFO) = String::new();
   *get_write(&CHAIN_TALK_STATE) = None;
+  *get_write(&PENDING_BRANCHES) = Vec::new();
   *get_write(&TALK_BIAS) = TalkBias::new();
   *get_write(&CURRENT_SURFACE) = 0;
   *get_write(&IDLE_SECONDS) = 0;
@@ -579,6 +580,9 @@ pub(crate) static LAST_SELFTALK_PHRASE: LazyLock<RwLock<String>> = LazyLock::new
 /// チェイントーク待機状態
 /// (対象部位のイベント名, チェイントーク内容, 期限のGHOST_UP_TIME, コールバック)
 pub(crate) static CHAIN_TALK_STATE: LazyLock<RwLock<Option<ChainTalkState>>> = LazyLock::new(|| RwLock::new(None));
+
+/// 表示中の BranchTalk 選択肢。バルーンの寿命と運命を共にする一時状態なので揮発でよい
+pub(crate) static PENDING_BRANCHES: LazyLock<RwLock<Vec<BranchChoice>>> = LazyLock::new(|| RwLock::new(Vec::new()));
 
 #[derive(Clone)]
 pub(crate) struct ChainTalkState {

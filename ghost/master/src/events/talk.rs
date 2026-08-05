@@ -7,7 +7,7 @@ use crate::events::talk::randomtalk::random_talks;
 use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::roulette::RouletteCell;
-use crate::system::variables::{get_read, get_write, TALK_COLLECTION};
+use crate::system::variables::{get_read, get_write, PENDING_BRANCHES, TALK_COLLECTION};
 use core::fmt::{Display, Formatter};
 use rand::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -265,10 +265,219 @@ impl DerivaliveTalk {
   }
 }
 
+/// 「トーク→選択肢→トーク」の分岐の一節。
+/// render() が本文と選択肢列のスクリプトを生成し、選択待ちの枝を PENDING_BRANCHES に積む。
+/// 選択されると OnTalkBranch が対応する next を同じ手順で表示する（多段ネストはこの再帰で成立する）。
+///
+/// 選択肢はバルーンが生きている間だけ有効。バルーン消滅後のクリックや
+/// 別トークによる上書きは黙って無視され、既読管理もしない。
+/// 「読み終えた後の任意の寄り道」には DerivativeTalk を使う。こちらは分岐そのものが本体のトーク用。
+#[derive(Clone)]
+pub(crate) struct BranchTalk {
+  pub(crate) text: String,
+  /// 空なら終端
+  pub(crate) choices: Vec<BranchChoice>,
+  pub(crate) callback: Option<fn()>,
+}
+
+/// BranchTalk の選択肢1つ。
+#[derive(Clone)]
+pub(crate) struct BranchChoice {
+  /// 選択肢として表示する文言
+  pub(crate) label: String,
+  pub(crate) next: BranchTalk,
+  /// Some(f) のとき f() が false なら選択肢に出さない
+  pub(crate) required_condition: Option<fn() -> bool>,
+}
+
+impl BranchChoice {
+  #[allow(dead_code)]
+  pub(crate) fn new(label: impl Into<String>, next: BranchTalk) -> Self {
+    Self {
+      label: label.into(),
+      next,
+      required_condition: None,
+    }
+  }
+}
+
+impl BranchTalk {
+  /// 選択肢を持たない終端ノードを作る
+  pub(crate) fn leaf(text: impl Into<String>) -> Self {
+    Self {
+      text: text.into(),
+      choices: vec![],
+      callback: None,
+    }
+  }
+
+  /// 選択肢付きのノードを作る
+  #[allow(dead_code)]
+  pub(crate) fn node(text: impl Into<String>, choices: Vec<BranchChoice>) -> Self {
+    Self {
+      text: text.into(),
+      choices,
+      callback: None,
+    }
+  }
+
+  /// 自身と全子孫の text を深さ優先で集める。dump_talks 用
+  pub(crate) fn all_texts(&self) -> Vec<String> {
+    let mut texts = vec![self.text.clone()];
+    for choice in &self.choices {
+      texts.extend(choice.next.all_texts());
+    }
+    texts
+  }
+
+  /// 本文+選択肢列のスクリプトを返し、PENDING_BRANCHES を表示中の枝で上書きする。
+  /// 選択肢のインデックスは required_condition によるフィルタ後の並びで振る。
+  pub(crate) fn render(&self) -> String {
+    if let Some(callback) = self.callback {
+      callback();
+    }
+    let available: Vec<BranchChoice> = self
+      .choices
+      .iter()
+      .filter(|c| c.required_condition.is_none_or(|f| f()))
+      .cloned()
+      .collect();
+    let mut script = self.text.clone();
+    if !available.is_empty() {
+      script.push_str("\\1");
+      for (i, choice) in available.iter().enumerate() {
+        if i > 0 {
+          script.push_str("\\n");
+        }
+        script.push_str(&format!(
+          "\\![*]\\__q[OnTalkBranch,{}]{}\\__q",
+          i, choice.label
+        ));
+      }
+    }
+    *get_write(&PENDING_BRANCHES) = available;
+    script
+  }
+}
+
+pub(crate) fn on_talk_branch(req: &Request) -> Result<Response, ShioriError> {
+  let refs = get_references(req);
+  let index_str = refs.first().ok_or(ShioriError::BadRequest)?;
+  let index = check_error!(index_str.parse::<usize>(), ShioriError::ParseIntError);
+  // 失効した選択肢（リロード後に残ったバルーン等）のクリックは正常系として黙って無視する
+  let next = {
+    let pending = get_read(&PENDING_BRANCHES);
+    match pending.get(index) {
+      Some(choice) => choice.next.clone(),
+      None => return Ok(new_response_nocontent()),
+    }
+  };
+  new_response_with_value_with_translate(next.render(), TranslateOption::with_shadow_completion())
+}
+
+#[cfg(test)]
+mod branch_talk_tests {
+  use super::*;
+  use shiorust::message::parts::*;
+  use std::sync::atomic::{AtomicBool, Ordering};
+
+  static CALLBACK_CALLED: AtomicBool = AtomicBool::new(false);
+
+  fn leaf(text: &str) -> BranchTalk {
+    BranchTalk {
+      text: text.to_string(),
+      choices: vec![],
+      callback: None,
+    }
+  }
+
+  fn make_branch_request(index: &str) -> Request {
+    let mut headers = Headers::new();
+    headers.insert_by_header_name(HeaderName::from("ID"), "OnTalkBranch".to_string());
+    headers.insert_by_header_name(HeaderName::from("Reference0"), index.to_string());
+    Request {
+      method: Method::GET,
+      version: Version::V20,
+      headers,
+    }
+  }
+
+  fn response_value(res: &Response) -> String {
+    res
+      .headers
+      .get_by_header_name(&HeaderName::from("Value"))
+      .cloned()
+      .unwrap_or_default()
+  }
+
+  // グローバル状態(PENDING_BRANCHES)を共有するため、順序保証のある単一テストにまとめる
+  #[test]
+  fn test_branch_talk_flow() {
+    let tree = BranchTalk {
+      text: "根の本文".to_string(),
+      choices: vec![
+        BranchChoice {
+          label: "条件で消える枝".to_string(),
+          next: leaf("到達しない"),
+          required_condition: Some(|| false),
+        },
+        BranchChoice {
+          label: "掘り下げる".to_string(),
+          next: BranchTalk {
+            text: "二段目の本文".to_string(),
+            choices: vec![BranchChoice {
+              label: "終端へ".to_string(),
+              next: leaf("終端の本文"),
+              required_condition: None,
+            }],
+            callback: Some(|| CALLBACK_CALLED.store(true, Ordering::SeqCst)),
+          },
+          required_condition: Some(|| true),
+        },
+      ],
+      callback: None,
+    };
+
+    // 1. render: 条件フィルタ後の枝だけが表示され、インデックスはフィルタ後の並びで振られる
+    let script = tree.render();
+    assert!(script.contains("根の本文"));
+    assert!(!script.contains("条件で消える枝"));
+    assert!(script.contains("\\__q[OnTalkBranch,0]掘り下げる\\__q"));
+    assert_eq!(get_read(&PENDING_BRANCHES).len(), 1);
+
+    // 2. 選択: next が表示され、その choices が積み直される(多段ネスト)
+    let res = on_talk_branch(&make_branch_request("0")).unwrap();
+    let value = response_value(&res);
+    assert!(value.contains("二段目の本文"));
+    assert!(value.contains("\\__q[OnTalkBranch,0]終端へ\\__q"));
+    assert!(
+      CALLBACK_CALLED.load(Ordering::SeqCst),
+      "表示時に callback が発火するべき"
+    );
+    assert_eq!(get_read(&PENDING_BRANCHES).len(), 1);
+
+    // 3. 範囲外インデックス(失効クリック)は握りつぶし、状態も壊さない
+    let res = on_talk_branch(&make_branch_request("5")).unwrap();
+    assert!(response_value(&res).is_empty());
+    assert_eq!(get_read(&PENDING_BRANCHES).len(), 1);
+
+    // 4. 終端を選ぶと選択肢なしで表示され、状態がクリアされる
+    let res = on_talk_branch(&make_branch_request("0")).unwrap();
+    let value = response_value(&res);
+    assert!(value.contains("終端の本文"));
+    assert!(!value.contains("OnTalkBranch"));
+    assert!(get_read(&PENDING_BRANCHES).is_empty());
+
+    // 5. クリア後のクリック(バルーン残骸)も握りつぶす
+    let res = on_talk_branch(&make_branch_request("0")).unwrap();
+    assert!(response_value(&res).is_empty());
+  }
+}
+
 /// 全トークを一つのテキストにまとめて返す。
 /// dump_talks バイナリ（`cargo run --bin dump_talks`）から使う開発用ユーティリティ。
 pub fn render_all_talks() -> String {
-  use crate::events::menu::QUESTIONS;
+  use crate::events::menu::questions::QUESTIONS;
   use crate::events::talk::first_boot::{FIRST_BOOT_TALK, FIRST_CLOSE_TALK, FIRST_RANDOMTALKS};
   use randomtalk::{derivative_talks, get_parent_talk, RANDOMTALK_COMMENTS_LIVING_ROOM};
 
@@ -279,7 +488,7 @@ pub fn render_all_talks() -> String {
   }
   lines.push(FIRST_CLOSE_TALK.to_string());
   for q in QUESTIONS.iter() {
-    lines.push(q.talk());
+    lines.extend(q.branch_talk().all_texts());
   }
   for talk_type in TalkType::all() {
     if let Some(talks) = random_talks(talk_type) {
