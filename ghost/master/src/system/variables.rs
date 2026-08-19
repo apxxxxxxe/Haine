@@ -386,6 +386,8 @@ impl EventFlags {
 }
 
 pub(crate) const TRANSPARENT_SURFACE: i32 = 1000000;
+/// bindで表情を組み立てる際の土台となる素体サーフェス
+pub(crate) const BASE_SURFACE: i32 = 1000100;
 
 pub fn load_global_variables() -> Result<(), Box<dyn Error>> {
   let main_exists = std::path::Path::new(VAR_PATH).exists();

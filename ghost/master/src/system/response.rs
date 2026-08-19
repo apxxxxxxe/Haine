@@ -413,6 +413,20 @@ pub(crate) fn generate_bind_script(from_surface: i32, dest_surface: i32, shadow_
   let dest_face = (dest_surface / 100000) % 10;
   let dest_skirt = (dest_surface / 1000000) % 10;
 
+  // 同一コードの場合は話者0への切り替えのみ
+  if from_surface == dest_surface {
+    return "\\0".to_string();
+  }
+
+  // スカート状態以外の全パーツが0のコード（h1000000）は非表示指定。
+  // 素体サーフェスにbindを重ねる方式では表現できないため、空のサーフェスを直接指定する
+  if dest_surface % 1000000 == 0 {
+    return format!(
+      "\\0\\![lock,repaint]\\s[{}]{}\\![unlock,repaint]",
+      TRANSPARENT_SURFACE, shadow_script
+    );
+  }
+
   // 非目パーツのbind命令を構築
   let non_eye_binds = format!(
     "\\![bind,スカート状態,{},1]\\![bind,眉,{},1]\\![bind,顔色,{},1]\\![bind,腕,{},1]\\![bind,口,{},1]",
@@ -423,18 +437,13 @@ pub(crate) fn generate_bind_script(from_surface: i32, dest_surface: i32, shadow_
     mouth_name(dest_mouth),
   );
 
-  // 同一コードの場合は話者0への切り替えのみ
-  if from_surface == dest_surface {
-    return "\\0".to_string();
-  }
-
   // 目の遷移スクリプトを生成
   let eye_script = generate_eye_transition(from_eyes, dest_eyes, ignore_upper_completion);
 
   // 全体を組み立て
   format!(
-    "\\0\\![lock,repaint]\\s[1000100]{}{}\\![unlock,repaint]{}",
-    non_eye_binds, shadow_script, eye_script
+    "\\0\\![lock,repaint]\\s[{}]{}{}\\![unlock,repaint]{}",
+    BASE_SURFACE, non_eye_binds, shadow_script, eye_script
   )
 }
 
@@ -577,6 +586,23 @@ pub(crate) fn render_immersive_icon() -> String {
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn test_generate_bind_script_hidden() {
+    // h1000000は非表示サーフェスへ直接切り替える
+    let result = generate_bind_script(1111201, 1000000, "", false);
+    assert!(result.contains("\\s[1000000]"));
+    assert!(!result.contains("\\s[1000100]"));
+    assert!(!result.contains("\\![bind,"));
+  }
+
+  #[test]
+  fn test_generate_bind_script_from_hidden() {
+    // 非表示からの復帰は素体サーフェス＋bindで組み立て直す
+    let result = generate_bind_script(1000000, 1111201, "", false);
+    assert!(result.contains("\\s[1000100]"));
+    assert!(result.contains("\\![bind,目,こっち目,1]"));
+  }
 
   #[test]
   fn test_generate_bind_script_same_surface() {
