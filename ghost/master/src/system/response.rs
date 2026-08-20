@@ -111,7 +111,7 @@ pub(crate) fn new_response_nocontent() -> Response {
 
 pub(crate) fn new_response_with_value_with_notranslate(value: String, option: HashSet<TranslateOption>) -> Response {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
+    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface_sakura())
   } else {
     String::new()
   };
@@ -129,7 +129,7 @@ pub(crate) fn new_response_with_value_with_notranslate(value: String, option: Ha
 
 pub(crate) fn new_response_with_value_with_translate(value: String, option: HashSet<TranslateOption>) -> Result<Response, ShioriError> {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
+    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface_sakura())
   } else {
     String::new()
   };
@@ -557,10 +557,18 @@ pub(crate) fn shake_with_notext() -> String {
     .join("")
 }
 
-pub(crate) fn render_immersive_icon() -> String {
+pub(crate) fn render_room_item() -> String {
+  let current_room = get_read(&TALKING_PLACE);
+  match *current_room {
+    TalkingPlace::GuestRoom => "\\p[2]\\s[10001000]".to_string(),
+    _ => render_immersive_icon(),
+  }
+}
+
+fn render_immersive_icon() -> String {
   let immersive_degrees = *get_read(&IMMERSIVE_DEGREES);
   let icon_count_float = immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
-  let current_icon_count = if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  let current_icon_count = if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     // 繰り上げ
     icon_count_float.ceil() as u32
   } else {
@@ -580,7 +588,7 @@ pub(crate) fn render_immersive_icon() -> String {
     ));
     candles[i as usize - 1] = blowed;
   }
-  format!("\\p[2]{}\\0", v)
+  format!("\\p[2]\\s[10000000]{}\\0", v)
 }
 
 #[cfg(test)]

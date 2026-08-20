@@ -2,7 +2,7 @@ use crate::check_error;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
-use crate::events::render_immersive_icon;
+use crate::events::render_room_item;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE_MAX;
@@ -79,7 +79,7 @@ fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> 
     format!(
       "{}{}{}",
       REMOVE_BALLOON_NUM,
-      render_immersive_icon(),
+      render_room_item(),
       dialogs[index].clone()
     ),
     TranslateOption::with_shadow_completion(),
@@ -146,7 +146,7 @@ pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, Shi
 }
 
 fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     return Some(on_ai_talk(req));
   }
 
@@ -159,7 +159,7 @@ fn zero_head_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     return Some(on_ai_talk(req));
   }
 
@@ -172,7 +172,7 @@ fn zero_face_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     return Some(on_ai_talk(req));
   }
 
@@ -199,7 +199,7 @@ fn zero_hand_nade(req: &Request, count: u32) -> Option<Result<Response, ShioriEr
 }
 
 fn zero_skirt_up(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     return None;
   }
 
@@ -244,7 +244,7 @@ fn zero_shoulder_down(_req: &Request, count: u32) -> Option<Result<Response, Shi
 }
 
 fn zero_bust_touch(req: &Request, count: u32) -> Option<Result<Response, ShioriError>> {
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     return Some(on_ai_talk(req));
   }
 
@@ -298,7 +298,7 @@ fn check_chain_talk(info: &str) -> Option<Result<Response, ShioriError>> {
         format!(
           "{}{}{}",
           REMOVE_BALLOON_NUM,
-          render_immersive_icon(),
+          render_room_item(),
           chain.chain_text,
         ),
         TranslateOption::with_shadow_completion(),
@@ -313,7 +313,7 @@ fn check_chain_talk(info: &str) -> Option<Result<Response, ShioriError>> {
 }
 
 fn two_candle_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     light_candle_fire()
   } else {
     blow_candle_fire()
@@ -388,7 +388,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
 
       // 話題解放メッセージ
       let system_message = if threshold == IMMERSIVE_RATE_MAX {
-        *get_write(&TALKING_PLACE) = TalkingPlace::Library; // 没入度最大なら書斎へ移動
+        *get_write(&TALKING_PLACE) = TalkingPlace::IMMERSED_LIVING_ROOM; // 没入度最大なら書斎へ移動
         let message = if get_read(&FLAGS).check(&EventFlag::FirstPlaceChange) {
           "".to_string()
         } else {
@@ -413,7 +413,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
           "\\_v[{}]\\0{}{}\\p[2]{}{}{}",
           SOUND_BLOW_CANDLE,
           render_shadow(true),
-          render_immersive_icon(),
+          render_room_item(),
           shake_with_notext(),
           dialog,
           system_message,
@@ -434,14 +434,14 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
     let threshold = IMMERSIVE_RATE_MAX / IMMERSIVE_ICON_COUNT * i;
     if *get_read(&IMMERSIVE_DEGREES) > threshold {
       // 没入度0なら居間へ移動
-      let m = if threshold == 0 && *get_read(&TALKING_PLACE) == TalkingPlace::Library {
-        *get_write(&TALKING_PLACE) = TalkingPlace::LivingRoom;
+      let m = if threshold == 0 && *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
+        *get_write(&TALKING_PLACE) = TalkingPlace::DEFAULT_LIVING_ROOM;
         format!(
           "\\0\\b[{}]h1111705……。h1111101\\n\
             ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
             \\n\\n[half](トーク傾向が元に戻りました)",
-          TalkingPlace::Library.balloon_surface(),
-          TalkingPlace::LivingRoom.balloon_surface(),
+          TalkingPlace::IMMERSED_LIVING_ROOM.balloon_surface_sakura(),
+          TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura(),
         )
       } else {
         "".to_string()
@@ -452,7 +452,7 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
           "\\_v[{}]\\0{}{}\\p[2]{}{}",
           SOUND_LIGHT_CANDLE,
           render_shadow(true),
-          render_immersive_icon(),
+          render_room_item(),
           shake_with_notext(),
           m
         ),

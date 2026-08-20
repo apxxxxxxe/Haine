@@ -116,39 +116,93 @@ impl TalkType {
   }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum TalkingPlace {
-  LivingRoom,
-  Library,
+  LivingRoom(bool), // boolは没入モードか否か
+  Conservatory,
+  GuestRoom,
+  Kitchen,
 }
 
 impl Display for TalkingPlace {
   fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
     let s = match self {
-      Self::LivingRoom => "客間",
-      Self::Library => "書斎",
+      Self::LivingRoom(is_immersed) => {
+        if *is_immersed {
+          "書斎"
+        } else {
+          "居間"
+        }
+      }
+      Self::Conservatory => "温室",
+      Self::GuestRoom => "ゲストルーム",
+      Self::Kitchen => "キッチン",
     };
     write!(f, "{}", s)
   }
 }
 
+impl std::str::FromStr for TalkingPlace {
+  type Err = String;
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    match s {
+      "居間" => Ok(Self::DEFAULT_LIVING_ROOM),
+      "書斎" => Ok(Self::IMMERSED_LIVING_ROOM),
+      "温室" => Ok(Self::Conservatory),
+      "ゲストルーム" => Ok(Self::GuestRoom),
+      "キッチン" => Ok(Self::Kitchen),
+      _ => Err(format!("不明な部屋名: {}", s)),
+    }
+  }
+}
+
 impl TalkingPlace {
-  pub fn balloon_surface(&self) -> u32 {
+  pub(crate) const DEFAULT_LIVING_ROOM: Self = Self::LivingRoom(false);
+  pub(crate) const IMMERSED_LIVING_ROOM: Self = Self::LivingRoom(true);
+
+  pub fn all() -> Vec<Self> {
+    vec![
+      Self::DEFAULT_LIVING_ROOM,
+      Self::IMMERSED_LIVING_ROOM,
+      Self::Conservatory,
+      Self::GuestRoom,
+      Self::Kitchen,
+    ]
+  }
+
+  pub fn balloon_surface_sakura(&self) -> u32 {
     match self {
-      Self::LivingRoom => 0,
-      Self::Library => 6,
+      Self::LivingRoom(is_immersed) => {
+        if *is_immersed {
+          6
+        } else {
+          0
+        }
+      }
+      Self::Conservatory => 4,
+      Self::GuestRoom => 8,
+      Self::Kitchen => 8,
     }
   }
 
   pub fn talk_types(&self) -> Vec<TalkType> {
     match self {
-      Self::LivingRoom => vec![
-        TalkType::AboutMe,
-        TalkType::Lore,
-        TalkType::WithYou,
-        TalkType::Servant,
-      ],
-      Self::Library => vec![TalkType::Abstract],
+      Self::LivingRoom(is_immersed) => {
+        if *is_immersed {
+          vec![TalkType::Abstract]
+        } else {
+          vec![
+            TalkType::AboutMe,
+            TalkType::Lore,
+            TalkType::WithYou,
+            TalkType::Servant,
+          ]
+        }
+      }
+      Self::Conservatory => vec![],
+      Self::GuestRoom => vec![],
+      Self::Kitchen => vec![],
     }
   }
 }

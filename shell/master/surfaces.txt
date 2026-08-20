@@ -593,6 +593,7 @@ surface84003 {
   animation281011.pattern0,overlay,3509,0,0,0
 }
 
+// 燭台
 surface10000000 {
   // ろうそく1
   animation500201.interval,bind+always
@@ -645,4 +646,8 @@ surface10000000 {
   animation500305.pattern1,overlay,-1,1000,0,0
 
   collisionex16,candle,region,immersion_candle_master_collision.png,0,255,0
+}
+
+// ナイトテーブル
+surface10001000 {
 }

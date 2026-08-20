@@ -5,8 +5,7 @@ use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::system::error::ShioriError;
 use crate::system::response::*;
-use crate::system::variables::PendingEvent;
-use crate::system::variables::{get_read, get_write, EventFlag, FLAGS, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE, TALK_COLLECTION, USER_NAME};
+use crate::system::variables::{get_read, get_write, EventFlag, PendingEvent, FLAGS, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE, TALK_COLLECTION, USER_NAME};
 use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE};
 use num_derive::{FromPrimitive, ToPrimitive};
 use shiorust::message::{Request, Response};
@@ -93,6 +92,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
           \\_l[0,1.5em]\
           \\![*]\\q[なにか話して,OnAiTalk]\\n\
           {}\
+          \\![*]\\q[移動する(現在地: {}),OnChangeRooms]\\n\
           \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
           \\![*]\\q[回想,OnStoryHistoryMenu]\
           \\_l[0,@2.5em]\
@@ -104,11 +104,12 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
           \\1{}\
           \\0\\_l[0,0]\
           ",
-        if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+        if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
           "".to_string()
         } else {
           "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
         },
+        get_read(&TALKING_PLACE),
         halloween_menu,
         talk_interval_selector,
         buttons,
@@ -246,6 +247,54 @@ pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
     ),
     TranslateOption::balloon_surface_only(),
   )
+}
+
+pub(crate) fn on_change_rooms(_req: &Request) -> Response {
+  let talking_place = get_read(&TALKING_PLACE);
+  let mut room_s = "".to_string();
+  for room in TalkingPlace::all() {
+    if room == *talking_place {
+      room_s.push_str(format!("\\![*]\\_q{}（現在地）\\_q\\n", room).as_str());
+    } else {
+      let m = match room {
+        TalkingPlace::GuestRoom => format!("少し休む（{}へ）", room),
+        _ => format!("{}へ移動", room),
+      };
+      room_s.push_str(format!("\\![*]\\q[{},OnChangeRoomsSelected,{}]\\n", m, room).as_str());
+    }
+  }
+  new_response_with_value_with_notranslate(
+    format!(
+      "\
+        \\1\\b[4]どこへ行く？\\n\
+        {}\
+        ",
+      room_s,
+    ),
+    TranslateOption::balloon_surface_only(),
+  )
+}
+
+pub(crate) fn on_change_rooms_selected(req: &Request) -> Result<Response, ShioriError> {
+  let refs = get_references(req);
+  let talking_place = check_error!(refs[0].parse::<TalkingPlace>(), ShioriError::ParseRoomError);
+  *get_write(&TALKING_PLACE) = talking_place;
+  let m = match talking_place {
+    TalkingPlace::GuestRoom => format!(
+      "\
+        h1111101\\1少し調子が悪い……。\\n\
+        『しばらく休みたい』\\n\
+        h1111204わかったわ。h1111210部屋に案内しましょう。\\n\
+        \\1\\c\\0h1000000\\c———————————\\_w[1200]\\c\
+        {}h1111210部屋にあるものは好きに使って。\\n\
+        しばらくしたら、様子を見に来るわ。\\n\
+        h1000000\
+        ",
+      render_room_item()
+    ),
+    _ => format!("{}{}へ移動", render_room_item(), talking_place),
+  };
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }
 
 pub(crate) fn on_changing_user_name(_req: &Request) -> Result<Response, ShioriError> {

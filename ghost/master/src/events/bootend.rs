@@ -16,7 +16,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     let mut res = new_response_nocontent();
     add_error_description(
       &mut res,
-      "ロードに失敗しました。ゴーストを終了し、お手数ですがゴーストフォルダ内のhaine.logの内容とともにバグ報告をお願い致します。",
+      "ロードに失敗しました。ゴーストを終了し、ゴーストフォルダ内のhaine.logの内容とともにバグ報告をお願い致します。",
     );
     return Ok(res);
   }
@@ -42,7 +42,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     event_talk
   } else {
     let talks = all_combo(&vec![
-      vec![render_immersive_icon()],
+      vec![render_room_item()],
       vec!["h1113105\\1今日も、霧が濃い。".to_string()],
       vec![format!(
         "\
@@ -108,13 +108,13 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
 pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   let mut parts = vec![vec![RESET_BINDS.to_string()]];
 
-  if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     parts.push(vec![format!(
       "\\0\\b[{}]h1111705……。h1111101\\n\
         ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
         h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
-      TalkingPlace::Library.balloon_surface(),
-      TalkingPlace::LivingRoom.balloon_surface(),
+      TalkingPlace::IMMERSED_LIVING_ROOM.balloon_surface_sakura(),
+      TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura(),
     )]);
   }
   if !get_read(&FLAGS).check(&EventFlag::FirstClose) {

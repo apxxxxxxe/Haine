@@ -555,7 +555,7 @@ pub(crate) fn reset_volatile_variables() {
   *get_write(&IDLE_SECONDS) = 0;
   *get_write(&IMMERSIVE_DEGREES) = 0;
   *get_write(&TOUCH_INFO) = HashMap::new();
-  *get_write(&TALKING_PLACE) = TalkingPlace::LivingRoom;
+  *get_write(&TALKING_PLACE) = TalkingPlace::DEFAULT_LIVING_ROOM;
   *get_write(&LAST_ANCHOR_ID) = None;
   *get_write(&CANDLES) = [false; IMMERSIVE_ICON_COUNT as usize];
   *get_write(&LAST_SELFTALK_PHRASE) = String::new();
@@ -600,7 +600,7 @@ pub(crate) static CURRENT_SURFACE: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLo
 pub(crate) static IDLE_SECONDS: LazyLock<RwLock<i32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static IMMERSIVE_DEGREES: LazyLock<RwLock<u32>> = LazyLock::new(|| RwLock::new(0));
 pub(crate) static TOUCH_INFO: LazyLock<RwLock<HashMap<String, TouchInfo>>> = LazyLock::new(|| RwLock::new(HashMap::new()));
-pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> = LazyLock::new(|| RwLock::new(TalkingPlace::LivingRoom));
+pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> = LazyLock::new(|| RwLock::new(TalkingPlace::DEFAULT_LIVING_ROOM));
 pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> = LazyLock::new(|| RwLock::new(None));
 pub(crate) static CANDLES: LazyLock<RwLock<[bool; IMMERSIVE_ICON_COUNT as usize]>> = LazyLock::new(|| RwLock::new([false; IMMERSIVE_ICON_COUNT as usize]));
 

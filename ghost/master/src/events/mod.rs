@@ -15,8 +15,8 @@ use crate::events::aitalk::*;
 use crate::events::bootend::*;
 use crate::events::input::*;
 use crate::events::key::*;
-use crate::events::menu::*;
 use crate::events::menu::questions::*;
+use crate::events::menu::*;
 use crate::events::mouse_core::*;
 use crate::events::periodic::*;
 use crate::events::talk::*;
@@ -152,6 +152,8 @@ fn get_event(id: &str) -> Option<EventHandler> {
       on_derivative_talk_request_button_toggled,
     )),
     "OnDerivativeTalkRequestInput" => Some(EventHandler::MayFailure(on_derivative_talk_request_input)),
+    "OnChangeRooms" => Some(EventHandler::AlwaysSuccess(on_change_rooms)),
+    "OnChangeRoomsSelected" => Some(EventHandler::MayFailure(on_change_rooms_selected)),
     _ => None,
   }
 }

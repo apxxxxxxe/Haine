@@ -14,6 +14,7 @@ pub enum ShioriError {
   FileWriteError,
   InvalidEvent,
   BadRequestError,
+  ParseRoomError,
 }
 
 impl fmt::Display for ShioriError {
@@ -44,6 +45,7 @@ impl fmt::Display for ShioriError {
       ShioriError::FileWriteError => write!(f, "[FileWriteError]ファイルの書き込みに失敗しました"),
       ShioriError::InvalidEvent => write!(f, "[InvalidEvent]無効なイベントが指定されました"),
       ShioriError::BadRequestError => write!(f, "[BadRequestError]不正なリクエストが発生しました"),
+      ShioriError::ParseRoomError => write!(f, "[ParseRoomError]部屋IDのパースに失敗しました"),
     }
   }
 }

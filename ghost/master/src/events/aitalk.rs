@@ -64,7 +64,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   }
 
   // バルーン右下に表示するコメントを取得
-  let comment = if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  let comment = if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     // 書斎では能動的に話しかけたかどうかで異なるコメントを表示
     let index = choose_one(&RANDOMTALK_COMMENTS_LIBRARY_INACTIVE, false).ok_or(ShioriError::TalkNotFound)?;
     RANDOMTALK_COMMENTS_LIBRARY_INACTIVE[index].to_string()
@@ -80,7 +80,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
 
   // 没入度を増減
   // トークのたび燭台への干渉を修復する方へ没入度が増減する
-  if *get_read(&TALKING_PLACE) == TalkingPlace::LivingRoom {
+  if *get_read(&TALKING_PLACE) == TalkingPlace::DEFAULT_LIVING_ROOM {
     let new_rate;
     {
       new_rate = get_read(&IMMERSIVE_DEGREES).saturating_sub(IMMERSIVE_RATE);
@@ -97,7 +97,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
   new_response_with_value_with_translate(
     format!(
       "\\0{}\\![set,balloonnum,{}]{}",
-      render_immersive_icon(),
+      render_room_item(),
       comment,
       render_talk(&choosed_talk),
     ),
@@ -106,7 +106,7 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
 }
 
 pub fn render_talk(talk: &Talk) -> String {
-  let derivative_talk_request_button = if *get_read(&DERIVATIVE_TALK_REQUESTABLE) && *get_read(&TALKING_PLACE) == TalkingPlace::LivingRoom {
+  let derivative_talk_request_button = if *get_read(&DERIVATIVE_TALK_REQUESTABLE) && *get_read(&TALKING_PLACE) == TalkingPlace::DEFAULT_LIVING_ROOM {
     format!(
       "\\0\\f[default]\\f[anchornotselectfontcolor,default.plain]\\_a[DerivativeTalkRequest,{}]{}\\_a\\f[anchornotselectfontcolor,default]\\_l[0,@1.5em]",
       talk.id,
@@ -315,11 +315,11 @@ mod test {
     assert!(get_read(&FLAGS).check(&EventFlag::FirstClose));
 
     // 書斎から正しく戻れるかのテスト
-    assert!(*get_read(&TALKING_PLACE) == TalkingPlace::Library);
+    assert!(*get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM);
     for _i in 0..IMMERSIVE_ICON_COUNT {
       on_mouse_double_click(&on_mouse_double_click_req)?;
     }
-    assert!(*get_read(&TALKING_PLACE) == TalkingPlace::LivingRoom);
+    assert!(*get_read(&TALKING_PLACE) == TalkingPlace::DEFAULT_LIVING_ROOM);
 
     // 従者関連トークの開放確認
     while *get_read(&CUMULATIVE_TALK_COUNT) < TALK_UNLOCK_COUNT_SERVANT {
