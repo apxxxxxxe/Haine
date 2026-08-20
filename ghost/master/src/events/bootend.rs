@@ -119,6 +119,12 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   }
   if !get_read(&FLAGS).check(&EventFlag::FirstClose) {
     get_write(&FLAGS).done(EventFlag::FirstClose);
+    if *get_read(&TALKING_PLACE) == TalkingPlace::DEFAULT_LIVING_ROOM {
+      // LivingRoom以外では↑で類似のセリフが出るので、LivingRoomの場合のみ追加でセリフを出す
+      parts.push(vec![
+        "h1111201あら、今日はやめるの？h1111204そう。\\n".to_string()
+      ]);
+    }
     parts.push(vec![FIRST_CLOSE_TALK.to_string()]);
   } else {
     parts.extend(vec![
