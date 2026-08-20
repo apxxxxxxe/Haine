@@ -345,14 +345,18 @@ pub(crate) fn on_story_event(req: &Request) -> Result<Response, ShioriError> {
         return Err(ShioriError::InvalidEvent);
       }
       PendingEvent::UnlockingLoreTalks => {
+        // 解放メッセージの有無を判定するため、トーク生成後にフラグを立てる
+        let s = unlock_lore_talks();
         get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(TalkType::Lore));
         callback();
-        unlock_lore_talks()
+        s
       }
       PendingEvent::UnlockingServantsComments => {
+        // 同上
+        let s = unlock_servents_comments();
         get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(TalkType::Servant));
         callback();
-        unlock_servents_comments()
+        s
       }
       _ => {
         error!("Unexpected pending event: {:?}", hoge);
