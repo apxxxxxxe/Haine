@@ -129,6 +129,7 @@ pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, Shi
     "0skirtup" => zero_skirt_up(req, touch_count),
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
     "2candledoubleclick" => two_candle_double_click(req, touch_count),
+    "2doubleclick" => two_double_click(req, touch_count),
     _ => None,
   };
 
@@ -461,6 +462,13 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
     }
   }
   None
+}
+
+fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+  if let TalkingPlace::LivingRoom(_) = *get_read(&TALKING_PLACE) {
+    return None;
+  }
+  Some(Ok(on_menu_exec(_req)))
 }
 
 pub(crate) fn phased_talks(count: u32, phased_talk_list: Vec<Vec<String>>) -> (Vec<String>, bool) {

@@ -90,6 +90,7 @@ pub(crate) enum TalkType {
   Lore,
   Past,
   Abstract,
+  GuestRoom,
 }
 
 impl Display for TalkType {
@@ -101,6 +102,7 @@ impl Display for TalkType {
       Self::Past => "ハイネの過去についての話題",
       Self::Abstract => "抽象的な話題",
       Self::WithYou => "あなたについての話題",
+      Self::GuestRoom => "ゲストルームでの出来事",
     };
     write!(f, "{}", s)
   }
@@ -186,6 +188,21 @@ impl TalkingPlace {
     }
   }
 
+  pub fn balloon_surface_kero(&self) -> u32 {
+    match self {
+      Self::LivingRoom(is_immersed) => {
+        if *is_immersed {
+          8
+        } else {
+          4
+        }
+      }
+      Self::Conservatory => 6,
+      Self::GuestRoom => 4,
+      Self::Kitchen => 10,
+    }
+  }
+
   pub fn talk_types(&self) -> Vec<TalkType> {
     match self {
       Self::LivingRoom(is_immersed) => {
@@ -201,7 +218,7 @@ impl TalkingPlace {
         }
       }
       Self::Conservatory => vec![],
-      Self::GuestRoom => vec![],
+      Self::GuestRoom => vec![TalkType::GuestRoom],
       Self::Kitchen => vec![],
     }
   }

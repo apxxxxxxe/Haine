@@ -108,15 +108,40 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
 pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
   let mut parts = vec![vec![RESET_BINDS.to_string()]];
 
-  if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
-    parts.push(vec![format!(
-      "\\0\\b[{}]h1111705……。h1111101\\n\
-        ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
-        h1111210……そう、今日はおしまいにするのね。\\n\\n\\1\\b[-1]",
-      TalkingPlace::IMMERSED_LIVING_ROOM.balloon_surface_sakura(),
-      TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura(),
-    )]);
+  match *get_read(&TALKING_PLACE) {
+    TalkingPlace::DEFAULT_LIVING_ROOM => {
+      // 何もしない
+    }
+    TalkingPlace::IMMERSED_LIVING_ROOM => {
+      parts.push(vec![format!(
+        "\\0\\b[{}]h1111705……。h1111101\\n\
+          ……h1111110\\1ハイネはお茶を一口飲んだ。\\0\\b[{}]\\1\\n\
+          h1111210……そう、今日はおしまいにするのね。\\n\\n[half]\\1\\b[-1]",
+        TalkingPlace::IMMERSED_LIVING_ROOM.balloon_surface_sakura(),
+        TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura(),
+      )]);
+    }
+    TalkingPlace::GuestRoom => {
+      parts.push(vec![format!(
+        "\
+          \\1\\b[{}]……体調も落ち着いたので、帰ることを伝えよう。\
+          \\1\\b[{}]\\c\\0h1000000\\c───────────\\_w[1200]\\c\\b[-1]\
+          h1111101\\1『帰ろうと思う』\\n\
+          h1111210\\b[{}]……そう、今日はおしまいにするのね。\\n\\n[half]\\1\\b[-1]\
+          ",
+        TalkingPlace::GuestRoom.balloon_surface_sakura() + 2,
+        TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura(),
+        TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura()
+      )]);
+    }
+    TalkingPlace::Kitchen => {
+      //TODO
+    }
+    TalkingPlace::Conservatory => {
+      //TODO
+    }
   }
+
   if !get_read(&FLAGS).check(&EventFlag::FirstClose) {
     get_write(&FLAGS).done(EventFlag::FirstClose);
     if *get_read(&TALKING_PLACE) == TalkingPlace::DEFAULT_LIVING_ROOM {

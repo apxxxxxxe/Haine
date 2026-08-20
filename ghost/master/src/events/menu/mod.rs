@@ -102,7 +102,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
       format!(
         "\
           \\_l[0,1.5em]\
-          \\![*]\\q[なにか話して,OnAiTalk]\\n\
+          \\![*]\\q[{},OnAiTalk]\\n\
           {}\
           \\![*]\\q[移動する(現在地: {}),OnChangeRooms]\\n\
           \\![*]\\q[トーク統計,OnCheckTalkCollection]\\n\
@@ -116,10 +116,20 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
           \\1{}\
           \\0\\_l[0,0]\
           ",
-        if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
-          "".to_string()
-        } else {
-          "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
+        match *get_read(&TALKING_PLACE) {
+          TalkingPlace::DEFAULT_LIVING_ROOM => "なにか話して",
+          TalkingPlace::IMMERSED_LIVING_ROOM => "ハイネを見る",
+          TalkingPlace::GuestRoom => "考えごとをする",
+          TalkingPlace::Kitchen => "",      // TODO
+          TalkingPlace::Conservatory => "", // TODO
+        },
+        match *get_read(&TALKING_PLACE) {
+          TalkingPlace::IMMERSED_LIVING_ROOM | TalkingPlace::GuestRoom => {
+            "".to_string()
+          }
+          _ => {
+            "\\![*]\\q[話しかける,OnTalk]\\n".to_string()
+          }
         },
         get_read(&TALKING_PLACE),
         halloween_menu,
@@ -295,18 +305,38 @@ pub(crate) fn on_change_rooms_selected(req: &Request) -> Result<Response, Shiori
   let talking_place = check_error!(refs[0].parse::<TalkingPlace>(), ShioriError::ParseRoomError);
   *get_write(&TALKING_PLACE) = talking_place;
   let m = match talking_place {
-    TalkingPlace::GuestRoom => format!(
-      "\
-        h1111101\\1少し調子が悪い……。\\n\
-        『しばらく休みたい』\\n\
-        h1111204わかったわ。h1111210部屋に案内しましょう。\\n\
-        \\1\\c\\0h1000000\\c———————————\\_w[1200]\\c\
-        {}h1111210部屋にあるものは好きに使って。\\n\
-        しばらくしたら、様子を見に来るわ。\\n\
-        h1000000\
-        ",
-      render_room_item()
-    ),
+    TalkingPlace::GuestRoom => {
+      let message = if get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::GuestRoom)) {
+        "".to_string()
+      } else {
+        // 初回はゲストルームトークの開放を通知
+        let achieved_talk_types = [TalkType::GuestRoom];
+        achieved_talk_types.iter().for_each(|t| {
+          get_write(&FLAGS).done(EventFlag::TalkTypeUnlock(*t));
+        });
+        let achievements_messages = achieved_talk_types
+          .iter()
+          .map(|t| render_achievement_message(*t))
+          .collect::<Vec<_>>();
+        achievements_messages.join("\\n")
+      };
+      format!(
+        "\
+          h1111101\\1少し調子が悪い……。\\n\\n[half]\
+          『しばらく休みたい』\\n\
+          h1111104……確かに、顔色が悪いわね。\\n\
+          h1111210部屋に案内しましょう。\\n\
+          \\1\\c\\0h1000000\\c───────────\\_w[1200]\\c\
+          {}h1111210さあ、ベッドに。遠慮しないで。\\n\\n[half]\
+          \\1言われるがまま、ベッドに横になる。\\n\
+          h1111206ここにあるものは好きに使って。\\n\
+          h1111204しばらくしたら、様子を見に来るわ。\\n\
+          h1000000{}\
+          ",
+        render_room_item(),
+        message
+      )
+    }
     _ => format!("{}{}へ移動", render_room_item(), talking_place),
   };
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())

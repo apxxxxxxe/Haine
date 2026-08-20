@@ -9,7 +9,7 @@ use crate::system::variables::{get_read, GHOST_UP_TIME};
 
 use crate::events::talk::{Talk, TalkType};
 
-use super::DerivaliveTalk;
+use super::{DerivaliveTalk, TalkingPlace};
 
 // 私/主: 50代の身綺麗な男
 // 僕/主様: 30代のおとなしい男
@@ -1561,6 +1561,24 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         callback: None,
       },
     ],
+    TalkType::GuestRoom => vec![RandomTalk {
+      id: "部屋の外の音".to_string(),
+      text: format!(
+        "\
+          \\1\\b[{}](───────────………)\\n\\n[half]\
+          幽霊たちは足音を立てない。\\n\
+          それでも、掃除をする音、水を汲む音、\\n\
+          皿を洗う音、食器を運ぶ音……\\n\
+          壁を通してかすかに聞こえる音は、\\n\
+          そこに誰かがいることを思い出させてくれる。\\n\
+          静かな、しかし孤独ではないさざめきの中で、\\n\
+          心が落ち着いていくのを感じた。\\n\
+          ",
+        TalkingPlace::GuestRoom.balloon_surface_kero(),
+      ),
+      required_condition: None,
+      callback: None,
+    }],
   };
 
   let mut talks = Vec::new();
