@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use crate::events::first_boot::{FIRST_BOOT_TALK, FIRST_RANDOMTALKS};
 use crate::events::input::InputId;
 use crate::events::talk::randomtalk::{derivative_talks_per_talk_type, random_talks};
@@ -8,6 +10,7 @@ use crate::system::response::*;
 use crate::system::variables::{get_read, get_write, EventFlag, PendingEvent, FLAGS, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE, TALK_COLLECTION, USER_NAME};
 use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE};
 use num_derive::{FromPrimitive, ToPrimitive};
+use num_traits::FromPrimitive;
 use shiorust::message::{Request, Response};
 
 use super::talk::first_boot::FIRST_CLOSE_TALK;
@@ -17,10 +20,19 @@ pub(crate) mod questions;
 #[derive(Debug, Clone, Copy, FromPrimitive, ToPrimitive)]
 #[repr(u32)]
 enum HalloweenCostumeTrigger {
-  AskToWear = 0,
-  GoatHorn = 1,
-  WitchHat = 2,
-  BlackRedCape = 3,
+  AskToWear,
+  GoatHorn,
+  WitchHat,
+  BlackRedCape,
+}
+
+impl std::str::FromStr for HalloweenCostumeTrigger {
+  type Err = ();
+
+  fn from_str(s: &str) -> Result<Self, Self::Err> {
+    let n = s.parse::<u32>().map_err(|_| ())?;
+    HalloweenCostumeTrigger::from_u32(n).ok_or(())
+  }
 }
 
 pub(crate) fn on_menu_exec(_req: &Request) -> Response {
@@ -150,11 +162,14 @@ pub(crate) fn on_config_menu_exec(_req: &Request) -> Response {
 
 pub(crate) fn on_costume_menu_exec(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
-  let dialog = match check_error!(refs[0].parse::<u32>(), ShioriError::ParseIntError) {
-    x if x == HalloweenCostumeTrigger::AskToWear as u32 => "h1113101着てほしいもの？h1113204また面白いことを考えるのね。".to_string(),
-    x if x == HalloweenCostumeTrigger::GoatHorn as u32 => "h1111210悪魔の象徴。h1111204拐かしてあげましょうか？".to_string(),
-    x if x == HalloweenCostumeTrigger::WitchHat as u32 => "h1111210魔法、ではないけれど、近いことはできるわね。\\n\\n".to_string(),
-    x if x == HalloweenCostumeTrigger::BlackRedCape as u32 => "h1111205吸血鬼かしら。\\nh1111206血は別に好みではないのだけど。\\n\\n".to_string(),
+  let dialog = match check_error!(
+    HalloweenCostumeTrigger::from_str(refs[0]),
+    ShioriError::ParseIntError
+  ) {
+    HalloweenCostumeTrigger::AskToWear => "h1113101着てほしいもの？h1113204また面白いことを考えるのね。".to_string(),
+    HalloweenCostumeTrigger::GoatHorn => "h1111210悪魔の象徴。h1111204拐かしてあげましょうか？".to_string(),
+    HalloweenCostumeTrigger::WitchHat => "h1111210魔法、ではないけれど、近いことはできるわね。\\n\\n".to_string(),
+    HalloweenCostumeTrigger::BlackRedCape => "h1111205吸血鬼かしら。\\nh1111206血は別に好みではないのだけど。\\n\\n".to_string(),
     _ => "".to_string(),
   };
   let m = format!(
