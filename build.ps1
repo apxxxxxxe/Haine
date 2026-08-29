@@ -52,26 +52,25 @@ if (Test-Path $PSScriptRoot\ghost\master\debug) {
   $uniqueid = Get-Content $PSScriptRoot\ghost\master\debug
 }
 
-# ろうそく画像をリサイズしてサーフェス画像としてリネーム
+# ろうそく画像をサーフェス画像としてリネーム
 $prefix = "$PSScriptRoot\shell\master"
-$size = 300
 $surface_number_original = 10000000
 $collision_images = @()
 $collision_image = "$prefix\immersion_candle_collision.png"
 $collision_images += $collision_image
-magick "$prefix\immersion_candle_base.png" -strip -resize ${size}x${size} "$prefix\surface$surface_number_original.png"
+Copy-Item -Force "$prefix\immersion_candle_base.png" "$prefix\surface$surface_number_original.png"
 magick "$prefix\surface$surface_number_original.png" -strip -fill "rgb(0,255,0)" -colorize 100 $collision_image
 for ($i = 1; $i -le 5; $i++) {
   for ($j = 1; $j -le 2; $j++) {
     $surface_number = $surface_number_original + $i + 10 * ($j - 1)
-    magick "$prefix\immersion_candle_fire_${i}_${j}.png" -strip -resize ${size}x${size} "$prefix\surface$surface_number.png"
+    Copy-Item -Force "$prefix\immersion_candle_fire_${i}_${j}.png" "$prefix\surface$surface_number.png"
   }
 }
 
 # 消えるろうそく画像をリサイズしてサーフェス画像としてリネーム
 for ($i = 1; $i -le 5; $i++) {
   $surface_number = $surface_number_original + $i + 100
-  magick "$prefix\immersion_candle_fire_${i}_0.png" -strip -resize ${size}x${size} "$prefix\surface$surface_number.png"
+  Copy-Item -Force "$prefix\immersion_candle_fire_${i}_0.png" "$prefix\surface$surface_number.png"
 }
 
 # $collision_imagesを重ねて出力
