@@ -557,7 +557,8 @@ pub(crate) fn reset_volatile_variables() {
   *get_write(&TOUCH_INFO) = HashMap::new();
   *get_write(&TALKING_PLACE) = TalkingPlace::DEFAULT_LIVING_ROOM;
   *get_write(&LAST_ANCHOR_ID) = None;
-  *get_write(&CANDLES) = [false; IMMERSIVE_ICON_COUNT as usize];
+  *get_write(&CANDLES) = [None; IMMERSIVE_ICON_COUNT as usize];
+  *get_write(&CURRENT_ROOM_SURFACE) = None;
   *get_write(&LAST_SELFTALK_PHRASE) = String::new();
 }
 
@@ -602,7 +603,10 @@ pub(crate) static IMMERSIVE_DEGREES: LazyLock<RwLock<u32>> = LazyLock::new(|| Rw
 pub(crate) static TOUCH_INFO: LazyLock<RwLock<HashMap<String, TouchInfo>>> = LazyLock::new(|| RwLock::new(HashMap::new()));
 pub(crate) static TALKING_PLACE: LazyLock<RwLock<TalkingPlace>> = LazyLock::new(|| RwLock::new(TalkingPlace::DEFAULT_LIVING_ROOM));
 pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> = LazyLock::new(|| RwLock::new(None));
-pub(crate) static CANDLES: LazyLock<RwLock<[bool; IMMERSIVE_ICON_COUNT as usize]>> = LazyLock::new(|| RwLock::new([false; IMMERSIVE_ICON_COUNT as usize]));
+/// 各ろうそくが消えているか。Noneは未初期化(まだ一度もbindを送っていない)
+pub(crate) static CANDLES: LazyLock<RwLock<[Option<bool>; IMMERSIVE_ICON_COUNT as usize]>> = LazyLock::new(|| RwLock::new([None; IMMERSIVE_ICON_COUNT as usize]));
+/// char2に現在表示している部屋のサーフェス。Noneは未設定
+pub(crate) static CURRENT_ROOM_SURFACE: LazyLock<RwLock<Option<u32>>> = LazyLock::new(|| RwLock::new(None));
 
 pub(crate) const IDLE_THRESHOLD: i32 = 60 * 5;
 

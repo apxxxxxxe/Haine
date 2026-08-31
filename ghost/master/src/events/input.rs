@@ -59,10 +59,13 @@ pub(crate) fn on_window_state_restore(_req: &Request) -> Result<Response, Shiori
   // トーク間隔をリセット
   *get_write(&LAST_RANDOM_TALK_TIME) = *get_read(&GHOST_UP_TIME);
 
+  // ウィンドウ復帰時はシェルの状態が分からないので、部屋のサーフェスを送り直させる
+  invalidate_room_surface();
+
   let m = match *get_read(&TALKING_PLACE) {
-    TalkingPlace::LivingRoom(_) => "\\p[2]\\s[10000000]\\0\\s[1111110]h1111204".to_string(),
-    TalkingPlace::GuestRoom => "\\p[2]\\s[10001000]h1000000".to_string(),
-    TalkingPlace::Kitchen => "".to_string(), //TODO
+    TalkingPlace::LivingRoom(_) => format!("{}\\s[1111110]h1111204", render_room_item()),
+    TalkingPlace::GuestRoom => format!("{}h1000000", render_room_item()),
+    TalkingPlace::Kitchen => "".to_string(),      //TODO
     TalkingPlace::Conservatory => "".to_string(), //TODO
   };
 

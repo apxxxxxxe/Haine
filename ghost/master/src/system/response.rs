@@ -557,12 +557,34 @@ pub(crate) fn shake_with_notext() -> String {
     .join("")
 }
 
+/// 居間(燭台)のchar2サーフェス
+const ROOM_SURFACE_CANDLE: u32 = 10000000;
+/// 客間のchar2サーフェス
+const ROOM_SURFACE_GUEST: u32 = 10001000;
+
 pub(crate) fn render_room_item() -> String {
   let current_room = get_read(&TALKING_PLACE);
   match *current_room {
-    TalkingPlace::GuestRoom => "\\p[2]\\s[10001000]".to_string(),
+    TalkingPlace::GuestRoom => format!("\\p[2]{}", render_room_surface(ROOM_SURFACE_GUEST)),
     _ => render_immersive_icon(),
   }
+}
+
+/// char2のサーフェスを切り替えるスクリプトを返す。すでに同じサーフェスなら空文字列。
+/// 同じ番号でも\s[]を送るとサーフェスは表示し直され、
+/// そのときbind中のrunonceアニメーション(ろうそくの煙)が再生されてしまうため
+fn render_room_surface(surface: u32) -> String {
+  let mut current_surface = get_write(&CURRENT_ROOM_SURFACE);
+  if *current_surface == Some(surface) {
+    return String::new();
+  }
+  *current_surface = Some(surface);
+  format!("\\s[{}]", surface)
+}
+
+/// char2のサーフェスを未設定扱いに戻す。次のrender_room_itemで必ず\s[]を送り直す
+pub(crate) fn invalidate_room_surface() {
+  *get_write(&CURRENT_ROOM_SURFACE) = None;
 }
 
 fn render_immersive_icon() -> String {
@@ -575,20 +597,33 @@ fn render_immersive_icon() -> String {
     // 切り捨て
     icon_count_float.floor() as u32
   };
-  let mut candles = *get_write(&CANDLES);
+  let surface_script = render_room_surface(ROOM_SURFACE_CANDLE);
+  // サーフェスを表示し直すときは、bind中のrunonce(煙)が再生されるので全ろうそくのbindを送り直す
+  let redisplaying = !surface_script.is_empty();
+  let mut candles = get_write(&CANDLES);
   let mut v = String::new();
   for i in 1..=IMMERSIVE_ICON_COUNT {
     let blowed = i <= current_icon_count;
+    let previous = candles[i as usize - 1];
+    // 煙を上げるのは、今このタイミングで消えたろうそくだけ
+    let smoking = blowed && previous != Some(true);
+    // 状態が変わらないろうそくにはbindを送らない
+    // (「消え」はrunonceなので、再bindすると消えたままのろうそくから煙が再生される)
+    if !redisplaying && previous == Some(blowed) {
+      continue;
+    }
     v.push_str(&format!(
       "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
       i,
       if blowed { 0 } else { 1 },
       i,
-      if blowed { 1 } else { 0 }
+      if smoking { 1 } else { 0 }
     ));
-    candles[i as usize - 1] = blowed;
+    candles[i as usize - 1] = Some(blowed);
   }
-  format!("\\p[2]\\s[10000000]{}\\0", v)
+  // bindを送ってからサーフェスを表示する:
+  // 表示時にbind中のrunonceが再生されるので、煙を出さないろうそくは先に「消え」のbindを外しておく
+  format!("\\p[2]{}{}\\0", v, surface_script)
 }
 
 #[cfg(test)]
