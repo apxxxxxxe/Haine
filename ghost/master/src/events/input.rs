@@ -5,6 +5,8 @@ use shiorust::message::{Request, Response};
 use std::fmt;
 use std::fmt::{Display, Formatter};
 
+use super::talk::TalkingPlace;
+
 pub(crate) enum InputId {
   UserName,
 }
@@ -57,8 +59,14 @@ pub(crate) fn on_window_state_restore(_req: &Request) -> Result<Response, Shiori
   // トーク間隔をリセット
   *get_write(&LAST_RANDOM_TALK_TIME) = *get_read(&GHOST_UP_TIME);
 
-  new_response_with_value_with_translate(
-    "\\p[2]\\s[10000000]\\0\\s[1111110]h1111204".to_string(),
-    TranslateOption::simple_translate(),
-  )
+  // ウィンドウ復帰時はシェルの状態が分からないので、部屋のサーフェスを送り直させる
+  invalidate_room_surface();
+
+  let m = match *get_read(&TALKING_PLACE) {
+    TalkingPlace::LivingRoom(_) => format!("{}\\s[1111110]h1111204", render_current_room_item()),
+    TalkingPlace::GuestRoom => format!("{}h1000000", render_current_room_item()),
+    TalkingPlace::Kitchen => "".to_string(), //TODO
+  };
+
+  new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }

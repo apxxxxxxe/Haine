@@ -111,7 +111,7 @@ pub(crate) fn new_response_nocontent() -> Response {
 
 pub(crate) fn new_response_with_value_with_notranslate(value: String, option: HashSet<TranslateOption>) -> Response {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
+    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface_sakura())
   } else {
     String::new()
   };
@@ -129,7 +129,7 @@ pub(crate) fn new_response_with_value_with_notranslate(value: String, option: Ha
 
 pub(crate) fn new_response_with_value_with_translate(value: String, option: HashSet<TranslateOption>) -> Result<Response, ShioriError> {
   let balloon_completion = if option.contains(&TranslateOption::CompleteBalloonSurface) {
-    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface())
+    format!("\\b[{}]", get_read(&TALKING_PLACE).balloon_surface_sakura())
   } else {
     String::new()
   };
@@ -557,35 +557,189 @@ pub(crate) fn shake_with_notext() -> String {
     .join("")
 }
 
-pub(crate) fn render_immersive_icon() -> String {
+/// 居間(燭台)のchar2サーフェス
+const ROOM_SURFACE_CANDLE: u32 = 10000000;
+/// 客間のchar2サーフェス
+const ROOM_SURFACE_GUEST: u32 = 10001000;
+
+pub(crate) fn render_current_room_item() -> String {
+  let current_room = get_read(&TALKING_PLACE);
+  render_room_item(&*current_room)
+}
+pub(crate) fn render_room_item(room: &TalkingPlace) -> String {
+  match *room {
+    TalkingPlace::GuestRoom => render_guest_room(),
+    _ => render_immersive_icon(),
+  }
+}
+
+/// 客間のchar2。サーフェスを表示し直すときは、
+/// シェル側に残っているbindと食い違わないようナイトテーブルの状態も送り直す
+fn render_guest_room() -> String {
+  let surface_script = render_room_surface(ROOM_SURFACE_GUEST);
+  if surface_script.is_empty() {
+    return "\\p[2]".to_string();
+  }
+  format!(
+    "\\p[2]{}{}",
+    night_table_bind_script(night_table()),
+    surface_script
+  )
+}
+
+/// descript.txt の char2.bindoption.group と対応する
+const NIGHT_TABLE_GROUP: &str = "nighttable";
+const COOKIE_GROUP: &str = "cookie";
+/// 盆・空カップ・皿・ポット。卓上に一式があるあいだは常に載っている
+const PART_TEASET: &str = "ティーセット";
+/// カップの中身。ティーセットの空カップに重なる
+const PART_TEA: &str = "お茶";
+
+fn bind_flag(enabled: bool) -> u32 {
+  if enabled {
+    1
+  } else {
+    0
+  }
+}
+
+/// ナイトテーブルの卓上を指定の状態にするbind。Noneは一式下げる。
+/// scopeは呼び出し側で\\p[2]にしておくこと
+pub(crate) fn night_table_bind_script(night_table: Option<NightTable>) -> String {
+  format!(
+    "{}{}",
+    teaset_bind_script(night_table.map(|t| t.teaset)),
+    cookies_bind_script(night_table.map_or(CookiesStatus::NoCookies, |t| t.cookies)),
+  )
+}
+
+/// ティーセットのbind。Noneは下げる。
+/// お茶は空カップに重ねる別パーツなので、盆とは独立に指定する
+pub(crate) fn teaset_bind_script(teaset: Option<TeasetStatus>) -> String {
+  format!(
+    "\\![bind,{},{},{}]\\![bind,{},{},{}]",
+    NIGHT_TABLE_GROUP,
+    PART_TEASET,
+    bind_flag(teaset.is_some()),
+    NIGHT_TABLE_GROUP,
+    PART_TEA,
+    bind_flag(teaset == Some(TeasetStatus::PouredCup)),
+  )
+}
+
+/// クッキーのbind。残っている枚数ぶんだけパーツを載せる
+pub(crate) fn cookies_bind_script(cookies: CookiesStatus) -> String {
+  (1..=CookiesStatus::MAX_COUNT)
+    .map(|i| {
+      format!(
+        "\\![bind,{},クッキー{},{}]",
+        COOKIE_GROUP,
+        i,
+        bind_flag(i <= cookies.count())
+      )
+    })
+    .collect()
+}
+
+/// char2のサーフェスを切り替えるスクリプトを返す。すでに同じサーフェスなら空文字列。
+/// 同じ番号でも\s[]を送るとサーフェスは表示し直され、
+/// そのときbind中のrunonceアニメーション(ろうそくの煙)が再生されてしまうため
+fn render_room_surface(surface: u32) -> String {
+  let mut current_surface = get_write(&CURRENT_ROOM_SURFACE);
+  if *current_surface == Some(surface) {
+    return String::new();
+  }
+  *current_surface = Some(surface);
+  format!("\\s[{}]", surface)
+}
+
+/// char2のサーフェスを未設定扱いに戻す。次のrender_room_itemで必ず\s[]を送り直す
+pub(crate) fn invalidate_room_surface() {
+  *get_write(&CURRENT_ROOM_SURFACE) = None;
+}
+
+fn render_immersive_icon() -> String {
   let immersive_degrees = *get_read(&IMMERSIVE_DEGREES);
   let icon_count_float = immersive_degrees as f32 * IMMERSIVE_ICON_COUNT as f32 / IMMERSIVE_RATE_MAX as f32;
-  let current_icon_count = if *get_read(&TALKING_PLACE) == TalkingPlace::Library {
+  let current_icon_count = if *get_read(&TALKING_PLACE) == TalkingPlace::IMMERSED_LIVING_ROOM {
     // 繰り上げ
     icon_count_float.ceil() as u32
   } else {
     // 切り捨て
     icon_count_float.floor() as u32
   };
-  let mut candles = *get_write(&CANDLES);
+  let surface_script = render_room_surface(ROOM_SURFACE_CANDLE);
+  // サーフェスを表示し直すときは、bind中のrunonce(煙)が再生されるので全ろうそくのbindを送り直す
+  let redisplaying = !surface_script.is_empty();
+  let mut candles = get_write(&CANDLES);
   let mut v = String::new();
   for i in 1..=IMMERSIVE_ICON_COUNT {
     let blowed = i <= current_icon_count;
+    let previous = candles[i as usize - 1];
+    // 煙を上げるのは、今このタイミングで消えたろうそくだけ
+    let smoking = blowed && previous != Some(true);
+    // 状態が変わらないろうそくにはbindを送らない
+    // (「消え」はrunonceなので、再bindすると消えたままのろうそくから煙が再生される)
+    if !redisplaying && previous == Some(blowed) {
+      continue;
+    }
     v.push_str(&format!(
       "\\![bind,icon,没入度{},{}]\\![bind,icon,消え{},{}]",
       i,
       if blowed { 0 } else { 1 },
       i,
-      if blowed { 1 } else { 0 }
+      if smoking { 1 } else { 0 }
     ));
-    candles[i as usize - 1] = blowed;
+    candles[i as usize - 1] = Some(blowed);
   }
-  format!("\\p[2]{}\\0", v)
+  // bindを送ってからサーフェスを表示する:
+  // 表示時にbind中のrunonceが再生されるので、煙を出さないろうそくは先に「消え」のbindを外しておく
+  format!("\\p[2]{}{}\\0", v, surface_script)
 }
 
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn test_night_table_bind_script_served() {
+    // 一式が運ばれてきた状態: 盆・お茶・クッキー3枚がすべて載る
+    let result = night_table_bind_script(Some(NightTable::served()));
+    assert_eq!(
+      result,
+      "\\![bind,nighttable,ティーセット,1]\\![bind,nighttable,お茶,1]\\![bind,cookie,クッキー1,1]\\![bind,cookie,クッキー2,1]\\![bind,cookie,クッキー3,1]"
+    );
+  }
+
+  #[test]
+  fn test_night_table_bind_script_empty() {
+    // 卓上に何もない状態: すべてのパーツを外す
+    let result = night_table_bind_script(None);
+    assert_eq!(
+      result,
+      "\\![bind,nighttable,ティーセット,0]\\![bind,nighttable,お茶,0]\\![bind,cookie,クッキー1,0]\\![bind,cookie,クッキー2,0]\\![bind,cookie,クッキー3,0]"
+    );
+  }
+
+  #[test]
+  fn test_teaset_bind_script_drunk() {
+    // 飲み干した後: 盆は残り、お茶だけ外れる
+    let result = teaset_bind_script(Some(TeasetStatus::EmptyCup));
+    assert_eq!(
+      result,
+      "\\![bind,nighttable,ティーセット,1]\\![bind,nighttable,お茶,0]"
+    );
+  }
+
+  #[test]
+  fn test_cookies_bind_script_partially_eaten() {
+    // 1枚食べた状態: 手前から2枚だけ残る
+    let result = cookies_bind_script(CookiesStatus::TwoCookies);
+    assert_eq!(
+      result,
+      "\\![bind,cookie,クッキー1,1]\\![bind,cookie,クッキー2,1]\\![bind,cookie,クッキー3,0]"
+    );
+  }
 
   #[test]
   fn test_generate_bind_script_hidden() {

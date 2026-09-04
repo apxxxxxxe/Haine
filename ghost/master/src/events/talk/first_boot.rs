@@ -456,7 +456,6 @@ pub(crate) static FIRST_RANDOMTALKS: LazyLock<Vec<String>> = LazyLock::new(|| {
 // 話し相手を失いたくない
 // 本音ではハイネはユーザを帰したくない
 pub(crate) static FIRST_CLOSE_TALK: &str = "\
-  h1111201あら、今日はやめるの？h1111204そう。\\n\
   \\n\
   ……ねえ、{user_name}。\\n\
   今日はもう遅いし、泊まっていきなさい。\\n\
