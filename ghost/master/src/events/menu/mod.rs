@@ -7,7 +7,7 @@ use crate::events::TalkType;
 use crate::events::TalkingPlace;
 use crate::system::error::ShioriError;
 use crate::system::response::*;
-use crate::system::variables::{get_read, get_write, EventFlag, PendingEvent, FLAGS, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE, TALK_COLLECTION, USER_NAME};
+use crate::system::variables::{get_read, get_write, EventFlag, PendingEvent, FLAGS, GUEST_ROOM_NIGHT_TABLE, PENDING_EVENT_TALK, RANDOM_TALK_INTERVAL, TALKING_PLACE, TALK_COLLECTION, USER_NAME};
 use crate::{check_error, DERIVATIVE_TALK_REQUESTABLE};
 use num_derive::{FromPrimitive, ToPrimitive};
 use num_traits::FromPrimitive;
@@ -120,8 +120,7 @@ pub(crate) fn on_menu_exec(_req: &Request) -> Response {
           TalkingPlace::DEFAULT_LIVING_ROOM => "なにか話して",
           TalkingPlace::IMMERSED_LIVING_ROOM => "ハイネを見る",
           TalkingPlace::GuestRoom => "考えごとをする",
-          TalkingPlace::Kitchen => "",      // TODO
-          TalkingPlace::Conservatory => "", // TODO
+          TalkingPlace::Kitchen => "", // TODO
         },
         match *get_read(&TALKING_PLACE) {
           TalkingPlace::IMMERSED_LIVING_ROOM | TalkingPlace::GuestRoom => {
@@ -180,7 +179,6 @@ pub(crate) fn on_costume_menu_exec(req: &Request) -> Result<Response, ShioriErro
     HalloweenCostumeTrigger::GoatHorn => "h1111210悪魔の象徴。h1111204拐かしてあげましょうか？".to_string(),
     HalloweenCostumeTrigger::WitchHat => "h1111210魔法、ではないけれど、近いことはできるわね。\\n\\n".to_string(),
     HalloweenCostumeTrigger::BlackRedCape => "h1111205吸血鬼かしら。\\nh1111206血は別に好みではないのだけど。\\n\\n".to_string(),
-    _ => "".to_string(),
   };
   let m = format!(
     "\
@@ -277,7 +275,12 @@ pub(crate) fn on_check_talk_collection(_req: &Request) -> Response {
 pub(crate) fn on_change_rooms(_req: &Request) -> Response {
   let talking_place = get_read(&TALKING_PLACE);
   let mut room_s = "".to_string();
-  for room in TalkingPlace::all() {
+  let rooms = vec![
+    TalkingPlace::DEFAULT_LIVING_ROOM,
+    TalkingPlace::GuestRoom,
+    // TalkingPlace::Kitchen,
+  ];
+  for room in rooms {
     if room == *talking_place {
       room_s.push_str(format!("\\![*]\\_q{}（現在地）\\_q\\n", room).as_str());
     } else {
@@ -303,9 +306,10 @@ pub(crate) fn on_change_rooms(_req: &Request) -> Response {
 pub(crate) fn on_change_rooms_selected(req: &Request) -> Result<Response, ShioriError> {
   let refs = get_references(req);
   let talking_place = check_error!(refs[0].parse::<TalkingPlace>(), ShioriError::ParseRoomError);
+  let current_talking_place = *get_read(&TALKING_PLACE);
   *get_write(&TALKING_PLACE) = talking_place;
-  let m = match talking_place {
-    TalkingPlace::GuestRoom => {
+  let m = match (current_talking_place, talking_place) {
+    (TalkingPlace::LivingRoom(_), TalkingPlace::GuestRoom) => {
       let message = if get_read(&FLAGS).check(&EventFlag::TalkTypeUnlock(TalkType::GuestRoom)) {
         "".to_string()
       } else {
@@ -320,24 +324,44 @@ pub(crate) fn on_change_rooms_selected(req: &Request) -> Result<Response, Shiori
           .collect::<Vec<_>>();
         achievements_messages.join("\\n")
       };
+      // 客間に入るときは卓上を空にする(render_room_itemがこの状態をbindで送る)
+      *get_write(&GUEST_ROOM_NIGHT_TABLE) = None;
       format!(
         "\
-          h1111101\\1少し調子が悪い……。\\n\\n[half]\
-          『しばらく休みたい』\\n\
-          h1111104……確かに、顔色が悪いわね。\\n\
+          h1111101\\1『しばらく休みたい』\\n\
+          h1111104確かに、顔色が悪いわね。\\n\
           h1111210部屋に案内しましょう。\\n\
           \\1\\c\\0h1000000\\c───────────\\_w[1200]\\c\
           {}h1111210さあ、ベッドに。遠慮しないで。\\n\\n[half]\
           \\1言われるがまま、ベッドに横になる。\\n\
           h1111206ここにあるものは好きに使って。\\n\
-          h1111204しばらくしたら、様子を見に来るわ。\\n\
+          h1111204お茶は持ってこさせるから、少し待っていてね。\\n\
           h1000000{}\
           ",
-        render_room_item(),
+        render_room_item(&TalkingPlace::GuestRoom),
         message
       )
     }
-    _ => format!("{}{}へ移動", render_room_item(), talking_place),
+    (TalkingPlace::GuestRoom, TalkingPlace::LivingRoom(_)) => {
+      // 部屋を出るとき、卓上の一式は従者が下げる
+      *get_write(&GUEST_ROOM_NIGHT_TABLE) = None;
+      format!(
+        "\
+          {}\\1……調子が戻ってきた。そろそろ戻ろう。\\n\
+          立ち上がろうとすると、\\n\
+          ティーセットがふわりと浮き、静かに運ばれていった\\p[2]{}\\1。\\n\
+          \\1\\c\\0h1000000\\c───────────\\_w[1200]\\c\
+          h1111105\\1(カチャ)\\n\\n[half]\
+          h1111201\\b[{}]あら、お帰りなさい。\\n\
+          ……h1111204うん、顔色もよくなったわね。\\n\
+          ",
+        render_room_item(&TalkingPlace::GuestRoom),
+        night_table_bind_script(None),
+        TalkingPlace::DEFAULT_LIVING_ROOM.balloon_surface_sakura(),
+      )
+    }
+    (TalkingPlace::Kitchen, _) | (_, TalkingPlace::Kitchen) => unreachable!(), // TODO
+    (TalkingPlace::LivingRoom(_), TalkingPlace::LivingRoom(_)) | (TalkingPlace::GuestRoom, TalkingPlace::GuestRoom) => unreachable!(),
   };
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())
 }

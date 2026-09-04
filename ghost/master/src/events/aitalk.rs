@@ -94,10 +94,19 @@ pub(crate) fn on_ai_talk(_req: &Request) -> Result<Response, ShioriError> {
     *get_write(&IMMERSIVE_DEGREES) = new_rate.min(IMMERSIVE_RATE_MAX);
   }
 
+  // 客間にハイネはいない。何かの拍子に姿が残っていた場合に備えて消しておく
+  // (すでに非表示なら generate_bind_script が \\0 だけを返すので実質無害)
+  let hide_haine = if *get_read(&TALKING_PLACE) == TalkingPlace::GuestRoom {
+    "h1000000"
+  } else {
+    ""
+  };
+
   new_response_with_value_with_translate(
     format!(
-      "\\0{}\\![set,balloonnum,{}]{}",
-      render_room_item(),
+      "{}\\0{}\\![set,balloonnum,{}]{}",
+      hide_haine,
+      render_current_room_item(),
       comment,
       render_talk(&choosed_talk),
     ),

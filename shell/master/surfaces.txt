@@ -650,4 +650,32 @@ surface10000000 {
 
 // ナイトテーブル
 surface10001000 {
+	// ティーセット
+  animation501201.interval,bind+runonce
+  animation501201.pattern0,overlay,10001001,0,0,0
+
+	// ポット
+  animation501202.interval,bind+runonce
+  animation501202.pattern0,overlay,10001002,0,0,0
+
+  // お茶
+  animation501210.interval,bind+runonce
+  animation501210.pattern0,overlay,10001010,0,0,0
+
+	// クッキー1
+  animation501211.interval,bind+runonce
+  animation501211.pattern0,overlay,10001011,0,0,0
+  animation501211.collisionex21,cookie,region,collision_cookie1.png,255,0,0
+
+	// クッキー2
+  animation501212.interval,bind+runonce
+  animation501212.pattern0,overlay,10001012,0,0,0
+  animation501212.collisionex22,cookie,region,collision_cookie2.png,255,0,0
+
+	// クッキー3
+  animation501213.interval,bind+runonce
+  animation501213.pattern0,overlay,10001013,0,0,0
+  animation501213.collisionex23,cookie,region,collision_cookie3.png,255,0,0
+
+  collisionex20,nighttable,region,collision_nighttable.png,255,0,0
 }

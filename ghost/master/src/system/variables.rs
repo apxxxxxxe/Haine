@@ -559,6 +559,7 @@ pub(crate) fn reset_volatile_variables() {
   *get_write(&LAST_ANCHOR_ID) = None;
   *get_write(&CANDLES) = [None; IMMERSIVE_ICON_COUNT as usize];
   *get_write(&CURRENT_ROOM_SURFACE) = None;
+  *get_write(&GUEST_ROOM_NIGHT_TABLE) = None;
   *get_write(&LAST_SELFTALK_PHRASE) = String::new();
 }
 
@@ -607,8 +608,102 @@ pub(crate) static LAST_ANCHOR_ID: LazyLock<RwLock<Option<String>>> = LazyLock::n
 pub(crate) static CANDLES: LazyLock<RwLock<[Option<bool>; IMMERSIVE_ICON_COUNT as usize]>> = LazyLock::new(|| RwLock::new([None; IMMERSIVE_ICON_COUNT as usize]));
 /// char2に現在表示している部屋のサーフェス。Noneは未設定
 pub(crate) static CURRENT_ROOM_SURFACE: LazyLock<RwLock<Option<u32>>> = LazyLock::new(|| RwLock::new(None));
+/// 客間のナイトテーブルの上。Noneは卓上に何もない状態。
+/// この変数が状態の真であり、シェルへのbindはここから組み立てる
+/// (OnDressupChangedを逆パースして追随するのではなく、こちらから送る)
+pub(crate) static GUEST_ROOM_NIGHT_TABLE: LazyLock<RwLock<Option<NightTable>>> = LazyLock::new(|| RwLock::new(None));
 
 pub(crate) const IDLE_THRESHOLD: i32 = 60 * 5;
+
+/// ナイトテーブルに載っている給仕一式。
+/// 一式で運ばれ一式で下げられるので、ティーセットとクッキーの有無は常に一致する
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) struct NightTable {
+  pub teaset: TeasetStatus,
+  pub cookies: CookiesStatus,
+  pub pot: PotStatus,
+}
+
+impl NightTable {
+  /// 従者が運んできた直後の状態
+  pub fn served() -> Self {
+    Self {
+      teaset: TeasetStatus::PouredCup,
+      cookies: CookiesStatus::ThreeCookies,
+      pot: PotStatus::TwoServings,
+    }
+  }
+}
+
+/// ナイトテーブルの現在の状態
+pub(crate) fn night_table() -> Option<NightTable> {
+  *get_read(&GUEST_ROOM_NIGHT_TABLE)
+}
+
+/// 卓上に一式があるときだけ、その一部を書き換える。何もないときは何もしない
+pub(crate) fn update_night_table(f: impl FnOnce(&mut NightTable)) {
+  if let Some(t) = get_write(&GUEST_ROOM_NIGHT_TABLE).as_mut() {
+    f(t);
+  }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum TeasetStatus {
+  PouredCup,
+  EmptyCup,
+}
+
+/// ポットに残っている注ぎ足しの回数。見た目は変わらないのでbindには出ない
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum PotStatus {
+  TwoServings,
+  OneServing,
+  Empty,
+}
+
+impl PotStatus {
+  /// 一杯注いだ後の状態。もう残っていないときはNone
+  pub fn poured(&self) -> Option<Self> {
+    match self {
+      Self::TwoServings => Some(Self::OneServing),
+      Self::OneServing => Some(Self::Empty),
+      Self::Empty => None,
+    }
+  }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum CookiesStatus {
+  ThreeCookies,
+  TwoCookies,
+  OneCookie,
+  NoCookies,
+}
+
+impl CookiesStatus {
+  /// 皿に載りうる最大枚数
+  pub const MAX_COUNT: u32 = 3;
+
+  /// 皿に残っている枚数
+  pub fn count(&self) -> u32 {
+    match self {
+      Self::ThreeCookies => 3,
+      Self::TwoCookies => 2,
+      Self::OneCookie => 1,
+      Self::NoCookies => 0,
+    }
+  }
+
+  /// 一枚食べた後の状態。もう残っていないときはNone
+  pub fn eaten(&self) -> Option<Self> {
+    match self {
+      Self::ThreeCookies => Some(Self::TwoCookies),
+      Self::TwoCookies => Some(Self::OneCookie),
+      Self::OneCookie => Some(Self::NoCookies),
+      Self::NoCookies => None,
+    }
+  }
+}
 
 #[derive(Clone)]
 pub(crate) struct TouchInfo {

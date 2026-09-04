@@ -268,6 +268,16 @@ char2.bindgroup500303.name,icon,消え3
 char2.bindgroup500304.name,icon,消え4
 char2.bindgroup500305.name,icon,消え5
 
+char2.bindoption.group,nighttable,multiple
+char2.bindgroup501201.name,nighttable,ティーセット
+char2.bindgroup501201.addid,501202
+char2.bindgroup501210.name,nighttable,お茶
+
+char2.bindoption.group,cookie,multiple
+char2.bindgroup501211.name,cookie,クッキー1
+char2.bindgroup501212.name,cookie,クッキー2
+char2.bindgroup501213.name,cookie,クッキー3
+
 char2.menu,hidden
 
 sakura.menuitemex1,頭,300001

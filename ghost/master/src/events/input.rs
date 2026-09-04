@@ -63,10 +63,9 @@ pub(crate) fn on_window_state_restore(_req: &Request) -> Result<Response, Shiori
   invalidate_room_surface();
 
   let m = match *get_read(&TALKING_PLACE) {
-    TalkingPlace::LivingRoom(_) => format!("{}\\s[1111110]h1111204", render_room_item()),
-    TalkingPlace::GuestRoom => format!("{}h1000000", render_room_item()),
-    TalkingPlace::Kitchen => "".to_string(),      //TODO
-    TalkingPlace::Conservatory => "".to_string(), //TODO
+    TalkingPlace::LivingRoom(_) => format!("{}\\s[1111110]h1111204", render_current_room_item()),
+    TalkingPlace::GuestRoom => format!("{}h1000000", render_current_room_item()),
+    TalkingPlace::Kitchen => "".to_string(), //TODO
   };
 
   new_response_with_value_with_translate(m, TranslateOption::simple_translate())

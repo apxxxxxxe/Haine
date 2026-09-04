@@ -121,7 +121,6 @@ impl TalkType {
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum TalkingPlace {
   LivingRoom(bool), // boolは没入モードか否か
-  Conservatory,
   GuestRoom,
   Kitchen,
 }
@@ -136,7 +135,6 @@ impl Display for TalkingPlace {
           "居間"
         }
       }
-      Self::Conservatory => "温室",
       Self::GuestRoom => "ゲストルーム",
       Self::Kitchen => "キッチン",
     };
@@ -151,7 +149,6 @@ impl std::str::FromStr for TalkingPlace {
     match s {
       "居間" => Ok(Self::DEFAULT_LIVING_ROOM),
       "書斎" => Ok(Self::IMMERSED_LIVING_ROOM),
-      "温室" => Ok(Self::Conservatory),
       "ゲストルーム" => Ok(Self::GuestRoom),
       "キッチン" => Ok(Self::Kitchen),
       _ => Err(format!("不明な部屋名: {}", s)),
@@ -163,16 +160,6 @@ impl TalkingPlace {
   pub(crate) const DEFAULT_LIVING_ROOM: Self = Self::LivingRoom(false);
   pub(crate) const IMMERSED_LIVING_ROOM: Self = Self::LivingRoom(true);
 
-  pub fn all() -> Vec<Self> {
-    vec![
-      Self::DEFAULT_LIVING_ROOM,
-      Self::IMMERSED_LIVING_ROOM,
-      Self::Conservatory,
-      Self::GuestRoom,
-      Self::Kitchen,
-    ]
-  }
-
   pub fn balloon_surface_sakura(&self) -> u32 {
     match self {
       Self::LivingRoom(is_immersed) => {
@@ -182,7 +169,6 @@ impl TalkingPlace {
           0
         }
       }
-      Self::Conservatory => 4,
       Self::GuestRoom => 8,
       Self::Kitchen => 8,
     }
@@ -197,7 +183,6 @@ impl TalkingPlace {
           4
         }
       }
-      Self::Conservatory => 6,
       Self::GuestRoom => 4,
       Self::Kitchen => 10,
     }
@@ -217,7 +202,6 @@ impl TalkingPlace {
           ]
         }
       }
-      Self::Conservatory => vec![],
       Self::GuestRoom => vec![TalkType::GuestRoom],
       Self::Kitchen => vec![],
     }

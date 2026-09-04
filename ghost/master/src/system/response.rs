@@ -562,12 +562,83 @@ const ROOM_SURFACE_CANDLE: u32 = 10000000;
 /// 客間のchar2サーフェス
 const ROOM_SURFACE_GUEST: u32 = 10001000;
 
-pub(crate) fn render_room_item() -> String {
+pub(crate) fn render_current_room_item() -> String {
   let current_room = get_read(&TALKING_PLACE);
-  match *current_room {
-    TalkingPlace::GuestRoom => format!("\\p[2]{}", render_room_surface(ROOM_SURFACE_GUEST)),
+  render_room_item(&*current_room)
+}
+pub(crate) fn render_room_item(room: &TalkingPlace) -> String {
+  match *room {
+    TalkingPlace::GuestRoom => render_guest_room(),
     _ => render_immersive_icon(),
   }
+}
+
+/// 客間のchar2。サーフェスを表示し直すときは、
+/// シェル側に残っているbindと食い違わないようナイトテーブルの状態も送り直す
+fn render_guest_room() -> String {
+  let surface_script = render_room_surface(ROOM_SURFACE_GUEST);
+  if surface_script.is_empty() {
+    return "\\p[2]".to_string();
+  }
+  format!(
+    "\\p[2]{}{}",
+    night_table_bind_script(night_table()),
+    surface_script
+  )
+}
+
+/// descript.txt の char2.bindoption.group と対応する
+const NIGHT_TABLE_GROUP: &str = "nighttable";
+const COOKIE_GROUP: &str = "cookie";
+/// 盆・空カップ・皿・ポット。卓上に一式があるあいだは常に載っている
+const PART_TEASET: &str = "ティーセット";
+/// カップの中身。ティーセットの空カップに重なる
+const PART_TEA: &str = "お茶";
+
+fn bind_flag(enabled: bool) -> u32 {
+  if enabled {
+    1
+  } else {
+    0
+  }
+}
+
+/// ナイトテーブルの卓上を指定の状態にするbind。Noneは一式下げる。
+/// scopeは呼び出し側で\\p[2]にしておくこと
+pub(crate) fn night_table_bind_script(night_table: Option<NightTable>) -> String {
+  format!(
+    "{}{}",
+    teaset_bind_script(night_table.map(|t| t.teaset)),
+    cookies_bind_script(night_table.map_or(CookiesStatus::NoCookies, |t| t.cookies)),
+  )
+}
+
+/// ティーセットのbind。Noneは下げる。
+/// お茶は空カップに重ねる別パーツなので、盆とは独立に指定する
+pub(crate) fn teaset_bind_script(teaset: Option<TeasetStatus>) -> String {
+  format!(
+    "\\![bind,{},{},{}]\\![bind,{},{},{}]",
+    NIGHT_TABLE_GROUP,
+    PART_TEASET,
+    bind_flag(teaset.is_some()),
+    NIGHT_TABLE_GROUP,
+    PART_TEA,
+    bind_flag(teaset == Some(TeasetStatus::PouredCup)),
+  )
+}
+
+/// クッキーのbind。残っている枚数ぶんだけパーツを載せる
+pub(crate) fn cookies_bind_script(cookies: CookiesStatus) -> String {
+  (1..=CookiesStatus::MAX_COUNT)
+    .map(|i| {
+      format!(
+        "\\![bind,{},クッキー{},{}]",
+        COOKIE_GROUP,
+        i,
+        bind_flag(i <= cookies.count())
+      )
+    })
+    .collect()
 }
 
 /// char2のサーフェスを切り替えるスクリプトを返す。すでに同じサーフェスなら空文字列。
@@ -629,6 +700,46 @@ fn render_immersive_icon() -> String {
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn test_night_table_bind_script_served() {
+    // 一式が運ばれてきた状態: 盆・お茶・クッキー3枚がすべて載る
+    let result = night_table_bind_script(Some(NightTable::served()));
+    assert_eq!(
+      result,
+      "\\![bind,nighttable,ティーセット,1]\\![bind,nighttable,お茶,1]\\![bind,cookie,クッキー1,1]\\![bind,cookie,クッキー2,1]\\![bind,cookie,クッキー3,1]"
+    );
+  }
+
+  #[test]
+  fn test_night_table_bind_script_empty() {
+    // 卓上に何もない状態: すべてのパーツを外す
+    let result = night_table_bind_script(None);
+    assert_eq!(
+      result,
+      "\\![bind,nighttable,ティーセット,0]\\![bind,nighttable,お茶,0]\\![bind,cookie,クッキー1,0]\\![bind,cookie,クッキー2,0]\\![bind,cookie,クッキー3,0]"
+    );
+  }
+
+  #[test]
+  fn test_teaset_bind_script_drunk() {
+    // 飲み干した後: 盆は残り、お茶だけ外れる
+    let result = teaset_bind_script(Some(TeasetStatus::EmptyCup));
+    assert_eq!(
+      result,
+      "\\![bind,nighttable,ティーセット,1]\\![bind,nighttable,お茶,0]"
+    );
+  }
+
+  #[test]
+  fn test_cookies_bind_script_partially_eaten() {
+    // 1枚食べた状態: 手前から2枚だけ残る
+    let result = cookies_bind_script(CookiesStatus::TwoCookies);
+    assert_eq!(
+      result,
+      "\\![bind,cookie,クッキー1,1]\\![bind,cookie,クッキー2,1]\\![bind,cookie,クッキー3,0]"
+    );
+  }
 
   #[test]
   fn test_generate_bind_script_hidden() {

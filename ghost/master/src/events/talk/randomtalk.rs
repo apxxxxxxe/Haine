@@ -1,11 +1,13 @@
 use crate::get_write;
+use crate::system::response::{night_table_bind_script, teaset_bind_script};
+use crate::system::variables::{night_table, update_night_table, NightTable, PotStatus, TeasetStatus};
 use crate::system::windows::get_local_time;
 use crate::LAST_SELFTALK_PHRASE;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use std::collections::HashMap;
 
-use crate::system::variables::{get_read, GHOST_UP_TIME};
+use crate::system::variables::{get_read, GHOST_UP_TIME, GUEST_ROOM_NIGHT_TABLE};
 
 use crate::events::talk::{Talk, TalkType};
 
@@ -1561,24 +1563,164 @@ pub(crate) fn random_talks(talk_type: TalkType) -> Option<Vec<Talk>> {
         callback: None,
       },
     ],
-    TalkType::GuestRoom => vec![RandomTalk {
-      id: "部屋の外の音".to_string(),
-      text: format!(
-        "\
-          \\1\\b[{}](───────────………)\\n\\n[half]\
-          幽霊たちは足音を立てない。\\n\
-          それでも、掃除をする音、水を汲む音、\\n\
-          皿を洗う音、食器を運ぶ音……\\n\
-          壁を通してかすかに聞こえる音は、\\n\
-          そこに誰かがいることを思い出させてくれる。\\n\
-          静かな、しかし孤独ではないさざめきの中で、\\n\
-          心が落ち着いていくのを感じた。\\n\
-          ",
-        TalkingPlace::GuestRoom.balloon_surface_kero(),
-      ),
-      required_condition: None,
-      callback: None,
-    }],
+    TalkType::GuestRoom => vec![
+      RandomTalk {
+        id: "部屋の外の音".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}](───────────………)\\n\\n[half]\
+            幽霊たちは足音を立てない。\\n\
+            それでも、掃除をする音、水を汲む音、\\n\
+            皿を洗う音、食器を運ぶ音……\\n\
+            壁を通してかすかに聞こえる音は、\\n\
+            そこに誰かがいることを思い出させてくれる。\\n\
+            静かな、しかし孤独ではないさざめきの中で、\\n\
+            心が落ち着いていくのを感じた。\\n\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+        ),
+        required_condition: None,
+        callback: None,
+      },
+      RandomTalk {
+        id: "ティーセットを持ってきてもらった".to_string(),
+        text: format!(
+          "\
+            \\0\\b[{}](コンコン)\\n\\n[half]\
+            \\1！\\n\\n[half]\
+            \\0(ガチャ)\\n\
+            \\1誰かが入ってきた。従者の人だ。\\n\
+            \\p[2]{}\\1音もなく、ティーセットが置かれた。\\n\
+            飲め、ということだろう。\\n\
+            ……今は食欲がない。後でいただこう……。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_sakura(),
+          night_table_bind_script(Some(NightTable::served())),
+        ),
+        required_condition: Some(|| night_table().is_none()),
+        callback: Some(|| *get_write(&GUEST_ROOM_NIGHT_TABLE) = Some(NightTable::served())),
+      },
+      RandomTalk {
+        id: "お茶を飲む".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]運んでもらったお茶を飲む。\\n\
+            \\1……カモミールだ。\\n\\n[half]\
+            \\p[2]{}\\1…………少し身体が温まった気がする。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+          teaset_bind_script(Some(TeasetStatus::EmptyCup)),
+        ),
+        // ポットが手つかずのうちは、運ばれてきた一杯目
+        required_condition: Some(|| night_table().is_some_and(|t| t.teaset == TeasetStatus::PouredCup && t.pot == PotStatus::TwoServings)),
+        callback: Some(|| update_night_table(|t| t.teaset = TeasetStatus::EmptyCup)),
+      },
+      RandomTalk {
+        id: "注いだお茶を飲む".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]注ぎ足したお茶を飲む。\\n\
+            \\1……一杯目より、少し濃い。\\n\\n[half]\
+            \\p[2]{}\\1…………それでも、身体は温かいままだ。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+          teaset_bind_script(Some(TeasetStatus::EmptyCup)),
+        ),
+        // 一度注いだ後の二杯目
+        required_condition: Some(|| night_table().is_some_and(|t| t.teaset == TeasetStatus::PouredCup && t.pot == PotStatus::OneServing)),
+        callback: Some(|| update_night_table(|t| t.teaset = TeasetStatus::EmptyCup)),
+      },
+      RandomTalk {
+        id: "最後のお茶を飲む".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]三杯目を飲みきる。\\n\
+            \\1……最後のほうは、すっかりぬるくなっていた。\\n\\n[half]\
+            \\p[2]{}\\1……これで飲み干してしまった。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+          teaset_bind_script(Some(TeasetStatus::EmptyCup)),
+        ),
+        // ポットを空にして注いだ三杯目
+        required_condition: Some(|| night_table().is_some_and(|t| t.teaset == TeasetStatus::PouredCup && t.pot == PotStatus::Empty)),
+        callback: Some(|| update_night_table(|t| t.teaset = TeasetStatus::EmptyCup)),
+      },
+      RandomTalk {
+        id: "ポットからお茶を注ぐ".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]空になったカップを持て余す。\\n\\n[half]\
+            ポットを持ち上げてみると、まだずしりと重い。\\n\\n[half]\
+            \\p[2]{}\\1……もう一杯、いただこう。\\n\
+            注ぐ音が、静かな部屋によく響いた。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+          teaset_bind_script(Some(TeasetStatus::PouredCup)),
+        ),
+        required_condition: Some(|| night_table().is_some_and(|t| t.teaset == TeasetStatus::EmptyCup && t.pot == PotStatus::TwoServings)),
+        callback: Some(|| {
+          update_night_table(|t| {
+            t.teaset = TeasetStatus::PouredCup;
+            if let Some(next) = t.pot.poured() {
+              t.pot = next;
+            }
+          })
+        }),
+      },
+      RandomTalk {
+        id: "ポットのお茶を注ぎきる".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]二杯目も飲みきってしまった。\\n\\n[half]\
+            ポットを傾けると、落ちてくるお茶は細く、\\n\
+            途切れがちだ。\\n\\n[half]\
+            \\p[2]{}\\1……これで最後らしい。\\n\
+            空になったポットは、驚くほど軽かった。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+          teaset_bind_script(Some(TeasetStatus::PouredCup)),
+        ),
+        required_condition: Some(|| night_table().is_some_and(|t| t.teaset == TeasetStatus::EmptyCup && t.pot == PotStatus::OneServing)),
+        callback: Some(|| {
+          update_night_table(|t| {
+            t.teaset = TeasetStatus::PouredCup;
+            if let Some(next) = t.pot.poured() {
+              t.pot = next;
+            }
+          })
+        }),
+      },
+      RandomTalk {
+        id: "ベッドの寝心地".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]……掛け布団を頭まで被ると、ほっとする。\\n\
+            肌に触れる布の感触は乾いていて暖かい。\\n\\n[half]\
+            ハイネは常に部屋の用意はあると言っていたが、\\n\
+            毎日シーツを干しているのだろうか。\\n\\n[half]\
+            まさかそんなことはないだろうと思いつつも、\\n\
+            清潔な心地良さを少しの間楽しんだ。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+        ),
+        required_condition: None,
+        callback: None,
+      },
+      RandomTalk {
+        id: "服にしわが寄る".to_string(),
+        text: format!(
+          "\
+            \\1\\b[{}]……服にしわが寄らないだろうかと、ふと思った。\\n\
+            好きな格好だが、手入れが面倒なものばかりだ。\\n\\n[half]\
+            でも、億劫だ。身体はずしりと重い。\\n\
+            ……ここでは、怠惰も許される気がした。\
+            ",
+          TalkingPlace::GuestRoom.balloon_surface_kero(),
+        ),
+        required_condition: None,
+        callback: None,
+      },
+    ],
   };
 
   let mut talks = Vec::new();

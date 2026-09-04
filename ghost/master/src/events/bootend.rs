@@ -42,7 +42,7 @@ pub(crate) fn on_boot(_req: &Request) -> Result<Response, ShioriError> {
     event_talk
   } else {
     let talks = all_combo(&vec![
-      vec![render_room_item()],
+      vec![render_current_room_item()],
       vec!["h1113105\\1今日も、霧が濃い。".to_string()],
       vec![format!(
         "\
@@ -135,9 +135,6 @@ pub(crate) fn on_close(_req: &Request) -> Result<Response, ShioriError> {
       )]);
     }
     TalkingPlace::Kitchen => {
-      //TODO
-    }
-    TalkingPlace::Conservatory => {
       //TODO
     }
   }

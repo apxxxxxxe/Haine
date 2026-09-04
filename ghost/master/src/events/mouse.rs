@@ -2,7 +2,6 @@ use crate::check_error;
 use crate::events::first_boot::FIRST_RANDOMTALKS;
 use crate::events::menu::on_menu_exec;
 use crate::events::on_ai_talk;
-use crate::events::render_room_item;
 use crate::events::TalkingPlace;
 use crate::events::IMMERSIVE_ICON_COUNT;
 use crate::events::IMMERSIVE_RATE_MAX;
@@ -10,7 +9,8 @@ use crate::system::error::ShioriError;
 use crate::system::response::*;
 use crate::system::status::Status;
 use crate::system::variables::{
-  get_read, get_write, EventFlag, TouchInfo, CHAIN_TALK_STATE, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES, LAST_TOUCH_INFO, LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX, TALKING_PLACE, TOUCH_INFO,
+  get_read, get_write, night_table, update_night_table, CookiesStatus, EventFlag, TouchInfo, CHAIN_TALK_STATE, FIRST_SEXIAL_TOUCH, FLAGS, GHOST_UP_TIME, IMMERSIVE_DEGREES, LAST_TOUCH_INFO,
+  LIBRARY_TRANSITION_SEQUENSE_DIALOG_INDEX, TALKING_PLACE, TOUCH_INFO,
 };
 use shiorust::message::{Parser, Request, Response};
 use std::sync::LazyLock;
@@ -79,7 +79,7 @@ fn common_choice_process(dialogs: Vec<String>) -> Result<Response, ShioriError> 
     format!(
       "{}{}{}",
       REMOVE_BALLOON_NUM,
-      render_room_item(),
+      render_current_room_item(),
       dialogs[index].clone()
     ),
     TranslateOption::with_shadow_completion(),
@@ -130,6 +130,8 @@ pub(crate) fn mouse_dialogs(req: &Request, info: String) -> Result<Response, Shi
     "0shoulderdown" => zero_shoulder_down(req, touch_count),
     "2candledoubleclick" => two_candle_double_click(req, touch_count),
     "2doubleclick" => two_double_click(req, touch_count),
+    "2cookiedoubleclick" => two_cookie_double_click(req, touch_count),
+    "2nighttabledoubleclick" => two_night_table_double_click(req, touch_count),
     _ => None,
   };
 
@@ -299,7 +301,7 @@ fn check_chain_talk(info: &str) -> Option<Result<Response, ShioriError>> {
         format!(
           "{}{}{}",
           REMOVE_BALLOON_NUM,
-          render_room_item(),
+          render_current_room_item(),
           chain.chain_text,
         ),
         TranslateOption::with_shadow_completion(),
@@ -414,7 +416,7 @@ fn blow_candle_fire() -> Option<Result<Response, ShioriError>> {
           "\\_v[{}]\\0{}{}\\p[2]{}{}{}",
           SOUND_BLOW_CANDLE,
           render_shadow(true),
-          render_room_item(),
+          render_current_room_item(),
           shake_with_notext(),
           dialog,
           system_message,
@@ -453,7 +455,7 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
           "\\_v[{}]\\0{}{}\\p[2]{}{}",
           SOUND_LIGHT_CANDLE,
           render_shadow(true),
-          render_room_item(),
+          render_current_room_item(),
           shake_with_notext(),
           m
         ),
@@ -462,6 +464,48 @@ fn light_candle_fire() -> Option<Result<Response, ShioriError>> {
     }
   }
   None
+}
+
+fn two_cookie_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+  // クッキーが無いときは当たり判定ごと消えているのでここには来ない
+  let remaining = night_table()?.cookies.eaten()?;
+  update_night_table(|t| t.cookies = remaining);
+
+  let dialog = match remaining {
+    CookiesStatus::TwoCookies => "一枚食べる。\\n……素朴な味だ。",
+    CookiesStatus::OneCookie => "もう一枚もらう。……ジャムクッキーだが、\\nやはり甘さは控えめで上品な感じがする。",
+    CookiesStatus::NoCookies => "最後の一枚を食べた。ビターなチョコクッキーだ。\\n……ごちそうさま。",
+    // eatenは3枚を返さないので到達しないが、皿の枚数が増えたときのために安全側に倒す
+    CookiesStatus::ThreeCookies => return Some(Ok(new_response_nocontent())),
+  };
+
+  Some(new_response_with_value_with_translate(
+    format!(
+      "{}{}\\p[2]{}\\1\\b[{}]{}",
+      REMOVE_BALLOON_NUM,
+      render_current_room_item(),
+      cookies_bind_script(remaining),
+      TalkingPlace::GuestRoom.balloon_surface_kero(),
+      dialog,
+    ),
+    TranslateOption::with_shadow_completion(),
+  ))
+}
+
+fn two_night_table_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
+  let dialogs = vec![
+    vec![format!(
+      "{}{}\\1\\b[{}]",
+      REMOVE_BALLOON_NUM,
+      render_current_room_item(),
+      TalkingPlace::GuestRoom.balloon_surface_kero(),
+    )],
+    vec![
+      "年季の入ったテーブルだがよく磨かれており、\\n細かな傷はむしろ年月の重みを感じさせる。".to_string(),
+      "引き出しを開けたが、空っぽだった。".to_string(),
+    ],
+  ];
+  Some(common_choice_process(all_combo(&dialogs)))
 }
 
 fn two_double_click(_req: &Request, _count: u32) -> Option<Result<Response, ShioriError>> {
