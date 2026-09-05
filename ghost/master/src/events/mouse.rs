@@ -501,7 +501,7 @@ fn two_night_table_double_click(_req: &Request, _count: u32) -> Option<Result<Re
       TalkingPlace::GuestRoom.balloon_surface_kero(),
     )],
     vec![
-      "年季の入ったテーブルだがよく磨かれており、\\n細かな傷はむしろ年月の重みを感じさせる。".to_string(),
+      "古いベッドテーブルだがよく磨かれており、\\n細かな傷はむしろ年月の重みを感じさせる。".to_string(),
       "引き出しを開けたが、空っぽだった。".to_string(),
     ],
   ];
